@@ -68,6 +68,18 @@ npm install --production
 npm start
 ```
 
+**Expected Output**:
+```
+🚀 OKR Management System - Production (CommonJS)
+✅ Environment variables loaded from .env file
+🔌 Using Neon serverless connection
+📧 Email service initialized
+🔒 API rate limiting enabled for production
+🔒 RLS middleware enabled for production
+✅ Server started successfully
+📡 Port: 5000
+```
+
 ## Production Features
 
 ### Automatic Database Seeding

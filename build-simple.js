@@ -86,9 +86,73 @@ process.on('SIGINT', () => {
 });
 `;
 
-  // Create both .js and .cjs files for compatibility
+  // Create ES module version (.js)
   writeFileSync('dist/index.js', serverScript, { mode: 0o755 });
-  writeFileSync('dist/index.cjs', serverScript, { mode: 0o755 });
+  
+  // Create CommonJS version (.cjs)
+  const cjsScript = `#!/usr/bin/env node
+
+// Production server for deployment (CommonJS)
+const { spawn } = require('child_process');
+const path = require('path');
+const fs = require('fs');
+
+console.log('🚀 OKR Management System - Production (CommonJS)');
+console.log('🌍 Environment:', process.env.NODE_ENV || 'production');
+console.log('📡 Host: 0.0.0.0');
+console.log('📡 Port:', process.env.PORT || 5000);
+console.log('📍 Working directory:', process.cwd());
+console.log('📍 Server path will be:', path.resolve(__dirname, '..', 'server', 'index.ts'));
+
+// Load environment variables for production if .env exists
+try {
+  require('dotenv').config();
+  console.log('✅ Environment variables loaded from .env file');
+} catch (error) {
+  console.log('📍 Using system environment variables (no .env file)');
+}
+
+// Ensure production environment
+process.env.NODE_ENV = 'production';
+
+// Launch server using tsx
+const serverPath = path.resolve(__dirname, '..', 'server', 'index.ts');
+
+console.log('⚡ Starting server at:', serverPath);
+
+// Verify server file exists
+if (!fs.existsSync(serverPath)) {
+  console.error('❌ Server file not found:', serverPath);
+  process.exit(1);
+}
+
+const server = spawn('npx', ['tsx', serverPath], {
+  stdio: 'inherit',
+  env: {
+    ...process.env,
+    NODE_ENV: 'production'
+  },
+  cwd: path.resolve(__dirname, '..')
+});
+
+server.on('error', (err) => {
+  console.error('❌ Server error:', err.message);
+  process.exit(1);
+});
+
+// Handle shutdown signals
+process.on('SIGTERM', () => {
+  console.log('Received SIGTERM, shutting down...');
+  server.kill('SIGTERM');
+});
+
+process.on('SIGINT', () => {
+  console.log('Received SIGINT, shutting down...');
+  server.kill('SIGINT');
+});
+`;
+
+  writeFileSync('dist/index.cjs', cjsScript, { mode: 0o755 });
   console.log('✅ Server bundle created successfully');
 
   console.log('🌐 Creating production frontend...');
