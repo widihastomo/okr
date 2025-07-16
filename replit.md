@@ -283,6 +283,13 @@ The system includes comprehensive database connection troubleshooting tools:
 
 ## Changelog
 ```
+- July 16, 2025. **CHECK-IN MODAL ORGANIZATION ID ERROR FIXED** - Successfully resolved check-in functionality and gamification issues:
+  * FIXED: Added useAuth hook to check-in modal for proper user authentication
+  * ADDED: organizationId parameter to check-in API request from user session
+  * ENHANCED: Backend endpoint with requireAuth middleware and organizationId validation
+  * FIXED: Gamification service organizationId parameter to prevent activity_logs constraint error
+  * IMPROVED: Enhanced cache invalidation for immediate OKR card refresh after check-in
+  * RESULT: Check-in system now works correctly with proper multi-tenant security and UI refresh
 - July 16, 2025. **BUILD SEEDER DATABASE ERROR FIXED** - Successfully resolved billing periods database constraint error:
   * FIXED: Updated billing periods creation to use correct schema fields (periodType, periodMonths)
   * CORRECTED: Changed from incorrect fields (period, duration) to match database schema

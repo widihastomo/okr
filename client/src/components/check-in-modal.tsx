@@ -103,9 +103,11 @@ export function CheckInModal({
         className: "border-green-200 bg-green-50 text-green-800",
       });
       
-      // Invalidate general lists first
+      // Invalidate all related queries for immediate refresh
       queryClient.invalidateQueries({ queryKey: ["/api/goals"] });
       queryClient.invalidateQueries({ queryKey: ["/api/objectives"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/okrs"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/key-results"] });
       
       // Invalidate specific key result data
       queryClient.invalidateQueries({
@@ -131,6 +133,11 @@ export function CheckInModal({
         queryClient.invalidateQueries({ 
           queryKey: [`/api/tasks/objective/${response.objectiveId}`] 
         });
+        
+        // Invalidate OKR hierarchy data
+        queryClient.invalidateQueries({ 
+          queryKey: [`/api/okrs-with-hierarchy`] 
+        });
       }
       
       // Force refetch all Goal-related queries with invalidateQueries using refetchType: 'active'
@@ -138,7 +145,9 @@ export function CheckInModal({
         predicate: (query) => {
           const queryKey = query.queryKey[0] as string;
           return queryKey?.includes('/api/goals/') || 
-                 queryKey?.includes('/api/objectives/');
+                 queryKey?.includes('/api/objectives/') ||
+                 queryKey?.includes('/api/okrs') ||
+                 queryKey?.includes('/api/key-results');
         },
         refetchType: 'active'
       });

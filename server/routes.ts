@@ -2747,7 +2747,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           "key_result",
           keyResultId,
           10, // 10 points for check-in
-          { value: req.body.value, notes: req.body.notes }
+          { value: req.body.value, notes: req.body.notes },
+          req.body.organizationId
         );
       } catch (gamificationError) {
         console.error("Error awarding points for check-in:", gamificationError);

@@ -6,6 +6,7 @@ import {
   userStats,
   levelRewards,
   activityLogs,
+  users,
   type Achievement,
   type UserStats,
   type UserAchievement,
@@ -71,11 +72,22 @@ export class GamificationService {
     entityType: string,
     entityId: string,
     points: number,
-    metadata?: any
+    metadata?: any,
+    organizationId?: string
   ): Promise<void> {
+    // Get organizationId from user if not provided
+    if (!organizationId) {
+      const [userRecord] = await db
+        .select({ organizationId: users.organizationId })
+        .from(users)
+        .where(eq(users.id, userId));
+      organizationId = userRecord?.organizationId;
+    }
+
     // Create activity log
     await db.insert(activityLogs).values({
       userId,
+      organizationId,
       action,
       entityType,
       entityId,
