@@ -2297,7 +2297,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           currentValue: krData.keyResultType === "achieve_or_not" ? (krData.currentValue || "") : (krData.currentValue === "" ? "0" : krData.currentValue),
           // Handle empty assignedTo field - convert empty string to null
           assignedTo: krData.assignedTo === "" ? null : krData.assignedTo,
-          createdBy: currentUser.id // Add created_by field
+          createdBy: currentUser.id, // Add created_by field
+          organizationId: currentUser.organizationId // Add organization_id field
         };
         const keyResult = await storage.createKeyResult(processedKrData);
         keyResults.push(keyResult);
@@ -2399,7 +2400,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
               targetValue: krData.targetValue,
               // Ensure numeric fields have proper defaults
               currentValue: krData.currentValue === "" ? "0" : krData.currentValue || "0",
-              createdBy: currentUser.id // Add created_by field for new key results
+              createdBy: currentUser.id, // Add created_by field for new key results
+              organizationId: currentUser.organizationId // Add organization_id field
             });
             keyResults.push(created);
           }
