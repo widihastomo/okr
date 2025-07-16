@@ -641,12 +641,12 @@ export default function UpgradePackage() {
         )}
       </div>
 
-      {/* Subscription Plans */}
+      {/* Subscription Plans Section */}
       {!paymentSuccess && (
-        <div className="space-y-6">
+        <div className="space-y-8">
           <div className="text-center space-y-2">
-            <h2 className="text-xl font-semibold text-gray-900">Pilih Paket Berlangganan</h2>
-            <p className="text-sm text-gray-600">Upgrade paket untuk mendapatkan fitur unlimited</p>
+            <h2 className="text-2xl font-semibold text-gray-900">Upgrade Paket</h2>
+            <p className="text-lg text-gray-600">Tingkatkan paket berlangganan untuk fitur unlimited</p>
           </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -737,6 +737,66 @@ export default function UpgradePackage() {
         </div>
       )}
 
+      {/* Add-ons Section */}
+      {!paymentSuccess && (
+        <div className="space-y-8">
+          <div className="text-center space-y-2">
+            <h2 className="text-2xl font-semibold text-gray-900">Beli Add-on</h2>
+            <p className="text-lg text-gray-600">Tingkatkan pengalaman dengan fitur-fitur tambahan</p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {availableAddOns.map((addOn) => (
+              <Card 
+                key={addOn.id} 
+                className="cursor-pointer transition-all border-2 hover:border-orange-300 hover:shadow-lg"
+              >
+                <CardHeader className="pb-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className="p-2 bg-orange-100 rounded-full">
+                        {addOn.icon}
+                      </div>
+                      <CardTitle className="text-lg">{addOn.name}</CardTitle>
+                    </div>
+                    <Badge variant="secondary" className="bg-orange-100 text-orange-800">
+                      {addOn.category}
+                    </Badge>
+                  </div>
+                </CardHeader>
+                
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <p className="text-sm text-gray-600">{addOn.description}</p>
+                    <div className="text-2xl font-bold text-orange-600">
+                      +{formatPrice(addOn.price)}
+                      <span className="text-sm font-normal text-gray-600">
+                        {addOn.allowQuantity ? "/pengguna" : ""}/bulan
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="pt-2">
+                    <Button 
+                      variant="default"
+                      className="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white font-medium"
+                      onClick={() => {
+                        setSelectedAddOns(new Set([addOn.id]));
+                        setAddOnQuantities(addOn.allowQuantity ? { [addOn.id]: 1 } : {});
+                        setShowPaymentModal(true);
+                      }}
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Beli Add-on
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Payment Modal */}
       <Dialog open={showPaymentModal} onOpenChange={setShowPaymentModal}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -746,15 +806,18 @@ export default function UpgradePackage() {
                 <CreditCard className="w-6 h-6 text-orange-600" />
               </div>
               <span className="bg-gradient-to-r from-orange-600 to-orange-500 bg-clip-text text-transparent">
-                Pilih Paket Pembayaran
+                {selectedPlan ? "Pilih Paket Pembayaran" : "Pilih Add-on"}
               </span>
             </DialogTitle>
             <DialogDescription className="text-gray-600">
-              Pilih periode pembayaran yang sesuai dengan kebutuhan Anda
+              {selectedPlan 
+                ? "Pilih periode pembayaran yang sesuai dengan kebutuhan Anda"
+                : "Konfigurasi add-on yang akan dibeli"
+              }
             </DialogDescription>
           </DialogHeader>
 
-          {selectedPlan && (
+          {selectedPlan ? (
             <div className="space-y-6">
               {/* Selected Plan Info */}
               <Card className="border-orange-200 bg-gradient-to-r from-orange-50 to-amber-50">
@@ -1050,6 +1113,161 @@ export default function UpgradePackage() {
                   </CardContent>
                 </Card>
               )}
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {/* Add-on Only Selection */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-900 flex items-center space-x-2">
+                  <Plus className="w-5 h-5 text-orange-500" />
+                  <span>Konfigurasi Add-on</span>
+                </h3>
+                
+                <div className="space-y-4">
+                  {Array.from(selectedAddOns).map(addOnId => {
+                    const addOn = availableAddOns.find(a => a.id === addOnId);
+                    if (!addOn) return null;
+                    
+                    return (
+                      <Card key={addOn.id} className="border-orange-200 bg-gradient-to-r from-orange-50 to-amber-50">
+                        <CardContent className="p-6">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-4">
+                              <div className="p-3 bg-orange-100 rounded-full">
+                                {addOn.icon}
+                              </div>
+                              <div>
+                                <h4 className="text-xl font-semibold text-gray-900">{addOn.name}</h4>
+                                <p className="text-gray-600">{addOn.description}</p>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-2xl font-bold text-orange-600">
+                                +{formatPrice(addOn.price)}
+                                <span className="text-sm font-normal text-gray-600">
+                                  {addOn.allowQuantity ? "/pengguna" : ""}/bulan
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {/* Quantity Controls for Add-on */}
+                          {addOn.allowQuantity && (
+                            <div className="mt-4 pt-4 border-t border-orange-200">
+                              <div className="flex items-center justify-between">
+                                <span className="text-sm font-medium text-gray-700">Jumlah pengguna:</span>
+                                <div className="flex items-center space-x-2">
+                                  <button
+                                    onClick={() => updateAddOnQuantity(addOn.id, (addOnQuantities[addOn.id] || 1) - 1)}
+                                    className="w-8 h-8 rounded-full bg-orange-200 hover:bg-orange-300 flex items-center justify-center transition-colors"
+                                    disabled={(addOnQuantities[addOn.id] || 1) <= (addOn.minQuantity || 1)}
+                                  >
+                                    <Minus className="w-4 h-4" />
+                                  </button>
+                                  <span className="w-8 text-center font-medium">
+                                    {addOnQuantities[addOn.id] || 1}
+                                  </span>
+                                  <button
+                                    onClick={() => updateAddOnQuantity(addOn.id, (addOnQuantities[addOn.id] || 1) + 1)}
+                                    className="w-8 h-8 rounded-full bg-orange-200 hover:bg-orange-300 flex items-center justify-center transition-colors"
+                                    disabled={(addOnQuantities[addOn.id] || 1) >= (addOn.maxQuantity || 50)}
+                                  >
+                                    <Plus className="w-4 h-4" />
+                                  </button>
+                                </div>
+                              </div>
+                              <div className="mt-2 text-right text-lg font-semibold text-orange-600">
+                                Subtotal: {formatPrice((parseFloat(addOn.price) * (addOnQuantities[addOn.id] || 1)).toString())}/bulan
+                              </div>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              </div>
+              
+              {/* Add-on Order Summary */}
+              <Card className="border-2 border-orange-200 bg-gradient-to-r from-orange-50 to-amber-50">
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2 text-orange-900">
+                    <Sparkles className="w-5 h-5" />
+                    <span>Ringkasan Pesanan Add-on</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-3">
+                    {Array.from(selectedAddOns).map(addOnId => {
+                      const addOn = availableAddOns.find(a => a.id === addOnId);
+                      if (!addOn) return null;
+                      
+                      const quantity = addOn.allowQuantity ? (addOnQuantities[addOnId] || 1) : 1;
+                      const subtotal = parseFloat(addOn.price) * quantity;
+                      
+                      return (
+                        <div key={addOn.id} className="flex justify-between items-center">
+                          <span className="text-gray-700">
+                            {addOn.name}
+                            {addOn.allowQuantity && ` (${quantity}x)`}
+                          </span>
+                          <span className="font-medium text-gray-900">
+                            +{formatPrice(subtotal.toString())}/bulan
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  
+                  <Separator />
+                  
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center text-xl font-semibold">
+                      <span className="text-gray-900">Total Add-on:</span>
+                      <span className="text-orange-600">{formatPrice(getSelectedAddOnsTotal().toString())}/bulan</span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex space-x-3 pt-4">
+                    <Button 
+                      variant="outline"
+                      onClick={() => {
+                        setShowPaymentModal(false);
+                        setSelectedPlanId("");
+                        setSelectedBillingPeriodId("");
+                        setSelectedAddOns(new Set());
+                        setAddOnQuantities({});
+                        setIsProcessing(false);
+                      }}
+                      className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50"
+                    >
+                      <X className="w-4 h-4 mr-2" />
+                      Batal
+                    </Button>
+                    <Button 
+                      onClick={handleUpgrade}
+                      disabled={isProcessing || createUpgradePayment.isPending}
+                      className="flex-1 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white shadow-lg"
+                    >
+                      {isProcessing || createUpgradePayment.isPending ? (
+                        <>
+                          <Clock className="w-4 h-4 mr-2 animate-spin" />
+                          Memproses...
+                        </>
+                      ) : (
+                        <>
+                          <ArrowRight className="w-4 h-4 mr-2" />
+                          Beli Add-on
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                  
+                  <div className="text-xs text-gray-500 text-center pt-2">
+                    🔒 Pembayaran aman dan terenkripsi melalui Midtrans
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           )}
         </DialogContent>
