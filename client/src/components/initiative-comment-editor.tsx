@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { User } from "@shared/schema";
 import { Bold, Italic, Underline, Link, AtSign, Send } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 interface InitiativeCommentEditorProps {
   initiativeId: string;
@@ -46,6 +47,7 @@ export function InitiativeCommentEditor({
   const editorRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { user } = useAuth();
 
   // Set initial content when initialContent prop changes
   useEffect(() => {
@@ -62,7 +64,11 @@ export function InitiativeCommentEditor({
 
   const createCommentMutation = useMutation({
     mutationFn: async (commentData: { content: string; mentionedUsers: string[]; parentId?: string }) => {
-      const response = await apiRequest("POST", `/api/initiatives/${initiativeId}/comments`, commentData);
+      const payload = {
+        ...commentData,
+        organizationId: user?.organizationId,
+      };
+      const response = await apiRequest("POST", `/api/initiatives/${initiativeId}/comments`, payload);
       return response.json();
     },
     onSuccess: () => {

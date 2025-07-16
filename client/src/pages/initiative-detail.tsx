@@ -1502,7 +1502,7 @@ export default function InitiativeDetailPage() {
                                 </Link>
                               </div>
                               <div className="text-xs text-gray-600 mt-1">
-                                {task.assignedTo ? getUserName(task.assignedTo) : "Belum diassign"} • {task.dueDate ? formatDate(task.dueDate) : "Belum diatur"}
+                                {task.dueDate ? formatDate(task.dueDate) : "Belum diatur"}
                               </div>
                             </div>
                             <div className="flex items-center gap-2">
