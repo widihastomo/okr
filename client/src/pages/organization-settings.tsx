@@ -682,20 +682,63 @@ export default function OrganizationSettings() {
               {subscription && (
                 <div className="space-y-4">
                   <div className="flex items-center justify-between p-4 border rounded-lg">
-                    <div>
+                    <div className="flex-1">
                       <h3 className="font-semibold text-lg">{subscription.plan.name}</h3>
                       <p className="text-gray-600">
                         Rp {parseInt(subscription.plan.price).toLocaleString("id-ID")}/bulan
                       </p>
-                      <Badge className="mt-2" variant="default">
-                        {subscription.status === "active" ? "Aktif" : "Tidak Aktif"}
-                      </Badge>
+                      <div className="flex items-center gap-2 mt-2">
+                        <Badge variant="default">
+                          {subscription.status === "active" ? "Aktif" : "Tidak Aktif"}
+                        </Badge>
+                        {subscription.isTrialActive && (
+                          <Badge variant="outline" className="text-orange-600 border-orange-200">
+                            Trial - {subscription.daysRemaining} hari tersisa
+                          </Badge>
+                        )}
+                      </div>
                     </div>
                     <div className="text-right">
                       <p className="text-sm text-gray-600">Maksimal pengguna</p>
                       <p className="text-2xl font-bold">
                         {subscription.plan.maxUsers || "Unlimited"}
                       </p>
+                    </div>
+                  </div>
+                  
+                  {/* Subscription Expiration Info */}
+                  <div className="p-4 bg-gray-50 rounded-lg">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">Masa Aktif Langganan</p>
+                        <p className="text-sm text-gray-600">
+                          {subscription.isTrialActive ? 'Trial berakhir' : 'Langganan berakhir'} pada:
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-semibold text-gray-900">
+                          {subscription.isTrialActive && subscription.trialEndsAt
+                            ? new Date(subscription.trialEndsAt).toLocaleDateString('id-ID', { 
+                                day: 'numeric', 
+                                month: 'long', 
+                                year: 'numeric' 
+                              })
+                            : subscription.currentPeriodEnd
+                            ? new Date(subscription.currentPeriodEnd).toLocaleDateString('id-ID', { 
+                                day: 'numeric', 
+                                month: 'long', 
+                                year: 'numeric' 
+                              })
+                            : 'Tidak tersedia'
+                          }
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {subscription.isTrialActive ? 
+                            `${subscription.daysRemaining || 0} hari tersisa` : 
+                            `${Math.ceil((new Date(subscription.currentPeriodEnd).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))} hari tersisa`
+                          }
+                        </p>
+                      </div>
                     </div>
                   </div>
                   <div className="flex justify-between">
