@@ -19,6 +19,7 @@ import {
   Calendar,
   Clock
 } from "lucide-react";
+import { TimelineIcon } from "@/components/ui/timeline-icon";
 
 interface TimelineItem {
   id: string;
@@ -260,7 +261,7 @@ export default function TimelinePage() {
         <div className="mb-6">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center space-x-2">
-              <Sparkles className="w-6 h-6 text-orange-600" />
+              <TimelineIcon size="md" variant="primary" />
               <h1 className="text-2xl font-bold text-gray-900">Timeline</h1>
             </div>
             <DailyCheckInButton />
@@ -290,7 +291,7 @@ export default function TimelinePage() {
                           </p>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <Clock className="w-4 h-4 text-gray-500" />
+                          <TimelineIcon size="sm" variant="muted" />
                           <span className="text-sm text-gray-500">
                             {new Date(item.createdAt).toLocaleString('id-ID', {
                               day: 'numeric',
@@ -306,7 +307,7 @@ export default function TimelinePage() {
 
                   <div className="mt-4">
                     <div className="flex items-center space-x-2 mb-2">
-                      <Target className="w-4 h-4 text-blue-600" />
+                      <TimelineIcon size="sm" variant="secondary" />
                       <span className="text-sm font-medium text-gray-700">
                         {item.keyResult?.title}
                       </span>
@@ -413,7 +414,7 @@ export default function TimelinePage() {
         ) : (
           <Card className="text-center py-12">
             <CardContent>
-              <Users className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+              <TimelineIcon size="lg" variant="muted" className="w-16 h-16 mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-gray-900 mb-2">
                 Belum ada progress yang dilaporkan
               </h3>
