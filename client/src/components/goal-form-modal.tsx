@@ -196,6 +196,7 @@ export default function GoalFormModal({ goal, open, onOpenChange }: ObjectiveFor
   const [currentStep, setCurrentStep] = useState(1);
   const [keyResultModalOpen, setKeyResultModalOpen] = useState(false);
   const [editingKeyResultIndex, setEditingKeyResultIndex] = useState<number | null>(null);
+  const { user } = useAuth();
   const isEditMode = !!goal;
 
   // Fetch data yang diperlukan
@@ -233,9 +234,9 @@ export default function GoalFormModal({ goal, open, onOpenChange }: ObjectiveFor
       objective: {
         title: "",
         description: "",
-        owner: "",
+        owner: user?.email || "",
         ownerType: "user",
-        ownerId: "",
+        ownerId: user?.id || "",
         status: "in_progress",
         cycleId: findClosestCycle(cycles || []),
         teamId: undefined,
@@ -281,9 +282,9 @@ export default function GoalFormModal({ goal, open, onOpenChange }: ObjectiveFor
           objective: {
             title: "",
             description: "",
-            owner: "",
+            owner: user?.email || "",
             ownerType: "user",
-            ownerId: "",
+            ownerId: user?.id || "",
             status: "not_started",
             cycleId: closestCycleId,
             teamId: undefined,
@@ -293,7 +294,7 @@ export default function GoalFormModal({ goal, open, onOpenChange }: ObjectiveFor
         });
       }
     }
-  }, [open, goal, isEditMode, form, cycles]);
+  }, [open, goal, isEditMode, form, cycles, user?.id]);
 
 
 
@@ -725,6 +726,7 @@ export default function GoalFormModal({ goal, open, onOpenChange }: ObjectiveFor
                               onValueChange={field.onChange}
                               placeholder="Pilih pemilik"
                               emptyMessage="Tidak ada user ditemukan"
+                              currentUser={user}
                             />
                           </FormControl>
                         )}
