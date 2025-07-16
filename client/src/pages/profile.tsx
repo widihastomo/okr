@@ -49,7 +49,7 @@ export default function Profile() {
       // Reload page after successful update
       setTimeout(() => {
         window.location.reload();
-      }, 1000);
+      }, 500);
     },
     onError: (error) => {
       toast({
