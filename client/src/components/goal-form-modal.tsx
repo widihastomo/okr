@@ -25,6 +25,29 @@ import { SearchableUserSelect } from "@/components/ui/searchable-user-select";
 import { formatNumberWithSeparator, handleNumberInputChange, getNumberValueForSubmission } from "@/lib/number-utils";
 import type { GoalWithKeyResults, Cycle, User, Objective, Team } from "@shared/schema";
 
+// Helper function to get user name with fallback
+const getUserName = (user: User): string => {
+  if (user.name?.trim()) {
+    return user.name.trim();
+  }
+  // Fallback to email username
+  return user.email?.split('@')[0] || 'Unknown';
+};
+
+// Helper function to get user initials
+const getUserInitials = (user: User): string => {
+  if (user.name?.trim()) {
+    const names = user.name.trim().split(' ');
+    if (names.length >= 2) {
+      return `${names[0][0]}${names[names.length - 1][0]}`.toUpperCase();
+    }
+    return names[0][0].toUpperCase();
+  }
+  // Fallback to email username
+  const email = user.email?.split('@')[0] || 'U';
+  return email[0].toUpperCase();
+};
+
 // Unit options for Key Results
 const unitOptions = [
   "Rp", // Rupiah (currency)
@@ -878,11 +901,11 @@ export default function GoalFormModal({ goal, open, onOpenChange }: ObjectiveFor
                                     <div className="flex items-center justify-center gap-2">
                                       <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center">
                                         <span className="text-xs font-medium text-blue-600">
-                                          {users?.find(u => u.id === keyResult.assignedTo)?.firstName?.charAt(0) || '?'}
+                                          {users?.find(u => u.id === keyResult.assignedTo) ? getUserInitials(users.find(u => u.id === keyResult.assignedTo)!) : '?'}
                                         </span>
                                       </div>
                                       <span className="text-sm text-gray-600 truncate max-w-20">
-                                        {users?.find(u => u.id === keyResult.assignedTo)?.firstName || 'Unknown'}
+                                        {users?.find(u => u.id === keyResult.assignedTo) ? getUserName(users.find(u => u.id === keyResult.assignedTo)!) : 'Unknown'}
                                       </span>
                                     </div>
                                   ) : (
@@ -1066,11 +1089,11 @@ export default function GoalFormModal({ goal, open, onOpenChange }: ObjectiveFor
                                   <div className="flex items-center gap-1">
                                     <div className="w-4 h-4 rounded-full bg-blue-100 flex items-center justify-center">
                                       <span className="text-xs font-medium text-blue-600">
-                                        {users?.find(u => u.id === keyResult.assignedTo)?.firstName?.charAt(0) || '?'}
+                                        {users?.find(u => u.id === keyResult.assignedTo) ? getUserInitials(users.find(u => u.id === keyResult.assignedTo)!) : '?'}
                                       </span>
                                     </div>
                                     <span className="text-xs font-semibold text-gray-700">
-                                      {users?.find(u => u.id === keyResult.assignedTo)?.firstName || 'Unknown'}
+                                      {users?.find(u => u.id === keyResult.assignedTo) ? getUserName(users.find(u => u.id === keyResult.assignedTo)!) : 'Unknown'}
                                     </span>
                                   </div>
                                 ) : (
