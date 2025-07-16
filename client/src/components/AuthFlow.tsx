@@ -344,7 +344,7 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
       case "register":
         return {
           title: "Daftar Organisasi Baru",
-          description: "Mulai kelola objective dan angka target tim Anda",
+          description: "Ubah tujuan menjadi aksi nyata yang terukur",
           showBackButton: true,
         };
       case "email-verification":
@@ -776,7 +776,7 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
               <Button
                 type="submit"
                 disabled={forgotPasswordMutation.isPending}
-                className="w-full h-11 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-medium"
+                className="w-full h-11 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white font-medium"
               >
                 {forgotPasswordMutation.isPending ? (
                   <>
@@ -862,7 +862,7 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
               <Button
                 type="submit"
                 disabled={resetPasswordMutation.isPending}
-                className="w-full h-11 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-medium"
+                className="w-full h-11 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white font-medium"
               >
                 {resetPasswordMutation.isPending ? (
                   <>
@@ -882,12 +882,12 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
       case "reset-success":
         return (
           <div className="space-y-6 text-center">
-            <div className="mx-auto w-16 h-16 bg-gradient-to-r from-green-600 to-green-500 rounded-full flex items-center justify-center mb-4">
+            <div className="mx-auto w-16 h-16 bg-gradient-to-r from-orange-600 to-orange-500 rounded-full flex items-center justify-center mb-4">
               <CheckCircle className="h-8 w-8 text-white" />
             </div>
             
             <div className="space-y-2">
-              <h3 className="text-lg font-semibold text-green-600">Password Berhasil Direset!</h3>
+              <h3 className="text-lg font-semibold text-orange-600">Password Berhasil Direset!</h3>
               <p className="text-gray-600">
                 Password Anda telah berhasil direset. Silakan login dengan password baru Anda.
               </p>
@@ -895,7 +895,7 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
             
             <Button
               onClick={() => navigateToStep("login")}
-              className="w-full bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white font-medium h-11"
+              className="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white font-medium h-11"
             >
               <ArrowRight className="h-4 w-4 mr-2" />
               Lanjut ke Login
