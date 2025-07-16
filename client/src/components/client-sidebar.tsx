@@ -254,15 +254,15 @@ export default function Sidebar({
                   <Link href={item.path}>
                     <button
                       className={cn(
-                        "flex items-center rounded-lg text-sm font-medium transition-colors w-full text-left",
+                        "flex items-center text-sm font-medium transition-colors w-full text-left",
                         item.active
                           ? "bg-gradient-to-r from-orange-600 to-orange-500 text-white"
                           : "text-gray-700 hover:bg-gray-100",
                         // Desktop: collapsed = center, expanded = space between
                         // Mobile: always space between (show labels)
                         isCollapsed
-                          ? "lg:px-4 lg:py-3 lg:justify-center px-4 py-3 space-x-4"
-                          : "px-4 py-3 space-x-4",
+                          ? "lg:w-12 lg:h-12 lg:rounded-full lg:justify-center px-4 py-3 rounded-lg space-x-4"
+                          : "px-4 py-3 space-x-4 rounded-lg",
                       )}
                       onClick={() => {
                         // Only close sidebar on mobile, don't affect desktop collapsed state
@@ -318,7 +318,7 @@ export default function Sidebar({
                     <Link href="/profile">
                       <button
                         className={cn(
-                          "flex items-center justify-center px-4 py-3 rounded-lg text-sm font-medium transition-colors w-full",
+                          "flex items-center justify-center w-12 h-12 rounded-full text-sm font-medium transition-colors",
                           location === "/profile"
                             ? "bg-gradient-to-r from-orange-600 to-orange-500 text-white"
                             : "text-gray-700 hover:bg-gray-100",
