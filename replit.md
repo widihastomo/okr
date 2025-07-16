@@ -283,12 +283,14 @@ The system includes comprehensive database connection troubleshooting tools:
 
 ## Changelog
 ```
-- July 16, 2025. **MEMBER ACCESS TO USER LIST IMPLEMENTATION** - Successfully enabled member role access to view organization user lists:
-  * UPDATED: /api/organization/users endpoint to allow members, administrators, and owners to view user lists
-  * ENHANCED: client-sidebar.tsx and app-sidebar.tsx to show "Kelola Pengguna" menu item for members
-  * UPDATED: client-user-management.tsx to allow members to access user management page for viewing
-  * MAINTAINED: Management capabilities (invite, edit, delete) remain restricted to owners only
-  * RESULT: Members can now view organization user lists while maintaining security for management operations
+- July 16, 2025. **MEMBER ROLE VIEW-ONLY ACCESS IMPLEMENTATION** - Successfully implemented view-only access for members in user management:
+  * RESTRICTED: Hidden "Undang Pengguna" button for members - only owners can invite new users
+  * RESTRICTED: Hidden user action dropdown menus for members - only owners can edit/delete/toggle user status
+  * RESTRICTED: Hidden "Tambah Tim" button for members - only owners can create new teams
+  * RESTRICTED: Hidden team action dropdown menus for members - only owners can edit/delete teams
+  * UPDATED: Page descriptions to show "Lihat" vs "Kelola" based on user role
+  * MAINTAINED: Members can still view all users and teams but cannot perform management actions
+  * RESULT: Complete role-based access control - members have view-only access while owners have full management capabilities
 - July 16, 2025. **REACT ROUTER NAVIGATION MIGRATION** - Successfully migrated all navigation from window.location to React Router:
   * UPDATED: Upgrade package role-based access control to use setLocation('/') instead of window.location.assign('/')
   * UPDATED: Delete objective functionality to use setLocation('/') instead of window.location.href = '/'

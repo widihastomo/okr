@@ -551,72 +551,74 @@ export default function ClientUserManagement() {
                 <div>
                   <CardTitle>Pengguna Organisasi</CardTitle>
                   <CardDescription>
-                    Kelola pengguna dalam organisasi Anda ({filteredUsers.length} pengguna)
+                    {isOwner ? 'Kelola' : 'Lihat'} pengguna dalam organisasi Anda ({filteredUsers.length} pengguna)
                   </CardDescription>
                 </div>
-                <Dialog open={showInviteModal} onOpenChange={setShowInviteModal}>
-                  <DialogTrigger asChild>
-                    <Button className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600">
-                      <UserPlus className="h-4 w-4 mr-2" />
-                      Undang Pengguna
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Undang Pengguna Baru</DialogTitle>
-                      <DialogDescription>
-                        Kirim undangan kepada pengguna untuk bergabung dengan organisasi Anda.
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="space-y-4">
-                      <div>
-                        <Label htmlFor="email">Email</Label>
-                        <Input
-                          id="email"
-                          type="email"
-                          placeholder="nama@perusahaan.com"
-                          value={inviteEmail}
-                          onChange={(e) => setInviteEmail(e.target.value)}
-                        />
+                {isOwner && (
+                  <Dialog open={showInviteModal} onOpenChange={setShowInviteModal}>
+                    <DialogTrigger asChild>
+                      <Button className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600">
+                        <UserPlus className="h-4 w-4 mr-2" />
+                        Undang Pengguna
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Undang Pengguna Baru</DialogTitle>
+                        <DialogDescription>
+                          Kirim undangan kepada pengguna untuk bergabung dengan organisasi Anda.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <div>
+                          <Label htmlFor="email">Email</Label>
+                          <Input
+                            id="email"
+                            type="email"
+                            placeholder="nama@perusahaan.com"
+                            value={inviteEmail}
+                            onChange={(e) => setInviteEmail(e.target.value)}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="role">Role</Label>
+                          <Select value={inviteRole} onValueChange={setInviteRole}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Pilih role" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="administrator">Administrator</SelectItem>
+                              <SelectItem value="member">Member</SelectItem>
+                              <SelectItem value="viewer">Viewer</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="flex justify-end space-x-2">
+                          <Button
+                            variant="outline"
+                            onClick={() => setShowInviteModal(false)}
+                          >
+                            Batal
+                          </Button>
+                          <Button
+                            onClick={handleInviteUser}
+                            disabled={inviteUserMutation.isPending}
+                            className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
+                          >
+                            {inviteUserMutation.isPending ? (
+                              <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Mengirim...
+                              </>
+                            ) : (
+                              "Kirim Undangan"
+                            )}
+                          </Button>
+                        </div>
                       </div>
-                      <div>
-                        <Label htmlFor="role">Role</Label>
-                        <Select value={inviteRole} onValueChange={setInviteRole}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Pilih role" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="administrator">Administrator</SelectItem>
-                            <SelectItem value="member">Member</SelectItem>
-                            <SelectItem value="viewer">Viewer</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="flex justify-end space-x-2">
-                        <Button
-                          variant="outline"
-                          onClick={() => setShowInviteModal(false)}
-                        >
-                          Batal
-                        </Button>
-                        <Button
-                          onClick={handleInviteUser}
-                          disabled={inviteUserMutation.isPending}
-                          className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
-                        >
-                          {inviteUserMutation.isPending ? (
-                            <>
-                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                              Mengirim...
-                            </>
-                          ) : (
-                            "Kirim Undangan"
-                          )}
-                        </Button>
-                      </div>
-                    </div>
-                  </DialogContent>
-                </Dialog>
+                    </DialogContent>
+                  </Dialog>
+                )}
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -732,7 +734,7 @@ export default function ClientUserManagement() {
                         </div>
                       </TableCell>
                       <TableCell className="text-right">
-                        {user.role !== "owner" && user.role !== "organization_admin" && (
+                        {isOwner && user.role !== "owner" && user.role !== "organization_admin" && (
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button variant="ghost" className="h-8 w-8 p-0">
@@ -784,16 +786,17 @@ export default function ClientUserManagement() {
                 <div>
                   <CardTitle>Manajemen Tim</CardTitle>
                   <CardDescription>
-                    Kelola tim dalam organisasi Anda ({filteredTeams.length} tim)
+                    {isOwner ? 'Kelola' : 'Lihat'} tim dalam organisasi Anda ({filteredTeams.length} tim)
                   </CardDescription>
                 </div>
-                <Dialog open={showCreateTeamModal} onOpenChange={setShowCreateTeamModal}>
-                  <DialogTrigger asChild>
-                    <Button className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600">
-                      <UserPlus className="h-4 w-4 mr-2" />
-                      Tambah Tim
-                    </Button>
-                  </DialogTrigger>
+                {isOwner && (
+                  <Dialog open={showCreateTeamModal} onOpenChange={setShowCreateTeamModal}>
+                    <DialogTrigger asChild>
+                      <Button className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600">
+                        <UserPlus className="h-4 w-4 mr-2" />
+                        Tambah Tim
+                      </Button>
+                    </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
                       <DialogTitle>{editingTeam ? 'Edit Tim' : 'Buat Tim Baru'}</DialogTitle>
@@ -1031,6 +1034,7 @@ export default function ClientUserManagement() {
                     </form>
                   </DialogContent>
                 </Dialog>
+                )}
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -1076,30 +1080,31 @@ export default function ClientUserManagement() {
                               <CardTitle className="text-lg">{team.name}</CardTitle>
                               <CardDescription>{team.description}</CardDescription>
                             </div>
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="sm">
-                                  <MoreVertical className="h-4 w-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuItem
-                                  onClick={() => handleEditTeam(team)}
-                                >
-                                  <Edit className="h-4 w-4 mr-2" />
-                                  Edit Tim
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <AlertDialog>
-                                  <AlertDialogTrigger asChild>
-                                    <DropdownMenuItem 
-                                      className="text-red-600 focus:text-red-600"
-                                      onSelect={(e) => e.preventDefault()}
-                                    >
-                                      <Trash2 className="h-4 w-4 mr-2" />
-                                      Hapus Tim
-                                    </DropdownMenuItem>
-                                  </AlertDialogTrigger>
+                            {isOwner && (
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="sm">
+                                    <MoreVertical className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem
+                                    onClick={() => handleEditTeam(team)}
+                                  >
+                                    <Edit className="h-4 w-4 mr-2" />
+                                    Edit Tim
+                                  </DropdownMenuItem>
+                                  <DropdownMenuSeparator />
+                                  <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                      <DropdownMenuItem 
+                                        className="text-red-600 focus:text-red-600"
+                                        onSelect={(e) => e.preventDefault()}
+                                      >
+                                        <Trash2 className="h-4 w-4 mr-2" />
+                                        Hapus Tim
+                                      </DropdownMenuItem>
+                                    </AlertDialogTrigger>
                                   <AlertDialogContent>
                                     <AlertDialogHeader>
                                       <AlertDialogTitle>Hapus Tim</AlertDialogTitle>
@@ -1121,6 +1126,7 @@ export default function ClientUserManagement() {
                                 </AlertDialog>
                               </DropdownMenuContent>
                             </DropdownMenu>
+                            )}
                           </div>
                         </CardHeader>
                         <CardContent>
