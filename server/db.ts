@@ -66,7 +66,7 @@ if (DB_CONNECTION_TYPE === 'node-postgres') {
     max: 20, // Maximum number of connections in the pool
     idleTimeoutMillis: 30000, // Close idle connections after 30 seconds
     connectionTimeoutMillis: 10000, // Increased timeout for production
-    ssl: process.env.NODE_ENV === 'production' ? { 
+    ssl: DATABASE_URL.includes('sslmode=require') ? { 
       rejectUnauthorized: false,
       require: true 
     } : false,
@@ -76,6 +76,7 @@ if (DB_CONNECTION_TYPE === 'node-postgres') {
 } else {
   // Default: Neon serverless connection
   console.log("🔌 Using Neon serverless connection");
+  console.log("🔐 SSL configuration:", DATABASE_URL.includes('sslmode=require') ? 'enabled' : 'disabled');
   
   const sql = neon(DATABASE_URL);
   db = drizzleNeon(sql, { schema });

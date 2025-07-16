@@ -6,6 +6,12 @@ import { storage } from "./storage";
  */
 export async function checkInitiativeDeadlines(): Promise<void> {
   try {
+    // Skip deadline checks in development environment to avoid SSL issues
+    if (process.env.NODE_ENV !== 'production') {
+      console.log("ℹ️ Skipping initiative deadline checks in development environment");
+      return;
+    }
+    
     console.log("🔔 Checking initiative deadlines...");
     
     // Get current date in GMT+7 (WIB - Waktu Indonesia Barat)
