@@ -903,10 +903,8 @@ export default function GoalDetail() {
       queryClient.invalidateQueries({ queryKey: ["/api/okrs"] });
       queryClient.invalidateQueries({ queryKey: [`/api/objectives/${id}`] });
       
-      // Redirect to index after successful deletion
-      setTimeout(() => {
-        window.location.href = "/";
-      }, 1000);
+      // Redirect to index immediately after successful deletion
+      window.location.href = "/";
     },
     onError: (error: any) => {
       toast({
