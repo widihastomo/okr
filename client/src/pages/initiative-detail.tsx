@@ -1199,9 +1199,16 @@ export default function InitiativeDetailPage() {
                           {pic && (
                             <div className="flex items-center gap-1">
                               <div className="w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-medium">
-                                {pic.firstName?.charAt(0)}{pic.lastName?.charAt(0)}
+                                {(() => {
+                                  const name = pic.name || pic.email?.split('@')[0] || 'U';
+                                  const nameParts = name.split(' ');
+                                  if (nameParts.length > 1) {
+                                    return nameParts[0].charAt(0) + nameParts[nameParts.length - 1].charAt(0);
+                                  }
+                                  return name.charAt(0);
+                                })()}
                               </div>
-                              <span className="text-xs font-medium">{pic.firstName} {pic.lastName}</span>
+                              <span className="text-xs font-medium">{pic.name || pic.email?.split('@')[0] || 'Unknown'}</span>
                             </div>
                           )}
                           {(members || []).filter((member: any) => member.userId !== pic?.id).length > 0 && (
@@ -1556,9 +1563,15 @@ export default function InitiativeDetailPage() {
                                       <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-medium cursor-pointer">
                                         {(() => {
                                           const assignedUser = users.find((u: any) => u.id === task.assignedTo);
-                                          return assignedUser ? 
-                                            `${assignedUser.firstName?.charAt(0) || ''}${assignedUser.lastName?.charAt(0) || ''}` : 
-                                            'U';
+                                          if (assignedUser) {
+                                            const name = assignedUser.name || assignedUser.email?.split('@')[0] || 'U';
+                                            const nameParts = name.split(' ');
+                                            if (nameParts.length > 1) {
+                                              return nameParts[0].charAt(0) + nameParts[nameParts.length - 1].charAt(0);
+                                            }
+                                            return name.charAt(0);
+                                          }
+                                          return 'U';
                                         })()}
                                       </div>
                                     </TooltipTrigger>
