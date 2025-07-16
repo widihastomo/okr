@@ -202,13 +202,15 @@ export default function Sidebar({
     });
   }
 
-  // Add organization settings as the last item
-  regularUserMenuItems.push({
-    label: "Pengaturan Organisasi",
-    icon: Settings,
-    path: "/organization-settings",
-    active: location === "/organization-settings",
-  });
+  // Add organization settings only for non-member users
+  if ((user as any)?.role !== "member") {
+    regularUserMenuItems.push({
+      label: "Pengaturan Organisasi",
+      icon: Settings,
+      path: "/organization-settings",
+      active: location === "/organization-settings",
+    });
+  }
 
   // Choose menu items based on user type
   const menuItems = isSystemOwner ? systemOwnerMenuItems : regularUserMenuItems;

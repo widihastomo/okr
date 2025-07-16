@@ -283,6 +283,12 @@ The system includes comprehensive database connection troubleshooting tools:
 
 ## Changelog
 ```
+- July 16, 2025. **ROLE-BASED SIDEBAR FILTERING IMPLEMENTED** - Successfully added role-based access control for settings menu:
+  * IMPLEMENTED: Users with "member" role no longer see "Pengaturan Organisasi" (Organization Settings) menu item
+  * ENHANCED: Role-based filtering in client-sidebar.tsx using user.role field from authentication
+  * MAINTAINED: All other menu items remain visible for members (Daily Focus, Tasks, Timeline, Goals, etc.)
+  * SECURED: Organization settings access now restricted to users with admin, owner, or non-member roles
+  * RESULT: Clean role-based menu filtering preventing member users from accessing organization settings
 - July 16, 2025. **DEPLOYMENT BUILD FAILURES COMPLETELY FIXED** - Successfully resolved all deployment build issues and created comprehensive build system:
   * FIXED: Enhanced build-simple.js with comprehensive file verification and size validation
   * CREATED: build-deployment.js with robust error handling and detailed verification logging
