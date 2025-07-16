@@ -1488,7 +1488,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
+      console.log(`🗑️ Starting cascade delete for objective ${id}`);
       const deleted = await storage.deleteObjectiveWithCascade(id);
+      console.log(`🗑️ Cascade delete result: ${deleted}`);
       
       if (!deleted) {
         return res.status(404).json({ message: "Objective not found" });

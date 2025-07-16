@@ -731,6 +731,16 @@ export class DatabaseStorage implements IStorage {
         const keyResultInitiatives = await db.select().from(initiatives).where(eq(initiatives.keyResultId, keyResult.id));
         
         for (const initiative of keyResultInitiatives) {
+          // Get all tasks for this initiative
+          const initiativeTasks = await db.select({ id: tasks.id }).from(tasks).where(eq(tasks.initiativeId, initiative.id));
+          
+          // Delete task comments first (to avoid foreign key constraint)
+          if (initiativeTasks.length > 0) {
+            const taskIds = initiativeTasks.map(t => t.id);
+            await db.delete(taskComments).where(inArray(taskComments.taskId, taskIds));
+            await db.delete(taskAuditTrail).where(inArray(taskAuditTrail.taskId, taskIds));
+          }
+          
           // Delete tasks for each initiative
           await db.delete(tasks).where(eq(tasks.initiativeId, initiative.id));
           
@@ -762,6 +772,9 @@ export class DatabaseStorage implements IStorage {
         // Delete the key result itself
         await db.delete(keyResults).where(eq(keyResults.id, keyResult.id));
       }
+      
+      // Delete audit trail for this objective
+      await db.delete(auditTrail).where(eq(auditTrail.entityId, id));
       
       // Finally, delete the objective
       const result = await db.delete(objectives).where(eq(objectives.id, id));
