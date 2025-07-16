@@ -50,9 +50,15 @@ function getTaskStatusLabel(status: string): string {
 // System Owner middleware to protect admin endpoints
 const requireSystemOwner = (req: any, res: any, next: any) => {
   const user = req.user as User;
+  console.log('🔍 System owner check for user:', user?.id, user?.email);
+  console.log('🔍 isSystemOwner value:', user?.isSystemOwner);
+  console.log('🔍 User object keys:', Object.keys(user || {}));
+  
   if (!user?.isSystemOwner) {
+    console.log('❌ Access denied - not system owner');
     return res.status(403).json({ message: "Access denied. System owner access required." });
   }
+  console.log('✅ System owner access granted');
   next();
 };
 
