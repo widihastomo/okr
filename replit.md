@@ -283,6 +283,11 @@ The system includes comprehensive database connection troubleshooting tools:
 
 ## Changelog
 ```
+- July 16, 2025. **TRIAL STATUS HEADER REDIRECT FIX** - Successfully fixed redirect issue in trial status header:
+  * FIXED: Changed Link component from "/pricing" to "/upgrade-package" route
+  * RESOLVED: Mobile upgrade button now redirects to correct upgrade package page
+  * ENHANCED: Proper navigation flow for trial users wanting to upgrade subscription
+  * RESULT: Trial status header upgrade button now works correctly on all devices
 - July 16, 2025. **INVOICE DETAIL ACCESS FIXED** - Successfully fixed invoice detail access from organization settings page:
   * FIXED: Added missing onClick handler to "Lihat Detail" menu item in organization settings
   * ENHANCED: Invoice detail links now properly navigate to /invoices/:id route using setLocation

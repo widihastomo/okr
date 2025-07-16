@@ -69,7 +69,7 @@ export default function TrialStatusHeader() {
               Masa uji coba akan berakhir dalam {daysRemaining} hari
             </span>
           </div>
-          <Link to="/pricing">
+          <Link to="/upgrade-package">
             <Button 
               size="sm" 
               className="h-6 px-2 text-xs bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
