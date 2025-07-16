@@ -255,6 +255,14 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 16, 2025. **ENHANCED DELETE GOAL LOADING STATES** - Added comprehensive loading states for delete goal functionality:
+  * ADDED: Loading toast notification "Menghapus goal..." shown immediately upon deletion confirmation
+  * ENHANCED: Delete button in dropdown menu shows "Menghapus..." state and gets disabled during process
+  * IMPROVED: Modal confirmation button changes to "Menghapus..." and gets disabled during deletion
+  * OPTIMIZED: Cancel button also disabled during deletion process to prevent conflicts
+  * PERFECTED: Immediate redirect to home page right after user confirms deletion (no API wait time)
+  * STREAMLINED: Deletion process continues in background after redirect for optimal user experience
+  * RESULT: Lightning-fast delete flow with immediate visual feedback and instant navigation
 - July 16, 2025. **IMPROVED DELETE OBJECTIVE UX** - Optimized delete objective user experience with immediate redirect:
   * ENHANCED: Delete objective now redirects immediately to index page instead of waiting for deletion completion
   * IMPROVED: User gets instant feedback and doesn't have to wait for deletion process to finish

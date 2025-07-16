@@ -703,7 +703,17 @@ export default function GoalDetail() {
     setDeleteObjectiveModal(false);
     
     if (id) {
-      // Execute deletion with loading state
+      // Show loading toast
+      toast({
+        title: "Menghapus goal...",
+        description: "Goal sedang dihapus...",
+        className: "border-orange-200 bg-orange-50 text-orange-800",
+      });
+      
+      // Redirect immediately, then start deletion in background
+      window.location.href = "/";
+      
+      // Start deletion process in background
       deleteObjectiveMutation.mutate(id);
     }
   };
@@ -883,15 +893,7 @@ export default function GoalDetail() {
       return response.json();
     },
     onMutate: () => {
-      // Show loading toast and redirect immediately
-      toast({
-        title: "Menghapus goal...",
-        description: "Goal sedang dihapus...",
-        className: "border-orange-200 bg-orange-50 text-orange-800",
-      });
-      
-      // Redirect immediately, deletion continues in background
-      window.location.href = "/";
+      // Deletion process started in background
     },
     onSuccess: () => {
       // Invalidate all objective-related queries (for when user returns)
