@@ -41,6 +41,9 @@ export function QuickUpdateButton({ metric, onUpdateSuccess, disabled = false }:
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/initiatives`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${metric.initiativeId}/history`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${metric.initiativeId}/success-metrics`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${metric.initiativeId}`] });
       toast({
         title: "Berhasil",
         description: "Pencapaian berhasil diupdate",

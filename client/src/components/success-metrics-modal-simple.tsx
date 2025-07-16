@@ -86,6 +86,8 @@ export default function SuccessMetricsModal({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}/success-metrics`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}/history`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}`] });
       toast({
         title: "Berhasil",
         description: "Metrik keberhasilan berhasil ditambahkan",
@@ -118,7 +120,7 @@ export default function SuccessMetricsModal({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}/success-metrics`] });
-      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}/audit-trail`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}/history`] });
       queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}`] });
       toast({
         title: "Berhasil",

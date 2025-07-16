@@ -811,6 +811,8 @@ export default function InitiativeDetailPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}/success-metrics`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}/history`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}`] });
       setIsDeleteMetricModalOpen(false);
       setMetricToDelete(null);
       toast({
