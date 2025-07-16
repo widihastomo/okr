@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
+import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -45,6 +46,7 @@ interface SimpleUpdateData {
 export function DailyUpdateSimple() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   
   const [updateData, setUpdateData] = useState<SimpleUpdateData>({
@@ -72,14 +74,17 @@ export function DailyUpdateSimple() {
     queryKey: ['/api/tasks'],
   });
 
+  // Filter tasks for current user only
+  const userTasks = allTasks.filter((task: any) => task.assignedTo === user?.id);
+
   // Filter tasks for today and overdue
-  const todayTasks = allTasks.filter((task: any) => {
+  const todayTasks = userTasks.filter((task: any) => {
     const today = new Date().toISOString().split('T')[0];
     const taskDate = task.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : null;
     return taskDate === today;
   });
 
-  const overdueTasks = allTasks.filter((task: any) => {
+  const overdueTasks = userTasks.filter((task: any) => {
     if (!task.dueDate || task.status === 'selesai' || task.status === 'dibatalkan') return false;
     const today = new Date().toISOString().split('T')[0];
     const taskDate = new Date(task.dueDate).toISOString().split('T')[0];
@@ -145,7 +150,7 @@ export function DailyUpdateSimple() {
         totalTasks: relevantTasks.length
       }));
     }
-  }, [isOpen]);
+  }, [isOpen, keyResults, successMetrics, relevantTasks, user?.id]);
 
   // Submit mutation
   const submitMutation = useMutation({
