@@ -903,7 +903,7 @@ export default function TaskModal({
 
               <div>
                 <Label className="flex items-center gap-2 mb-2">
-                  Periode Task
+                  Periode Task *
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
@@ -918,7 +918,7 @@ export default function TaskModal({
                       <div className="space-y-2">
                         <h4 className="font-medium">Menentukan Periode Task</h4>
                         <p className="text-sm text-muted-foreground">
-                          Pilih tanggal untuk task ini. Jika Anda memilih 1 tanggal, maka itu akan menjadi tanggal selesai. Jika Anda memilih 2 tanggal, maka akan menjadi periode mulai dan selesai.
+                          Pilih tanggal untuk task ini (wajib). Jika Anda memilih 1 tanggal, maka itu akan menjadi tanggal selesai. Jika Anda memilih 2 tanggal, maka akan menjadi periode mulai dan selesai.
                         </p>
                       </div>
                     </PopoverContent>
@@ -935,7 +935,7 @@ export default function TaskModal({
                         ? `${formData.startDate.toLocaleDateString("id-ID")} - ${formData.dueDate.toLocaleDateString("id-ID")}`
                         : formData.dueDate
                         ? formData.dueDate.toLocaleDateString("id-ID")
-                        : "Pilih tanggal"}
+                        : "Pilih tanggal (wajib)"}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
@@ -1005,7 +1005,8 @@ export default function TaskModal({
               createMutation.isPending ||
               updateMutation.isPending ||
               !formData.assignedTo ||
-              formData.assignedTo === "unassigned"
+              formData.assignedTo === "unassigned" ||
+              !formData.dueDate
             }
             className="w-full sm:w-auto px-6 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white order-1 sm:order-2"
           >
