@@ -62,13 +62,19 @@ export function DailyUpdateSimple() {
   });
 
   // Fetch data
-  const { data: keyResults = [] } = useQuery({
+  const { data: allKeyResults = [] } = useQuery({
     queryKey: ['/api/key-results'],
   });
 
-  const { data: initiatives = [] } = useQuery({
+  // Filter key results for current user only
+  const keyResults = allKeyResults.filter((kr: any) => kr.assignedTo === user?.id);
+
+  const { data: allInitiatives = [] } = useQuery({
     queryKey: ['/api/initiatives'],
   });
+
+  // Filter initiatives for current user only (where user is PIC)
+  const initiatives = allInitiatives.filter((initiative: any) => initiative.picId === user?.id);
 
   const { data: allTasks = [] } = useQuery({
     queryKey: ['/api/tasks'],
@@ -150,7 +156,7 @@ export function DailyUpdateSimple() {
         totalTasks: relevantTasks.length
       }));
     }
-  }, [isOpen, keyResults, successMetrics, relevantTasks, user?.id]);
+  }, [isOpen, keyResults, successMetrics, relevantTasks, initiatives, user?.id]);
 
   // Submit mutation
   const submitMutation = useMutation({
