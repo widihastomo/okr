@@ -3053,7 +3053,7 @@ export default function GoalDetail() {
               <br />
               • Goal dan semua data terkait
               <br />
-              • Semua Angka Target (Key Results)
+              • Semua Angka Target
               <br />
               • Semua Inisiatif dan Tasks
               <br />
