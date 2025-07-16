@@ -700,14 +700,22 @@ export default function GoalDetail() {
   };
 
   const confirmDeleteObjective = () => {
-    if (id) {
-      // Redirect immediately to index page
-      window.location.href = "/";
-      
-      // Then execute the deletion in the background
-      deleteObjectiveMutation.mutate(id);
-    }
     setDeleteObjectiveModal(false);
+    
+    if (id) {
+      // Show toast immediately
+      toast({
+        title: "Menghapus goal...",
+        description: "Sedang menghapus goal, Anda akan diarahkan ke halaman utama.",
+        className: "border-orange-200 bg-orange-50 text-orange-800",
+      });
+      
+      // Redirect immediately, then delete in background
+      setTimeout(() => {
+        window.location.href = "/";
+        deleteObjectiveMutation.mutate(id);
+      }, 100);
+    }
   };
 
   // Create initiative with success metrics mutation
@@ -885,12 +893,6 @@ export default function GoalDetail() {
       return response.json();
     },
     onSuccess: () => {
-      toast({
-        title: "Goal berhasil dihapus",
-        description: "Goal telah dihapus secara permanen.",
-        className: "border-green-200 bg-green-50 text-green-800",
-      });
-      
       // Invalidate all objective-related queries
       queryClient.invalidateQueries({ queryKey: ["/api/objectives"] });
       queryClient.invalidateQueries({ queryKey: ["/api/okrs"] });
