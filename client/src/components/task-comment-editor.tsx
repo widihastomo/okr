@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { User } from "@shared/schema";
 import { AtSign, Send, Bold, Italic, Underline, List, Link } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 
 interface TaskCommentEditorProps {
@@ -49,6 +50,7 @@ export function TaskCommentEditor({
   const editorRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { user } = useAuth();
 
   // Set initial content when initialContent prop changes
   useEffect(() => {
@@ -65,7 +67,11 @@ export function TaskCommentEditor({
 
   const createCommentMutation = useMutation({
     mutationFn: async (commentData: { content: string; mentionedUsers: string[]; parentId?: string | null }) => {
-      const response = await apiRequest("POST", `/api/tasks/${taskId}/comments`, commentData);
+      const payload = {
+        ...commentData,
+        organizationId: user?.organizationId,
+      };
+      const response = await apiRequest("POST", `/api/tasks/${taskId}/comments`, payload);
       return response.json();
     },
     onSuccess: () => {
