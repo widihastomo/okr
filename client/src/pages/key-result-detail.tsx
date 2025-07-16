@@ -1029,18 +1029,18 @@ export default function KeyResultDetailPage() {
           {/* Achievement Chart and Progress History */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             {/* Achievement Chart */}
-            {chartData.length > 0 && (
-              <Card className="lg:col-span-8">
-                <CardHeader>
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <TrendingUp className="h-5 w-5" />
-                    Pencapaian
-                  </CardTitle>
-                  <CardDescription>
-                    Pelacakan progress dari waktu ke waktu dibandingkan dengan timeline ideal
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
+            <Card className="lg:col-span-8">
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5" />
+                  Pencapaian
+                </CardTitle>
+                <CardDescription>
+                  Pelacakan progress dari waktu ke waktu dibandingkan dengan timeline ideal
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {chartData.length > 0 ? (
                   <div className="h-80 w-full">
                     <ResponsiveContainer width="100%" height="100%">
                       <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
@@ -1130,9 +1130,19 @@ export default function KeyResultDetailPage() {
                       </AreaChart>
                     </ResponsiveContainer>
                   </div>
-                </CardContent>
-              </Card>
-            )}
+                ) : (
+                  <div className="h-80 w-full flex items-center justify-center">
+                    <div className="text-center">
+                      <TrendingUp className="h-16 w-16 mx-auto mb-4 text-gray-300" />
+                      <p className="text-gray-600 font-medium mb-2">Belum ada data pencapaian</p>
+                      <p className="text-sm text-gray-500">
+                        Mulai melacak progress dengan menambahkan check-in pertama
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
 
             {/* Progress History */}
             <Card className="lg:col-span-4">
