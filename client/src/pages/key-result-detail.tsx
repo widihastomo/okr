@@ -1177,29 +1177,7 @@ export default function KeyResultDetailPage() {
                             </div>
                           )}
                           <div className="flex items-center justify-between mt-2">
-                            {checkIn.confidence && (
-                              <div className="flex items-center gap-2">
-                                <div className="space-y-1">
-                                  <div className="flex items-center gap-1">
-                                    <div className="w-16 bg-gray-200 rounded-full h-2">
-                                      <div 
-                                        className={`h-2 rounded-full ${getConfidenceDisplay(checkIn.confidence).color}`}
-                                        style={{ width: `${getConfidenceDisplay(checkIn.confidence).percentage}%` }}
-                                      ></div>
-                                    </div>
-                                    <span className="text-xs text-gray-600 font-medium">
-                                      {checkIn.confidence}/10
-                                    </span>
-                                  </div>
-                                  <div className="text-xs text-gray-500">
-                                    <span className="font-medium">{getConfidenceDisplay(checkIn.confidence).label}</span> - {' '}
-                                    {checkIn.confidence >= 8 ? 'Sangat yakin target tercapai' :
-                                     checkIn.confidence >= 6 ? 'Cukup optimis dengan progress' :
-                                     'Butuh perhatian lebih untuk mencapai target'}
-                                  </div>
-                                </div>
-                              </div>
-                            )}
+                            
                             {checkIn.createdBy && (
                               <div className="flex items-center gap-2 text-xs text-gray-500">
                                 <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-medium">
