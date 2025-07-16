@@ -26,11 +26,7 @@ import { populateGamificationData } from "./gamification-data";
 
 import { NotificationService } from "./notification-service";
 import { calculateKeyResultProgress } from "@shared/progress-calculator";
-import { 
-  generateHabitSuggestions, 
-  generateFallbackHabitSuggestions,
-  type HabitAlignmentRequest 
-} from "./habit-alignment";
+// Habit alignment functionality removed
 import { db } from "./db";
 import { eq, and, desc, inArray, isNotNull, sql } from "drizzle-orm";
 import { createSnapTransaction } from "./midtrans";
@@ -5676,105 +5672,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Habit Alignment Wizard endpoints
-  app.post("/api/ai/habit-suggestions", requireAuth, async (req, res) => {
-    try {
-      const { objectiveIds, preferences, userId } = req.body;
-      
-      if (!objectiveIds || !Array.isArray(objectiveIds) || objectiveIds.length === 0) {
-        return res.status(400).json({ message: "At least one objective ID is required" });
-      }
+  // Habit alignment functionality removed
 
-      // Fetch the objectives with key results
-      const objectives = await Promise.all(
-        objectiveIds.map(async (id: string) => {
-          const objective = await storage.getOKRWithKeyResults(id);
-          if (!objective) {
-            throw new Error(`Objective with ID ${id} not found`);
-          }
-          return objective;
-        })
-      );
+  // Habit tracking functionality removed
 
-      const request: HabitAlignmentRequest = {
-        objectiveIds,
-        objectives: objectives as any, // Type assertion for compatibility
-        preferences: preferences || {
-          timeAvailable: '30',
-          difficulty: 'medium',
-          categories: [],
-          focusAreas: []
-        },
-        userId: userId || req.session?.userId || ""
-      };
-
-      try {
-        // Try AI-powered suggestions first
-        const result = await generateHabitSuggestions(request);
-        res.json(result);
-      } catch (aiError) {
-        console.log("AI suggestions failed, using fallback:", aiError);
-        // Fallback to rule-based suggestions
-        const fallbackResult = generateFallbackHabitSuggestions(request);
-        res.json(fallbackResult);
-      }
-    } catch (error) {
-      console.error("Error generating habit suggestions:", error);
-      res.status(500).json({ message: "Failed to generate habit suggestions" });
-    }
-  });
-
-  // Create habit tracking entries
-  app.post("/api/habits", requireAuth, async (req, res) => {
-    try {
-      const userId = req.session?.userId;
-      if (!userId) {
-        return res.status(401).json({ message: "Authentication required" });
-      }
-
-      const habits = req.body;
-      if (!Array.isArray(habits)) {
-        return res.status(400).json({ message: "Habits must be an array" });
-      }
-
-      // Store habits in database (for now, just return success)
-      // In a real implementation, you would save these to a habits table
-      const createdHabits = habits.map((habit, index) => ({
-        id: `habit-${Date.now()}-${index}`,
-        ...habit,
-        userId,
-        createdAt: new Date().toISOString(),
-        isActive: true
-      }));
-
-      console.log("Created habits:", createdHabits);
-      
-      res.status(201).json({ 
-        message: "Habits created successfully", 
-        habits: createdHabits 
-      });
-    } catch (error) {
-      console.error("Error creating habits:", error);
-      res.status(500).json({ message: "Failed to create habits" });
-    }
-  });
-
-  // Get user's habits
-  app.get("/api/habits", requireAuth, async (req, res) => {
-    try {
-      const userId = req.session?.userId;
-      if (!userId) {
-        return res.status(401).json({ message: "Authentication required" });
-      }
-
-      // For now, return empty array since we haven't implemented full habit storage
-      // In a real implementation, you would fetch from a habits table
-      res.json([]);
-    } catch (error) {
-      console.error("Error fetching habits:", error);
-      res.status(500).json({ message: "Failed to fetch habits" });
-    }
-  });
+  // All habit-related endpoints removed
 
   // Close initiative endpoint
   app.post("/api/initiatives/:id/close", requireAuth, async (req, res) => {
@@ -9570,43 +9472,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Habit Alignment API routes
-  app.post("/api/habits/generate", requireAuth, async (req, res) => {
-    try {
-      const { generateHabitSuggestions, generateFallbackHabitSuggestions } = await import("./habit-alignment");
-      
-      const { objectiveIds, objectives, preferences, userId } = req.body;
-      
-      if (!objectiveIds || !Array.isArray(objectiveIds) || objectiveIds.length === 0) {
-        return res.status(400).json({ error: "objectiveIds is required and must be a non-empty array" });
-      }
-      
-      if (!preferences || typeof preferences !== 'object') {
-        return res.status(400).json({ error: "preferences is required" });
-      }
-
-      const request = {
-        objectiveIds,
-        objectives: objectives || [],
-        preferences,
-        userId: userId || (req.user as any)?.id
-      };
-
-      try {
-        // Try AI-powered suggestions first
-        const result = await generateHabitSuggestions(request);
-        res.json(result);
-      } catch (aiError) {
-        console.warn('AI suggestions failed, falling back to rule-based suggestions:', aiError);
-        // Fallback to rule-based suggestions
-        const fallbackResult = generateFallbackHabitSuggestions(request);
-        res.json(fallbackResult);
-      }
-    } catch (error) {
-      console.error("Error generating habit suggestions:", error);
-      res.status(500).json({ error: "Failed to generate habit suggestions" });
-    }
-  });
+  // Habit Alignment API routes removed
 
   // Notification routes
   app.get("/api/notifications", requireAuth, async (req, res) => {
