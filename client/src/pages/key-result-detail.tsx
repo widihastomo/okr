@@ -834,27 +834,21 @@ export default function KeyResultDetailPage() {
   );
 
   const getStatusBadge = (status: string) => {
-    const statusColors = {
-      on_track: "bg-green-100 text-green-800 border-green-200",
-      at_risk: "bg-yellow-100 text-yellow-800 border-yellow-200",
-      behind: "bg-red-100 text-red-800 border-red-200",
-      completed: "bg-blue-100 text-blue-800 border-blue-200",
-      ahead: "bg-purple-100 text-purple-800 border-purple-200"
+    // Pre-computed status configurations for better performance
+    const statusConfig = {
+      on_track: { label: "Sesuai Target", className: "bg-green-100 text-green-800 border-green-200" },
+      at_risk: { label: "Berisiko", className: "bg-yellow-100 text-yellow-800 border-yellow-200" },
+      behind: { label: "Tertinggal", className: "bg-red-100 text-red-800 border-red-200" },
+      completed: { label: "Selesai", className: "bg-blue-100 text-blue-800 border-blue-200" },
+      ahead: { label: "Unggul", className: "bg-purple-100 text-purple-800 border-purple-200" }
     };
 
-    const statusLabels = {
-      on_track: "Sesuai Target",
-      at_risk: "Berisiko", 
-      behind: "Tertinggal",
-      completed: "Selesai",
-      ahead: "Unggul"
+    const config = statusConfig[status as keyof typeof statusConfig] || { 
+      label: status, 
+      className: "bg-gray-100 text-gray-800 border-gray-200" 
     };
 
-    return (
-      <Badge className={statusColors[status as keyof typeof statusColors] || "bg-gray-100 text-gray-800 border-gray-200"}>
-        {statusLabels[status as keyof typeof statusLabels] || status}
-      </Badge>
-    );
+    return <Badge className={config.className}>{config.label}</Badge>;
   };
 
   return (
@@ -929,16 +923,12 @@ export default function KeyResultDetailPage() {
                     <span className="font-medium text-gray-600">Tipe:</span>
                     <Badge variant="outline" className="text-xs">
                       {(() => {
-                        switch (keyResult.keyResultType) {
-                          case 'increase_to':
-                            return 'Peningkatan';
-                          case 'decrease_to':
-                            return 'Penurunan';
-                          case 'achieve_or_not':
-                            return 'Ya/Tidak';
-                          default:
-                            return keyResult.keyResultType.replace('_', ' ');
-                        }
+                        const typeLabels = {
+                          increase_to: 'Peningkatan',
+                          decrease_to: 'Penurunan',
+                          achieve_or_not: 'Ya/Tidak'
+                        };
+                        return typeLabels[keyResult.keyResultType as keyof typeof typeLabels] || keyResult.keyResultType.replace('_', ' ');
                       })()}
                     </Badge>
                   </div>
@@ -1295,24 +1285,16 @@ export default function KeyResultDetailPage() {
                                 "outline"
                               }>
                                 {(() => {
-                                  switch (initiative.status) {
-                                    case 'draft':
-                                      return 'Draft';
-                                    case 'sedang_berjalan':
-                                      return 'Sedang Berjalan';
-                                    case 'selesai':
-                                      return 'Selesai';
-                                    case 'dibatalkan':
-                                      return 'Dibatalkan';
-                                    case 'completed':
-                                      return 'Selesai';
-                                    case 'in_progress':
-                                      return 'Sedang Berjalan';
-                                    case 'on_hold':
-                                      return 'Ditunda';
-                                    default:
-                                      return initiative.status || 'Belum Dimulai';
-                                  }
+                                  const statusLabels = {
+                                    draft: 'Draft',
+                                    sedang_berjalan: 'Sedang Berjalan',
+                                    selesai: 'Selesai',
+                                    dibatalkan: 'Dibatalkan',
+                                    completed: 'Selesai',
+                                    in_progress: 'Sedang Berjalan',
+                                    on_hold: 'Ditunda'
+                                  };
+                                  return statusLabels[initiative.status as keyof typeof statusLabels] || initiative.status || 'Belum Dimulai';
                                 })()}
                               </Badge>
                             </TableCell>
