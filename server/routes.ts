@@ -2922,6 +2922,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             initiativeId: initiative.id,
             userId,
             role: "member",
+            organizationId: currentUser.organizationId,
           });
         }
       }
@@ -4995,7 +4996,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             await storage.createInitiativeMember({
               initiativeId: task.initiativeId,
               userId: task.assignedTo,
-              role: "member"
+              role: "member",
+              organizationId: currentUser.organizationId
             });
             addedAsMember = true;
           }

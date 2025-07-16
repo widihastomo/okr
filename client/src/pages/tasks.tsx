@@ -1174,14 +1174,14 @@ const TasksPage = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
         <div>
           <h1 className="text-2xl font-bold">Tasks</h1>
           <p className="text-gray-600">Kelola semua task dalam berbagai tampilan</p>
         </div>
         <Button 
           onClick={handleAddTask}
-          className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
+          className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white w-full sm:w-auto"
         >
           <Plus className="w-4 h-4 mr-2" />
           Tambah Task
@@ -1220,24 +1220,24 @@ const TasksPage = () => {
               </Button>
             </div>
             {/* Filter indicators */}
-            <div className="flex items-center space-x-2 flex-wrap">
+            <div className="flex items-center space-x-1 sm:space-x-2 flex-wrap gap-1">
               {statusFilter !== 'all' && (
-                <span className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full">
+                <span className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full whitespace-nowrap">
                   Status: {statusFilter === 'not_started' ? 'Belum Mulai' : statusFilter === 'in_progress' ? 'Sedang Berjalan' : statusFilter === 'completed' ? 'Selesai' : 'Dibatalkan'}
                 </span>
               )}
               {priorityFilter !== 'all' && (
-                <span className="px-2 py-1 text-xs bg-orange-100 text-orange-700 rounded-full">
+                <span className="px-2 py-1 text-xs bg-orange-100 text-orange-700 rounded-full whitespace-nowrap">
                   Prioritas: {priorityFilter === 'low' ? 'Rendah' : priorityFilter === 'medium' ? 'Sedang' : 'Tinggi'}
                 </span>
               )}
               {userFilter !== 'all' && userFilter !== '' && (
-                <span className="px-2 py-1 text-xs bg-green-100 text-green-700 rounded-full">
+                <span className="px-2 py-1 text-xs bg-green-100 text-green-700 rounded-full whitespace-nowrap">
                   PIC: {getUserName(userFilter)}
                 </span>
               )}
               {teamFilter !== 'all' && (
-                <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded-full">
+                <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded-full whitespace-nowrap">
                   Tim: {teams.find(t => t.id === teamFilter)?.name || 'Unknown'}
                 </span>
               )}
@@ -1331,21 +1331,21 @@ const TasksPage = () => {
       {/* Task Views */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="list" className="flex items-center">
-            <List className="w-4 h-4 mr-2" />
-            List
+          <TabsTrigger value="list" className="flex items-center justify-center">
+            <List className="w-4 h-4 sm:mr-2" />
+            <span className="hidden sm:inline">List</span>
           </TabsTrigger>
-          <TabsTrigger value="kanban" className="flex items-center">
-            <Kanban className="w-4 h-4 mr-2" />
-            Kanban
+          <TabsTrigger value="kanban" className="flex items-center justify-center">
+            <Kanban className="w-4 h-4 sm:mr-2" />
+            <span className="hidden sm:inline">Kanban</span>
           </TabsTrigger>
-          <TabsTrigger value="gantt" className="flex items-center">
-            <BarChart3 className="w-4 h-4 mr-2" />
-            Timeline
+          <TabsTrigger value="gantt" className="flex items-center justify-center">
+            <BarChart3 className="w-4 h-4 sm:mr-2" />
+            <span className="hidden sm:inline">Timeline</span>
           </TabsTrigger>
-          <TabsTrigger value="calendar" className="flex items-center">
-            <CalendarIcon className="w-4 h-4 mr-2" />
-            Calendar
+          <TabsTrigger value="calendar" className="flex items-center justify-center">
+            <CalendarIcon className="w-4 h-4 sm:mr-2" />
+            <span className="hidden sm:inline">Calendar</span>
           </TabsTrigger>
         </TabsList>
 
