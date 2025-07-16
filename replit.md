@@ -255,6 +255,12 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 16, 2025. **FIXED SUCCESS METRICS CREATION ERROR** - Resolved organizationId validation error when creating success metrics:
+  * ADDED: useAuth hook to success-metrics-modal-simple.tsx for user authentication
+  * FIXED: organizationId now included in success metrics creation payload  
+  * ENHANCED: Success metrics creation now properly validates with required organizationId field
+  * RESOLVED: "organizationId required" validation error during metrics creation
+  * RESULT: Users can now successfully create success metrics without validation errors
 - July 16, 2025. **AUTO-EXPAND MISSION CARD** - Added automatic expansion of mission card when initiative has no metrics and tasks:
   * ADDED: Auto-expansion logic for empty initiatives - MissionCard expands automatically when successMetrics and tasks are empty
   * ENHANCED: MissionCard component now accepts successMetrics and tasks props for expansion logic

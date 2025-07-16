@@ -22,6 +22,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { useAuth } from "@/hooks/useAuth";
 
 // Simplified schema with only 3 fields
 const successMetricSchema = z.object({
@@ -47,6 +48,7 @@ export default function SuccessMetricsModal({
 }: SuccessMetricsModalProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   const form = useForm<SuccessMetricFormData>({
     resolver: zodResolver(successMetricSchema),
@@ -76,7 +78,11 @@ export default function SuccessMetricsModal({
 
   const createMutation = useMutation({
     mutationFn: async (data: SuccessMetricFormData) => {
-      return apiRequest("POST", `/api/initiatives/${initiativeId}/success-metrics`, data);
+      const payload = {
+        ...data,
+        organizationId: user?.organizationId,
+      };
+      return apiRequest("POST", `/api/initiatives/${initiativeId}/success-metrics`, payload);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}/success-metrics`] });
