@@ -242,9 +242,12 @@ export default function Profile() {
                             type="email"
                             value={formData.email}
                             onChange={(e) => setFormData({...formData, email: e.target.value})}
-                            disabled={!isEditing}
+                            disabled={true}
                             placeholder="Masukkan email"
                           />
+                          <p className="text-sm text-gray-500">
+                            (Email tidak dapat diubah)
+                          </p>
                         </div>
 
                         <div className="space-y-2">
