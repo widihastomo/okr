@@ -131,7 +131,7 @@ async function createApplicationSettings() {
     { key: 'enable_notifications', value: 'true', type: 'boolean', category: 'features', description: 'Aktifkan sistem notifikasi', isPublic: false },
     { key: 'enable_achievements', value: 'true', type: 'boolean', category: 'features', description: 'Aktifkan sistem achievement', isPublic: false },
     { key: 'enable_gamification', value: 'true', type: 'boolean', category: 'features', description: 'Aktifkan sistem gamifikasi', isPublic: false },
-    { key: 'enable_trials', value: 'true', type: 'boolean', category: 'features', description: 'Aktifkan sistem trial', isPublic: false },
+
     
     // Security Settings
     { key: 'session_timeout', value: '3600', type: 'number', category: 'security', description: 'Timeout sesi dalam detik', isPublic: false },
@@ -139,10 +139,7 @@ async function createApplicationSettings() {
     { key: 'max_login_attempts', value: '5', type: 'number', category: 'security', description: 'Maksimal percobaan login', isPublic: false },
     
     // Business Settings
-    { key: 'default_trial_days', value: '7', type: 'number', category: 'business', description: 'Durasi trial default dalam hari', isPublic: false },
-    { key: 'max_trial_users', value: '3', type: 'number', category: 'business', description: 'Maksimal user dalam trial', isPublic: false },
     { key: 'currency', value: 'IDR', type: 'text', category: 'business', description: 'Mata uang default', isPublic: true },
-    { key: 'default_trial_plan', value: '43ee40b6-4f63-4cdf-b9bd-02d577867f61', type: 'text', category: 'business', description: 'Default subscription plan untuk registrasi baru', isPublic: false },
     
     // Integration Settings
     { key: 'enable_email_notifications', value: 'true', type: 'boolean', category: 'integration', description: 'Aktifkan notifikasi email', isPublic: false },

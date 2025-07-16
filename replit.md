@@ -283,6 +283,13 @@ The system includes comprehensive database connection troubleshooting tools:
 
 ## Changelog
 ```
+- July 16, 2025. **TRIAL SETTINGS CLEANUP COMPLETED** - Successfully removed duplicate trial settings and standardized configuration:
+  * REMOVED: Unused trial settings from application_settings table (default_trial_days, max_trial_users, trial_duration_days, max_users_per_trial, enable_trial, enable_trials)
+  * CLEANED: Removed duplicate trial settings from seeder files (build-seeder.ts, populate-application-settings.ts, populate-app-settings-db.ts)
+  * STANDARDIZED: Trial configuration now uses single source of truth - subscription_plans table
+  * CONFIRMED: Free Trial plan (16e80037-0b0e-4fe3-a023-5bbefcfe55ad) with 3 max users and 7-day duration from subscription system
+  * SIMPLIFIED: Removed redundant trial settings that caused confusion between 3 different configuration sources
+  * RESULT: Clean, single-source trial configuration without duplicate settings
 - July 16, 2025. **TRIAL SETTINGS CONFIGURATION FIXED** - Successfully resolved trial settings 404 error by creating missing free trial plan:
   * CREATED: Free Trial subscription plan with id 16e80037-0b0e-4fe3-a023-5bbefcfe55ad
   * ADDED: Billing period for free trial (trial type, 1 month, 0.00 price)

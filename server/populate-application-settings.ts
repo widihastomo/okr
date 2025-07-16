@@ -104,27 +104,7 @@ async function populateApplicationSettings() {
         description: "Mengizinkan registrasi pengguna baru",
         isPublic: true,
       },
-      {
-        key: "enable_trial",
-        value: "true",
-        category: "feature",
-        description: "Mengaktifkan fitur free trial",
-        isPublic: true,
-      },
-      {
-        key: "trial_duration_days",
-        value: "7",
-        category: "feature",
-        description: "Durasi free trial dalam hari",
-        isPublic: true,
-      },
-      {
-        key: "max_users_per_trial",
-        value: "3",
-        category: "feature",
-        description: "Maksimal pengguna per organisasi trial",
-        isPublic: true,
-      },
+
       {
         key: "smtp_host",
         value: "smtp.gmail.com",
