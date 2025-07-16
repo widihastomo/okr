@@ -917,9 +917,8 @@ export default function KeyResultDetailPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {/* Title and Description */}
+              {/* Description */}
               <div className="mb-6">
-                <h1 className="text-2xl font-bold text-gray-900 mb-2">{keyResult.title}</h1>
                 {keyResult.description && (
                   <p className="text-gray-600 mb-3">{keyResult.description}</p>
                 )}

@@ -290,6 +290,7 @@ The system includes comprehensive database connection troubleshooting tools:
   * UPDATED: Progress chart labels to Indonesian (Progress Saat Ini, Target Ideal, Progress Aktual, Ideal Saat Ini)
   * TRANSLATED: Card headers to Indonesian (Pencapaian, Riwayat Progress, Inisiatif)
   * CHANGED: Card title from "Angka Target Overview" to display actual key result name while keeping Target icon
+  * REMOVED: Redundant h1 element that duplicated the key result title for cleaner visual hierarchy
   * ENHANCED: Chart tooltips and progress indicators with Indonesian terminology
   * RESULT: Complete Indonesian language implementation across all key result detail page components
 - July 16, 2025. **MULTI-SELECT CYCLE FILTER IMPLEMENTED** - Successfully implemented multi-select cycle filtering while maintaining select box appearance:
