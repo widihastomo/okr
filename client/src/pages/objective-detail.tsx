@@ -703,18 +703,8 @@ export default function GoalDetail() {
     setDeleteObjectiveModal(false);
     
     if (id) {
-      // Show toast immediately
-      toast({
-        title: "Menghapus goal...",
-        description: "Sedang menghapus goal, Anda akan diarahkan ke halaman utama.",
-        className: "border-orange-200 bg-orange-50 text-orange-800",
-      });
-      
-      // Redirect immediately, then delete in background
-      setTimeout(() => {
-        window.location.href = "/";
-        deleteObjectiveMutation.mutate(id);
-      }, 100);
+      // Execute deletion with loading state
+      deleteObjectiveMutation.mutate(id);
     }
   };
 
@@ -892,11 +882,31 @@ export default function GoalDetail() {
       const response = await apiRequest("DELETE", `/api/objectives/${objectiveId}`);
       return response.json();
     },
+    onMutate: () => {
+      // Show loading toast
+      toast({
+        title: "Menghapus goal...",
+        description: "Sedang menghapus goal, mohon tunggu...",
+        className: "border-orange-200 bg-orange-50 text-orange-800",
+      });
+    },
     onSuccess: () => {
+      // Show success toast
+      toast({
+        title: "Goal berhasil dihapus",
+        description: "Goal telah dihapus secara permanen.",
+        className: "border-green-200 bg-green-50 text-green-800",
+      });
+      
       // Invalidate all objective-related queries
       queryClient.invalidateQueries({ queryKey: ["/api/objectives"] });
       queryClient.invalidateQueries({ queryKey: ["/api/okrs"] });
       queryClient.invalidateQueries({ queryKey: [`/api/objectives/${id}`] });
+      
+      // Redirect to index after successful deletion
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 1000);
     },
     onError: (error: any) => {
       toast({
@@ -1177,9 +1187,10 @@ export default function GoalDetail() {
                 <DropdownMenuItem 
                   className="text-red-600 hover:text-red-700"
                   onClick={handleDeleteObjective}
+                  disabled={deleteObjectiveMutation.isPending}
                 >
                   <Trash2 className="w-4 h-4 mr-2" />
-                  Hapus Goal
+                  {deleteObjectiveMutation.isPending ? "Menghapus..." : "Hapus Goal"}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -3104,12 +3115,15 @@ export default function GoalDetail() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogCancel disabled={deleteObjectiveMutation.isPending}>
+              Batal
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDeleteObjective}
               className="bg-red-600 hover:bg-red-700"
+              disabled={deleteObjectiveMutation.isPending}
             >
-              Hapus
+              {deleteObjectiveMutation.isPending ? "Menghapus..." : "Hapus"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
