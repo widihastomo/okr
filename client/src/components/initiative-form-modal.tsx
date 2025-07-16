@@ -245,9 +245,10 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
         console.log('Initiative ID:', initiative.id);
         return await apiRequest("PUT", `/api/initiatives/${initiative.id}`, basePayload);
       } else {
-        // For new initiatives, include createdBy and status
+        // For new initiatives, include createdBy, status, and organizationId
         const createPayload = {
           ...basePayload,
+          organizationId: user?.organizationId,
           status: "draft", // Auto-set status to draft for new initiatives
           createdBy: currentUserId, // Current user ID
         };

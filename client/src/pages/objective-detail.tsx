@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams, useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import { apiRequest } from "@/lib/queryClient";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
@@ -377,6 +378,7 @@ export default function GoalDetail() {
   const { id } = useParams();
   const [location] = useLocation();
   const { toast } = useToast();
+  const { user } = useAuth();
   const [checkInModal, setCheckInModal] = useState<{
     open: boolean;
     keyResult?: KeyResult;
@@ -752,6 +754,7 @@ export default function GoalDetail() {
         },
         body: JSON.stringify({
           objectiveId: id,
+          organizationId: user?.organizationId,
           initiative: data.initiative,
           successMetrics: data.successMetrics,
         }),
