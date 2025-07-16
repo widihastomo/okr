@@ -4,7 +4,7 @@ import { User, Team, TeamMember } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 import { useOrganization } from "@/hooks/useOrganization";
 import { useAuth } from "@/hooks/useAuth";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -1816,9 +1816,11 @@ function InvoiceManagementSection() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem>
-                              <Eye className="mr-2 h-4 w-4" />
-                              Lihat Detail
+                            <DropdownMenuItem asChild>
+                              <Link href={`/invoices/${item.invoice.id}`}>
+                                <Eye className="mr-2 h-4 w-4" />
+                                Lihat Detail
+                              </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem>
                               <Download className="mr-2 h-4 w-4" />

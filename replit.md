@@ -283,6 +283,12 @@ The system includes comprehensive database connection troubleshooting tools:
 
 ## Changelog
 ```
+- July 16, 2025. **INVOICE DETAIL ACCESS FIXED** - Successfully fixed invoice detail access from organization settings page:
+  * FIXED: Added missing onClick handler to "Lihat Detail" menu item in organization settings
+  * ENHANCED: Invoice detail links now properly navigate to /invoices/:id route using setLocation
+  * VERIFIED: Invoice detail page access now works correctly from organization settings dropdown menu  
+  * MAINTAINED: All existing invoice functionality including payment processing and status management
+  * RESULT: Complete invoice detail access workflow from organization settings with proper navigation
 - July 16, 2025. **COMPLETE ROLE-BASED ACCESS CONTROL IMPLEMENTATION** - Successfully implemented comprehensive role-based access control for member view-only access:
   * FRONTEND RESTRICTIONS: Hidden "Undang Pengguna" button for members - only owners can invite new users
   * FRONTEND RESTRICTIONS: Hidden user action dropdown menus for members - only owners can edit/delete/toggle user status
