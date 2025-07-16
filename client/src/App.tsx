@@ -53,6 +53,8 @@ import SystemAddonManagement from "@/pages/system-addon-management";
 import SystemSubscriptionManagement from "@/pages/system-subscription-management";
 
 import InvoicePaymentFinish from "@/pages/invoice-payment-finish";
+import InvoiceManagement from "@/pages/invoice-management";
+import InvoiceDetail from "@/pages/invoice-detail";
 import SubscriptionAddonIntegration from "@/pages/subscription-addon-integration";
 import TrialSettingsPage from "@/pages/system-admin/trial-settings";
 import DummyClientExamples from "@/pages/dummy-client-examples";
@@ -295,6 +297,8 @@ function Router() {
                 <DummyClientExamples />
               </Route>
               <Route path="/referral-codes" component={ReferralCodes} />
+              <Route path="/invoices" component={InvoiceManagement} />
+              <Route path="/invoices/:id" component={InvoiceDetail} />
               <Route
                 path="/invoice-payment-finish"
                 component={InvoicePaymentFinish}
