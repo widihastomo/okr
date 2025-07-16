@@ -3,8 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Clock, Users, AlertTriangle } from "lucide-react";
 import { Link } from "wouter";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function TrialStatusHeader() {
+  const { user } = useAuth();
+  
   // Fetch trial status and user limit
   const { data: trialStatus } = useQuery({
     queryKey: ["/api/trial-status"],
@@ -13,6 +16,11 @@ export default function TrialStatusHeader() {
   const { data: userLimit } = useQuery({
     queryKey: ["/api/user-limit-status"],
   });
+
+  // Don't show for system owners
+  if (user?.isSystemOwner) {
+    return null;
+  }
 
   // Only show during active trial
   if (!trialStatus?.isTrialActive) {
