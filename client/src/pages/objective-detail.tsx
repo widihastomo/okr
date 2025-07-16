@@ -2820,7 +2820,7 @@ export default function GoalDetail() {
                                       Edit
                                     </DropdownMenuItem>
                                     <DropdownMenuItem
-                                      onClick={() => handleDeleteTask(task)}
+                                      onClick={() => handleTaskDelete(task)}
                                       className="cursor-pointer text-red-600"
                                     >
                                       <Trash2 className="w-3 h-3 mr-2" />
@@ -2973,7 +2973,7 @@ export default function GoalDetail() {
                                   Edit
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
-                                  onClick={() => handleDeleteTask(task)}
+                                  onClick={() => handleTaskDelete(task)}
                                   className="cursor-pointer text-red-600"
                                 >
                                   <Trash2 className="w-3 h-3 mr-2" />
