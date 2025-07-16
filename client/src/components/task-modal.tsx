@@ -462,8 +462,7 @@ export default function TaskModal({
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="w-[95vw] max-w-[95vw] sm:max-w-2xl lg:max-w-4xl max-h-[90vh] overflow-y-auto p-3 sm:p-6 mx-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <CheckCircle2 className="h-5 w-5 text-orange-500" />
+          <DialogTitle>
             {isAdding ? "Tambah Task Baru" : "Edit Task"}
           </DialogTitle>
           <DialogDescription className="text-left">
