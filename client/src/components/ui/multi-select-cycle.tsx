@@ -61,7 +61,7 @@ export function MultiSelectCycle({
       return "Semua Cycle";
     }
     
-    return `${selectedCycles.length} Cycle dipilih`;
+    return `${selectedCycles.length} cycle dipilih`;
   };
 
   const removeSelection = (cycleId: string, e: React.MouseEvent) => {
@@ -82,43 +82,15 @@ export function MultiSelectCycle({
             className
           )}
         >
-          <div className="flex items-center gap-1 flex-wrap">
+          <div className="flex items-center justify-between w-full">
             <span className="truncate">{getDisplayText()}</span>
-            {selectedCycles.length > 1 && (
-              <div className="flex items-center gap-1">
-                {selectedCycles.slice(0, 2).map((cycleId) => {
-                  const cycle = cycles.find(c => c.id === cycleId);
-                  return (
-                    <Badge
-                      key={cycleId}
-                      variant="secondary"
-                      className="text-xs px-1 py-0"
-                    >
-                      {cycle?.name}
-                      <button
-                        type="button"
-                        onClick={(e) => removeSelection(cycleId, e)}
-                        className="ml-1 hover:text-destructive"
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
-                    </Badge>
-                  );
-                })}
-                {selectedCycles.length > 2 && (
-                  <Badge variant="secondary" className="text-xs px-1 py-0">
-                    +{selectedCycles.length - 2}
-                  </Badge>
-                )}
-              </div>
-            )}
           </div>
           <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[200px] p-0" align="start">
-        <div className="p-2">
-          <div className="flex items-center justify-between mb-2">
+      <PopoverContent className="w-[220px] p-0" align="start">
+        <div className="p-3">
+          <div className="flex items-center justify-between mb-3">
             <button
               type="button"
               onClick={handleSelectAll}
@@ -136,7 +108,7 @@ export function MultiSelectCycle({
               </button>
             )}
           </div>
-          <div className="space-y-2 max-h-[200px] overflow-y-auto">
+          <div className="space-y-1 max-h-[200px] overflow-y-auto">
             {cycles.map((cycle) => (
               <div
                 key={cycle.id}
