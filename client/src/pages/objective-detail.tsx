@@ -885,8 +885,8 @@ export default function GoalDetail() {
       queryClient.invalidateQueries({ queryKey: ["/api/okrs"] });
       queryClient.invalidateQueries({ queryKey: [`/api/objectives/${id}`] });
       
-      // Navigate back to dashboard
-      window.location.href = "/dashboard";
+      // Navigate back to index
+      window.location.href = "/";
     },
     onError: (error: any) => {
       toast({
