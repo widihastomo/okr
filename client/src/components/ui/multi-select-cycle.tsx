@@ -22,7 +22,7 @@ export function MultiSelectCycle({
   cycles,
   selectedCycles,
   onSelectionChange,
-  placeholder = "Pilih Cycle",
+  placeholder = "Pilih Siklus",
   className
 }: MultiSelectCycleProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -58,10 +58,10 @@ export function MultiSelectCycle({
     }
     
     if (selectedCycles.length === cycles.length) {
-      return "Semua Cycle";
+      return "Semua Siklus";
     }
     
-    return `${selectedCycles.length} cycle dipilih`;
+    return `${selectedCycles.length} siklus dipilih`;
   };
 
   const removeSelection = (cycleId: string, e: React.MouseEvent) => {

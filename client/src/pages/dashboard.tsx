@@ -638,7 +638,7 @@ export default function Dashboard() {
               cycles={cycles}
               selectedCycles={cycleFilter}
               onSelectionChange={handleCycleFilterChange}
-              placeholder="Pilih Cycle"
+              placeholder="Pilih Siklus"
               className="w-full sm:w-[150px] md:w-[180px] text-xs sm:text-sm h-8 sm:h-10"
             />
 

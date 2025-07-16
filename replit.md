@@ -283,6 +283,15 @@ The system includes comprehensive database connection troubleshooting tools:
 
 ## Changelog
 ```
+- July 16, 2025. **MULTI-SELECT CYCLE FILTER IMPLEMENTED** - Successfully implemented multi-select cycle filtering while maintaining select box appearance:
+  * CREATED: MultiSelectCycle component with select box UI appearance
+  * UPDATED: Dashboard to use array-based cycle filtering instead of single selection
+  * ENHANCED: Filtering logic to handle multiple cycle selections with hierarchical relationships
+  * FIXED: DOM nesting warnings by removing nested buttons and simplifying display
+  * ADDED: Comma-separated URL parameter support for multiple cycle selections
+  * IMPLEMENTED: "Pilih Semua" and "Hapus" functionality with proper state management
+  * LOCALIZED: Changed placeholder text from "Pilih Cycle" to "Pilih Siklus" for better Indonesian language support
+  * RESULT: Complete multi-select cycle filtering with select box appearance and improved user experience
 - July 16, 2025. **AUTOMATIC CYCLE SELECTION IMPLEMENTED** - Successfully implemented automatic cycle selection in dashboard:
   * ADDED: findClosestCycle function to dashboard.tsx matching goal-form-modal logic
   * UPDATED: defaultCycle calculation to use closest cycle to today's date instead of shortest active cycle
