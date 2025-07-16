@@ -909,30 +909,9 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50 flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Background Ornaments */}
-      <div className="absolute inset-0 overflow-hidden">
-        {/* Top left ornament */}
-        <div className="absolute -top-16 -left-16 w-32 h-32 bg-gradient-to-br from-orange-200 to-orange-300 rounded-full opacity-20 animate-pulse"></div>
-        
-        {/* Top right ornament */}
-        <div className="absolute -top-8 -right-8 w-24 h-24 bg-gradient-to-br from-blue-200 to-blue-300 rounded-full opacity-15"></div>
-        
-        {/* Bottom left ornament */}
-        <div className="absolute -bottom-12 -left-12 w-28 h-28 bg-gradient-to-br from-purple-200 to-purple-300 rounded-full opacity-10"></div>
-        
-        {/* Bottom right ornament */}
-        <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-gradient-to-br from-orange-300 to-orange-400 rounded-full opacity-15 animate-pulse"></div>
-        
-        {/* Floating geometric shapes */}
-        <div className="absolute top-1/4 left-1/4 w-6 h-6 bg-orange-300 opacity-20 rotate-45 animate-bounce"></div>
-        <div className="absolute top-3/4 right-1/4 w-8 h-8 bg-blue-300 opacity-15 rotate-12"></div>
-        <div className="absolute top-1/2 left-1/6 w-4 h-4 bg-purple-300 opacity-10 rounded-full animate-pulse"></div>
-        
-
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50 flex items-center justify-center p-4">
       
-      <div className="max-w-md w-full relative z-10">
+      <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <img 
             src={refokusLogo} 
@@ -941,13 +920,9 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
           />
         </div>
         
-        <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-sm relative overflow-hidden">
-          {/* Card ornaments */}
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600"></div>
-          <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-orange-100 to-transparent rounded-bl-full opacity-50"></div>
-          <div className="absolute bottom-0 left-0 w-20 h-20 bg-gradient-to-tr from-orange-50 to-transparent rounded-tr-full opacity-30"></div>
+        <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-sm">
           
-          <CardHeader className="text-center pb-8 pt-8 relative">
+          <CardHeader className="text-center pb-8 pt-8">
             <CardTitle className="text-2xl font-bold text-gray-900">
               {stepConfig.title}
             </CardTitle>
@@ -955,7 +930,7 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
               {stepConfig.description}
             </CardDescription>
           </CardHeader>
-          <CardContent className="px-8 pb-8 relative">
+          <CardContent className="px-8 pb-8">
             {renderStepContent()}
           </CardContent>
         </Card>
