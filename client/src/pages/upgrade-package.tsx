@@ -100,19 +100,12 @@ export default function UpgradePackage() {
                 </div>
               </div>
               
-              <div className="flex justify-center space-x-4">
+              <div className="flex justify-center">
                 <Button 
                   onClick={() => window.location.href = '/'}
                   className="bg-orange-600 hover:bg-orange-700 text-white"
                 >
                   Kembali ke Beranda
-                </Button>
-                <Button 
-                  variant="outline"
-                  onClick={() => window.location.href = '/organization-settings'}
-                  className="border-orange-600 text-orange-600 hover:bg-orange-50"
-                >
-                  Pengaturan Organisasi
                 </Button>
               </div>
             </div>
