@@ -415,6 +415,7 @@ export default function GoalDetail() {
   const [deletingInitiative, setDeletingInitiative] = useState<Initiative | null>(null);
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [deletingTask, setDeletingTask] = useState<Task | null>(null);
   const [deleteObjectiveModal, setDeleteObjectiveModal] = useState(false);
   const queryClient = useQueryClient();
   const [tourStep, setTourStep] = useState<number>(0);
@@ -994,7 +995,15 @@ export default function GoalDetail() {
 
   // Handle task delete
   const handleTaskDelete = (task: Task) => {
-    deleteTaskMutation.mutate(task.id);
+    setDeletingTask(task);
+  };
+
+  // Confirm task deletion
+  const confirmDeleteTask = () => {
+    if (deletingTask) {
+      deleteTaskMutation.mutate(deletingTask.id);
+      setDeletingTask(null);
+    }
   };
 
   // Handle task edit
@@ -3104,6 +3113,36 @@ export default function GoalDetail() {
             <AlertDialogCancel>Batal</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDeleteInitiative}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Hapus
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete Task Confirmation Dialog */}
+      <AlertDialog open={!!deletingTask} onOpenChange={() => setDeletingTask(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Hapus Task</AlertDialogTitle>
+            <AlertDialogDescription>
+              Apakah Anda yakin ingin menghapus task "{deletingTask?.title}"?
+              <br />
+              <br />
+              Tindakan ini tidak dapat dibatalkan dan akan menghapus:
+              <br />
+              • Task dan semua data terkait
+              <br />
+              • Semua komentar task
+              <br />
+              • Riwayat audit trail
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeleteTask}
               className="bg-red-600 hover:bg-red-700"
             >
               Hapus
