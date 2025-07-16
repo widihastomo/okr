@@ -255,6 +255,12 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 16, 2025. **AUTO-EXPAND MISSION CARD** - Added automatic expansion of mission card when initiative has no metrics and tasks:
+  * ADDED: Auto-expansion logic for empty initiatives - MissionCard expands automatically when successMetrics and tasks are empty
+  * ENHANCED: MissionCard component now accepts successMetrics and tasks props for expansion logic
+  * IMPROVED: New initiatives automatically show expanded mission card to guide users through setup
+  * OPTIMIZED: shouldAutoExpand calculation based on data availability for better user experience
+  * RESULT: Users immediately see mission guidance when creating new initiatives without manual expansion
 - July 16, 2025. **ENHANCED DELETE GOAL LOADING STATES** - Added comprehensive loading states for delete goal functionality:
   * ADDED: Loading toast notification "Menghapus goal..." shown immediately upon deletion confirmation
   * ENHANCED: Delete button in dropdown menu shows "Menghapus..." state and gets disabled during process

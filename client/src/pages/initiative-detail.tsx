@@ -217,12 +217,17 @@ interface MissionCardProps {
     difficulty: 'easy' | 'medium' | 'hard';
   }>;
   className?: string;
+  successMetrics?: any[];
+  tasks?: any[];
 }
 
-function MissionCard({ missions, className }: MissionCardProps) {
+function MissionCard({ missions, className, successMetrics, tasks }: MissionCardProps) {
   const completedMissions = missions.filter(m => m.isCompleted).length;
   const totalMissions = missions.length;
-  const [isExpanded, setIsExpanded] = useState(false);
+  // Auto-expand if initiative has no metrics and no tasks
+  const shouldAutoExpand = (!successMetrics || successMetrics.length === 0) && 
+                          (!tasks || tasks.length === 0);
+  const [isExpanded, setIsExpanded] = useState(shouldAutoExpand);
   
   return (
     <div className={className}>
@@ -1151,6 +1156,8 @@ export default function InitiativeDetailPage() {
               difficulty: 'easy' as const
             }
           ]}
+          successMetrics={successMetrics}
+          tasks={tasks}
         />
       )}
       
