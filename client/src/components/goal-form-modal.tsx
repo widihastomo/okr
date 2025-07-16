@@ -23,6 +23,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { cn } from "@/lib/utils";
 import { SearchableUserSelect } from "@/components/ui/searchable-user-select";
 import { formatNumberWithSeparator, handleNumberInputChange, getNumberValueForSubmission } from "@/lib/number-utils";
+import { useAuth } from "@/hooks/useAuth";
 import type { GoalWithKeyResults, Cycle, User, Objective, Team } from "@shared/schema";
 
 // Helper function to get user name with fallback
@@ -1194,6 +1195,7 @@ export interface KeyResultModalProps {
 }
 
 export function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEditing, users }: KeyResultModalProps) {
+  const { user } = useAuth();
   const keyResultForm = useForm<KeyResultFormData>({
     resolver: zodResolver(z.object({
       title: z.string().min(1, "Judul harus diisi"),
@@ -1256,7 +1258,7 @@ export function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult,
       currentValue: "0",
       unit: "",
       status: "in_progress",
-      assignedTo: "",
+      assignedTo: user?.id || "",
     },
   });
 
@@ -1277,7 +1279,7 @@ export function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult,
           currentValue: "0",
           unit: "",
           status: "in_progress",
-          assignedTo: "",
+          assignedTo: user?.id || "",
         });
       }
     }
