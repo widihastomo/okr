@@ -54,6 +54,39 @@ import DashboardD3Tree from "@/components/dashboard-d3-tree";
 import { useLocation } from "wouter";
 import type { GoalWithKeyResults, KeyResult, Cycle, User } from "@shared/schema";
 
+// Function to find the closest cycle to today's date
+function findClosestCycle(cycles: Cycle[]): string {
+  if (!cycles || cycles.length === 0) return "all";
+  
+  const today = new Date();
+  today.setHours(0, 0, 0, 0); // Set to start of day for comparison
+  
+  let closestCycle = cycles[0];
+  let smallestDifference = Infinity;
+  
+  for (const cycle of cycles) {
+    const startDate = new Date(cycle.startDate);
+    const endDate = new Date(cycle.endDate);
+    
+    // Check if today is within the cycle
+    if (today >= startDate && today <= endDate) {
+      return cycle.id; // Return immediately if today is within a cycle
+    }
+    
+    // Calculate the minimum distance to the cycle (either to start or end)
+    const distanceToStart = Math.abs(today.getTime() - startDate.getTime());
+    const distanceToEnd = Math.abs(today.getTime() - endDate.getTime());
+    const minDistance = Math.min(distanceToStart, distanceToEnd);
+    
+    if (minDistance < smallestDifference) {
+      smallestDifference = minDistance;
+      closestCycle = cycle;
+    }
+  }
+  
+  return closestCycle.id;
+}
+
 export default function Dashboard() {
   const { toast } = useToast();
   const { user: currentUser } = useAuth();
@@ -200,19 +233,9 @@ export default function Dashboard() {
   };
 
   // Set default cycle to active cycle with shortest duration when cycles are loaded
-  const activeCycles = cycles.filter((cycle) => cycle.status === "active");
-  const defaultCycle =
-    activeCycles.length > 0
-      ? activeCycles.reduce((shortest, current) => {
-          const shortestDuration =
-            new Date(shortest.endDate).getTime() -
-            new Date(shortest.startDate).getTime();
-          const currentDuration =
-            new Date(current.endDate).getTime() -
-            new Date(current.startDate).getTime();
-          return currentDuration < shortestDuration ? current : shortest;
-        })
-      : null;
+  // Find the closest cycle to today's date
+  const closestCycleId = findClosestCycle(cycles);
+  const defaultCycle = cycles.find(cycle => cycle.id === closestCycleId) || null;
 
   // Initialize cycle filter with longest active cycle on first load only if no URL param exists
   useEffect(() => {

@@ -283,6 +283,20 @@ The system includes comprehensive database connection troubleshooting tools:
 
 ## Changelog
 ```
+- July 16, 2025. **AUTOMATIC CYCLE SELECTION IMPLEMENTED** - Successfully implemented automatic cycle selection in dashboard:
+  * ADDED: findClosestCycle function to dashboard.tsx matching goal-form-modal logic
+  * UPDATED: defaultCycle calculation to use closest cycle to today's date instead of shortest active cycle
+  * ENHANCED: Dashboard now automatically selects "Juli 2025" cycle as default when closest to current date
+  * IMPROVED: User experience with intelligent cycle pre-selection based on temporal proximity
+  * RESULT: Dashboard filter automatically shows most relevant cycle without manual selection
+- July 16, 2025. **COMPREHENSIVE DEFAULT ASSIGNEE SYSTEM** - Successfully implemented default assignee functionality:
+  * ENHANCED: SearchableUserSelect component with currentUser prop for automatic preselection
+  * ADDED: useAuth hook to GoalFormModal for current user context
+  * UPDATED: Default values in both objective and key result forms to use current user
+  * FIXED: Form reset logic to include current user for new goals/key results
+  * RESOLVED: Objective creation 400 error caused by deprecated firstName/lastName field references
+  * UPDATED: Server-side user name lookup to use consolidated name field
+  * RESULT: Both objectives and key results now automatically preselect current user as default owner/assignee
 - July 16, 2025. **TIMELINE ICON IMPLEMENTATION** - Successfully implemented custom circular timeline icon with consistent colors:
   * CREATED: TimelineIcon component matching user's circular dashed design with checkmark
   * IMPLEMENTED: Consistent color variants (primary orange, secondary blue, success green, muted gray)
