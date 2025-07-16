@@ -283,6 +283,18 @@ The system includes comprehensive database connection troubleshooting tools:
 
 ## Changelog
 ```
+- July 16, 2025. **TRIAL SETTINGS CONFIGURATION FIXED** - Successfully resolved trial settings 404 error by creating missing free trial plan:
+  * CREATED: Free Trial subscription plan with id 16e80037-0b0e-4fe3-a023-5bbefcfe55ad
+  * ADDED: Billing period for free trial (trial type, 1 month, 0.00 price)
+  * CONFIGURED: Trial plan with 3 max users, full feature access, active status
+  * FIXED: System owner privilege for admin@refokus.com user (set is_system_owner = true)
+  * RESULT: Trial settings page now accessible with proper configuration data
+- July 16, 2025. **SUBSCRIPTION DATA EMPTY ISSUE FIXED** - Successfully resolved subscription appearing empty by creating trial subscription:
+  * FIXED: All firstName/lastName database queries updated to use consolidated name field
+  * UPDATED: Payment data in invoice and upgrade endpoints to use name field splitting
+  * CREATED: Trial subscription for current organization (Starter plan, 14 days)
+  * VERIFIED: Trial status now shows isTrialActive: true with 14 days remaining
+  * RESULT: Subscription data now properly displays in upgrade package page
 - July 16, 2025. **HABIT ALIGNMENT FUNCTIONALITY REMOVED** - Successfully removed entire habit-alignment system to eliminate OpenAI dependency issues:
   * REMOVED: server/habit-alignment.ts file completely deleted
   * REMOVED: All habit-alignment API endpoints (/api/ai/habit-suggestions, /api/habits/generate, /api/habits) from server/routes.ts
