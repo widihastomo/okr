@@ -283,13 +283,6 @@ The system includes comprehensive database connection troubleshooting tools:
 
 ## Changelog
 ```
-- July 16, 2025. **ADD-ON ONLY PURCHASE PAGE** - Successfully modified upgrade package page to show only add-on purchase options:
-  * UPDATED: Page header changed from "Upgrade Paket Berlangganan" to "Beli Add-on"
-  * REMOVED: All subscription plan selection cards and billing period options
-  * ENHANCED: Direct add-on purchase interface with quantity controls and pricing
-  * SIMPLIFIED: Payment modal now shows only selected add-ons without plan information
-  * IMPROVED: Streamlined checkout process focused solely on add-on purchases
-  * RESULT: Clean, focused interface for purchasing add-ons without subscription plan complexity
 - July 16, 2025. **AUTH FLOW IMPROVEMENTS** - Successfully updated AuthFlow component with new messaging and consistent orange theme:
   * UPDATED: Register description from "Mulai kelola objective dan angka target tim Anda" to "Ubah tujuan menjadi aksi nyata yang terukur"
   * STANDARDIZED: All buttons now use orange gradient (from-orange-600 to-orange-500) instead of mixed blue/green colors
