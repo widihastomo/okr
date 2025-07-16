@@ -1816,6 +1816,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const currentUser = req.user as User;
       
+      // Only allow owners to create teams
+      if (!currentUser.isSystemOwner && currentUser.role === 'member') {
+        return res.status(403).json({ message: "Access denied. Only administrators and owners can create teams." });
+      }
+      
       // Extract memberIds from request body
       const { memberIds, ...teamData } = req.body;
       
@@ -1869,6 +1874,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!currentUser.isSystemOwner) {
         if (currentUser.organizationId !== existingTeam.organizationId) {
           return res.status(403).json({ message: "Access denied to this team" });
+        }
+        
+        // Only allow owners to edit teams
+        if (currentUser.role === 'member') {
+          return res.status(403).json({ message: "Access denied. Only administrators and owners can edit teams." });
         }
       }
       
@@ -1927,6 +1937,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!currentUser.isSystemOwner) {
         if (currentUser.organizationId !== existingTeam.organizationId) {
           return res.status(403).json({ message: "Access denied to this team" });
+        }
+        
+        // Only allow owners to delete teams
+        if (currentUser.role === 'member') {
+          return res.status(403).json({ message: "Access denied. Only administrators and owners can delete teams." });
         }
       }
       
@@ -2007,6 +2022,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (currentUser.organizationId !== team.organizationId) {
           return res.status(403).json({ message: "Access denied to this team" });
         }
+        
+        // Only allow owners to add team members
+        if (currentUser.role === 'member') {
+          return res.status(403).json({ message: "Access denied. Only administrators and owners can add team members." });
+        }
       }
       
       const memberData = { ...req.body, teamId };
@@ -2033,6 +2053,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!currentUser.isSystemOwner) {
         if (currentUser.organizationId !== team.organizationId) {
           return res.status(403).json({ message: "Access denied to this team" });
+        }
+        
+        // Only allow owners to remove team members
+        if (currentUser.role === 'member') {
+          return res.status(403).json({ message: "Access denied. Only administrators and owners can remove team members." });
         }
       }
       
@@ -2063,6 +2088,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!currentUser.isSystemOwner) {
         if (currentUser.organizationId !== team.organizationId) {
           return res.status(403).json({ message: "Access denied to this team" });
+        }
+        
+        // Only allow owners to update team member roles
+        if (currentUser.role === 'member') {
+          return res.status(403).json({ message: "Access denied. Only administrators and owners can update team member roles." });
         }
       }
       
