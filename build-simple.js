@@ -73,7 +73,7 @@ process.on('SIGINT', () => {
 });
 `;
 
-  writeFileSync('dist/index.js', serverScript, { mode: 0o755 });
+  writeFileSync('dist/index.cjs', serverScript, { mode: 0o755 });
   console.log('✅ Server bundle created successfully');
 
   console.log('🌐 Creating production frontend...');
@@ -177,14 +177,14 @@ process.on('SIGINT', () => {
   const deployInfo = {
     buildTime: new Date().toISOString(),
     nodeVersion: process.version,
-    files: ['dist/index.js', 'dist/public/index.html']
+    files: ['dist/index.cjs', 'dist/public/index.html']
   };
   
   writeFileSync('dist/deploy-info.json', JSON.stringify(deployInfo, null, 2));
 
   // Verify files were created
-  if (!existsSync('dist/index.js')) {
-    throw new Error('Failed to create dist/index.js');
+  if (!existsSync('dist/index.cjs')) {
+    throw new Error('Failed to create dist/index.cjs');
   }
   
   if (!existsSync('dist/public/index.html')) {
@@ -194,7 +194,7 @@ process.on('SIGINT', () => {
   console.log('✅ Build completed successfully');
   console.log('');
   console.log('📋 Build Summary:');
-  console.log('  ✅ dist/index.js: Server bundle');
+  console.log('  ✅ dist/index.cjs: Server bundle');
   console.log('  ✅ dist/public/index.html: Frontend');
   console.log('  ✅ dist/deploy-info.json: Deployment info');
   console.log('');

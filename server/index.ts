@@ -3,6 +3,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import mongoSanitize from "express-mongo-sanitize";
+import cors from "cors";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
@@ -85,7 +86,6 @@ app.use(mongoSanitize());
 
 // CORS configuration for production
 if (process.env.NODE_ENV === 'production') {
-  const cors = require('cors');
   app.use(cors({
     origin: process.env.ALLOWED_ORIGINS?.split(',') || ['https://*.replit.app'],
     credentials: true
