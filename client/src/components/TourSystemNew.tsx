@@ -552,7 +552,7 @@ export default function TourSystem() {
       {/* Tour tooltip - only show when tour is active */}
       {isActive && isVisible && (
         <div
-          className="fixed z-[100] bg-white rounded-xl shadow-2xl border border-orange-200 border-2"
+          className="fixed z-[9999] bg-white rounded-xl shadow-2xl border border-orange-200 border-2"
           style={{
             left: `${tooltipPosition.x}px`,
             top: `${tooltipPosition.y}px`,
