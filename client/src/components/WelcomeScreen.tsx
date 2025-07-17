@@ -59,7 +59,7 @@ export default function WelcomeScreen({ isOpen, onClose, onStartTour }: WelcomeS
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-2xl">
             <Sparkles className="h-6 w-6 text-orange-500" />
-            Selamat Datang di Sistem OKR
+            Selamat Datang di Refokus
           </DialogTitle>
         </DialogHeader>
         

@@ -283,6 +283,7 @@ The system includes comprehensive database connection troubleshooting tools:
 
 ## Changelog
 ```
+- July 17, 2025. **WELCOME SCREEN TITLE UPDATED** - Changed welcome screen title from "Selamat Datang di Sistem OKR" to "Selamat Datang di Refokus" for proper branding alignment
 - July 17, 2025. **DAILY FOCUS TOUR ENHANCEMENT COMPLETED** - Successfully added 6 new tour steps for Daily Focus page with comprehensive Indonesian explanations:
   * ADDED: Update Harian Instan button tour step with data-tour="update-harian-instan" attribute
   * ADDED: Overview cards section tour step with data-tour="overview-cards" attribute  
