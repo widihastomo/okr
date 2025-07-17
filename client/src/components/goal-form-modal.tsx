@@ -1913,7 +1913,7 @@ export function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult,
 }
 
 // Component untuk tombol Create Goal
-export function CreateGoalButton() {
+export function CreateGoalButton(props: any) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -1921,6 +1921,8 @@ export function CreateGoalButton() {
       <Button 
         onClick={() => setOpen(true)}
         className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white w-full sm:w-auto"
+        data-tour="add-goal"
+        {...props}
       >
         <Plus className="w-4 h-4 mr-2" />
         Buat Goal
