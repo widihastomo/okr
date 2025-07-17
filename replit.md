@@ -291,7 +291,7 @@ The system includes comprehensive database connection troubleshooting tools:
   * ADDED: Informational indicator explaining that blinking menus show feature locations
   * ENHANCED: Each step now includes detailed explanation of functionality, benefits, and use cases
   * IMPROVED: Tour flow now uses standard next/previous buttons instead of click-to-advance
-  * REORDERED: Tour steps now follow top-to-bottom navigation order (Notifications → Daily Focus → Goals → Tasks → Timeline → Cycles → Achievements → Analytics → Users → Settings)
+  * REORDERED: Tour steps now follow top-to-bottom navigation order (Notifications → Daily Focus → Timeline → Tasks → Goals → Cycles → Achievements → Analytics → Users → Settings)
   * RESULT: More educational and user-friendly tour experience with comprehensive feature explanations and logical navigation flow
 - July 17, 2025. **TRIAL DURATION FIELD IMPLEMENTATION** - Successfully added configurable trial duration field to subscription package management:
   * ADDED: trial_duration column to subscription_plans database table

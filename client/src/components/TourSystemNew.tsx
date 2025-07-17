@@ -38,11 +38,11 @@ const TOUR_STEPS: TourStep[] = [
     category: 'action'
   },
   {
-    id: 'goals',
-    title: 'Goals - Manajemen Tujuan',
-    description: 'Kelola seluruh tujuan organisasi menggunakan metodologi OKR (Objectives and Key Results). Buat objectives yang inspiratif dan tentukan key results yang terukur untuk melacak pencapaian. Sistem ini membantu menyelaraskan visi organisasi dengan eksekusi yang nyata dan terukur.',
-    icon: Flag,
-    selector: '[data-tour="goals"]',
+    id: 'timeline',
+    title: 'Timeline - Riwayat Progress',
+    description: 'Visualisasi kronologis dari semua aktivitas dan progress yang telah dicapai. Lihat check-in, pencapaian milestone, dan perkembangan key results dalam format timeline yang mudah dipahami. Fitur ini memberikan gambaran historis yang komprehensif tentang perjalanan organisasi.',
+    icon: Clock,
+    selector: '[data-tour="timeline"]',
     position: 'right',
     category: 'feature'
   },
@@ -56,11 +56,11 @@ const TOUR_STEPS: TourStep[] = [
     category: 'feature'
   },
   {
-    id: 'timeline',
-    title: 'Timeline - Riwayat Progress',
-    description: 'Visualisasi kronologis dari semua aktivitas dan progress yang telah dicapai. Lihat check-in, pencapaian milestone, dan perkembangan key results dalam format timeline yang mudah dipahami. Fitur ini memberikan gambaran historis yang komprehensif tentang perjalanan organisasi.',
-    icon: Clock,
-    selector: '[data-tour="timeline"]',
+    id: 'goals',
+    title: 'Goals - Manajemen Tujuan',
+    description: 'Kelola seluruh tujuan organisasi menggunakan metodologi OKR (Objectives and Key Results). Buat objectives yang inspiratif dan tentukan key results yang terukur untuk melacak pencapaian. Sistem ini membantu menyelaraskan visi organisasi dengan eksekusi yang nyata dan terukur.',
+    icon: Flag,
+    selector: '[data-tour="goals"]',
     position: 'right',
     category: 'feature'
   },
