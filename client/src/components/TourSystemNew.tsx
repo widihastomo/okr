@@ -55,9 +55,8 @@ const TOUR_STEPS: TourStep[] = [
     icon: Sun,
     selector: '[data-tour="daily-focus"]',
     position: 'right',
-    category: 'action',
-    targetPath: '/daily-focus',
-    requiresClick: true
+    category: 'feature',
+    targetPath: '/daily-focus'
   },
   {
     id: 'daily-focus-content',
