@@ -486,7 +486,7 @@ export default function TourSystem() {
         const tooltipHeight = 300; // Increased height to accommodate content
         
         let x = rect.left + rect.width / 2 - tooltipWidth / 2;
-        let y = rect.top - tooltipHeight - 15;
+        let y = rect.top - tooltipHeight - 50; // Moved tooltip higher up
         
         // Adjust position based on step position
         switch (currentStepData.position) {
@@ -499,7 +499,7 @@ export default function TourSystem() {
             y = rect.top + rect.height / 2 - tooltipHeight / 2;
             break;
           case 'bottom':
-            y = rect.bottom + 15;
+            y = rect.bottom + 30; // Increased spacing for bottom positioning
             break;
           case 'top':
           default:
