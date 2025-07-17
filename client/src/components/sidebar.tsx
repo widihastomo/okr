@@ -184,7 +184,7 @@ export default function Sidebar({
       {/* Mobile backdrop */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-[19] lg:hidden"
+          className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden"
           onClick={onClose}
         />
       )}
@@ -193,7 +193,7 @@ export default function Sidebar({
       <TooltipProvider>
         <div
           className={cn(
-            "fixed left-0 top-16 h-[calc(100vh-4rem)] bg-white border-r border-gray-200 transition-all duration-300 ease-in-out z-[20]",
+            "fixed left-0 top-16 h-[calc(100vh-4rem)] bg-white border-r border-gray-200 transition-all duration-300 ease-in-out z-30",
             // Mobile: slide in/out
             "lg:translate-x-0", // Desktop: always visible
             isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",

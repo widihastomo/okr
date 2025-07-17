@@ -359,27 +359,10 @@ export default function TourSystem() {
       document.querySelectorAll('.tour-highlight').forEach(el => {
         el.classList.remove('tour-highlight');
         el.classList.remove('tour-click-required');
-        
-        // Restore original z-index
-        const originalZIndex = el.getAttribute('data-original-z-index');
-        if (originalZIndex) {
-          el.style.zIndex = originalZIndex;
-        } else {
-          el.style.zIndex = '';
-        }
-        el.removeAttribute('data-original-z-index');
       });
       
       // Add highlight to current element
       element.classList.add('tour-highlight');
-      
-      // Ensure element is above overlay with inline style
-      const originalZIndex = element.style.zIndex;
-      element.style.zIndex = '40';
-      element.style.position = 'relative';
-      
-      // Store original z-index to restore later
-      element.setAttribute('data-original-z-index', originalZIndex || '');
       
       // Get element position for spotlight effect
       const rect = element.getBoundingClientRect();
@@ -468,16 +451,6 @@ export default function TourSystem() {
   const cleanupHighlights = () => {
     document.querySelectorAll('.tour-highlight').forEach(el => {
       el.classList.remove('tour-highlight');
-      el.classList.remove('tour-click-required');
-      
-      // Restore original z-index
-      const originalZIndex = el.getAttribute('data-original-z-index');
-      if (originalZIndex) {
-        el.style.zIndex = originalZIndex;
-      } else {
-        el.style.zIndex = '';
-      }
-      el.removeAttribute('data-original-z-index');
     });
   };
 
@@ -510,11 +483,11 @@ export default function TourSystem() {
       {isActive && isVisible && (
         <>
           {/* Full screen overlay to dim background */}
-          <div className="fixed inset-0 bg-black/50 z-[10] transition-all duration-300 tour-overlay" />
+          <div className="fixed inset-0 bg-black/50 z-[90] transition-all duration-300 tour-overlay" />
           
           {/* Spotlight effect - creates a clear area around the target element */}
           <div 
-            className="fixed inset-0 z-[15] pointer-events-none transition-all duration-300 tour-spotlight"
+            className="fixed inset-0 z-[95] pointer-events-none transition-all duration-300 tour-spotlight"
             style={{
               background: elementPosition.x && elementPosition.y ? 
                 `radial-gradient(circle 80px at ${elementPosition.x}px ${elementPosition.y}px, transparent 0%, transparent 40%, rgba(0,0,0,0.3) 70%)` : 
@@ -524,7 +497,7 @@ export default function TourSystem() {
           
           {/* Tour tooltip */}
           <div
-            className="fixed z-[50] rounded-xl shadow-2xl tour-tooltip"
+            className="fixed z-[100] rounded-xl shadow-2xl tour-tooltip"
             style={{
               left: `${tooltipPosition.x}px`,
               top: `${tooltipPosition.y}px`,
