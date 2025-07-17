@@ -1084,17 +1084,25 @@ export default function DailyFocusPage() {
             </p>
           </div>
 
-          {/* Date display - desktop only */}
-          <div className="hidden sm:flex items-center gap-2 text-sm text-gray-500">
-            <Calendar className="h-4 w-4" />
-            <span>
-              {today.toLocaleDateString("id-ID", {
-                weekday: "long",
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </span>
+          {/* Welcome Screen Button and Date display - desktop */}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => window.dispatchEvent(new CustomEvent('showWelcomeScreen'))}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-md text-sm font-medium transition-colors"
+            >
+              Welcome Screen
+            </button>
+            <div className="hidden sm:flex items-center gap-2 text-sm text-gray-500">
+              <Calendar className="h-4 w-4" />
+              <span>
+                {today.toLocaleDateString("id-ID", {
+                  weekday: "long",
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </span>
+            </div>
           </div>
         </div>
 
