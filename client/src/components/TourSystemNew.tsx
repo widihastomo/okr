@@ -530,11 +530,7 @@ export default function TourSystem() {
               )}
             </CardDescription>
             
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
-              <p className="text-sm text-blue-700 font-medium">
-                ℹ️ Menu yang berkedip menunjukkan lokasi fitur yang sedang dijelaskan
-              </p>
-            </div>
+            
             
             <Progress value={progress} className="h-1 mb-3" />
             
