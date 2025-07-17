@@ -283,6 +283,13 @@ The system includes comprehensive database connection troubleshooting tools:
 
 ## Changelog
 ```
+- July 17, 2025. **MOBILE TOUR POSITIONING ENHANCEMENT** - Successfully fixed tooltip positioning to prevent covering highlighted menu items on mobile:
+  * FIXED: Mobile tooltip positioning logic to prevent covering highlighted menu items
+  * ENHANCED: Mobile menu items now show tooltip below the menu item instead of overlapping
+  * IMPROVED: Mobile tooltip width responsive to screen size (calc(100vw - 30px))
+  * ADDED: Smart positioning for mobile - bottom placement for menu items, adaptive for other elements
+  * OPTIMIZED: Mobile tooltip positioning considers available space above/below elements
+  * RESULT: Mobile tour tooltips no longer cover highlighted menu items for better user experience
 - July 17, 2025. **MOBILE SIDEBAR EXPANSION FOR TOUR** - Successfully implemented automatic sidebar expansion on mobile devices during tour:
   * ADDED: isMobile() function to detect mobile viewport (window width <= 768px)
   * ADDED: isMenuStep() function to identify menu-related tour steps

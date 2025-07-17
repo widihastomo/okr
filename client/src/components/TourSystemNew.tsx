@@ -632,29 +632,46 @@ export default function TourSystem() {
       // Wait for scroll to complete then calculate position
       setTimeout(() => {
         const rect = element.getBoundingClientRect();
-        const tooltipWidth = 380;
+        const tooltipWidth = isMobile() ? Math.min(window.innerWidth - 30, 380) : 380;
         const tooltipHeight = 300; // Increased height to accommodate content
 
         let x = rect.left + rect.width / 2 - tooltipWidth / 2;
         let y = rect.top - tooltipHeight - 150; // Moved tooltip even higher up
 
-        // Adjust position based on step position
-        switch (currentStepData.position) {
-          case "right":
-            x = rect.right + 15;
-            y = rect.top + rect.height / 2 - tooltipHeight / 2;
-            break;
-          case "left":
-            x = rect.left - tooltipWidth - 15;
-            y = rect.top + rect.height / 2 - tooltipHeight / 2;
-            break;
-          case "bottom":
-            y = rect.bottom + 30; // Increased spacing for bottom positioning
-            break;
-          case "top":
-          default:
-            // Keep default values
-            break;
+        // Mobile-specific positioning for menu items
+        if (isMobile() && isMenuStep(currentStepData.id)) {
+          // For mobile menu items, always position at the bottom to avoid covering the menu
+          x = 15; // Left edge with padding
+          y = rect.bottom + 15; // Below the menu item with padding
+        } else if (isMobile()) {
+          // For mobile non-menu items, position at bottom or top based on available space
+          x = 15; // Left edge with padding
+          if (rect.bottom + tooltipHeight + 30 > window.innerHeight) {
+            // Position above if not enough space below
+            y = Math.max(15, rect.top - tooltipHeight - 15);
+          } else {
+            // Position below if enough space
+            y = rect.bottom + 15;
+          }
+        } else {
+          // Desktop positioning - adjust based on step position
+          switch (currentStepData.position) {
+            case "right":
+              x = rect.right + 15;
+              y = rect.top + rect.height / 2 - tooltipHeight / 2;
+              break;
+            case "left":
+              x = rect.left - tooltipWidth - 15;
+              y = rect.top + rect.height / 2 - tooltipHeight / 2;
+              break;
+            case "bottom":
+              y = rect.bottom + 30; // Increased spacing for bottom positioning
+              break;
+            case "top":
+            default:
+              // Keep default values
+              break;
+          }
         }
 
         // Ensure tooltip stays within viewport
@@ -709,7 +726,8 @@ export default function TourSystem() {
           style={{
             left: `${tooltipPosition.x}px`,
             top: `${tooltipPosition.y}px`,
-            width: "380px",
+            width: isMobile() ? "calc(100vw - 30px)" : "380px",
+            maxWidth: isMobile() ? "calc(100vw - 30px)" : "380px",
             maxHeight: "400px",
             pointerEvents: "auto",
           }}
