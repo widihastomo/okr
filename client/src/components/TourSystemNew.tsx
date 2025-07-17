@@ -58,15 +58,7 @@ const TOUR_STEPS: TourStep[] = [
     category: 'action',
     targetPath: '/daily-focus'
   },
-  {
-    id: 'daily-focus-content',
-    title: 'Daily Focus - Tab Prioritas',
-    description: 'Tiga tab utama membantu Anda mengatur fokus harian: Task Prioritas untuk tugas yang harus diselesaikan, Update Progress untuk key results yang perlu diperbarui, dan Kelola Inisiatif untuk proyek yang sedang berjalan.',
-    icon: Sun,
-    selector: '[data-tour="daily-focus-tabs"]',
-    position: 'bottom',
-    category: 'feature'
-  },
+
   {
     id: 'update-harian-instan',
     title: 'Update Harian Instan - Pencatatan Progress Cepat',
