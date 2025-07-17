@@ -220,7 +220,7 @@ export default function TourSystem() {
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
   const [waitingForClick, setWaitingForClick] = useState(false);
   const [location, setLocation] = useLocation();
-  const [showWelcomeScreen, setShowWelcomeScreen] = useState(true);
+  const [showWelcomeScreen, setShowWelcomeScreen] = useState(false);
   
   const totalSteps = TOUR_STEPS.length;
   
@@ -274,12 +274,20 @@ export default function TourSystem() {
   // Tour control functions for welcome screen
   const handleWelcomeScreenClose = () => {
     setShowWelcomeScreen(false);
+    localStorage.setItem('welcome-screen-shown', 'true');
   };
 
   const handleStartTourFromWelcome = () => {
     setShowWelcomeScreen(false);
+    localStorage.setItem('welcome-screen-shown', 'true');
     setIsActive(true);
     setCurrentStep(0);
+  };
+
+  const showWelcomeScreenManually = () => {
+    localStorage.removeItem('welcome-screen-shown');
+    localStorage.setItem('onboarding-completed', 'true');
+    setShowWelcomeScreen(true);
   };
 
   // Listen for start tour event
@@ -287,10 +295,12 @@ export default function TourSystem() {
     const handleStartTour = () => {
       // Check if onboarding is completed first
       const onboardingCompleted = localStorage.getItem('onboarding-completed') === 'true';
-      if (onboardingCompleted) {
+      const welcomeScreenShown = localStorage.getItem('welcome-screen-shown') === 'true';
+      
+      if (onboardingCompleted && !welcomeScreenShown) {
         setShowWelcomeScreen(true);
       } else {
-        // Start tour directly if no onboarding
+        // Start tour directly if no onboarding or welcome screen already shown
         setIsActive(true);
         setCurrentStep(0);
       }
@@ -303,11 +313,17 @@ export default function TourSystem() {
       localStorage.removeItem('tour-completed');
     };
 
+    const handleShowWelcomeScreen = () => {
+      showWelcomeScreenManually();
+    };
+
     window.addEventListener('startTour', handleStartTour);
     window.addEventListener('startTourDirect', handleStartTourDirect);
+    window.addEventListener('showWelcomeScreen', handleShowWelcomeScreen);
     return () => {
       window.removeEventListener('startTour', handleStartTour);
       window.removeEventListener('startTourDirect', handleStartTourDirect);
+      window.removeEventListener('showWelcomeScreen', handleShowWelcomeScreen);
     };
   }, []);
 

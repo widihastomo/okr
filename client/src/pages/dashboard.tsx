@@ -605,6 +605,12 @@ export default function Dashboard() {
             </div>
             <div className="flex-shrink-0 flex gap-2">
               <CreateGoalButton data-tour="add-goal" />
+              <button
+                onClick={() => window.dispatchEvent(new CustomEvent('showWelcomeScreen'))}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md text-sm font-medium transition-colors"
+              >
+                Welcome Screen
+              </button>
             </div>
           </div>
 
