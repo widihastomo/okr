@@ -288,6 +288,8 @@ The system includes comprehensive database connection troubleshooting tools:
   * ADDED: areStepsOnSamePage() function to detect same-page transitions
   * ENHANCED: Smart sidebar management prevents unwanted toggles during Daily Focus tour steps
   * IMPROVED: Sidebar only closes when transitioning between different pages, not within same page
+  * FIXED: Menu item highlighting on mobile - step 4 (daily-focus) now properly highlights after sidebar expansion
+  * ENHANCED: Separate highlighting logic for mobile menu items with proper timing delays
   * RESULT: Smooth tour experience without disruptive sidebar toggles between steps 4-5 (Daily Focus)
 - July 17, 2025. **MOBILE TOUR POSITIONING ENHANCEMENT** - Successfully fixed tooltip positioning to prevent covering highlighted menu items on mobile:
   * FIXED: Mobile tooltip positioning logic to prevent covering highlighted menu items

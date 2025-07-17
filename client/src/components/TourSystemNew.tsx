@@ -593,9 +593,16 @@ export default function TourSystem() {
           setTimeout(() => {
             const updatedElement = document.querySelector(currentStepData.selector);
             if (updatedElement) {
+              // Remove any existing highlights first
+              document.querySelectorAll(".tour-highlight").forEach((el) => {
+                el.classList.remove("tour-highlight");
+                el.classList.remove("tour-click-required");
+              });
+              // Then highlight the current element
               updatedElement.classList.add("tour-highlight");
+              console.log(`Mobile: Re-highlighted menu item ${currentStepData.id} after sidebar expansion`);
             }
-          }, 100);
+          }, 200);
         });
       } else if (isPreviousMenuStep && !areOnSamePage) {
         // Only close sidebar if transitioning from menu step to non-menu step AND changing pages
@@ -611,14 +618,19 @@ export default function TourSystem() {
     }
 
     if (element) {
-      // Remove existing highlights and click handlers
-      document.querySelectorAll(".tour-highlight").forEach((el) => {
-        el.classList.remove("tour-highlight");
-        el.classList.remove("tour-click-required");
-      });
+      // For mobile menu items, skip normal highlighting as it's handled by sidebar expansion logic
+      if (isMobile() && isMenuStep(currentStepData.id)) {
+        console.log(`Mobile: Skipping normal highlight for menu item ${currentStepData.id} - handled by sidebar expansion`);
+      } else {
+        // Remove existing highlights and click handlers
+        document.querySelectorAll(".tour-highlight").forEach((el) => {
+          el.classList.remove("tour-highlight");
+          el.classList.remove("tour-click-required");
+        });
 
-      // Add highlight to current element
-      element.classList.add("tour-highlight");
+        // Add highlight to current element
+        element.classList.add("tour-highlight");
+      }
 
       // If this step requires a click, add click handler
       if (currentStepData.requiresClick) {
