@@ -227,6 +227,7 @@ export default function TourSystem() {
   const [currentStep, setCurrentStep] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
+  const [elementPosition, setElementPosition] = useState({ x: 0, y: 0 });
   const [waitingForClick, setWaitingForClick] = useState(false);
   const [location, setLocation] = useLocation();
   const [showWelcomeScreen, setShowWelcomeScreen] = useState(false);
@@ -376,6 +377,13 @@ export default function TourSystem() {
       // Add highlight to current element
       element.classList.add('tour-highlight');
       
+      // Get element position for spotlight effect
+      const rect = element.getBoundingClientRect();
+      setElementPosition({
+        x: rect.left + rect.width / 2,
+        y: rect.top + rect.height / 2
+      });
+      
       // If this step requires a click, add click handler
       if (currentStepData.requiresClick) {
         setWaitingForClick(true);
@@ -450,6 +458,8 @@ export default function TourSystem() {
       }, 300);
     } else {
       console.warn(`Element not found for selector: ${currentStepData.selector}`);
+      // Reset element position if element not found
+      setElementPosition({ x: 0, y: 0 });
     }
   };
 
@@ -484,18 +494,33 @@ export default function TourSystem() {
 
   return (
     <>
-      {/* Tour tooltip - only show when tour is active */}
+      {/* Tour overlay - only show when tour is active */}
       {isActive && isVisible && (
-        <div
-          className="fixed z-[100] bg-white rounded-xl shadow-2xl border border-orange-200 border-2"
-          style={{
-            left: `${tooltipPosition.x}px`,
-            top: `${tooltipPosition.y}px`,
-            width: '380px',
-            pointerEvents: 'auto'
-          }}
-        >
-          <CardHeader className="pb-3">
+        <>
+          {/* Full screen overlay to dim background */}
+          <div className="fixed inset-0 bg-black/50 z-[90] transition-all duration-300 tour-overlay" />
+          
+          {/* Spotlight effect - creates a clear area around the target element */}
+          <div 
+            className="fixed inset-0 z-[95] pointer-events-none transition-all duration-300 tour-spotlight"
+            style={{
+              background: elementPosition.x && elementPosition.y ? 
+                `radial-gradient(circle 80px at ${elementPosition.x}px ${elementPosition.y}px, transparent 0%, transparent 40%, rgba(0,0,0,0.3) 70%)` : 
+                'transparent'
+            }}
+          />
+          
+          {/* Tour tooltip */}
+          <div
+            className="fixed z-[100] rounded-xl shadow-2xl tour-tooltip"
+            style={{
+              left: `${tooltipPosition.x}px`,
+              top: `${tooltipPosition.y}px`,
+              width: '380px',
+              pointerEvents: 'auto'
+            }}
+          >
+            <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <Badge variant="outline" className="text-xs">
                 {currentStep + 1} dari {totalSteps}
@@ -587,7 +612,8 @@ export default function TourSystem() {
               </div>
             </div>
           </CardContent>
-        </div>
+          </div>
+        </>
       )}
       
       {/* Welcome Screen */}

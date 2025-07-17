@@ -741,3 +741,38 @@
 .animate-typing-cursor {
   animation: typing-cursor 1s infinite;
 }
+
+/* Tour System Styles */
+.tour-highlight {
+  position: relative;
+  z-index: 60;
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(249, 115, 22, 0.1);
+  }
+}
+
+/* Tour Overlay Styles */
+.tour-overlay {
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
+}
+
+.tour-spotlight {
+  background: radial-gradient(circle, transparent 0%, transparent 40%, rgba(0,0,0,0.4) 70%);
+  transition: all 0.3s ease-in-out;
+}
+
+.tour-tooltip {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px solid rgba(249, 115, 22, 0.3);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
