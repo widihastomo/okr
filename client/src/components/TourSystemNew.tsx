@@ -204,17 +204,6 @@ const TOUR_STEPS: TourStep[] = [
     category: "feature",
   },
   {
-    id: "goals-expand-card",
-    title: "Goals - Expand Detail Card",
-    description:
-      "Klik tombol expand untuk melihat detail lengkap goal termasuk key results, progress tracking, dan informasi tambahan. Fitur ini membantu Anda memahami status dan perkembangan setiap tujuan.",
-    icon: Target,
-    selector: '[data-tour="goals-expand-card"]',
-    position: "bottom",
-    category: "feature",
-    requiresClick: true,
-  },
-  {
     id: "goals-hierarchy-view-tab",
     title: "Goals - Tampilan Hierarchy",
     description:

@@ -283,18 +283,23 @@ The system includes comprehensive database connection troubleshooting tools:
 
 ## Changelog
 ```
+- July 17, 2025. **TOUR STEP 16 REMOVAL** - Successfully removed goals-expand-card tour step to streamline tour experience:
+  * REMOVED: goals-expand-card tour step (step 16) from TourSystemNew.tsx
+  * UPDATED: Tour system now has 30 total steps instead of 31
+  * STREAMLINED: Goals page tour now has 5 contextual steps instead of 6
+  * ENHANCED: Tour automatically restarted after update with proper step counting
+  * RESULT: More concise tour experience with focused goal management guidance
 - July 17, 2025. **GOALS PAGE TOUR IMPLEMENTATION COMPLETED** - Successfully added comprehensive tour system for Goals page with 6 interactive elements:
   * ADDED: goals-add-button tour step with data-tour="add-goal" attribute for "Tambah Tujuan Baru" button
   * ADDED: goals-filter tour step with data-tour="goals-filter" attribute for filter controls section
   * ADDED: goals-overview tour step with data-tour="goals-overview-card" attribute for statistics overview cards
   * ADDED: goals-list-view-tab tour step with data-tour="goals-list-view" attribute for List View tab
-  * ADDED: goals-expand-card tour step with data-tour="goals-expand-card" attribute for goal card expand button (requiresClick: true)
   * ADDED: goals-hierarchy-view-tab tour step with data-tour="goals-hierarchy-view" attribute for Hierarchy View tab (requiresClick: true)
   * ENHANCED: All tour steps include comprehensive Indonesian descriptions explaining functionality and benefits
-  * IMPLEMENTED: Interactive click requirements for expand card and hierarchy view for hands-on learning experience
-  * FIXED: Tour system now allows interactive elements to function properly during tour (expand card, hierarchy view, Daily Focus tabs)
+  * IMPLEMENTED: Interactive click requirements for hierarchy view for hands-on learning experience
+  * FIXED: Tour system now allows interactive elements to function properly during tour (hierarchy view, Daily Focus tabs)
   * ENHANCED: Click handlers preserve original functionality while still progressing tour steps
-  * RESULT: Complete Goals page tour coverage with 6 contextual steps explaining core goal management features
+  * RESULT: Complete Goals page tour coverage with 5 contextual steps explaining core goal management features
 - July 17, 2025. **GOALS MENU ICON UPDATED** - Successfully changed Goals menu icon from Flag to Target (bullseye-arrow) for better visual representation:
   * CHANGED: Goals menu icon from Flag to Target icon in sidebar navigation
   * UPDATED: All Goals-related tour steps to use Target icon instead of Flag icon
