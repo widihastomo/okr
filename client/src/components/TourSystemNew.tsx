@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { X, ChevronRight, ChevronLeft, CheckSquare, Sun, Flag, Clock, BarChart3, Bell, Users, Settings, Trophy, Calendar, MousePointer2 } from 'lucide-react';
+import { X, ChevronRight, ChevronLeft, CheckSquare, Sun, Flag, Clock, BarChart3, Bell, Users, Settings, Trophy, Calendar, MousePointer2, Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLocation } from 'wouter';
 import WelcomeScreen from './WelcomeScreen';
@@ -21,6 +21,15 @@ interface TourStep {
 }
 
 const TOUR_STEPS: TourStep[] = [
+  {
+    id: 'hamburger-menu',
+    title: 'Menu Navigasi - Hamburger Menu',
+    description: 'Menu hamburger (☰) di bagian kiri atas adalah pusat navigasi utama aplikasi. Klik untuk membuka/menutup sidebar dan mengakses semua fitur seperti Daily Focus, Timeline, Tasks, Goals, dan pengaturan lainnya. Menu ini responsif dan mudah digunakan di desktop maupun mobile.',
+    icon: Menu,
+    selector: '[data-tour="hamburger-menu"]',
+    position: 'right',
+    category: 'navigation'
+  },
   {
     id: 'notifications',
     title: 'Notifikasi - Update Real-time',
@@ -291,6 +300,23 @@ export default function TourSystem() {
     setShowWelcomeScreen(true);
     console.log('Welcome screen state set to true');
   };
+
+  const restartTourFromHamburgerMenu = () => {
+    console.log('Tour restarted from hamburger menu step');
+    setIsActive(true);
+    setCurrentStep(0);
+    setIsVisible(true);
+    setTimeout(() => highlightCurrentStep(), 100);
+  };
+
+  // Auto-restart tour from hamburger menu when component mounts
+  useEffect(() => {
+    // If tour is already active, restart it from step 0 (hamburger menu)
+    if (isActive) {
+      console.log('Auto-restarting tour from hamburger menu');
+      restartTourFromHamburgerMenu();
+    }
+  }, [isActive]);
 
   // Listen for start tour event
   useEffect(() => {

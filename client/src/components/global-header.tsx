@@ -204,6 +204,7 @@ export default function GlobalHeader({
           size="icon"
           onClick={handleMenuClick}
           className="hover:bg-gray-100"
+          data-tour="hamburger-menu"
         >
           <Menu className="h-5 w-5" />
         </Button>
