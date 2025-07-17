@@ -11,27 +11,6 @@
   box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.4);
 }
 
-/* Onboarding Highlight Effects */
-.onboarding-highlight {
-  position: relative !important;
-  z-index: 1051 !important;
-  animation: onboardingHighlight 2s infinite;
-  border-radius: 8px !important;
-  box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.6) !important;
-  background: rgba(255, 255, 255, 0.95) !important;
-}
-
-.onboarding-overlay {
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  background: rgba(0, 0, 0, 0.7) !important;
-  z-index: 1050 !important;
-  pointer-events: none !important;
-}
-
 @keyframes tourHighlight {
   0%, 100% { 
     box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.4), 0 0 20px rgba(249, 115, 22, 0.2);
@@ -40,17 +19,6 @@
   50% { 
     box-shadow: 0 0 0 8px rgba(249, 115, 22, 0.6), 0 0 30px rgba(249, 115, 22, 0.4);
     transform: scale(1.02);
-  }
-}
-
-@keyframes onboardingHighlight {
-  0%, 100% { 
-    box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.6), 0 0 20px rgba(249, 115, 22, 0.3);
-    transform: scale(1);
-  }
-  50% { 
-    box-shadow: 0 0 0 8px rgba(249, 115, 22, 0.8), 0 0 30px rgba(249, 115, 22, 0.5);
-    transform: scale(1.01);
   }
 }
 
