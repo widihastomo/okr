@@ -45,6 +45,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import TimelineIconDefault from "@/components/ui/timeline-icon";
+import BullseyeArrowIcon from "@/components/ui/bullseye-arrow-icon";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -158,7 +159,7 @@ export default function Sidebar({
     },
     {
       label: "Goals",
-      icon: Target,
+      icon: BullseyeArrowIcon,
       path: "/goals",
       active: location === "/goals",
       tourId: "goals",
