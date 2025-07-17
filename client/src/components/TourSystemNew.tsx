@@ -262,8 +262,6 @@ export default function TourSystem() {
     localStorage.setItem('tour-completed', 'true');
     cleanupHighlights();
   };
-  
-  console.log('TourSystemNew state:', { isActive, currentStep, totalSteps });
 
   useEffect(() => {
     if (isActive) {
@@ -295,15 +293,12 @@ export default function TourSystem() {
   };
 
   const showWelcomeScreenManually = () => {
-    console.log('showWelcomeScreenManually called');
     localStorage.removeItem('welcome-screen-shown');
     localStorage.setItem('onboarding-completed', 'true');
     setShowWelcomeScreen(true);
-    console.log('Welcome screen state set to true');
   };
 
   const restartTourFromHamburgerMenu = () => {
-    console.log('Tour restarted from hamburger menu step');
     setIsActive(true);
     setCurrentStep(0);
     setIsVisible(true);
@@ -314,7 +309,6 @@ export default function TourSystem() {
   useEffect(() => {
     // If tour is already active, restart it from step 0 (hamburger menu)
     if (isActive) {
-      console.log('Auto-restarting tour from hamburger menu');
       restartTourFromHamburgerMenu();
     }
   }, [isActive]);
@@ -343,7 +337,6 @@ export default function TourSystem() {
     };
 
     const handleShowWelcomeScreen = () => {
-      console.log('showWelcomeScreen event received');
       showWelcomeScreenManually();
     };
 
@@ -360,12 +353,6 @@ export default function TourSystem() {
   const highlightCurrentStep = () => {
     const currentStepData = TOUR_STEPS[currentStep];
     const element = document.querySelector(currentStepData.selector);
-    
-    console.log(`Step ${currentStep + 1}: Looking for element: ${currentStepData.selector}`, element);
-    
-    // Debug: Show all available data-tour elements
-    const allTourElements = document.querySelectorAll('[data-tour]');
-    console.log('All available tour elements:', Array.from(allTourElements).map(el => el.getAttribute('data-tour')));
     
     if (element) {
       // Remove existing highlights and click handlers
@@ -399,7 +386,6 @@ export default function TourSystem() {
           
           // Navigate to target path if specified
           if (currentStepData.targetPath) {
-            console.log('Navigating to:', currentStepData.targetPath);
             setLocation(currentStepData.targetPath);
           }
           
@@ -457,7 +443,6 @@ export default function TourSystem() {
         setTooltipPosition({ x, y });
       }, 300);
     } else {
-      console.warn(`Element not found for selector: ${currentStepData.selector}`);
       // Reset element position if element not found
       setElementPosition({ x: 0, y: 0 });
     }

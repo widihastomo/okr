@@ -112,59 +112,30 @@ export function BillingPeriodFormModal({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Debug logging
-    console.log("=== BILLING PERIOD FORM VALIDATION ===");
-    console.log("Raw formData:", formData);
-    console.log("Type of formData:", typeof formData);
-    console.log("Type of formData.planId:", typeof formData.planId);
-    console.log("Type of formData.price:", typeof formData.price);
-    console.log("Type of formData.periodMonths:", typeof formData.periodMonths);
-    console.log("planId prop:", planId);
-    console.log("billingPeriod prop:", billingPeriod);
-    console.log("Validation checks:", {
-      planId: formData.planId,
-      planIdEmpty: !formData.planId,
-      price: formData.price,
-      priceEmpty: !formData.price,
-      priceTrimmed: formData.price?.trim(),
-      priceFloat: parseFloat(formData.price),
-      priceIsNaN: isNaN(parseFloat(formData.price)),
-      priceNegative: parseFloat(formData.price) < 0,
-      periodMonths: formData.periodMonths,
-      periodMonthsInvalid: formData.periodMonths <= 0
-    });
-    
     let missingFields = [];
     
     // Check planId - formData.planId should have the value
     if (!formData.planId || formData.planId.trim() === "") {
       missingFields.push("Plan ID kosong");
-      console.log("❌ Plan ID validation failed:", formData.planId);
     }
     
     // Check price - more lenient validation
     const priceValue = formData.price ? formData.price.toString().trim() : "";
     if (!priceValue) {
       missingFields.push("Harga tidak boleh kosong");
-      console.log("❌ Price empty validation failed:", formData.price);
     } else {
       const numericPrice = parseFloat(priceValue);
       if (isNaN(numericPrice)) {
         missingFields.push("Harga harus berupa angka yang valid");
-        console.log("❌ Price NaN validation failed:", priceValue, "->", numericPrice);
       } else if (numericPrice <= 0) {
         missingFields.push("Harga harus lebih besar dari 0");
-        console.log("❌ Price must be positive validation failed:", numericPrice);
       }
     }
     
     // Check period months
     if (!formData.periodMonths || formData.periodMonths <= 0) {
       missingFields.push("Periode bulan harus lebih dari 0");
-      console.log("❌ Period months validation failed:", formData.periodMonths);
     }
-    
-    console.log("Missing fields:", missingFields);
     
     if (missingFields.length > 0) {
       toast({
