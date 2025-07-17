@@ -295,6 +295,7 @@ The system includes comprehensive database connection troubleshooting tools:
   * ADDED: Proper icon imports (Zap, TrendingUp, Rocket, Target) for new tour steps
   * REMOVED: Step 5 (daily-focus-content) - eliminated redundant Daily Focus tabs overview step
   * ENHANCED: Step 9 (update-progress-tab) now requires click interaction to switch to Update Progress tab
+  * ENHANCED: Step 10 (kelola-inisiatif-tab) now requires click interaction to switch to Kelola Inisiatif tab
   * RESULT: Complete Daily Focus page tour coverage with 6 new contextual steps explaining core daily productivity features
 - July 17, 2025. **TOUR SYSTEM REDESIGN COMPLETED** - Successfully redesigned interactive tour system with comprehensive explanations:
   * REMOVED: Click-to-advance functionality for smoother user experience

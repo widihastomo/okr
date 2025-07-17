@@ -112,7 +112,8 @@ const TOUR_STEPS: TourStep[] = [
     icon: Rocket,
     selector: '[data-tour="kelola-inisiatif-tab"]',
     position: 'bottom',
-    category: 'action'
+    category: 'action',
+    requiresClick: true
   },
   {
     id: 'timeline',
