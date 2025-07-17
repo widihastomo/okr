@@ -148,11 +148,7 @@ const useTypingEffect = (text: string, speed: number = 30) => {
   return { displayText, isTyping };
 };
 
-interface CompanyOnboardingProps {
-  onComplete?: () => void;
-}
-
-export default function CompanyOnboarding({ onComplete }: CompanyOnboardingProps) {
+export default function CompanyOnboarding() {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -416,11 +412,6 @@ export default function CompanyOnboarding({ onComplete }: CompanyOnboardingProps
       // Immediate cache invalidation
       queryClient.invalidateQueries({ queryKey: ["/api/onboarding/status"] });
       queryClient.invalidateQueries({ queryKey: ["/api/onboarding/progress"] });
-
-      // Trigger transition to guided highlights
-      if (onComplete) {
-        onComplete();
-      }
 
       // Redirect using wouter
       console.log("🔄 Redirecting to dashboard using wouter...");

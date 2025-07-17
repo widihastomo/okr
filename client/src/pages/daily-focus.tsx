@@ -1171,7 +1171,7 @@ export default function DailyFocusPage() {
         ) : (
           <>
             {/* Task Hari Ini */}
-            <Card data-tour="today-tasks-card">
+            <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
                   Task Hari Ini
@@ -1199,7 +1199,7 @@ export default function DailyFocusPage() {
             </Card>
 
             {/* Task Terlambat */}
-            <Card data-tour="overdue-tasks-card">
+            <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
                   Task Terlambat
@@ -1217,7 +1217,7 @@ export default function DailyFocusPage() {
             </Card>
 
             {/* Angka Target Aktif */}
-            <Card data-tour="active-targets-card">
+            <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
                   Angka Target Aktif
@@ -1235,7 +1235,7 @@ export default function DailyFocusPage() {
             </Card>
 
             {/* Level & Progress */}
-            <Card data-tour="level-progress-card">
+            <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
                   Level & Progress
@@ -1532,15 +1532,15 @@ export default function DailyFocusPage() {
         </CardContent>
       </Card>
       {/* Main Content Tabs */}
-      <Tabs defaultValue="tasks" className="w-full" data-tour="daily-focus-tabs">
+      <Tabs defaultValue="tasks" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="tasks" data-tour="tasks-tab">
+          <TabsTrigger value="tasks">
             Task Prioritas ({overdueTasks.length + todayTasks.length + tomorrowTasks.length})
           </TabsTrigger>
-          <TabsTrigger value="progress" data-tour="progress-tab">
+          <TabsTrigger value="progress">
             Update Progress ({activeKeyResults.length})
           </TabsTrigger>
-          <TabsTrigger value="initiatives" data-tour="initiatives-tab">
+          <TabsTrigger value="initiatives">
             Kelola Inisiatif ({activeInitiatives.length})
           </TabsTrigger>
         </TabsList>
@@ -1561,7 +1561,6 @@ export default function DailyFocusPage() {
                   size="sm"
                   className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 w-full sm:w-auto flex-shrink-0"
                   onClick={() => setIsTaskModalOpen(true)}
-                  data-tour="add-task-button"
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   <span className="hidden sm:inline">Tambah Task</span>
