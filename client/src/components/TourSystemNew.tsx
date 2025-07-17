@@ -285,9 +285,11 @@ export default function TourSystem() {
   };
 
   const showWelcomeScreenManually = () => {
+    console.log('showWelcomeScreenManually called');
     localStorage.removeItem('welcome-screen-shown');
     localStorage.setItem('onboarding-completed', 'true');
     setShowWelcomeScreen(true);
+    console.log('Welcome screen state set to true');
   };
 
   // Listen for start tour event
@@ -314,6 +316,7 @@ export default function TourSystem() {
     };
 
     const handleShowWelcomeScreen = () => {
+      console.log('showWelcomeScreen event received');
       showWelcomeScreenManually();
     };
 
