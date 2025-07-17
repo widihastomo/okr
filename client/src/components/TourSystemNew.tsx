@@ -596,18 +596,17 @@ export default function TourSystem() {
     if (isMobile()) {
       console.log("closeSidebarForMobile: Mobile detected, checking sidebar");
       const hamburgerButton = document.querySelector('[data-tour="hamburger-menu"]');
-      const sidebarOpen = isSidebarOpen();
       
       console.log("closeSidebarForMobile: hamburgerButton found:", !!hamburgerButton);
-      console.log("closeSidebarForMobile: sidebar is open:", sidebarOpen);
       
-      if (hamburgerButton && sidebarOpen) {
+      if (hamburgerButton) {
+        // Always click to close sidebar after menu steps - don't rely on state detection
         console.log("closeSidebarForMobile: Clicking hamburger to close sidebar");
         (hamburgerButton as HTMLElement).click();
         // Return promise to wait for sidebar animation
         return new Promise(resolve => setTimeout(resolve, 300));
       } else {
-        console.log("closeSidebarForMobile: Sidebar already closed or hamburger not found");
+        console.log("closeSidebarForMobile: Hamburger button not found");
       }
     } else {
       console.log("closeSidebarForMobile: Not mobile, skipping");
