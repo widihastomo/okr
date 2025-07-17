@@ -388,7 +388,21 @@ export default function TourSystem() {
     cleanupHighlights();
 
     if (currentStep < totalSteps - 1) {
-      setCurrentStep(currentStep + 1);
+      const nextStepIndex = currentStep + 1;
+      
+      // Manual logic: Close sidebar when transitioning from step 3 to step 4
+      if (nextStepIndex === 4) { // Step 5 (update-harian-instan) - index 4
+        console.log("Manual sidebar close: Transitioning from step 4 to step 5");
+        if (isMobile()) {
+          const hamburgerButton = document.querySelector('[data-tour="hamburger-menu"]');
+          if (hamburgerButton) {
+            console.log("Clicking hamburger to close sidebar before step 5");
+            (hamburgerButton as HTMLElement).click();
+          }
+        }
+      }
+      
+      setCurrentStep(nextStepIndex);
     } else {
       completeTour();
     }
