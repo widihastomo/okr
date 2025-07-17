@@ -20,6 +20,15 @@ interface TourStep {
 
 const TOUR_STEPS: TourStep[] = [
   {
+    id: 'notifications',
+    title: 'Notifikasi - Update Real-time',
+    description: 'Dapatkan notifikasi real-time tentang aktivitas tim, deadline yang mendekat, pencapaian milestone, dan update penting lainnya. Sistem notifikasi yang cerdas membantu Anda tetap up-to-date tanpa mengganggu fokus kerja.',
+    icon: Bell,
+    selector: '[data-tour="notifications"]',
+    position: 'bottom',
+    category: 'feature'
+  },
+  {
     id: 'daily-focus',
     title: 'Daily Focus - Fokus Harian',
     description: 'Pusat kendali produktivitas harian Anda. Di sini Anda dapat melihat tugas yang harus diselesaikan hari ini, update progress key results, dan mengelola inisiatif yang sedang berjalan. Fitur ini membantu Anda tetap fokus pada prioritas utama dan tidak kehilangan momentum dalam mencapai tujuan.',
@@ -90,15 +99,6 @@ const TOUR_STEPS: TourStep[] = [
     selector: '[data-tour="users"]',
     position: 'right',
     category: 'navigation'
-  },
-  {
-    id: 'notifications',
-    title: 'Notifikasi - Update Real-time',
-    description: 'Dapatkan notifikasi real-time tentang aktivitas tim, deadline yang mendekat, pencapaian milestone, dan update penting lainnya. Sistem notifikasi yang cerdas membantu Anda tetap up-to-date tanpa mengganggu fokus kerja.',
-    icon: Bell,
-    selector: '[data-tour="notifications"]',
-    position: 'bottom',
-    category: 'feature'
   },
   {
     id: 'settings',
