@@ -296,10 +296,10 @@ The system includes comprehensive database connection troubleshooting tools:
   * ENHANCED: Click handlers preserve original functionality while still progressing tour steps
   * RESULT: Complete Goals page tour coverage with 6 contextual steps explaining core goal management features
 - July 17, 2025. **MENU REORGANIZATION AND TOUR SEQUENCE UPDATE** - Successfully reorganized sidebar menu and adjusted tour sequence to match new order:
-  * MOVED: Goals menu item to appear directly after Daily Focus in sidebar navigation  
-  * UPDATED: Tour sequence to match new menu order (Daily Focus → Goals → Timeline → Tasks → Cycles → Achievements → Analytics)
-  * ENHANCED: Goals tour steps now appear immediately after Daily Focus tour completion for better flow
-  * RESULT: Improved navigation hierarchy with Goals positioned as primary feature after Daily Focus
+  * MOVED: Tasks menu item to appear directly after Goals in sidebar navigation  
+  * UPDATED: Tour sequence to match new menu order (Daily Focus → Goals → Tasks → Timeline → Cycles → Achievements → Analytics)
+  * ENHANCED: Tasks tour steps now appear immediately after Goals tour completion for better workflow
+  * RESULT: Improved navigation hierarchy with Tasks positioned as primary action after Goals planning
 - July 17, 2025. **WELCOME SCREEN TITLE UPDATED** - Changed welcome screen title from "Selamat Datang di Sistem OKR" to "Selamat Datang di Refokus" for proper branding alignment
 - July 17, 2025. **DAILY FOCUS TOUR ENHANCEMENT COMPLETED** - Successfully added 6 new tour steps for Daily Focus page with comprehensive Indonesian explanations:
   * ADDED: Update Harian Instan button tour step with data-tour="update-harian-instan" attribute

@@ -226,28 +226,6 @@ const TOUR_STEPS: TourStep[] = [
     requiresClick: true,
   },
   {
-    id: "timeline",
-    title: "Timeline - Riwayat Progress",
-    description:
-      "Visualisasi kronologis dari semua aktivitas dan progress yang telah dicapai. Lihat check-in, pencapaian milestone, dan perkembangan key results dalam format timeline yang mudah dipahami. Fitur ini memberikan gambaran historis yang komprehensif tentang perjalanan organisasi.",
-    icon: Clock,
-    selector: '[data-tour="timeline"]',
-    position: "right",
-    category: "feature",
-    targetPath: "/timeline",
-    requiresClick: true,
-  },
-  {
-    id: "timeline-content",
-    title: "Timeline - Daily Check-in",
-    description:
-      "Tombol Daily Check-in memungkinkan Anda mencatat progress harian dengan mudah. Setiap check-in akan ditampilkan dalam timeline kronologis untuk tracking yang lebih baik.",
-    icon: Clock,
-    selector: '[data-tour="timeline-checkin"]',
-    position: "bottom",
-    category: "feature",
-  },
-  {
     id: "tasks",
     title: "Tasks - Manajemen Tugas",
     description:
@@ -266,6 +244,28 @@ const TOUR_STEPS: TourStep[] = [
       "Gunakan filter dan pencarian untuk menemukan tugas dengan cepat. Anda dapat memfilter berdasarkan status, prioritas, penanggungjawab, dan tim untuk manajemen yang lebih efisien.",
     icon: CheckSquare,
     selector: '[data-tour="tasks-filter"]',
+    position: "bottom",
+    category: "feature",
+  },
+  {
+    id: "timeline",
+    title: "Timeline - Riwayat Progress",
+    description:
+      "Visualisasi kronologis dari semua aktivitas dan progress yang telah dicapai. Lihat check-in, pencapaian milestone, dan perkembangan key results dalam format timeline yang mudah dipahami. Fitur ini memberikan gambaran historis yang komprehensif tentang perjalanan organisasi.",
+    icon: Clock,
+    selector: '[data-tour="timeline"]',
+    position: "right",
+    category: "feature",
+    targetPath: "/timeline",
+    requiresClick: true,
+  },
+  {
+    id: "timeline-content",
+    title: "Timeline - Daily Check-in",
+    description:
+      "Tombol Daily Check-in memungkinkan Anda mencatat progress harian dengan mudah. Setiap check-in akan ditampilkan dalam timeline kronologis untuk tracking yang lebih baik.",
+    icon: Clock,
+    selector: '[data-tour="timeline-checkin"]',
     position: "bottom",
     category: "feature",
   },
