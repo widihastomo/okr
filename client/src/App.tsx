@@ -73,22 +73,6 @@ function Router() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   const [location, navigate] = useLocation();
-  const [isTransitioning, setIsTransitioning] = useState(false);
-
-  // Handle page transition animations
-  useEffect(() => {
-    // Check if transitioning from onboarding to dashboard
-    if (location === "/" && !isTransitioning) {
-      const wasOnboarding = sessionStorage.getItem("wasOnOnboarding");
-      if (wasOnboarding === "true") {
-        setIsTransitioning(true);
-        sessionStorage.removeItem("wasOnOnboarding");
-        
-        // Reset transition state after animation completes
-        setTimeout(() => setIsTransitioning(false), 600);
-      }
-    }
-  }, [location, isTransitioning]);
 
   // Check trial status for dynamic content positioning
   const { data: trialStatus } = useQuery({
@@ -226,15 +210,13 @@ function Router() {
           {/* Main Content */}
           <div
             className={cn(
-              "flex-1 min-h-[calc(100vh-6rem)] py-3 overflow-x-hidden transition-all duration-600 ease-out",
+              "flex-1 min-h-[calc(100vh-6rem)] py-3 overflow-x-hidden",
               // Different padding for onboarding page and trial status
               isOnboardingPage
                 ? "pt-0 px-0"
                 : trialStatus?.isTrialActive && !(user as any)?.isSystemOwner
                   ? "pt-[130px] sm:pt-[130px] px-3 sm:px-6" // Header (64px) + Trial Header (44px)
                   : "pt-[64px] sm:pt-[64px] px-3 sm:px-6", // Just header
-              // Add fade-in animation when transitioning from onboarding
-              isTransitioning ? "opacity-0 translate-y-4" : "opacity-100 translate-y-0"
             )}
           >
             <Switch>
