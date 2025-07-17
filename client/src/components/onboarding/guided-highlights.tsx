@@ -58,22 +58,22 @@ const HIGHLIGHT_STEPS: HighlightStep[] = [
     order: 4
   },
   {
-    id: 'analytics',
-    title: 'Analytics',
-    description: 'Analisis performa dan pencapaian tim melalui dashboard yang komprehensif.',
+    id: 'overdue-tasks',
+    title: 'Task Terlambat',
+    description: 'Pantau dan kelola task yang sudah melewati deadline untuk prioritas utama.',
     icon: TrendingUp,
-    selector: '[data-tour="analytics"]',
-    position: 'right',
+    selector: '[data-tour="overdue-tasks-card"]',
+    position: 'bottom',
     category: 'feature',
     order: 5
   },
   {
-    id: 'users',
-    title: 'Team Management',
-    description: 'Undang anggota tim dan kelola akses user dalam organisasi.',
+    id: 'level-progress',
+    title: 'Level & Progress',
+    description: 'Pantau level pencapaian dan progress gamifikasi Anda.',
     icon: Users,
-    selector: '[data-tour="users"]',
-    position: 'right',
+    selector: '[data-tour="level-progress-card"]',
+    position: 'bottom',
     category: 'feature',
     order: 6
   },

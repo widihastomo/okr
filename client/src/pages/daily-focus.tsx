@@ -122,6 +122,7 @@ import { DailyUpdateSimple } from "@/components/daily-update-simple";
 import { useAuth } from "@/hooks/useAuth";
 import GoalFormModal from "@/components/goal-form-modal";
 import TaskModal from "@/components/task-modal";
+import TestTransition from "@/components/test-transition";
 
 // Icon mapping for mission cards
 const iconMapping = {
@@ -3727,8 +3728,8 @@ export default function DailyFocusPage() {
         isAdding={!selectedTask}
       />
 
-
-
+      {/* Test Transition Component */}
+      <TestTransition />
       
     </div>
   );
