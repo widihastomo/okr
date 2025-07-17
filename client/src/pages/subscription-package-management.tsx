@@ -78,7 +78,7 @@ function PackageFormModal({
   isOpen, 
   onClose 
 }: { 
-  package?: SubscriptionPlan; 
+  package?: SubscriptionPlan & { billingPeriods?: BillingPeriod[] }; 
   isOpen: boolean; 
   onClose: () => void; 
 }) {
@@ -103,7 +103,7 @@ function PackageFormModal({
         maxUsers: pkg.maxUsers || null,
         features: pkg.features as string[] || [],
         isActive: pkg.isActive ?? true,
-        billingPeriods: [],
+        billingPeriods: (pkg as any).billingPeriods || [],
       });
     } else {
       setFormData({
@@ -139,15 +139,22 @@ function PackageFormModal({
       });
       const planResponse = await response.json();
       
-      // Then, create billing periods if this is a new plan
-      if (!pkg && data.billingPeriods.length > 0) {
-        const planId = planResponse.id;
+      // Handle billing periods for both create and update
+      if (data.billingPeriods.length > 0) {
+        const planId = pkg ? pkg.id : planResponse.id;
         
         if (!planId) {
           throw new Error("Plan ID not found in response - cannot create billing periods");
         }
         
-        // Create each billing period
+        // If editing, delete existing billing periods first
+        if (pkg && (pkg as any).billingPeriods) {
+          for (const existingPeriod of (pkg as any).billingPeriods) {
+            await apiRequest("DELETE", `/api/admin/billing-periods/${existingPeriod.id}`);
+          }
+        }
+        
+        // Create new billing periods
         for (const period of data.billingPeriods) {
           await apiRequest("POST", "/api/admin/billing-periods", {
             planId: planId,
@@ -577,7 +584,7 @@ export default function SubscriptionPackageManagement() {
   const queryClient = useQueryClient();
   const [, setLocation] = useLocation();
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedPackage, setSelectedPackage] = useState<SubscriptionPlan | undefined>();
+  const [selectedPackage, setSelectedPackage] = useState<(SubscriptionPlan & { billingPeriods?: BillingPeriod[] }) | undefined>();
   const [showFormModal, setShowFormModal] = useState(false);
   const [deletePackageId, setDeletePackageId] = useState<string | null>(null);
 
@@ -664,7 +671,7 @@ export default function SubscriptionPackageManagement() {
     }).format(parseFloat(price));
   };
 
-  const handleEdit = (pkg: SubscriptionPlan) => {
+  const handleEdit = (pkg: SubscriptionPlan & { billingPeriods: BillingPeriod[] }) => {
     setSelectedPackage(pkg);
     setShowFormModal(true);
   };
