@@ -483,7 +483,7 @@ export default function TourSystem() {
       setTimeout(() => {
         const rect = element.getBoundingClientRect();
         const tooltipWidth = 380;
-        const tooltipHeight = 220;
+        const tooltipHeight = 300; // Increased height to accommodate content
         
         let x = rect.left + rect.width / 2 - tooltipWidth / 2;
         let y = rect.top - tooltipHeight - 15;
@@ -557,6 +557,7 @@ export default function TourSystem() {
             left: `${tooltipPosition.x}px`,
             top: `${tooltipPosition.y}px`,
             width: '380px',
+            maxHeight: '400px',
             pointerEvents: 'auto'
           }}
         >
@@ -580,26 +581,26 @@ export default function TourSystem() {
             </CardTitle>
           </CardHeader>
           
-          <CardContent className="pt-0">
-            <CardDescription className="text-sm text-gray-600 mb-3">
-              {currentStepData.description}
-              {currentStepData.requiresClick && waitingForClick && (
-                <div className="mt-3 p-3 bg-orange-50 border border-orange-200 rounded-lg">
-                  <div className="flex items-center gap-2">
-                    <MousePointer2 className="w-4 h-4 text-orange-600" />
-                    <span className="text-sm font-medium text-orange-800">
-                      Klik menu ini untuk melanjutkan tour
-                    </span>
+          <CardContent className="pt-0 flex flex-col" style={{ maxHeight: '280px' }}>
+            <div className="flex-1 overflow-y-auto">
+              <CardDescription className="text-sm text-gray-600 mb-3">
+                {currentStepData.description}
+                {currentStepData.requiresClick && waitingForClick && (
+                  <div className="mt-3 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <MousePointer2 className="w-4 h-4 text-orange-600" />
+                      <span className="text-sm font-medium text-orange-800">
+                        Klik menu ini untuk melanjutkan tour
+                      </span>
+                    </div>
                   </div>
-                </div>
-              )}
-            </CardDescription>
+                )}
+              </CardDescription>
+              
+              <Progress value={progress} className="h-1 mb-3" />
+            </div>
             
-            
-            
-            <Progress value={progress} className="h-1 mb-3" />
-            
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center mt-3 flex-shrink-0">
               <Button
                 variant="outline"
                 size="sm"
