@@ -6307,6 +6307,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin API - Set default subscription plan
+  app.patch("/api/admin/subscription-plans/:id/set-default", requireAuth, requireSystemOwner, async (req, res) => {
+    try {
+      const { db } = await import("./db");
+      const { eq } = await import("drizzle-orm");
+      const planId = req.params.id;
+      
+      // Get current plan
+      const [currentPlan] = await db.select()
+        .from(subscriptionPlans)
+        .where(eq(subscriptionPlans.id, planId));
+      
+      if (!currentPlan) {
+        return res.status(404).json({ message: "Subscription plan not found" });
+      }
+      
+      // Use transaction to ensure atomicity
+      await db.transaction(async (tx) => {
+        // First, set all plans to not default
+        await tx.update(subscriptionPlans)
+          .set({
+            isDefault: false,
+            updatedAt: new Date(),
+          });
+        
+        // Then set the selected plan as default
+        await tx.update(subscriptionPlans)
+          .set({
+            isDefault: true,
+            updatedAt: new Date(),
+          })
+          .where(eq(subscriptionPlans.id, planId));
+      });
+      
+      const [updatedPlan] = await db.select()
+        .from(subscriptionPlans)
+        .where(eq(subscriptionPlans.id, planId));
+      
+      res.json({
+        message: "Default package berhasil diubah",
+        plan: updatedPlan
+      });
+    } catch (error) {
+      console.error("Error setting default subscription plan:", error);
+      res.status(500).json({ message: "Failed to set default subscription plan" });
+    }
+  });
+
   // Billing Period Management Endpoints
   app.post("/api/admin/billing-periods", requireAuth, requireSystemOwner, async (req, res) => {
     try {

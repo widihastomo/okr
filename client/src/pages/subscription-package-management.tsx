@@ -87,16 +87,43 @@ function PackageFormModal({
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [formData, setFormData] = useState<PackageFormData>({
-    name: pkg?.name || "",
-    slug: pkg?.slug || "",
-    maxUsers: pkg?.maxUsers || null,
-    features: pkg?.features as string[] || [],
-    stripeProductId: pkg?.stripeProductId || "",
-    stripePriceId: pkg?.stripePriceId || "",
-    isActive: pkg?.isActive ?? true,
+    name: "",
+    slug: "",
+    maxUsers: null,
+    features: [],
+    stripeProductId: "",
+    stripePriceId: "",
+    isActive: true,
     billingPeriods: [],
   });
   const [newFeature, setNewFeature] = useState("");
+
+  // Reset form data when package prop changes
+  React.useEffect(() => {
+    if (pkg) {
+      setFormData({
+        name: pkg.name || "",
+        slug: pkg.slug || "",
+        maxUsers: pkg.maxUsers || null,
+        features: pkg.features as string[] || [],
+        stripeProductId: pkg.stripeProductId || "",
+        stripePriceId: pkg.stripePriceId || "",
+        isActive: pkg.isActive ?? true,
+        billingPeriods: [],
+      });
+    } else {
+      setFormData({
+        name: "",
+        slug: "",
+        maxUsers: null,
+        features: [],
+        stripeProductId: "",
+        stripePriceId: "",
+        isActive: true,
+        billingPeriods: [],
+      });
+    }
+  }, [pkg, isOpen]);
   
   const getPeriodTypeFromMonths = (months: number): string => {
     if (months === 1) return "monthly";
@@ -621,7 +648,7 @@ export default function SubscriptionPackageManagement() {
       return await apiRequest("PATCH", `/api/admin/subscription-plans/${id}/toggle-status`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/subscription-plans"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/subscription-plans-with-periods"] });
       toast({
         title: "Status paket berhasil diubah",
         description: "Status paket telah diperbarui.",
@@ -630,6 +657,27 @@ export default function SubscriptionPackageManagement() {
     onError: (error) => {
       toast({
         title: "Gagal mengubah status",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Set default package mutation
+  const setDefaultMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return await apiRequest("PATCH", `/api/admin/subscription-plans/${id}/set-default`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/subscription-plans-with-periods"] });
+      toast({
+        title: "Default package berhasil diubah",
+        description: "Package default untuk pengguna baru telah diperbarui.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Gagal mengubah default package",
         description: error.message,
         variant: "destructive",
       });
@@ -783,6 +831,7 @@ export default function SubscriptionPackageManagement() {
                 <TableHead>Max Users</TableHead>
                 <TableHead>Fitur</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Default</TableHead>
                 <TableHead>Stripe Integration</TableHead>
                 <TableHead className="text-right">Aksi</TableHead>
               </TableRow>
@@ -826,6 +875,26 @@ export default function SubscriptionPackageManagement() {
                     <Badge variant={pkg.isActive ? "default" : "secondary"}>
                       {pkg.isActive ? "Aktif" : "Nonaktif"}
                     </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      {pkg.isDefault ? (
+                        <Badge variant="default" className="bg-yellow-100 text-yellow-800 border-yellow-300">
+                          <Crown className="h-3 w-3 mr-1" />
+                          Default
+                        </Badge>
+                      ) : (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setDefaultMutation.mutate(pkg.id)}
+                          disabled={setDefaultMutation.isPending}
+                          className="text-xs"
+                        >
+                          Set Default
+                        </Button>
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell>
                     <div className="flex space-x-1">

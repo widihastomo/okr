@@ -190,62 +190,41 @@ async function createSubscriptionPlans() {
       id: randomUUID(),
       name: 'Free Trial',
       slug: 'free-trial',
-      description: 'Trial gratis 7 hari dengan fitur lengkap',
-      price: 0,
-      currency: 'IDR',
-      billingPeriod: 'trial',
+      price: "0",
       maxUsers: 3,
-      maxObjectives: 10,
-      maxKeyResults: 50,
       features: ['Basic OKR Management', 'Team Collaboration', 'Progress Tracking', 'Email Support'],
       isActive: true,
-      isTrial: true,
-      trialDays: 7
+      isDefault: true // Free Trial is the default package for new users
     },
     {
       id: randomUUID(),
       name: 'Starter',
       slug: 'starter',
-      description: 'Paket dasar untuk tim kecil',
-      price: 199000,
-      currency: 'IDR',
-      billingPeriod: 'monthly',
+      price: "199000",
       maxUsers: 10,
-      maxObjectives: 50,
-      maxKeyResults: 200,
       features: ['Advanced OKR Management', 'Team Collaboration', 'Progress Tracking', 'Analytics Dashboard', 'Email Support'],
       isActive: true,
-      isTrial: false
+      isDefault: false
     },
     {
       id: randomUUID(),
       name: 'Growth',
       slug: 'growth',
-      description: 'Paket pertumbuhan untuk tim menengah',
-      price: 499000,
-      currency: 'IDR',
-      billingPeriod: 'monthly',
+      price: "499000",
       maxUsers: 50,
-      maxObjectives: 200,
-      maxKeyResults: 1000,
       features: ['Premium OKR Management', 'Advanced Analytics', 'Custom Reports', 'Priority Support', 'API Access'],
       isActive: true,
-      isTrial: false
+      isDefault: false
     },
     {
       id: randomUUID(),
       name: 'Enterprise',
       slug: 'enterprise',
-      description: 'Paket enterprise untuk organisasi besar',
-      price: 999000,
-      currency: 'IDR',
-      billingPeriod: 'monthly',
-      maxUsers: -1, // Unlimited
-      maxObjectives: -1,
-      maxKeyResults: -1,
+      price: "999000",
+      maxUsers: null, // Unlimited
       features: ['Enterprise OKR Management', 'Custom Integration', 'Dedicated Support', 'Custom Training', 'SLA Guarantee'],
       isActive: true,
-      isTrial: false
+      isDefault: false
     }
   ];
 

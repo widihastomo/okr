@@ -69,6 +69,7 @@ export const subscriptionPlans = pgTable("subscription_plans", {
   stripeProductId: text("stripe_product_id"),
   stripePriceId: text("stripe_price_id"),
   isActive: boolean("is_active").default(true),
+  isDefault: boolean("is_default").default(false), // Only one package can be default for new user registrations
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
