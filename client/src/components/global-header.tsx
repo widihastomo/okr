@@ -229,6 +229,7 @@ export default function GlobalHeader({
               variant="ghost"
               size="sm"
               className="px-2 py-1 hover:bg-blue-100 focus:bg-blue-100 focus:outline-none rounded-lg flex items-center space-x-2"
+              data-tour="user-profile"
             >
               <Avatar className="h-8 w-8">
                 <AvatarImage src={(user as any)?.profileImageUrl} />

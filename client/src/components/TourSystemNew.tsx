@@ -40,6 +40,15 @@ const TOUR_STEPS: TourStep[] = [
     category: 'feature'
   },
   {
+    id: 'user-profile',
+    title: 'Profil Pengguna - Akun & Pengaturan',
+    description: 'Kelola profil pengguna Anda dengan mengklik avatar di pojok kanan atas. Dari sini Anda bisa mengubah informasi pribadi, mengatur preferensi notifikasi, mengelola keamanan akun, dan mengakses pengaturan lainnya. Dropdown ini juga menyediakan akses cepat untuk logout.',
+    icon: Users,
+    selector: '[data-tour="user-profile"]',
+    position: 'bottom',
+    category: 'feature'
+  },
+  {
     id: 'daily-focus',
     title: 'Daily Focus - Fokus Harian',
     description: 'Pusat kendali produktivitas harian Anda. Di sini Anda dapat melihat tugas yang harus diselesaikan hari ini, update progress key results, dan mengelola inisiatif yang sedang berjalan. Fitur ini membantu Anda tetap fokus pada prioritas utama dan tidak kehilangan momentum dalam mencapai tujuan.',
