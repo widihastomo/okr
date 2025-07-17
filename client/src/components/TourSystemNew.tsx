@@ -549,6 +549,24 @@ export default function TourSystem() {
     return Promise.resolve();
   };
 
+  // Function to close sidebar on mobile when moving away from menu items
+  const closeSidebarForMobile = () => {
+    if (isMobile()) {
+      // Find the hamburger menu button and click it to close sidebar
+      const hamburgerButton = document.querySelector('[data-tour="hamburger-menu"]');
+      if (hamburgerButton) {
+        // Only click if sidebar is currently open
+        const sidebar = document.querySelector('[data-sidebar="sidebar"]');
+        if (sidebar && sidebar.classList.contains('translate-x-0')) {
+          (hamburgerButton as HTMLElement).click();
+          // Return promise to wait for sidebar animation
+          return new Promise(resolve => setTimeout(resolve, 300));
+        }
+      }
+    }
+    return Promise.resolve();
+  };
+
   const highlightCurrentStep = () => {
     const currentStepData = TOUR_STEPS[currentStep];
     const element = document.querySelector(currentStepData.selector);
@@ -565,8 +583,9 @@ export default function TourSystem() {
       Array.from(allTourElements).map((el) => el.getAttribute("data-tour")),
     );
 
-    // Expand sidebar on mobile if highlighting a menu item and wait for animation
+    // Handle sidebar visibility based on step type
     if (isMenuStep(currentStepData.id)) {
+      // Expand sidebar on mobile if highlighting a menu item and wait for animation
       expandSidebarForMobile().then(() => {
         // Re-highlight after sidebar animation completes
         setTimeout(() => {
@@ -576,6 +595,9 @@ export default function TourSystem() {
           }
         }, 100);
       });
+    } else {
+      // Close sidebar on mobile if moving away from menu items
+      closeSidebarForMobile();
     }
 
     if (element) {
