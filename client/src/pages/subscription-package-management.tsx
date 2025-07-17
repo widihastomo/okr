@@ -61,8 +61,6 @@ interface PackageFormData {
   slug: string;
   maxUsers: number | null;
   features: string[];
-  stripeProductId?: string;
-  stripePriceId?: string;
   isActive: boolean;
   billingPeriods: BillingPeriodData[];
 }
@@ -91,8 +89,6 @@ function PackageFormModal({
     slug: "",
     maxUsers: null,
     features: [],
-    stripeProductId: "",
-    stripePriceId: "",
     isActive: true,
     billingPeriods: [],
   });
@@ -106,8 +102,6 @@ function PackageFormModal({
         slug: pkg.slug || "",
         maxUsers: pkg.maxUsers || null,
         features: pkg.features as string[] || [],
-        stripeProductId: pkg.stripeProductId || "",
-        stripePriceId: pkg.stripePriceId || "",
         isActive: pkg.isActive ?? true,
         billingPeriods: [],
       });
@@ -117,8 +111,6 @@ function PackageFormModal({
         slug: "",
         maxUsers: null,
         features: [],
-        stripeProductId: "",
-        stripePriceId: "",
         isActive: true,
         billingPeriods: [],
       });
@@ -396,32 +388,7 @@ function PackageFormModal({
               <p className="text-xs text-gray-500 mt-1">Batas maksimal pengguna (kosongkan untuk unlimited)</p>
             </div>
 
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <h4 className="text-sm font-medium mb-3">Integrasi Stripe (Opsional)</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="stripeProductId" className="text-sm font-medium">Stripe Product ID</Label>
-                  <Input
-                    id="stripeProductId"
-                    value={formData.stripeProductId}
-                    onChange={(e) => setFormData({ ...formData, stripeProductId: e.target.value })}
-                    placeholder="prod_xxxxx"
-                    className="mt-1"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="stripePriceId" className="text-sm font-medium">Stripe Price ID</Label>
-                  <Input
-                    id="stripePriceId"
-                    value={formData.stripePriceId}
-                    onChange={(e) => setFormData({ ...formData, stripePriceId: e.target.value })}
-                    placeholder="price_xxxxx"
-                    className="mt-1"
-                  />
-                </div>
-              </div>
-              <p className="text-xs text-gray-500 mt-2">ID produk dan harga dari Stripe untuk integrasi pembayaran</p>
-            </div>
+
           </div>
 
           <div className="flex items-center space-x-3 p-3 bg-green-50 rounded-lg">
@@ -832,7 +799,6 @@ export default function SubscriptionPackageManagement() {
                 <TableHead>Fitur</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Default</TableHead>
-                <TableHead>Stripe Integration</TableHead>
                 <TableHead className="text-right">Aksi</TableHead>
               </TableRow>
             </TableHeader>
@@ -896,19 +862,7 @@ export default function SubscriptionPackageManagement() {
                       )}
                     </div>
                   </TableCell>
-                  <TableCell>
-                    <div className="flex space-x-1">
-                      {pkg.stripeProductId && (
-                        <Badge variant="outline" className="text-xs">Product</Badge>
-                      )}
-                      {pkg.stripePriceId && (
-                        <Badge variant="outline" className="text-xs">Price</Badge>
-                      )}
-                      {!pkg.stripeProductId && !pkg.stripePriceId && (
-                        <span className="text-xs text-gray-400">No integration</span>
-                      )}
-                    </div>
-                  </TableCell>
+
                   <TableCell className="text-right">
                     <div className="flex justify-end space-x-2">
                       <Button 

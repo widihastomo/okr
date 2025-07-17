@@ -8511,8 +8511,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         planPrice: subscriptionPlans.price,
         planMaxUsers: subscriptionPlans.maxUsers,
         planFeatures: subscriptionPlans.features,
-        planStripeProductId: subscriptionPlans.stripeProductId,
-        planStripePriceId: subscriptionPlans.stripePriceId,
         planIsActive: subscriptionPlans.isActive,
         planCreatedAt: subscriptionPlans.createdAt,
         planUpdatedAt: subscriptionPlans.updatedAt,
@@ -8521,7 +8519,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         billingPeriodMonths: billingPeriods.periodMonths,
         billingPrice: billingPeriods.price,
         billingDiscountPercentage: billingPeriods.discountPercentage,
-        billingStripePriceId: billingPeriods.stripePriceId,
         billingIsActive: billingPeriods.isActive
       })
       .from(subscriptionPlans)
@@ -8542,8 +8539,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
             price: row.planPrice,
             maxUsers: row.planMaxUsers,
             features: row.planFeatures,
-            stripeProductId: row.planStripeProductId,
-            stripePriceId: row.planStripePriceId,
             isActive: row.planIsActive,
             createdAt: row.planCreatedAt,
             updatedAt: row.planUpdatedAt,
@@ -8558,7 +8553,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
             periodMonths: row.billingPeriodMonths,
             price: row.billingPrice,
             discountPercentage: row.billingDiscountPercentage,
-            stripePriceId: row.billingStripePriceId,
             isActive: row.billingIsActive
           });
         }

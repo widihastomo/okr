@@ -66,8 +66,6 @@ export const subscriptionPlans = pgTable("subscription_plans", {
   price: decimal("price", { precision: 10, scale: 2 }).notNull(), // Base monthly price in IDR
   maxUsers: integer("max_users"), // null for enterprise (unlimited)
   features: jsonb("features").notNull(), // Array of feature strings
-  stripeProductId: text("stripe_product_id"),
-  stripePriceId: text("stripe_price_id"),
   isActive: boolean("is_active").default(true),
   isDefault: boolean("is_default").default(false), // Only one package can be default for new user registrations
   createdAt: timestamp("created_at").defaultNow(),
@@ -112,7 +110,6 @@ export const billingPeriods = pgTable("billing_periods", {
   periodMonths: integer("period_months").notNull(), // 1, 3, 12
   price: decimal("price", { precision: 10, scale: 2 }).notNull(), // Final price for this period
   discountPercentage: integer("discount_percentage").default(0), // Discount from base price
-  stripePriceId: text("stripe_price_id"),
   isActive: boolean("is_active").default(true),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
