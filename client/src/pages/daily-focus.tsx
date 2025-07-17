@@ -1085,10 +1085,17 @@ export default function DailyFocusPage() {
           </div>
 
           {/* Welcome Screen Button and Date display - desktop */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 relative z-10">
             <button
-              onClick={() => window.dispatchEvent(new CustomEvent('showWelcomeScreen'))}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-md text-sm font-medium transition-colors"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Welcome Screen button clicked');
+                window.dispatchEvent(new CustomEvent('showWelcomeScreen'));
+              }}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-md text-sm font-medium transition-colors cursor-pointer border-0 outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              type="button"
+              style={{ pointerEvents: 'auto' }}
             >
               Welcome Screen
             </button>
