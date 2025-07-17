@@ -5,8 +5,8 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { X, ChevronRight, ChevronLeft, CheckSquare, Sun, Flag, Clock, BarChart3, Bell, Users, Settings, Trophy, Calendar } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useTour } from '@/hooks/useTour';
-import { tourSteps } from '@/data/tour-steps';
+// import { useTour } from '@/hooks/useTour'; // No longer needed - using own state management
+// import { tourSteps } from '@/data/tour-steps'; // No longer needed - using TOUR_STEPS below
 
 interface TourStep {
   id: string;
@@ -112,18 +112,44 @@ const TOUR_STEPS: TourStep[] = [
 ];
 
 export default function TourSystem() {
-  const {
-    isActive,
-    currentStep,
-    totalSteps,
-    nextStep,
-    previousStep,
-    skipTour,
-    completeTour,
-  } = useTour();
-
+  // Own state management (not using useTour hook)
+  const [isActive, setIsActive] = useState(false);
+  const [currentStep, setCurrentStep] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
+  
+  const totalSteps = TOUR_STEPS.length;
+  
+  // Tour control functions
+  const nextStep = () => {
+    if (currentStep < totalSteps - 1) {
+      setCurrentStep(currentStep + 1);
+    } else {
+      completeTour();
+    }
+  };
+
+  const previousStep = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const skipTour = () => {
+    setIsActive(false);
+    setIsVisible(false);
+    localStorage.setItem('tour-completed', 'true');
+    cleanupHighlights();
+  };
+
+  const completeTour = () => {
+    setIsActive(false);
+    setIsVisible(false);
+    localStorage.setItem('tour-completed', 'true');
+    cleanupHighlights();
+  };
+  
+  console.log('TourSystemNew state:', { isActive, currentStep, totalSteps });
 
   useEffect(() => {
     if (isActive) {
@@ -146,6 +172,7 @@ export default function TourSystem() {
     const handleStartTour = () => {
       setIsActive(true);
       setCurrentStep(0);
+      setIsVisible(true);
       localStorage.removeItem('tour-completed');
     };
 

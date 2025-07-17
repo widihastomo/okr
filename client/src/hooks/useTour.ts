@@ -67,12 +67,11 @@ export function useTour() {
   const [completedSteps, setCompletedSteps] = useState<string[]>([]);
 
   useEffect(() => {
-    const hasCompletedTour = localStorage.getItem('tour-completed');
-    
-    // Start tour automatically if not completed
-    if (!hasCompletedTour) {
-      setIsActive(true);
-    }
+    // Disable auto-start - tour will be started manually
+    // const hasCompletedTour = localStorage.getItem('tour-completed');
+    // if (!hasCompletedTour) {
+    //   setIsActive(true);
+    // }
   }, []);
 
   const startTour = () => {
