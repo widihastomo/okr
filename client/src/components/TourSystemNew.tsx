@@ -482,18 +482,7 @@ export default function TourSystem() {
       {/* Tour overlay - only show when tour is active */}
       {isActive && isVisible && (
         <>
-          {/* Full screen overlay to dim background */}
-          <div className="fixed inset-0 bg-black/50 z-[90] transition-all duration-300 tour-overlay" />
-          
-          {/* Spotlight effect - creates a clear area around the target element */}
-          <div 
-            className="fixed inset-0 z-[95] pointer-events-none transition-all duration-300 tour-spotlight"
-            style={{
-              background: elementPosition.x && elementPosition.y ? 
-                `radial-gradient(circle 80px at ${elementPosition.x}px ${elementPosition.y}px, transparent 0%, transparent 40%, rgba(0,0,0,0.3) 70%)` : 
-                'transparent'
-            }}
-          />
+
           
           {/* Tour tooltip */}
           <div
@@ -505,6 +494,7 @@ export default function TourSystem() {
               pointerEvents: 'auto'
             }}
           >
+          <Card className="w-80 shadow-lg border-2 border-orange-200 bg-white">
             <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <Badge variant="outline" className="text-xs">
@@ -593,6 +583,7 @@ export default function TourSystem() {
               </div>
             </div>
           </CardContent>
+          </Card>
           </div>
         </>
       )}
