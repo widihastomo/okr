@@ -12,6 +12,9 @@ import ClientSidebar from "@/components/client-sidebar";
 import SystemAdminSidebar from "@/components/system-admin-sidebar";
 import { NotificationProvider } from "@/components/notifications/notification-provider";
 import TourSystemNew from "@/components/TourSystemNew";
+import GuidedHighlights from "@/components/onboarding/guided-highlights";
+import TransitionManager from "@/components/onboarding/transition-manager";
+import { useGuidedHighlights } from "@/hooks/useGuidedHighlights";
 
 import Dashboard from "@/pages/dashboard";
 
@@ -74,6 +77,10 @@ function Router() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   const [location, navigate] = useLocation();
+  const [showTransition, setShowTransition] = useState(false);
+  
+  // Guided highlights hook
+  const guidedHighlights = useGuidedHighlights();
 
   // Check trial status for dynamic content positioning
   const { data: trialStatus } = useQuery({
@@ -221,7 +228,9 @@ function Router() {
             )}
           >
             <Switch>
-              <Route path="/onboarding" component={CompanyOnboarding} />
+              <Route path="/onboarding">
+                <CompanyOnboarding onComplete={() => setShowTransition(true)} />
+              </Route>
               <Route path="/" component={DailyFocusPage} />
               <Route path="/daily-focus" component={DailyFocusPage} />
               <Route path="/tasks" component={TasksPage} />
@@ -308,6 +317,26 @@ function Router() {
         </div>
       </div>
       <TourSystemNew />
+      
+      {/* Guided Highlights System */}
+      <GuidedHighlights
+        isActive={guidedHighlights.isActive}
+        onComplete={guidedHighlights.completeGuidedHighlights}
+        onSkip={guidedHighlights.skipGuidedHighlights}
+      />
+      
+      {/* Transition Manager */}
+      <TransitionManager
+        isVisible={showTransition}
+        onStartGuidedHighlights={() => {
+          setShowTransition(false);
+          guidedHighlights.startGuidedHighlights();
+        }}
+        onSkip={() => {
+          setShowTransition(false);
+          guidedHighlights.skipGuidedHighlights();
+        }}
+      />
     </NotificationProvider>
   );
 }
