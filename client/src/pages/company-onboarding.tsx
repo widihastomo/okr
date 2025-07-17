@@ -411,22 +411,10 @@ export default function CompanyOnboarding() {
       queryClient.invalidateQueries({ queryKey: ["/api/onboarding/status"] });
       queryClient.invalidateQueries({ queryKey: ["/api/onboarding/progress"] });
 
-      // Force redirect with both navigate and window.location as fallback
-      console.log("🔄 Attempting redirect to dashboard...");
-
-      // Try wouter navigation first
-      try {
-        navigate("/");
-        console.log("✅ Wouter navigation called successfully");
-      } catch (error) {
-        console.error("❌ Wouter navigation failed:", error);
-      }
-
-      // Add window.location fallback after short delay
-      setTimeout(() => {
-        console.log("🔄 Fallback redirect using window.location");
-        window.location.href = "/";
-      }, 100);
+      // Redirect using wouter
+      console.log("🔄 Redirecting to dashboard using wouter...");
+      navigate("/");
+      console.log("✅ Wouter navigation completed successfully");
     },
     onError: (error) => {
       toast({
