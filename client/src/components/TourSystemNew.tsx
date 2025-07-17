@@ -413,6 +413,9 @@ export default function TourSystem() {
         
         // Add visual indication that click is required
         element.classList.add('tour-click-required');
+      } else {
+        // Reset waitingForClick to false for steps that don't require a click
+        setWaitingForClick(false);
       }
       
       // Scroll element into view smoothly
