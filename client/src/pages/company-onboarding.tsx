@@ -553,7 +553,10 @@ export default function CompanyOnboarding() {
       // Complete the onboarding process
       await completeOnboardingMutation.mutateAsync();
       
-      // Start the tour system
+      // Set onboarding completed flag to trigger welcome screen flow
+      localStorage.setItem('onboarding-completed', 'true');
+      
+      // Start the tour system (which will show welcome screen first)
       startTour();
       
       // Navigate to dashboard

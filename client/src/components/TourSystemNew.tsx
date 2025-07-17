@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { X, ChevronRight, ChevronLeft, CheckSquare, Sun, Flag, Clock, BarChart3, Bell, Users, Settings, Trophy, Calendar, MousePointer2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLocation } from 'wouter';
+import WelcomeScreen from './WelcomeScreen';
 
 interface TourStep {
   id: string;
@@ -219,6 +220,7 @@ export default function TourSystem() {
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
   const [waitingForClick, setWaitingForClick] = useState(false);
   const [location, setLocation] = useLocation();
+  const [showWelcomeScreen, setShowWelcomeScreen] = useState(false);
   
   const totalSteps = TOUR_STEPS.length;
   
@@ -269,9 +271,32 @@ export default function TourSystem() {
     }
   }, [currentStep]);
 
+  // Tour control functions for welcome screen
+  const handleWelcomeScreenClose = () => {
+    setShowWelcomeScreen(false);
+  };
+
+  const handleStartTourFromWelcome = () => {
+    setShowWelcomeScreen(false);
+    setIsActive(true);
+    setCurrentStep(0);
+  };
+
   // Listen for start tour event
   useEffect(() => {
     const handleStartTour = () => {
+      // Check if onboarding is completed first
+      const onboardingCompleted = localStorage.getItem('onboarding-completed') === 'true';
+      if (onboardingCompleted) {
+        setShowWelcomeScreen(true);
+      } else {
+        // Start tour directly if no onboarding
+        setIsActive(true);
+        setCurrentStep(0);
+      }
+    };
+    
+    const handleStartTourDirect = () => {
       setIsActive(true);
       setCurrentStep(0);
       setIsVisible(true);
@@ -279,7 +304,11 @@ export default function TourSystem() {
     };
 
     window.addEventListener('startTour', handleStartTour);
-    return () => window.removeEventListener('startTour', handleStartTour);
+    window.addEventListener('startTourDirect', handleStartTourDirect);
+    return () => {
+      window.removeEventListener('startTour', handleStartTour);
+      window.removeEventListener('startTourDirect', handleStartTourDirect);
+    };
   }, []);
 
   const highlightCurrentStep = () => {
@@ -512,6 +541,13 @@ export default function TourSystem() {
           </div>
         </CardContent>
       </div>
+      
+      {/* Welcome Screen */}
+      <WelcomeScreen
+        isOpen={showWelcomeScreen}
+        onClose={handleWelcomeScreenClose}
+        onStartTour={handleStartTourFromWelcome}
+      />
     </>
   );
 }
