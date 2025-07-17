@@ -1,19 +1,30 @@
-import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
-import { 
-  Compass, 
-  Target, 
-  Users, 
-  TrendingUp, 
-  Calendar, 
-  CheckCircle, 
-  ArrowRight, 
+import React from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
+import {
+  Compass,
+  Target,
+  Users,
+  TrendingUp,
+  Calendar,
+  CheckCircle,
+  ArrowRight,
   Sparkles,
-  Play
-} from 'lucide-react';
+  Play,
+} from "lucide-react";
 
 interface WelcomeScreenProps {
   isOpen: boolean;
@@ -21,28 +32,35 @@ interface WelcomeScreenProps {
   onStartTour: () => void;
 }
 
-export default function WelcomeScreen({ isOpen, onClose, onStartTour }: WelcomeScreenProps) {
+export default function WelcomeScreen({
+  isOpen,
+  onClose,
+  onStartTour,
+}: WelcomeScreenProps) {
   const features = [
     {
       icon: <Target className="h-5 w-5 text-orange-500" />,
-      title: "Kelola Goals & OKR",
-      description: "Buat dan pantau objektif dengan key results yang terukur"
+      title: "Kelola Tujuan Dengan Strategi Terukur",
+      description:
+        "Tetapkan tujuan yang jelas dan pantau hasilnya secara nyata dan terukur",
     },
     {
       icon: <Users className="h-5 w-5 text-blue-500" />,
-      title: "Kolaborasi Tim",
-      description: "Bekerja sama dengan tim untuk mencapai target bersama"
+      title: "Alignment Tim",
+      description:
+        "Menyelaraskan tujuan dengan tim dan tetapkan kontribusi masing - masing terhadap goals bersama.",
     },
     {
       icon: <TrendingUp className="h-5 w-5 text-green-500" />,
       title: "Analytics & Progress",
-      description: "Analisis performa dan progress dengan visualisasi yang jelas"
+      description:
+        "Analisis performa dan progress dengan visualisasi yang jelas dan realtime",
     },
     {
       icon: <Calendar className="h-5 w-5 text-purple-500" />,
       title: "Daily Focus",
-      description: "Fokus harian dengan prioritas task dan update progress"
-    }
+      description: "Bangun kebiasaan kerja yang konsisten dan berdampak lewat check-in harian. Fokus setiap hari = progres setiap minggu.",
+    },
   ];
 
   const tourHighlights = [
@@ -50,7 +68,7 @@ export default function WelcomeScreen({ isOpen, onClose, onStartTour }: WelcomeS
     "Cara membuat dan mengelola goals",
     "Sistem notifikasi dan reminder",
     "Analytics dan laporan progress",
-    "Pengaturan tim dan organisasi"
+    "Pengaturan tim dan organisasi",
   ];
 
   return (
@@ -62,17 +80,15 @@ export default function WelcomeScreen({ isOpen, onClose, onStartTour }: WelcomeS
             Selamat Datang di Refokus
           </DialogTitle>
         </DialogHeader>
-        
+
         <div className="space-y-6">
           {/* Welcome Message */}
           <div className="text-center space-y-2">
             <p className="text-gray-600">
-              Selamat datang! Kami akan memandu Anda mengenal fitur-fitur utama platform ini.
+              Terima kasih telah bergabung! Kami akan membantu Anda memahami
+              fitur utama untuk memaksimalkan produktivitas tim dan pencapaian
+              goals.
             </p>
-            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-              <CheckCircle className="h-3 w-3 mr-1" />
-              Onboarding Selesai
-            </Badge>
           </div>
 
           {/* Key Features */}
@@ -83,11 +99,16 @@ export default function WelcomeScreen({ isOpen, onClose, onStartTour }: WelcomeS
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {features.map((feature, index) => (
-                <div key={index} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                <div
+                  key={index}
+                  className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg"
+                >
                   {feature.icon}
                   <div>
                     <h4 className="font-medium text-sm">{feature.title}</h4>
-                    <p className="text-xs text-gray-600">{feature.description}</p>
+                    <p className="text-xs text-gray-600">
+                      {feature.description}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -114,14 +135,10 @@ export default function WelcomeScreen({ isOpen, onClose, onStartTour }: WelcomeS
 
           {/* Action Buttons */}
           <div className="flex gap-3 pt-4">
-            <Button 
-              variant="outline" 
-              onClick={onClose}
-              className="flex-1"
-            >
+            <Button variant="outline" onClick={onClose} className="flex-1">
               Lewati Tour
             </Button>
-            <Button 
+            <Button
               onClick={onStartTour}
               className="flex-1 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
             >
@@ -132,7 +149,8 @@ export default function WelcomeScreen({ isOpen, onClose, onStartTour }: WelcomeS
 
           {/* Tour Info */}
           <div className="text-center text-xs text-gray-500 border-t pt-4">
-            Tour interaktif ini akan memandu Anda melalui 10 fitur utama platform (~5 menit)
+            Tour interaktif ini akan memandu Anda melalui 10 fitur utama
+            platform (~5 menit)
           </div>
         </div>
       </DialogContent>

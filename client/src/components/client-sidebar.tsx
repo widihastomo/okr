@@ -157,6 +157,13 @@ export default function Sidebar({
       tourId: "daily-focus",
     },
     {
+      label: "Goals",
+      icon: Flag,
+      path: "/goals",
+      active: location === "/goals",
+      tourId: "goals",
+    },
+    {
       label: "Timeline",
       icon: TimelineIconDefault,
       path: "/timeline",
@@ -170,14 +177,6 @@ export default function Sidebar({
       active: location === "/tasks",
       tourId: "tasks",
     },
-    {
-      label: "Goals",
-      icon: Flag,
-      path: "/goals",
-      active: location === "/goals",
-      tourId: "goals",
-    },
-
     {
       label: "Siklus",
       icon: Calendar,
