@@ -220,7 +220,7 @@ export default function TourSystem() {
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
   const [waitingForClick, setWaitingForClick] = useState(false);
   const [location, setLocation] = useLocation();
-  const [showWelcomeScreen, setShowWelcomeScreen] = useState(false);
+  const [showWelcomeScreen, setShowWelcomeScreen] = useState(true);
   
   const totalSteps = TOUR_STEPS.length;
   
