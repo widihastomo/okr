@@ -6246,27 +6246,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      // Use transaction to ensure atomic deletion
-      await db.transaction(async (tx) => {
-        // First, delete all billing periods associated with this plan
-        console.log("Deleting billing periods for plan:", planId);
-        const deletedBillingPeriods = await tx.delete(billingPeriods)
-          .where(eq(billingPeriods.planId, planId))
-          .returning();
-        console.log("Deleted billing periods:", deletedBillingPeriods.length);
+      // Delete billing periods first, then subscription plan (without transaction for Neon compatibility)
+      console.log("Deleting billing periods for plan:", planId);
+      const deletedBillingPeriods = await db.delete(billingPeriods)
+        .where(eq(billingPeriods.planId, planId))
+        .returning();
+      console.log("Deleted billing periods:", deletedBillingPeriods.length);
+      
+      // Then delete the subscription plan
+      console.log("Deleting subscription plan:", planId);
+      const [deletedPlan] = await db.delete(subscriptionPlans)
+        .where(eq(subscriptionPlans.id, planId))
+        .returning();
         
-        // Then delete the subscription plan
-        console.log("Deleting subscription plan:", planId);
-        const [deletedPlan] = await tx.delete(subscriptionPlans)
-          .where(eq(subscriptionPlans.id, planId))
-          .returning();
-          
-        if (!deletedPlan) {
-          throw new Error("Subscription plan not found");
-        }
-        
-        return deletedPlan;
-      });
+      if (!deletedPlan) {
+        return res.status(404).json({ message: "Subscription plan not found" });
+      }
 
       
       res.json({ message: "Subscription plan deleted successfully" });
