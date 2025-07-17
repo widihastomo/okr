@@ -1149,7 +1149,9 @@ export default function DailyFocusPage() {
 
           {/* Action buttons */}
           <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
-            <DailyUpdateSimple />
+            <div data-tour="update-harian-instan">
+              <DailyUpdateSimple />
+            </div>
             <TourStartButton variant="outline" size="sm" />
           </div>
         </div>
@@ -1177,6 +1179,7 @@ export default function DailyFocusPage() {
       {/* Overview Cards */}
       <div
         className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4"
+        data-tour="overview-cards"
       >
         {isLoadingAllTasks || isLoadingObjectives ? (
           <>
@@ -1403,7 +1406,7 @@ export default function DailyFocusPage() {
         </CardContent>
       </Card>
       {/* Goal Section - Always Show */}
-      <Card className="border-blue-200 bg-blue-50">
+      <Card className="border-blue-200 bg-blue-50" data-tour="goal-terkait-aktivitas">
         <CardHeader>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div className="flex-1 min-w-0">
@@ -1551,13 +1554,13 @@ export default function DailyFocusPage() {
       {/* Main Content Tabs */}
       <Tabs defaultValue="tasks" className="w-full">
         <TabsList className="grid w-full grid-cols-3" data-tour="daily-focus-tabs">
-          <TabsTrigger value="tasks">
+          <TabsTrigger value="tasks" data-tour="task-prioritas">
             Task Prioritas ({overdueTasks.length + todayTasks.length + tomorrowTasks.length})
           </TabsTrigger>
-          <TabsTrigger value="progress">
+          <TabsTrigger value="progress" data-tour="update-progress-tab">
             Update Progress ({activeKeyResults.length})
           </TabsTrigger>
-          <TabsTrigger value="initiatives">
+          <TabsTrigger value="initiatives" data-tour="kelola-inisiatif-tab">
             Kelola Inisiatif ({activeInitiatives.length})
           </TabsTrigger>
         </TabsList>

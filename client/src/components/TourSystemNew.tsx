@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { X, ChevronRight, ChevronLeft, CheckSquare, Sun, Flag, Clock, BarChart3, Bell, Users, Settings, Trophy, Calendar, MousePointer2, Menu } from 'lucide-react';
+import { X, ChevronRight, ChevronLeft, CheckSquare, Sun, Flag, Clock, BarChart3, Bell, Users, Settings, Trophy, Calendar, MousePointer2, Menu, Zap, TrendingUp, Rocket, Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLocation } from 'wouter';
 import WelcomeScreen from './WelcomeScreen';
@@ -66,6 +66,60 @@ const TOUR_STEPS: TourStep[] = [
     selector: '[data-tour="daily-focus-tabs"]',
     position: 'bottom',
     category: 'feature'
+  },
+  {
+    id: 'update-harian-instan',
+    title: 'Update Harian Instan - Pencatatan Progress Cepat',
+    description: 'Tombol "Update Harian Instan" memungkinkan Anda mencatat progress harian dengan mudah dan cepat. Klik tombol ini untuk melakukan update status key results dan mencatat pencapaian harian. Fitur ini membantu mempertahankan momentum dan konsistensi dalam pelacakan progress.',
+    icon: Zap,
+    selector: '[data-tour="update-harian-instan"]',
+    position: 'bottom',
+    category: 'action'
+  },
+  {
+    id: 'overview-cards',
+    title: 'Overview Cards - Ringkasan Aktivitas',
+    description: 'Kartu overview memberikan gambaran cepat tentang aktivitas harian Anda. Lihat jumlah task yang harus diselesaikan, progress key results, inisiatif yang sedang berjalan, dan statistik gamifikasi. Informasi ini membantu Anda memahami beban kerja dan prioritas untuk hari ini.',
+    icon: BarChart3,
+    selector: '[data-tour="overview-cards"]',
+    position: 'bottom',
+    category: 'feature'
+  },
+  {
+    id: 'goal-terkait-aktivitas',
+    title: 'Goal Terkait - Hubungan Aktivitas dengan Tujuan',
+    description: 'Bagian ini menampilkan goal (objectives) yang terkait dengan aktivitas harian Anda. Setiap goal menunjukkan progress saat ini, status pencapaian, dan target ideal. Fitur ini membantu Anda tetap fokus pada tujuan utama dan memahami bagaimana aktivitas harian berkontribusi pada pencapaian goal organisasi.',
+    icon: Target,
+    selector: '[data-tour="goal-terkait-aktivitas"]',
+    position: 'bottom',
+    category: 'feature'
+  },
+  {
+    id: 'task-prioritas-tab',
+    title: 'Tab Task Prioritas - Manajemen Tugas Harian',
+    description: 'Tab Task Prioritas menampilkan semua tugas yang perlu diselesaikan, diurutkan berdasarkan prioritas dan deadline. Anda dapat melihat task yang terlambat, task hari ini, dan task yang akan datang. Klik tab ini untuk mengelola dan mengubah status tugas sesuai progress aktual.',
+    icon: CheckSquare,
+    selector: '[data-tour="task-prioritas"]',
+    position: 'bottom',
+    category: 'action'
+  },
+  {
+    id: 'update-progress-tab',
+    title: 'Tab Update Progress - Perbarui Key Results',
+    description: 'Tab Update Progress memungkinkan Anda memperbarui progress key results yang sedang aktif. Klik tab ini untuk melakukan check-in pada key results, mencatat pencapaian, dan memperbarui nilai current progress. Fitur ini penting untuk melacak kemajuan menuju target yang telah ditetapkan.',
+    icon: TrendingUp,
+    selector: '[data-tour="update-progress-tab"]',
+    position: 'bottom',
+    category: 'action'
+  },
+  {
+    id: 'kelola-inisiatif-tab',
+    title: 'Tab Kelola Inisiatif - Manajemen Proyek',
+    description: 'Tab Kelola Inisiatif menampilkan semua inisiatif (proyek) yang sedang berjalan dan memerlukan perhatian. Klik tab ini untuk mengelola inisiatif, memperbarui success metrics, dan melacak progress proyek. Fitur ini membantu koordinasi tim dalam menjalankan inisiatif strategis.',
+    icon: Rocket,
+    selector: '[data-tour="kelola-inisiatif-tab"]',
+    position: 'bottom',
+    category: 'action'
   },
   {
     id: 'timeline',
