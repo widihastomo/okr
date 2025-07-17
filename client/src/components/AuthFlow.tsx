@@ -765,7 +765,7 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                     type="email"
                     placeholder="Masukkan email Anda"
                     {...forgotPasswordForm.register("email")}
-                    className="pl-10 h-11"
+                    className="pl-10 h-11 border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all duration-200"
                   />
                 </div>
                 {forgotPasswordForm.formState.errors.email && (
@@ -811,7 +811,7 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                   id="code"
                   placeholder="Masukkan kode 6 digit"
                   {...resetPasswordForm.register("code")}
-                  className="h-11"
+                  className="h-11 border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all duration-200"
                 />
                 {resetPasswordForm.formState.errors.code && (
                   <p className="text-sm text-red-600">{resetPasswordForm.formState.errors.code.message}</p>
@@ -827,7 +827,7 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                     type={showPassword ? "text" : "password"}
                     placeholder="Masukkan password baru"
                     {...resetPasswordForm.register("newPassword")}
-                    className="pl-10 pr-10 h-11"
+                    className="pl-10 pr-10 h-11 border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all duration-200"
                   />
                   <button
                     type="button"
@@ -851,7 +851,7 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                     type={showPassword ? "text" : "password"}
                     placeholder="Ulangi password baru"
                     {...resetPasswordForm.register("confirmPassword")}
-                    className="pl-10 h-11"
+                    className="pl-10 h-11 border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all duration-200"
                   />
                 </div>
                 {resetPasswordForm.formState.errors.confirmPassword && (
