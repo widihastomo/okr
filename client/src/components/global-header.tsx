@@ -195,7 +195,7 @@ export default function GlobalHeader({
   const headerTop = hasTrialStatus ? '44px' : '0px';
 
   return (
-    <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between fixed left-0 right-0 z-[9999]" style={{ top: headerTop }}>
+    <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between fixed left-0 right-0 z-[30]" style={{ top: headerTop }}>
       {/* Left side - Menu toggle and Logo */}
       <div className="flex items-center space-x-3">
         {/* Sidebar toggle button */}
@@ -203,7 +203,7 @@ export default function GlobalHeader({
           variant="ghost"
           size="icon"
           onClick={handleMenuClick}
-          className="hover:bg-gray-100 relative z-[9999]"
+          className="hover:bg-gray-100 relative z-[30]"
           data-tour="hamburger-menu"
         >
           <Menu className="h-5 w-5" />
