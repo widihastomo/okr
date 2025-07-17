@@ -531,6 +531,23 @@ export default function TourSystem() {
     return menuSteps.includes(stepId);
   };
 
+  // Function to check if sidebar is currently open
+  const isSidebarOpen = () => {
+    // Check for mobile sidebar state
+    const mobileOverlay = document.querySelector('[data-sidebar="overlay"]');
+    const sidebarProvider = document.querySelector('[data-sidebar="provider"]');
+    
+    if (mobileOverlay && mobileOverlay.getAttribute('data-state') === 'open') {
+      return true;
+    }
+    
+    if (sidebarProvider && sidebarProvider.getAttribute('data-mobile') === 'true') {
+      return sidebarProvider.getAttribute('data-state') === 'open';
+    }
+    
+    return false;
+  };
+
   // Function to expand sidebar on mobile for menu items
   const expandSidebarForMobile = () => {
     if (isMobile()) {
@@ -553,47 +570,19 @@ export default function TourSystem() {
   const closeSidebarForMobile = () => {
     if (isMobile()) {
       console.log("closeSidebarForMobile: Mobile detected, checking sidebar");
-      // Find the hamburger menu button and click it to close sidebar
       const hamburgerButton = document.querySelector('[data-tour="hamburger-menu"]');
-      
-      // Try multiple selectors for sidebar
-      const sidebarSelectors = [
-        '[data-sidebar="sidebar"]',
-        '.sidebar',
-        '[data-sidebar]',
-        'aside',
-        '.group'
-      ];
-      
-      let sidebar = null;
-      let sidebarSelector = '';
-      
-      for (const selector of sidebarSelectors) {
-        sidebar = document.querySelector(selector);
-        if (sidebar) {
-          sidebarSelector = selector;
-          break;
-        }
-      }
+      const sidebarOpen = isSidebarOpen();
       
       console.log("closeSidebarForMobile: hamburgerButton found:", !!hamburgerButton);
-      console.log("closeSidebarForMobile: sidebar found:", !!sidebar, "with selector:", sidebarSelector);
+      console.log("closeSidebarForMobile: sidebar is open:", sidebarOpen);
       
-      if (hamburgerButton) {
-        // Check if sidebar is currently visible (different approach)
-        const sidebarGroup = document.querySelector('group[data-state="open"]') || 
-                            document.querySelector('.group[data-state="open"]') ||
-                            document.querySelector('[data-state="open"]');
-        
-        console.log("closeSidebarForMobile: sidebar group with open state:", !!sidebarGroup);
-        
-        // Just click hamburger button to toggle sidebar regardless of state detection
+      if (hamburgerButton && sidebarOpen) {
         console.log("closeSidebarForMobile: Clicking hamburger to close sidebar");
         (hamburgerButton as HTMLElement).click();
         // Return promise to wait for sidebar animation
         return new Promise(resolve => setTimeout(resolve, 300));
       } else {
-        console.log("closeSidebarForMobile: hamburger button not found");
+        console.log("closeSidebarForMobile: Sidebar already closed or hamburger not found");
       }
     } else {
       console.log("closeSidebarForMobile: Not mobile, skipping");
