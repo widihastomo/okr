@@ -6235,6 +6235,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Check if any organizations are using this plan
       const { organizationSubscriptions, billingPeriods, subscriptionPlans } = await import("@shared/schema");
+      
+      // Get the subscription plan to check if it's a default plan
+      const [planToDelete] = await db.select()
+        .from(subscriptionPlans)
+        .where(eq(subscriptionPlans.id, planId))
+        .limit(1);
+        
+      if (!planToDelete) {
+        return res.status(404).json({ message: "Subscription plan not found" });
+      }
+      
+      // Prevent deletion of default plans (Free Trial, Starter, Growth, Enterprise)
+      const defaultPlanSlugs = ['free-trial', 'starter', 'growth', 'enterprise'];
+      if (defaultPlanSlugs.includes(planToDelete.slug)) {
+        return res.status(400).json({ 
+          message: "Cannot delete default subscription plan. Default plans are protected from deletion." 
+        });
+      }
+      
       const [activeSubscription] = await db.select()
         .from(organizationSubscriptions)
         .where(eq(organizationSubscriptions.planId, planId))

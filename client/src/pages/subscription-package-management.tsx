@@ -635,6 +635,7 @@ export default function SubscriptionPackageManagement() {
       return await apiRequest("DELETE", `/api/admin/subscription-plans/${id}`);
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/subscription-plans-with-periods"] });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/subscription-plans"] });
       toast({
         title: "Paket berhasil dihapus",
@@ -936,13 +937,25 @@ export default function SubscriptionPackageManagement() {
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => setDeletePackageId(pkg.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      {/* Hide delete button for default packages */}
+                      {!['free-trial', 'starter', 'growth', 'enterprise'].includes(pkg.slug) ? (
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => setDeletePackageId(pkg.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      ) : (
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          disabled
+                          title="Paket default tidak dapat dihapus"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>
