@@ -533,18 +533,43 @@ export default function TourSystem() {
 
   // Function to check if sidebar is currently open
   const isSidebarOpen = () => {
-    // Check for mobile sidebar state
-    const mobileOverlay = document.querySelector('[data-sidebar="overlay"]');
-    const sidebarProvider = document.querySelector('[data-sidebar="provider"]');
+    // Multiple approaches to detect sidebar state
     
+    // 1. Check for mobile overlay
+    const mobileOverlay = document.querySelector('[data-sidebar="overlay"]');
     if (mobileOverlay && mobileOverlay.getAttribute('data-state') === 'open') {
+      console.log("isSidebarOpen: Detected open via overlay");
       return true;
     }
     
-    if (sidebarProvider && sidebarProvider.getAttribute('data-mobile') === 'true') {
-      return sidebarProvider.getAttribute('data-state') === 'open';
+    // 2. Check provider state
+    const sidebarProvider = document.querySelector('[data-sidebar="provider"]');
+    if (sidebarProvider) {
+      const isMobile = sidebarProvider.getAttribute('data-mobile') === 'true';
+      const state = sidebarProvider.getAttribute('data-state');
+      console.log("isSidebarOpen: Provider mobile:", isMobile, "state:", state);
+      if (isMobile && state === 'open') {
+        return true;
+      }
     }
     
+    // 3. Check for visible sidebar elements
+    const sidebarElements = document.querySelectorAll('[data-sidebar]');
+    for (const element of sidebarElements) {
+      const rect = element.getBoundingClientRect();
+      if (rect.width > 0 && rect.height > 0 && element.offsetParent !== null) {
+        // Check if it's actually visible and not just rendered
+        const styles = window.getComputedStyle(element);
+        if (styles.display !== 'none' && styles.visibility !== 'hidden' && styles.opacity !== '0') {
+          console.log("isSidebarOpen: Found visible sidebar element:", element.getAttribute('data-sidebar'));
+          if (element.getAttribute('data-sidebar') === 'sidebar') {
+            return true;
+          }
+        }
+      }
+    }
+    
+    console.log("isSidebarOpen: No open sidebar detected");
     return false;
   };
 
