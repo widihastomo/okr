@@ -290,6 +290,9 @@ export default function TourSystem() {
   
   // Tour control functions
   const nextStep = () => {
+    // Clean up highlights from previous step
+    cleanupHighlights();
+    
     if (currentStep < totalSteps - 1) {
       setCurrentStep(currentStep + 1);
     } else {
@@ -440,8 +443,10 @@ export default function TourSystem() {
           e.preventDefault();
           e.stopPropagation();
           
-          // Remove click handler
+          // Remove click handler and highlights immediately
           element.removeEventListener('click', handleClick);
+          element.classList.remove('tour-highlight');
+          element.classList.remove('tour-click-required');
           setWaitingForClick(false);
           
           // Navigate to target path if specified
@@ -514,6 +519,7 @@ export default function TourSystem() {
   const cleanupHighlights = () => {
     document.querySelectorAll('.tour-highlight').forEach(el => {
       el.classList.remove('tour-highlight');
+      el.classList.remove('tour-click-required');
     });
   };
 
