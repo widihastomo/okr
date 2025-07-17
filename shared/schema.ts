@@ -68,6 +68,7 @@ export const subscriptionPlans = pgTable("subscription_plans", {
   features: jsonb("features").notNull(), // Array of feature strings
   isActive: boolean("is_active").default(true),
   isDefault: boolean("is_default").default(false), // Only one package can be default for new user registrations
+  isTrial: boolean("is_trial").default(false), // Flag for standard free trial package
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

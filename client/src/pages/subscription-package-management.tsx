@@ -62,6 +62,7 @@ interface PackageFormData {
   maxUsers: number | null;
   features: string[];
   isActive: boolean;
+  isTrial: boolean;
   billingPeriods: BillingPeriodData[];
 }
 
@@ -90,6 +91,7 @@ function PackageFormModal({
     maxUsers: null,
     features: [],
     isActive: true,
+    isTrial: false,
     billingPeriods: [],
   });
   const [newFeature, setNewFeature] = useState("");
@@ -103,6 +105,7 @@ function PackageFormModal({
         maxUsers: pkg.maxUsers || null,
         features: pkg.features as string[] || [],
         isActive: pkg.isActive ?? true,
+        isTrial: (pkg as any).isTrial ?? false,
         billingPeriods: (pkg as any).billingPeriods || [],
       });
     } else {
@@ -112,6 +115,7 @@ function PackageFormModal({
         maxUsers: null,
         features: [],
         isActive: true,
+        isTrial: false,
         billingPeriods: [],
       });
     }
@@ -407,6 +411,18 @@ function PackageFormModal({
             <div>
               <Label htmlFor="isActive" className="text-sm font-medium">Paket Aktif</Label>
               <p className="text-xs text-gray-500">Centang untuk mengaktifkan paket ini di sistem</p>
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg">
+            <Switch
+              id="isTrial"
+              checked={formData.isTrial}
+              onCheckedChange={(checked) => setFormData({ ...formData, isTrial: checked })}
+            />
+            <div>
+              <Label htmlFor="isTrial" className="text-sm font-medium">Paket Free Trial</Label>
+              <p className="text-xs text-gray-500">Centang untuk menjadikan paket ini sebagai paket standar free trial</p>
             </div>
           </div>
 
@@ -806,6 +822,7 @@ export default function SubscriptionPackageManagement() {
                 <TableHead>Fitur</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Default</TableHead>
+                <TableHead>Free Trial</TableHead>
                 <TableHead className="text-right">Aksi</TableHead>
               </TableRow>
             </TableHeader>
@@ -868,6 +885,12 @@ export default function SubscriptionPackageManagement() {
                         </Button>
                       )}
                     </div>
+                  </TableCell>
+                  
+                  <TableCell>
+                    <Badge variant={(pkg as any).isTrial ? "default" : "secondary"}>
+                      {(pkg as any).isTrial ? "Ya" : "Tidak"}
+                    </Badge>
                   </TableCell>
 
                   <TableCell className="text-right">

@@ -283,6 +283,15 @@ The system includes comprehensive database connection troubleshooting tools:
 
 ## Changelog
 ```
+- July 17, 2025. **FREE TRIAL PACKAGE FLAGGING SYSTEM IMPLEMENTED** - Successfully added is_trial column and max_user support for standardized free trial package functionality:
+  * ADDED: is_trial boolean column to subscription_plans table schema in shared/schema.ts
+  * ADDED: is_trial field to PackageFormData interface and form handling
+  * ENHANCED: Package form modal now includes "Paket Free Trial" switch for flagging standard trial packages
+  * ADDED: "Free Trial" column to subscription packages table display with Ya/Tidak badges
+  * UPDATED: Build seeder to mark Free Trial package with is_trial: true flag
+  * CONFIGURED: Free Trial package (3 max users, 0 price) now properly flagged as standard trial package
+  * ENHANCED: Form validation and UI properly handle is_trial field for both create and edit operations
+  * RESULT: Clear identification of free trial packages with proper database schema and UI support
 - July 17, 2025. **STRIPE INTEGRATION COMPLETELY REMOVED** - Successfully removed all Stripe integration from subscription package management system:
   * REMOVED: Stripe Product ID and Stripe Price ID fields from subscription package creation form
   * REMOVED: Stripe Integration section from PackageFormModal component
