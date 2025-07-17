@@ -73,9 +73,6 @@ class MailtrapProvider implements EmailProvider {
       }
       
       // In development, allow placeholder credentials but warn user
-      if (process.env.NODE_ENV === 'development') {
-        console.log('⚠️  Using Mailtrap for development - emails will be caught in sandbox');
-      }
       if (process.env.NODE_ENV === 'development' && 
           (settings.mailtrap_user === 'deb40b3a0b567f' || settings.mailtrap_pass === '1a8d3f2b2e7c39')) {
         console.log('📧 Using placeholder Mailtrap credentials in development mode - this may fail');
@@ -232,27 +229,12 @@ class DevelopmentEmailProvider implements EmailProvider {
 
 // Email Service with fallback providers
 class EmailService {
-  private providers: EmailProvider[] = [];
-  
-  constructor() {
-    // In development mode, prioritize Mailtrap for local testing
-    if (process.env.NODE_ENV === 'development') {
-      this.providers = [
-        new MailtrapProvider(), // Mailtrap as primary for development
-        new SMTPProvider(), // Custom SMTP as fallback
-        new SendGridProvider(),
-        new GmailProvider(),
-      ];
-    } else {
-      // In production, use SMTP as primary
-      this.providers = [
-        new SMTPProvider(), // Custom SMTP as primary
-        new MailtrapProvider(), // Mailtrap as fallback
-        new SendGridProvider(),
-        new GmailProvider(),
-      ];
-    }
-  }
+  private providers: EmailProvider[] = [
+    new SMTPProvider(), // Custom SMTP as primary
+    new MailtrapProvider(), // Mailtrap as fallback
+    new SendGridProvider(),
+    new GmailProvider(),
+  ];
   
   async sendEmail(config: EmailConfig): Promise<{ success: boolean; provider?: string; error?: string }> {
     let lastError = '';
@@ -324,18 +306,9 @@ class EmailService {
 export const emailService = new EmailService();
 
 // Log the email service configuration on startup
-if (process.env.NODE_ENV === 'development') {
-  console.log('📧 Email service initialized for LOCAL DEVELOPMENT:');
-  console.log('  - Primary provider: Mailtrap (sandbox.smtp.mailtrap.io)');
-  console.log('  - Port: 2525 (development sandbox)');
-  console.log('  - Sender: noreply@okrapp.com');
-  console.log('  - Fallback providers: Custom SMTP → SendGrid → Gmail');
-  console.log('  - All emails will be caught in Mailtrap sandbox for testing');
-} else {
-  console.log('📧 Email service initialized with custom SMTP configuration:');
-  console.log('  - Primary provider: Custom SMTP (mx3.mailspace.id)');
-  console.log('  - Port: 465 (SSL)');
-  console.log('  - Sender: no-reply@mail.refokus.id');
-  console.log('  - Fallback providers: Mailtrap → SendGrid → Gmail');
-  console.log('  - Configuration loaded from environment variables');
-}
+console.log('📧 Email service initialized with custom SMTP configuration:');
+console.log('  - Primary provider: Custom SMTP (mx3.mailspace.id)');
+console.log('  - Port: 465 (SSL)');
+console.log('  - Sender: no-reply@mail.refokus.id');
+console.log('  - Fallback providers: Mailtrap → SendGrid → Gmail');
+console.log('  - Configuration loaded from environment variables');

@@ -227,7 +227,6 @@ export default function TourSystem() {
   const [currentStep, setCurrentStep] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
-  const [elementPosition, setElementPosition] = useState({ x: 0, y: 0 });
   const [waitingForClick, setWaitingForClick] = useState(false);
   const [location, setLocation] = useLocation();
   const [showWelcomeScreen, setShowWelcomeScreen] = useState(false);
@@ -262,6 +261,8 @@ export default function TourSystem() {
     localStorage.setItem('tour-completed', 'true');
     cleanupHighlights();
   };
+  
+  console.log('TourSystemNew state:', { isActive, currentStep, totalSteps });
 
   useEffect(() => {
     if (isActive) {
@@ -293,12 +294,15 @@ export default function TourSystem() {
   };
 
   const showWelcomeScreenManually = () => {
+    console.log('showWelcomeScreenManually called');
     localStorage.removeItem('welcome-screen-shown');
     localStorage.setItem('onboarding-completed', 'true');
     setShowWelcomeScreen(true);
+    console.log('Welcome screen state set to true');
   };
 
   const restartTourFromHamburgerMenu = () => {
+    console.log('Tour restarted from hamburger menu step');
     setIsActive(true);
     setCurrentStep(0);
     setIsVisible(true);
@@ -309,6 +313,7 @@ export default function TourSystem() {
   useEffect(() => {
     // If tour is already active, restart it from step 0 (hamburger menu)
     if (isActive) {
+      console.log('Auto-restarting tour from hamburger menu');
       restartTourFromHamburgerMenu();
     }
   }, [isActive]);
@@ -337,6 +342,7 @@ export default function TourSystem() {
     };
 
     const handleShowWelcomeScreen = () => {
+      console.log('showWelcomeScreen event received');
       showWelcomeScreenManually();
     };
 
@@ -354,6 +360,12 @@ export default function TourSystem() {
     const currentStepData = TOUR_STEPS[currentStep];
     const element = document.querySelector(currentStepData.selector);
     
+    console.log(`Step ${currentStep + 1}: Looking for element: ${currentStepData.selector}`, element);
+    
+    // Debug: Show all available data-tour elements
+    const allTourElements = document.querySelectorAll('[data-tour]');
+    console.log('All available tour elements:', Array.from(allTourElements).map(el => el.getAttribute('data-tour')));
+    
     if (element) {
       // Remove existing highlights and click handlers
       document.querySelectorAll('.tour-highlight').forEach(el => {
@@ -363,13 +375,6 @@ export default function TourSystem() {
       
       // Add highlight to current element
       element.classList.add('tour-highlight');
-      
-      // Get element position for spotlight effect
-      const rect = element.getBoundingClientRect();
-      setElementPosition({
-        x: rect.left + rect.width / 2,
-        y: rect.top + rect.height / 2
-      });
       
       // If this step requires a click, add click handler
       if (currentStepData.requiresClick) {
@@ -386,6 +391,7 @@ export default function TourSystem() {
           
           // Navigate to target path if specified
           if (currentStepData.targetPath) {
+            console.log('Navigating to:', currentStepData.targetPath);
             setLocation(currentStepData.targetPath);
           }
           
@@ -443,8 +449,7 @@ export default function TourSystem() {
         setTooltipPosition({ x, y });
       }, 300);
     } else {
-      // Reset element position if element not found
-      setElementPosition({ x: 0, y: 0 });
+      console.warn(`Element not found for selector: ${currentStepData.selector}`);
     }
   };
 
@@ -479,23 +484,18 @@ export default function TourSystem() {
 
   return (
     <>
-      {/* Tour overlay - only show when tour is active */}
+      {/* Tour tooltip - only show when tour is active */}
       {isActive && isVisible && (
-        <>
-
-          
-          {/* Tour tooltip */}
-          <div
-            className="fixed z-[100] rounded-xl shadow-2xl tour-tooltip"
-            style={{
-              left: `${tooltipPosition.x}px`,
-              top: `${tooltipPosition.y}px`,
-              width: '380px',
-              pointerEvents: 'auto'
-            }}
-          >
-          <Card className="w-80 shadow-lg border-2 border-orange-200 bg-white">
-            <CardHeader className="pb-3">
+        <div
+          className="fixed z-[100] bg-white rounded-xl shadow-2xl border border-orange-200 border-2"
+          style={{
+            left: `${tooltipPosition.x}px`,
+            top: `${tooltipPosition.y}px`,
+            width: '380px',
+            pointerEvents: 'auto'
+          }}
+        >
+          <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <Badge variant="outline" className="text-xs">
                 {currentStep + 1} dari {totalSteps}
@@ -530,7 +530,11 @@ export default function TourSystem() {
               )}
             </CardDescription>
             
-            
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
+              <p className="text-sm text-blue-700 font-medium">
+                ℹ️ Menu yang berkedip menunjukkan lokasi fitur yang sedang dijelaskan
+              </p>
+            </div>
             
             <Progress value={progress} className="h-1 mb-3" />
             
@@ -583,9 +587,7 @@ export default function TourSystem() {
               </div>
             </div>
           </CardContent>
-          </Card>
-          </div>
-        </>
+        </div>
       )}
       
       {/* Welcome Screen */}
