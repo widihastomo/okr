@@ -154,38 +154,47 @@ export default function TourSystem() {
       // Add highlight to current element
       element.classList.add('tour-highlight');
       
-      // Calculate tooltip position
-      const rect = element.getBoundingClientRect();
-      const tooltipWidth = 320;
-      const tooltipHeight = 200;
+      // Scroll element into view smoothly
+      element.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'center',
+        inline: 'center'
+      });
       
-      let x = rect.left + rect.width / 2 - tooltipWidth / 2;
-      let y = rect.top - tooltipHeight - 10;
-      
-      // Adjust position based on step position
-      switch (currentStepData.position) {
-        case 'right':
-          x = rect.right + 10;
-          y = rect.top + rect.height / 2 - tooltipHeight / 2;
-          break;
-        case 'left':
-          x = rect.left - tooltipWidth - 10;
-          y = rect.top + rect.height / 2 - tooltipHeight / 2;
-          break;
-        case 'bottom':
-          y = rect.bottom + 10;
-          break;
-        case 'top':
-        default:
-          // Keep default values
-          break;
-      }
-      
-      // Ensure tooltip stays within viewport
-      x = Math.max(10, Math.min(x, window.innerWidth - tooltipWidth - 10));
-      y = Math.max(10, Math.min(y, window.innerHeight - tooltipHeight - 10));
-      
-      setTooltipPosition({ x, y });
+      // Wait for scroll to complete then calculate position
+      setTimeout(() => {
+        const rect = element.getBoundingClientRect();
+        const tooltipWidth = 320;
+        const tooltipHeight = 180;
+        
+        let x = rect.left + rect.width / 2 - tooltipWidth / 2;
+        let y = rect.top - tooltipHeight - 15;
+        
+        // Adjust position based on step position
+        switch (currentStepData.position) {
+          case 'right':
+            x = rect.right + 15;
+            y = rect.top + rect.height / 2 - tooltipHeight / 2;
+            break;
+          case 'left':
+            x = rect.left - tooltipWidth - 15;
+            y = rect.top + rect.height / 2 - tooltipHeight / 2;
+            break;
+          case 'bottom':
+            y = rect.bottom + 15;
+            break;
+          case 'top':
+          default:
+            // Keep default values
+            break;
+        }
+        
+        // Ensure tooltip stays within viewport
+        x = Math.max(15, Math.min(x, window.innerWidth - tooltipWidth - 15));
+        y = Math.max(15, Math.min(y, window.innerHeight - tooltipHeight - 15));
+        
+        setTooltipPosition({ x, y });
+      }, 300);
     }
   };
 
@@ -215,15 +224,20 @@ export default function TourSystem() {
   return (
     <>
       {/* Overlay backdrop */}
-      <div className="fixed inset-0 bg-black bg-opacity-50 z-[100]" onClick={skipTour} />
+      <div 
+        className="fixed inset-0 bg-black bg-opacity-60 z-[9999]" 
+        onClick={skipTour}
+        style={{ pointerEvents: 'auto' }}
+      />
       
       {/* Tour tooltip */}
       <div
-        className="fixed z-[101] bg-white rounded-lg shadow-2xl border border-gray-200 max-w-sm"
+        className="fixed z-[10002] bg-white rounded-xl shadow-2xl border border-gray-200"
         style={{
           left: `${tooltipPosition.x}px`,
           top: `${tooltipPosition.y}px`,
           width: '320px',
+          pointerEvents: 'auto'
         }}
       >
         <CardHeader className="pb-3">
