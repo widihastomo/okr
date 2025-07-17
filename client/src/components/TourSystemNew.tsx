@@ -541,9 +541,12 @@ export default function TourSystem() {
         const sidebar = document.querySelector('[data-sidebar="sidebar"]');
         if (!sidebar || !sidebar.classList.contains('translate-x-0')) {
           (hamburgerButton as HTMLElement).click();
+          // Return promise to wait for sidebar animation
+          return new Promise(resolve => setTimeout(resolve, 300));
         }
       }
     }
+    return Promise.resolve();
   };
 
   const highlightCurrentStep = () => {
@@ -562,9 +565,17 @@ export default function TourSystem() {
       Array.from(allTourElements).map((el) => el.getAttribute("data-tour")),
     );
 
-    // Expand sidebar on mobile if highlighting a menu item
+    // Expand sidebar on mobile if highlighting a menu item and wait for animation
     if (isMenuStep(currentStepData.id)) {
-      expandSidebarForMobile();
+      expandSidebarForMobile().then(() => {
+        // Re-highlight after sidebar animation completes
+        setTimeout(() => {
+          const updatedElement = document.querySelector(currentStepData.selector);
+          if (updatedElement) {
+            updatedElement.classList.add("tour-highlight");
+          }
+        }, 100);
+      });
     }
 
     if (element) {
@@ -630,6 +641,8 @@ export default function TourSystem() {
       });
 
       // Wait for scroll to complete then calculate position
+      // Add extra delay for mobile menu items to ensure sidebar animation completes
+      const delay = isMobile() && isMenuStep(currentStepData.id) ? 500 : 300;
       setTimeout(() => {
         const rect = element.getBoundingClientRect();
         const tooltipWidth = isMobile() ? Math.min(window.innerWidth - 30, 380) : 380;
@@ -640,9 +653,18 @@ export default function TourSystem() {
 
         // Mobile-specific positioning for menu items
         if (isMobile() && isMenuStep(currentStepData.id)) {
-          // For mobile menu items, always position at the bottom to avoid covering the menu
-          x = 15; // Left edge with padding
-          y = rect.bottom + 15; // Below the menu item with padding
+          // For mobile menu items, position tooltip far to the right or bottom
+          // Check if we have enough space to the right of the sidebar
+          const sidebarWidth = 280; // Approximate sidebar width
+          if (window.innerWidth > sidebarWidth + tooltipWidth + 30) {
+            // Position to the right of sidebar
+            x = sidebarWidth + 15;
+            y = rect.top + rect.height / 2 - tooltipHeight / 2;
+          } else {
+            // Position at bottom with full width
+            x = 15; // Left edge with padding
+            y = Math.max(rect.bottom + 20, window.innerHeight - tooltipHeight - 15); // Below menu or at bottom
+          }
         } else if (isMobile()) {
           // For mobile non-menu items, position at bottom or top based on available space
           x = 15; // Left edge with padding
@@ -679,7 +701,7 @@ export default function TourSystem() {
         y = Math.max(15, Math.min(y, window.innerHeight - tooltipHeight - 15));
 
         setTooltipPosition({ x, y });
-      }, 300);
+      }, delay);
     } else {
       console.warn(
         `Element not found for selector: ${currentStepData.selector}`,
