@@ -284,12 +284,15 @@ The system includes comprehensive database connection troubleshooting tools:
 ## Changelog
 ```
 - July 16, 2025. **TRIAL SETTINGS CLEANUP COMPLETED** - Successfully removed duplicate trial settings and standardized configuration:
-  * REMOVED: Unused trial settings from application_settings table (default_trial_days, max_trial_users, trial_duration_days, max_users_per_trial, enable_trial, enable_trials)
+  * REMOVED: Unused trial settings from application_settings table (default_trial_days, max_trial_users, trial_duration_days, max_users_per_trial, enable_trial, enable_trials, default_trial_plan)
   * CLEANED: Removed duplicate trial settings from seeder files (build-seeder.ts, populate-application-settings.ts, populate-app-settings-db.ts)
+  * DELETED: Trial settings page (/system-admin/trial-settings) and component completely removed from frontend
+  * REMOVED: Trial configuration API endpoints (/api/admin/trial-configuration GET/PUT) from server routes
+  * CLEANED: System admin sidebar menu item "Pengaturan Free Trial" removed
   * STANDARDIZED: Trial configuration now uses single source of truth - subscription_plans table
   * CONFIRMED: Free Trial plan (16e80037-0b0e-4fe3-a023-5bbefcfe55ad) with 3 max users and 7-day duration from subscription system
   * SIMPLIFIED: Removed redundant trial settings that caused confusion between 3 different configuration sources
-  * RESULT: Clean, single-source trial configuration without duplicate settings
+  * RESULT: Clean, single-source trial configuration without duplicate settings or unused interfaces
 - July 16, 2025. **TRIAL SETTINGS CONFIGURATION FIXED** - Successfully resolved trial settings 404 error by creating missing free trial plan:
   * CREATED: Free Trial subscription plan with id 16e80037-0b0e-4fe3-a023-5bbefcfe55ad
   * ADDED: Billing period for free trial (trial type, 1 month, 0.00 price)

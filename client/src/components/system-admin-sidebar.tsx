@@ -16,7 +16,6 @@ import {
   Trophy,
   Calendar,
   CreditCard,
-  Clock,
   Focus,
   CheckSquare,
   Sun,
@@ -78,12 +77,7 @@ export default function SystemAdminSidebar({
       path: "/subscription-packages",
       active: location === "/subscription-packages",
     },
-    {
-      label: "Pengaturan Free Trial",
-      icon: Clock,
-      path: "/system-admin/trial-settings",
-      active: location === "/system-admin/trial-settings",
-    },
+
 
     {
       label: "Pengaturan Aplikasi",

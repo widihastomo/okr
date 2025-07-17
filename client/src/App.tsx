@@ -56,7 +56,7 @@ import InvoicePaymentFinish from "@/pages/invoice-payment-finish";
 import InvoiceManagement from "@/pages/invoice-management";
 import InvoiceDetail from "@/pages/invoice-detail";
 import SubscriptionAddonIntegration from "@/pages/subscription-addon-integration";
-import TrialSettingsPage from "@/pages/system-admin/trial-settings";
+
 import DummyClientExamples from "@/pages/dummy-client-examples";
 import ReferralCodes from "@/pages/referral-codes";
 
@@ -273,10 +273,7 @@ function Router() {
                 path="/system-admin/add-ons"
                 component={SystemAddonManagement}
               />
-              <Route
-                path="/system-admin/trial-settings"
-                component={TrialSettingsPage}
-              />
+
 
               <Route
                 path="/system-admin/client-status-mapping"
