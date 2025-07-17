@@ -585,6 +585,7 @@ export default function TourSystem() {
 
     // Handle sidebar visibility based on step type
     if (isMenuStep(currentStepData.id)) {
+      console.log(`Step ${currentStep + 1} (${currentStepData.id}) is a menu step - expanding sidebar`);
       // Expand sidebar on mobile if highlighting a menu item and wait for animation
       expandSidebarForMobile().then(() => {
         // Re-highlight after sidebar animation completes
@@ -596,6 +597,7 @@ export default function TourSystem() {
         }, 100);
       });
     } else {
+      console.log(`Step ${currentStep + 1} (${currentStepData.id}) is NOT a menu step - closing sidebar`);
       // Close sidebar on mobile if moving away from menu items
       closeSidebarForMobile();
     }
