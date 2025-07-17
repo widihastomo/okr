@@ -450,116 +450,119 @@ export default function TourSystem() {
     }
   }, [isActive, currentStep]);
 
-  if (!isActive || !isVisible) return null;
+  // Only return null if neither tour is active nor welcome screen should show
+  if ((!isActive || !isVisible) && !showWelcomeScreen) return null;
 
   const currentStepData = TOUR_STEPS[currentStep];
   const progress = ((currentStep + 1) / totalSteps) * 100;
 
   return (
     <>
-      {/* Tour tooltip - floating without backdrop */}
-      <div
-        className="fixed z-[100] bg-white rounded-xl shadow-2xl border border-orange-200 border-2"
-        style={{
-          left: `${tooltipPosition.x}px`,
-          top: `${tooltipPosition.y}px`,
-          width: '380px',
-          pointerEvents: 'auto'
-        }}
-      >
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <Badge variant="outline" className="text-xs">
-              {currentStep + 1} dari {totalSteps}
-            </Badge>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={skipTour}
-              className="h-auto p-1"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-          <CardTitle className="text-lg flex items-center gap-2">
-            <currentStepData.icon className="h-5 w-5 text-orange-600" />
-            {currentStepData.title}
-          </CardTitle>
-        </CardHeader>
-        
-        <CardContent className="pt-0">
-          <CardDescription className="text-sm text-gray-600 mb-3">
-            {currentStepData.description}
-            {currentStepData.requiresClick && waitingForClick && (
-              <div className="mt-3 p-3 bg-orange-50 border border-orange-200 rounded-lg">
-                <div className="flex items-center gap-2">
-                  <MousePointer2 className="w-4 h-4 text-orange-600" />
-                  <span className="text-sm font-medium text-orange-800">
-                    Klik menu ini untuk melanjutkan tour
-                  </span>
-                </div>
-              </div>
-            )}
-          </CardDescription>
-          
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
-            <p className="text-sm text-blue-700 font-medium">
-              ℹ️ Menu yang berkedip menunjukkan lokasi fitur yang sedang dijelaskan
-            </p>
-          </div>
-          
-          <Progress value={progress} className="h-1 mb-3" />
-          
-          <div className="flex justify-between items-center">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={previousStep}
-              disabled={currentStep === 0 || waitingForClick}
-              className={cn(
-                "flex items-center gap-1",
-                waitingForClick && "opacity-50 cursor-not-allowed"
-              )}
-            >
-              <ChevronLeft className="h-4 w-4" />
-              Sebelumnya
-            </Button>
-            
-            <div className="flex gap-2">
+      {/* Tour tooltip - only show when tour is active */}
+      {isActive && isVisible && (
+        <div
+          className="fixed z-[100] bg-white rounded-xl shadow-2xl border border-orange-200 border-2"
+          style={{
+            left: `${tooltipPosition.x}px`,
+            top: `${tooltipPosition.y}px`,
+            width: '380px',
+            pointerEvents: 'auto'
+          }}
+        >
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <Badge variant="outline" className="text-xs">
+                {currentStep + 1} dari {totalSteps}
+              </Badge>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={skipTour}
-                className="text-gray-500"
+                className="h-auto p-1"
               >
-                Lewati
+                <X className="h-4 w-4" />
               </Button>
-              
+            </div>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <currentStepData.icon className="h-5 w-5 text-orange-600" />
+              {currentStepData.title}
+            </CardTitle>
+          </CardHeader>
+          
+          <CardContent className="pt-0">
+            <CardDescription className="text-sm text-gray-600 mb-3">
+              {currentStepData.description}
+              {currentStepData.requiresClick && waitingForClick && (
+                <div className="mt-3 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <MousePointer2 className="w-4 h-4 text-orange-600" />
+                    <span className="text-sm font-medium text-orange-800">
+                      Klik menu ini untuk melanjutkan tour
+                    </span>
+                  </div>
+                </div>
+              )}
+            </CardDescription>
+            
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
+              <p className="text-sm text-blue-700 font-medium">
+                ℹ️ Menu yang berkedip menunjukkan lokasi fitur yang sedang dijelaskan
+              </p>
+            </div>
+            
+            <Progress value={progress} className="h-1 mb-3" />
+            
+            <div className="flex justify-between items-center">
               <Button
+                variant="outline"
                 size="sm"
-                onClick={nextStep}
-                disabled={waitingForClick}
+                onClick={previousStep}
+                disabled={currentStep === 0 || waitingForClick}
                 className={cn(
-                  "bg-orange-600 hover:bg-orange-700 text-white flex items-center gap-1",
+                  "flex items-center gap-1",
                   waitingForClick && "opacity-50 cursor-not-allowed"
                 )}
               >
-                {currentStep === totalSteps - 1 ? (
-                  <>
-                    <CheckSquare className="h-4 w-4" />
-                    Selesai
-                  </>
-                ) : (
-                  <>
-                    Selanjutnya
-                    <ChevronRight className="h-4 w-4" />
-                  </>
-                )}
+                <ChevronLeft className="h-4 w-4" />
+                Sebelumnya
               </Button>
+              
+              <div className="flex gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={skipTour}
+                  className="text-gray-500"
+                >
+                  Lewati
+                </Button>
+                
+                <Button
+                  size="sm"
+                  onClick={nextStep}
+                  disabled={waitingForClick}
+                  className={cn(
+                    "bg-orange-600 hover:bg-orange-700 text-white flex items-center gap-1",
+                    waitingForClick && "opacity-50 cursor-not-allowed"
+                  )}
+                >
+                  {currentStep === totalSteps - 1 ? (
+                    <>
+                      <CheckSquare className="h-4 w-4" />
+                      Selesai
+                    </>
+                  ) : (
+                    <>
+                      Selanjutnya
+                      <ChevronRight className="h-4 w-4" />
+                    </>
+                  )}
+                </Button>
+              </div>
             </div>
-          </div>
-        </CardContent>
-      </div>
+          </CardContent>
+        </div>
+      )}
       
       {/* Welcome Screen */}
       <WelcomeScreen
