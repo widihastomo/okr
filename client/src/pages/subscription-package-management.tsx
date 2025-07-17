@@ -422,9 +422,26 @@ function PackageFormModal({
             />
             <div>
               <Label htmlFor="isTrial" className="text-sm font-medium">Paket Free Trial</Label>
-              <p className="text-xs text-gray-500">Centang untuk menjadikan paket ini sebagai paket standar free trial</p>
+              <p className="text-xs text-gray-500">
+                Centang untuk menjadikan paket ini sebagai paket standar free trial. 
+                Paket free trial tidak memerlukan konfigurasi periode billing.
+              </p>
             </div>
           </div>
+
+          {/* Information for Free Trial packages */}
+          {formData.isTrial && (
+            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="flex items-center space-x-2 mb-2">
+                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                <span className="text-sm font-medium text-blue-800">Paket Free Trial</span>
+              </div>
+              <p className="text-sm text-blue-700">
+                Paket ini ditandai sebagai free trial dan tidak memerlukan konfigurasi periode billing. 
+                Sistem akan otomatis menangani durasi trial berdasarkan pengaturan aplikasi.
+              </p>
+            </div>
+          )}
 
           <div className="space-y-3">
             <div>
@@ -469,80 +486,81 @@ function PackageFormModal({
             )}
           </div>
 
-          {/* Billing Periods Section */}
-          <div className="space-y-4 pt-6 border-t">
-            <div className="flex items-center justify-between">
-              <div>
-                <Label className="text-sm font-medium">
-                  Periode Billing
-                </Label>
-                <p className="text-xs text-gray-500 mt-1">Atur opsi periode dan harga untuk paket ini</p>
+          {/* Billing Periods Section - Hidden for Free Trial packages */}
+          {!formData.isTrial && (
+            <div className="space-y-4 pt-6 border-t">
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label className="text-sm font-medium">
+                    Periode Billing
+                  </Label>
+                  <p className="text-xs text-gray-500 mt-1">Atur opsi periode dan harga untuk paket ini</p>
+                </div>
+                <Button
+                  type="button"
+                  onClick={addBillingPeriod}
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-2"
+                >
+                  <Plus className="h-4 w-4" />
+                  Tambah Periode
+                </Button>
               </div>
-              <Button
-                type="button"
-                onClick={addBillingPeriod}
-                variant="outline"
-                size="sm"
-                className="flex items-center gap-2"
-              >
-                <Plus className="h-4 w-4" />
-                Tambah Periode
-              </Button>
-            </div>
 
-            {formData.billingPeriods.length > 0 && (
-              <div className="space-y-3">
-                {formData.billingPeriods.map((period, index) => (
-                  <div key={index} className="p-4 border rounded-lg bg-gray-50">
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                      <div>
-                        <Label className="text-xs text-gray-600">Jumlah Bulan</Label>
-                        <Input
-                          type="number"
-                          min="1"
-                          max="60"
-                          value={period.periodMonths}
-                          onChange={(e) => {
-                            const months = parseInt(e.target.value) || 1;
-                            updateBillingPeriod(index, {
-                              ...period,
-                              periodMonths: months,
-                              periodType: getPeriodTypeFromMonths(months)
-                            });
-                          }}
-                          placeholder="1"
-                          className="h-8 text-sm"
-                        />
-                      </div>
-                      
-                      <div>
-                        <Label className="text-xs text-gray-600">Harga (IDR)</Label>
-                        <Input
-                          type="number"
-                          value={period.price || "0"}
-                          onChange={(e) => updateBillingPeriod(index, { ...period, price: e.target.value || "0" })}
-                          placeholder="0"
-                          className="h-8 text-sm"
-                        />
-                      </div>
-                      
-                      <div>
-                        <Label className="text-xs text-gray-600">Diskon (%)</Label>
-                        <Input
-                          type="number"
-                          min="0"
-                          max="100"
-                          value={period.discountPercentage}
-                          onChange={(e) => updateBillingPeriod(index, { 
-                            ...period, 
-                            discountPercentage: parseInt(e.target.value) || 0 
-                          })}
-                          placeholder="0"
-                          className="h-8 text-sm"
-                        />
-                      </div>
-                      
-                      <div className="flex items-center justify-between">
+              {formData.billingPeriods.length > 0 && (
+                <div className="space-y-3">
+                  {formData.billingPeriods.map((period, index) => (
+                    <div key={index} className="p-4 border rounded-lg bg-gray-50">
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div>
+                          <Label className="text-xs text-gray-600">Jumlah Bulan</Label>
+                          <Input
+                            type="number"
+                            min="1"
+                            max="60"
+                            value={period.periodMonths}
+                            onChange={(e) => {
+                              const months = parseInt(e.target.value) || 1;
+                              updateBillingPeriod(index, {
+                                ...period,
+                                periodMonths: months,
+                                periodType: getPeriodTypeFromMonths(months)
+                              });
+                            }}
+                            placeholder="1"
+                            className="h-8 text-sm"
+                          />
+                        </div>
+                        
+                        <div>
+                          <Label className="text-xs text-gray-600">Harga (IDR)</Label>
+                          <Input
+                            type="number"
+                            value={period.price || "0"}
+                            onChange={(e) => updateBillingPeriod(index, { ...period, price: e.target.value || "0" })}
+                            placeholder="0"
+                            className="h-8 text-sm"
+                          />
+                        </div>
+                        
+                        <div>
+                          <Label className="text-xs text-gray-600">Diskon (%)</Label>
+                          <Input
+                            type="number"
+                            min="0"
+                            max="100"
+                            value={period.discountPercentage}
+                            onChange={(e) => updateBillingPeriod(index, { 
+                              ...period, 
+                              discountPercentage: parseInt(e.target.value) || 0 
+                            })}
+                            placeholder="0"
+                            className="h-8 text-sm"
+                          />
+                        </div>
+                        
+                        <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
                           <Switch
                             checked={period.isActive}
@@ -562,13 +580,14 @@ function PackageFormModal({
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
           <div className="flex justify-end space-x-2 pt-6 border-t">
             <Button 
