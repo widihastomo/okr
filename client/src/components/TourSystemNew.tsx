@@ -21,8 +21,8 @@ interface TourStep {
 const TOUR_STEPS: TourStep[] = [
   {
     id: 'daily-focus',
-    title: 'Daily Focus',
-    description: 'Klik menu Daily Focus untuk melihat tugas harian dan prioritas Anda.',
+    title: 'Daily Focus - Fokus Harian',
+    description: 'Pusat kendali produktivitas harian Anda. Di sini Anda dapat melihat tugas yang harus diselesaikan hari ini, update progress key results, dan mengelola inisiatif yang sedang berjalan. Fitur ini membantu Anda tetap fokus pada prioritas utama dan tidak kehilangan momentum dalam mencapai tujuan.',
     icon: Sun,
     selector: '[data-tour="daily-focus"]',
     position: 'right',
@@ -30,8 +30,8 @@ const TOUR_STEPS: TourStep[] = [
   },
   {
     id: 'goals',
-    title: 'Goals',
-    description: 'Klik menu Goals untuk mengelola tujuan organisasi dengan sistem OKR.',
+    title: 'Goals - Manajemen Tujuan',
+    description: 'Kelola seluruh tujuan organisasi menggunakan metodologi OKR (Objectives and Key Results). Buat objectives yang inspiratif dan tentukan key results yang terukur untuk melacak pencapaian. Sistem ini membantu menyelaraskan visi organisasi dengan eksekusi yang nyata dan terukur.',
     icon: Flag,
     selector: '[data-tour="goals"]',
     position: 'right',
@@ -39,8 +39,8 @@ const TOUR_STEPS: TourStep[] = [
   },
   {
     id: 'tasks',
-    title: 'Tasks',
-    description: 'Klik menu Tasks untuk melihat dan mengelola semua tugas tim.',
+    title: 'Tasks - Manajemen Tugas',
+    description: 'Pantau dan kelola semua tugas yang terkait dengan objectives dan key results. Atur prioritas, deadline, dan assignee untuk setiap tugas. Fitur ini memungkinkan kolaborasi tim yang efektif dan memastikan setiap pekerjaan berkontribusi pada pencapaian tujuan organisasi.',
     icon: CheckSquare,
     selector: '[data-tour="tasks"]',
     position: 'right',
@@ -48,8 +48,8 @@ const TOUR_STEPS: TourStep[] = [
   },
   {
     id: 'timeline',
-    title: 'Timeline',
-    description: 'Klik menu Timeline untuk melihat progress dalam format kronologis.',
+    title: 'Timeline - Riwayat Progress',
+    description: 'Visualisasi kronologis dari semua aktivitas dan progress yang telah dicapai. Lihat check-in, pencapaian milestone, dan perkembangan key results dalam format timeline yang mudah dipahami. Fitur ini memberikan gambaran historis yang komprehensif tentang perjalanan organisasi.',
     icon: Clock,
     selector: '[data-tour="timeline"]',
     position: 'right',
@@ -57,8 +57,8 @@ const TOUR_STEPS: TourStep[] = [
   },
   {
     id: 'cycles',
-    title: 'Siklus',
-    description: 'Klik menu Siklus untuk mengatur periode waktu goals Anda.',
+    title: 'Siklus - Periode Waktu',
+    description: 'Atur periode waktu untuk goals Anda (bulanan, kuartalan, atau tahunan). Siklus membantu mengorganisir objectives berdasarkan timeframe yang realistis dan memungkinkan perencanaan yang lebih terstruktur. Setiap siklus memiliki target dan milestone yang jelas.',
     icon: Calendar,
     selector: '[data-tour="cycles"]',
     position: 'right',
@@ -66,8 +66,8 @@ const TOUR_STEPS: TourStep[] = [
   },
   {
     id: 'achievements',
-    title: 'Pencapaian',
-    description: 'Klik menu Pencapaian untuk melihat badges dan rewards tim.',
+    title: 'Pencapaian - Sistem Reward',
+    description: 'Lihat badges, rewards, dan pencapaian yang telah diraih oleh tim. Sistem gamifikasi ini dirancang untuk meningkatkan motivasi dan engagement anggota tim. Setiap pencapaian mencerminkan kontribusi nyata terhadap tujuan organisasi.',
     icon: Trophy,
     selector: '[data-tour="achievements"]',
     position: 'right',
@@ -75,8 +75,8 @@ const TOUR_STEPS: TourStep[] = [
   },
   {
     id: 'analytics',
-    title: 'Analytics',
-    description: 'Klik menu Analytics untuk melihat dashboard performa tim.',
+    title: 'Analytics - Dashboard Performa',
+    description: 'Analisis mendalam tentang performa tim dan pencapaian objectives. Dashboard ini menyediakan insights berbasis data untuk membantu pengambilan keputusan strategis. Lihat tren progress, identifikasi area yang perlu perbaikan, dan ukur ROI dari setiap inisiatif.',
     icon: BarChart3,
     selector: '[data-tour="analytics"]',
     position: 'right',
@@ -84,8 +84,8 @@ const TOUR_STEPS: TourStep[] = [
   },
   {
     id: 'users',
-    title: 'Kelola Pengguna',
-    description: 'Klik menu Kelola Pengguna untuk mengundang dan mengelola anggota tim.',
+    title: 'Kelola Pengguna - Tim Management',
+    description: 'Undang anggota tim baru, kelola peran dan permissions, serta atur akses pengguna ke berbagai fitur. Sistem role-based access control memastikan setiap anggota tim memiliki akses yang tepat sesuai dengan tanggung jawab mereka dalam organisasi.',
     icon: Users,
     selector: '[data-tour="users"]',
     position: 'right',
@@ -93,8 +93,8 @@ const TOUR_STEPS: TourStep[] = [
   },
   {
     id: 'notifications',
-    title: 'Notifikasi',
-    description: 'Klik ikon notifikasi untuk melihat update terbaru aktivitas tim.',
+    title: 'Notifikasi - Update Real-time',
+    description: 'Dapatkan notifikasi real-time tentang aktivitas tim, deadline yang mendekat, pencapaian milestone, dan update penting lainnya. Sistem notifikasi yang cerdas membantu Anda tetap up-to-date tanpa mengganggu fokus kerja.',
     icon: Bell,
     selector: '[data-tour="notifications"]',
     position: 'bottom',
@@ -102,8 +102,8 @@ const TOUR_STEPS: TourStep[] = [
   },
   {
     id: 'settings',
-    title: 'Pengaturan',
-    description: 'Klik menu Pengaturan untuk mengelola konfigurasi organisasi.',
+    title: 'Pengaturan - Konfigurasi Sistem',
+    description: 'Kelola preferensi organisasi, konfigurasi billing dan subscription, pengaturan security, dan customization sistem. Area ini memberikan kontrol penuh terhadap bagaimana platform OKR bekerja sesuai dengan kebutuhan spesifik organisasi Anda.',
     icon: Settings,
     selector: '[data-tour="settings"]',
     position: 'right',
@@ -146,17 +146,13 @@ export default function TourSystem() {
     const element = document.querySelector(currentStepData.selector);
     
     if (element) {
-      // Remove existing highlights and click listeners
+      // Remove existing highlights
       document.querySelectorAll('.tour-highlight').forEach(el => {
         el.classList.remove('tour-highlight');
-        el.removeEventListener('click', handleElementClick);
       });
       
       // Add highlight to current element
       element.classList.add('tour-highlight');
-      
-      // Add click listener to highlighted element
-      element.addEventListener('click', handleElementClick);
       
       // Scroll element into view smoothly
       element.scrollIntoView({ 
@@ -168,8 +164,8 @@ export default function TourSystem() {
       // Wait for scroll to complete then calculate position
       setTimeout(() => {
         const rect = element.getBoundingClientRect();
-        const tooltipWidth = 320;
-        const tooltipHeight = 160;
+        const tooltipWidth = 380;
+        const tooltipHeight = 220;
         
         let x = rect.left + rect.width / 2 - tooltipWidth / 2;
         let y = rect.top - tooltipHeight - 15;
@@ -202,16 +198,9 @@ export default function TourSystem() {
     }
   };
 
-  const handleElementClick = (e: Event) => {
-    e.stopPropagation();
-    // Auto advance to next step when element is clicked
-    nextStep();
-  };
-
   const cleanupHighlights = () => {
     document.querySelectorAll('.tour-highlight').forEach(el => {
       el.classList.remove('tour-highlight');
-      el.removeEventListener('click', handleElementClick);
     });
   };
 
@@ -245,7 +234,7 @@ export default function TourSystem() {
         style={{
           left: `${tooltipPosition.x}px`,
           top: `${tooltipPosition.y}px`,
-          width: '320px',
+          width: '380px',
           pointerEvents: 'auto'
         }}
       >
@@ -274,9 +263,9 @@ export default function TourSystem() {
             {currentStepData.description}
           </CardDescription>
           
-          <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 mb-3">
-            <p className="text-sm text-orange-700 font-medium">
-              💡 Klik pada menu yang berkedip untuk melanjutkan
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
+            <p className="text-sm text-blue-700 font-medium">
+              ℹ️ Menu yang berkedip menunjukkan lokasi fitur yang sedang dijelaskan
             </p>
           </div>
           
