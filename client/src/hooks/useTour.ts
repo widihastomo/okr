@@ -68,9 +68,9 @@ export function useTour() {
 
   useEffect(() => {
     const hasCompletedTour = localStorage.getItem('tour-completed');
-    const hasSeenOnboarding = localStorage.getItem('onboarding-completed');
     
-    if (!hasCompletedTour && hasSeenOnboarding) {
+    // Start tour automatically if not completed
+    if (!hasCompletedTour) {
       setIsActive(true);
     }
   }, []);

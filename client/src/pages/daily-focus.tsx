@@ -122,6 +122,7 @@ import { DailyUpdateSimple } from "@/components/daily-update-simple";
 import { useAuth } from "@/hooks/useAuth";
 import GoalFormModal from "@/components/goal-form-modal";
 import TaskModal from "@/components/task-modal";
+import TourStartButton from "@/components/tour-start-button";
 
 // Icon mapping for mission cards
 const iconMapping = {
@@ -1134,6 +1135,7 @@ export default function DailyFocusPage() {
           {/* Action buttons */}
           <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
             <DailyUpdateSimple />
+            <TourStartButton variant="outline" size="sm" />
           </div>
         </div>
       </div>
