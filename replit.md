@@ -283,13 +283,6 @@ The system includes comprehensive database connection troubleshooting tools:
 
 ## Changelog
 ```
-- July 17, 2025. **MOBILE SIDEBAR AUTO-CLOSE ENHANCEMENT** - Successfully added automatic sidebar closing when tour moves away from menu items:
-  * ADDED: closeSidebarForMobile() function to automatically close sidebar when leaving menu items
-  * ENHANCED: Smart sidebar management - opens for menu items, closes for non-menu elements
-  * IMPROVED: Better mobile UX by clearing sidebar when highlighting main content areas
-  * OPTIMIZED: Async sidebar close with proper timing delays (300ms animation wait)
-  * INTEGRATED: Sidebar visibility logic based on step type (menu vs non-menu)
-  * RESULT: Mobile tour now intelligently manages sidebar visibility for optimal user experience
 - July 17, 2025. **MOBILE TOUR POSITIONING ENHANCEMENT** - Successfully fixed tooltip positioning to prevent covering highlighted menu items on mobile:
   * FIXED: Mobile tooltip positioning logic to prevent covering highlighted menu items
   * ENHANCED: Mobile menu items now show tooltip to the right of sidebar or at bottom to avoid overlapping

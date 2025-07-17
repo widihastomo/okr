@@ -388,21 +388,7 @@ export default function TourSystem() {
     cleanupHighlights();
 
     if (currentStep < totalSteps - 1) {
-      const nextStepIndex = currentStep + 1;
-      
-      // Manual logic: Close sidebar when transitioning from step 3 to step 4
-      if (nextStepIndex === 4) { // Step 5 (update-harian-instan) - index 4
-        console.log("Manual sidebar close: Transitioning from step 4 to step 5");
-        if (isMobile()) {
-          const hamburgerButton = document.querySelector('[data-tour="hamburger-menu"]');
-          if (hamburgerButton) {
-            console.log("Clicking hamburger to close sidebar before step 5");
-            (hamburgerButton as HTMLElement).click();
-          }
-        }
-      }
-      
-      setCurrentStep(nextStepIndex);
+      setCurrentStep(currentStep + 1);
     } else {
       completeTour();
     }
@@ -545,48 +531,6 @@ export default function TourSystem() {
     return menuSteps.includes(stepId);
   };
 
-  // Function to check if sidebar is currently open
-  const isSidebarOpen = () => {
-    // Multiple approaches to detect sidebar state
-    
-    // 1. Check for mobile overlay
-    const mobileOverlay = document.querySelector('[data-sidebar="overlay"]');
-    if (mobileOverlay && mobileOverlay.getAttribute('data-state') === 'open') {
-      console.log("isSidebarOpen: Detected open via overlay");
-      return true;
-    }
-    
-    // 2. Check provider state
-    const sidebarProvider = document.querySelector('[data-sidebar="provider"]');
-    if (sidebarProvider) {
-      const isMobile = sidebarProvider.getAttribute('data-mobile') === 'true';
-      const state = sidebarProvider.getAttribute('data-state');
-      console.log("isSidebarOpen: Provider mobile:", isMobile, "state:", state);
-      if (isMobile && state === 'open') {
-        return true;
-      }
-    }
-    
-    // 3. Check for visible sidebar elements
-    const sidebarElements = document.querySelectorAll('[data-sidebar]');
-    for (const element of sidebarElements) {
-      const rect = element.getBoundingClientRect();
-      if (rect.width > 0 && rect.height > 0 && element.offsetParent !== null) {
-        // Check if it's actually visible and not just rendered
-        const styles = window.getComputedStyle(element);
-        if (styles.display !== 'none' && styles.visibility !== 'hidden' && styles.opacity !== '0') {
-          console.log("isSidebarOpen: Found visible sidebar element:", element.getAttribute('data-sidebar'));
-          if (element.getAttribute('data-sidebar') === 'sidebar') {
-            return true;
-          }
-        }
-      }
-    }
-    
-    console.log("isSidebarOpen: No open sidebar detected");
-    return false;
-  };
-
   // Function to expand sidebar on mobile for menu items
   const expandSidebarForMobile = () => {
     if (isMobile()) {
@@ -601,29 +545,6 @@ export default function TourSystem() {
           return new Promise(resolve => setTimeout(resolve, 300));
         }
       }
-    }
-    return Promise.resolve();
-  };
-
-  // Function to close sidebar on mobile when moving away from menu items
-  const closeSidebarForMobile = () => {
-    if (isMobile()) {
-      console.log("closeSidebarForMobile: Mobile detected, checking sidebar");
-      const hamburgerButton = document.querySelector('[data-tour="hamburger-menu"]');
-      
-      console.log("closeSidebarForMobile: hamburgerButton found:", !!hamburgerButton);
-      
-      if (hamburgerButton) {
-        // Always click to close sidebar after menu steps - don't rely on state detection
-        console.log("closeSidebarForMobile: Clicking hamburger to close sidebar");
-        (hamburgerButton as HTMLElement).click();
-        // Return promise to wait for sidebar animation
-        return new Promise(resolve => setTimeout(resolve, 300));
-      } else {
-        console.log("closeSidebarForMobile: Hamburger button not found");
-      }
-    } else {
-      console.log("closeSidebarForMobile: Not mobile, skipping");
     }
     return Promise.resolve();
   };
@@ -644,10 +565,8 @@ export default function TourSystem() {
       Array.from(allTourElements).map((el) => el.getAttribute("data-tour")),
     );
 
-    // Handle sidebar visibility based on step type
+    // Expand sidebar on mobile if highlighting a menu item and wait for animation
     if (isMenuStep(currentStepData.id)) {
-      console.log(`Step ${currentStep + 1} (${currentStepData.id}) is a menu step - expanding sidebar`);
-      // Expand sidebar on mobile if highlighting a menu item and wait for animation
       expandSidebarForMobile().then(() => {
         // Re-highlight after sidebar animation completes
         setTimeout(() => {
@@ -657,10 +576,6 @@ export default function TourSystem() {
           }
         }, 100);
       });
-    } else {
-      console.log(`Step ${currentStep + 1} (${currentStepData.id}) is NOT a menu step - closing sidebar`);
-      // Close sidebar on mobile if moving away from menu items
-      closeSidebarForMobile();
     }
 
     if (element) {
