@@ -55,6 +55,7 @@ import {
 } from "lucide-react";
 import { ReminderSettings } from "@/components/ReminderSettings";
 import { type CompanyOnboardingData } from "@shared/schema";
+import { useTour } from "@/hooks/useTour";
 
 // Onboarding steps following the reference structure
 const ONBOARDING_STEPS = [
@@ -155,6 +156,7 @@ export default function CompanyOnboarding() {
   const [startDateOpen, setStartDateOpen] = useState(false);
   const [endDateOpen, setEndDateOpen] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
+  const { startTour } = useTour();
   const [onboardingData, setOnboardingData] = useState<OnboardingData>({
     currentStep: 0, // Start at welcome screen
     completedSteps: [],
@@ -530,7 +532,7 @@ export default function CompanyOnboarding() {
     }
   };
 
-  const handleComplete = () => {
+  const handleComplete = async () => {
     // Prevent double clicks
     if (completeOnboardingMutation.isPending || isRedirecting) {
       return;
@@ -544,8 +546,26 @@ export default function CompanyOnboarding() {
       ],
       isCompleted: true,
     };
+    
     setOnboardingData(finalData);
-    completeOnboardingMutation.mutate();
+    
+    try {
+      // Complete the onboarding process
+      await completeOnboardingMutation.mutateAsync();
+      
+      // Start the tour system
+      startTour();
+      
+      // Navigate to dashboard
+      setTimeout(() => {
+        setIsRedirecting(true);
+        setTimeout(() => {
+          navigate("/");
+        }, 1000);
+      }, 500);
+    } catch (error) {
+      console.error("Failed to complete onboarding:", error);
+    }
   };
 
   const renderStepContent = () => {
@@ -3222,7 +3242,7 @@ export default function CompanyOnboarding() {
                           ? "Menyimpan..."
                           : isRedirecting
                           ? "Menuju Dashboard..."
-                          : "Selesai"}
+                          : "Mulai Tur"}
                       </span>
                     </div>
                     {/* Animated background overlay during loading */}

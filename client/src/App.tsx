@@ -11,6 +11,7 @@ import TrialStatusHeader from "@/components/trial-status-header";
 import ClientSidebar from "@/components/client-sidebar";
 import SystemAdminSidebar from "@/components/system-admin-sidebar";
 import { NotificationProvider } from "@/components/notifications/notification-provider";
+import TourSystemNew from "@/components/TourSystemNew";
 
 import Dashboard from "@/pages/dashboard";
 
@@ -306,6 +307,7 @@ function Router() {
           </div>
         </div>
       </div>
+      <TourSystemNew />
     </NotificationProvider>
   );
 }

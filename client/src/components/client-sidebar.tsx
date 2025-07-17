@@ -154,24 +154,28 @@ export default function Sidebar({
       icon: Sun,
       path: "/",
       active: location === "/" || location === "/daily-focus",
+      tourId: "daily-focus",
     },
     {
       label: "Timeline",
       icon: TimelineIconDefault,
       path: "/timeline",
       active: location === "/timeline",
+      tourId: "timeline",
     },
     {
       label: "Tasks",
       icon: CheckSquare,
       path: "/tasks",
       active: location === "/tasks",
+      tourId: "tasks",
     },
     {
       label: "Goals",
       icon: Flag,
       path: "/goals",
       active: location === "/goals",
+      tourId: "goals",
     },
 
     {
@@ -179,18 +183,21 @@ export default function Sidebar({
       icon: Calendar,
       path: "/cycles",
       active: location === "/cycles",
+      tourId: "cycles",
     },
     {
       label: "Pencapaian",
       icon: Trophy,
       path: "/achievements",
       active: location === "/achievements",
+      tourId: "achievements",
     },
     {
       label: "Analitik",
       icon: BarChart3,
       path: "/analytics",
       active: location === "/analytics",
+      tourId: "analytics",
     },
   ];
 
@@ -201,6 +208,7 @@ export default function Sidebar({
       icon: Users,
       path: "/client-users",
       active: location === "/client-users",
+      tourId: "users",
     });
   }
 
@@ -210,6 +218,7 @@ export default function Sidebar({
     icon: Settings,
     path: "/organization-settings",
     active: location === "/organization-settings",
+    tourId: "settings",
   });
 
   // Choose menu items based on user type
@@ -251,6 +260,7 @@ export default function Sidebar({
                 const menuItem = (
                   <Link href={item.path}>
                     <button
+                      data-tour={item.tourId}
                       className={cn(
                         "flex items-center rounded-lg text-sm font-medium transition-colors w-full text-left",
                         item.active

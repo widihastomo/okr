@@ -2,6 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Tour System Highlight Effects */
+.tour-highlight {
+  position: relative;
+  z-index: 45;
+  animation: tourHighlight 2s infinite;
+  border-radius: 8px;
+  box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.4);
+}
+
+@keyframes tourHighlight {
+  0%, 100% { 
+    box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.4), 0 0 20px rgba(249, 115, 22, 0.2);
+    transform: scale(1);
+  }
+  50% { 
+    box-shadow: 0 0 0 8px rgba(249, 115, 22, 0.6), 0 0 30px rgba(249, 115, 22, 0.4);
+    transform: scale(1.02);
+  }
+}
+
 /* Enhanced onboarding animations */
 @keyframes pulse-glow {
   0%, 100% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.4); }
