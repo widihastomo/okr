@@ -553,8 +553,17 @@ export default function TourSystem() {
 
         // Add click event listener
         const handleClick = (e) => {
-          e.preventDefault();
-          e.stopPropagation();
+          // Don't prevent default for certain interactive elements - let them work normally
+          if (currentStepData.selector === '[data-tour="goals-expand-card"]' || 
+              currentStepData.selector === '[data-tour="goals-hierarchy-view"]' ||
+              currentStepData.selector === '[data-tour="update-progress-tab"]' ||
+              currentStepData.selector === '[data-tour="kelola-inisiatif-tab"]') {
+            // Let the original click handler execute first
+            // Don't prevent default so the functionality works
+          } else {
+            e.preventDefault();
+            e.stopPropagation();
+          }
 
           // Remove click handler and highlights immediately
           element.removeEventListener("click", handleClick);
