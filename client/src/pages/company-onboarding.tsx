@@ -411,10 +411,25 @@ export default function CompanyOnboarding() {
       queryClient.invalidateQueries({ queryKey: ["/api/onboarding/status"] });
       queryClient.invalidateQueries({ queryKey: ["/api/onboarding/progress"] });
 
-      // Redirect using wouter
+      // Redirect using wouter with smooth animation
       console.log("🔄 Redirecting to dashboard using wouter...");
-      navigate("/");
-      console.log("✅ Wouter navigation completed successfully");
+      
+      // Set flag for transition animation
+      sessionStorage.setItem("wasOnOnboarding", "true");
+      
+      // Add fade out animation before navigation
+      const onboardingContainer = document.querySelector('.onboarding-container');
+      if (onboardingContainer) {
+        onboardingContainer.style.transition = 'opacity 0.5s ease-out, transform 0.5s ease-out';
+        onboardingContainer.style.opacity = '0';
+        onboardingContainer.style.transform = 'translateY(-20px)';
+      }
+      
+      // Navigate after animation completes
+      setTimeout(() => {
+        navigate("/");
+        console.log("✅ Wouter navigation completed successfully");
+      }, 500);
     },
     onError: (error) => {
       toast({
@@ -2986,7 +3001,7 @@ export default function CompanyOnboarding() {
   const assistantMessage = getVirtualAssistantMessage();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
+    <div className="onboarding-container min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
       {/* Loading overlay for redirect */}
       {isRedirecting && (
         <div className="fixed inset-0 bg-white/90 backdrop-blur-sm z-50 flex items-center justify-center">
