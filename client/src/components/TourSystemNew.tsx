@@ -3,10 +3,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { X, ChevronRight, ChevronLeft, CheckSquare, Sun, Flag, Clock, BarChart3, Bell, Users, Settings, Trophy, Calendar } from 'lucide-react';
+import { X, ChevronRight, ChevronLeft, CheckSquare, Sun, Flag, Clock, BarChart3, Bell, Users, Settings, Trophy, Calendar, MousePointer2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-// import { useTour } from '@/hooks/useTour'; // No longer needed - using own state management
-// import { tourSteps } from '@/data/tour-steps'; // No longer needed - using TOUR_STEPS below
+import { useLocation } from 'wouter';
 
 interface TourStep {
   id: string;
@@ -16,6 +15,8 @@ interface TourStep {
   selector: string;
   position: 'top' | 'bottom' | 'left' | 'right';
   category: 'navigation' | 'feature' | 'action';
+  targetPath?: string; // Path to navigate to when clicked
+  requiresClick?: boolean; // Whether this step requires user to click the element
 }
 
 const TOUR_STEPS: TourStep[] = [
@@ -35,7 +36,9 @@ const TOUR_STEPS: TourStep[] = [
     icon: Sun,
     selector: '[data-tour="daily-focus"]',
     position: 'right',
-    category: 'action'
+    category: 'action',
+    targetPath: '/daily-focus',
+    requiresClick: true
   },
   {
     id: 'timeline',
@@ -44,7 +47,9 @@ const TOUR_STEPS: TourStep[] = [
     icon: Clock,
     selector: '[data-tour="timeline"]',
     position: 'right',
-    category: 'feature'
+    category: 'feature',
+    targetPath: '/timeline',
+    requiresClick: true
   },
   {
     id: 'tasks',
@@ -53,7 +58,9 @@ const TOUR_STEPS: TourStep[] = [
     icon: CheckSquare,
     selector: '[data-tour="tasks"]',
     position: 'right',
-    category: 'feature'
+    category: 'feature',
+    targetPath: '/tasks',
+    requiresClick: true
   },
   {
     id: 'goals',
@@ -62,7 +69,9 @@ const TOUR_STEPS: TourStep[] = [
     icon: Flag,
     selector: '[data-tour="goals"]',
     position: 'right',
-    category: 'feature'
+    category: 'feature',
+    targetPath: '/goals',
+    requiresClick: true
   },
   {
     id: 'cycles',
@@ -71,7 +80,9 @@ const TOUR_STEPS: TourStep[] = [
     icon: Calendar,
     selector: '[data-tour="cycles"]',
     position: 'right',
-    category: 'feature'
+    category: 'feature',
+    targetPath: '/cycles',
+    requiresClick: true
   },
   {
     id: 'achievements',
@@ -80,7 +91,9 @@ const TOUR_STEPS: TourStep[] = [
     icon: Trophy,
     selector: '[data-tour="achievements"]',
     position: 'right',
-    category: 'feature'
+    category: 'feature',
+    targetPath: '/achievements',
+    requiresClick: true
   },
   {
     id: 'analytics',
@@ -89,7 +102,9 @@ const TOUR_STEPS: TourStep[] = [
     icon: BarChart3,
     selector: '[data-tour="analytics"]',
     position: 'right',
-    category: 'feature'
+    category: 'feature',
+    targetPath: '/analytics',
+    requiresClick: true
   },
   {
     id: 'users',
@@ -98,7 +113,9 @@ const TOUR_STEPS: TourStep[] = [
     icon: Users,
     selector: '[data-tour="users"]',
     position: 'right',
-    category: 'navigation'
+    category: 'navigation',
+    targetPath: '/users',
+    requiresClick: true
   },
   {
     id: 'settings',
@@ -107,7 +124,9 @@ const TOUR_STEPS: TourStep[] = [
     icon: Settings,
     selector: '[data-tour="settings"]',
     position: 'right',
-    category: 'navigation'
+    category: 'navigation',
+    targetPath: '/settings',
+    requiresClick: true
   }
 ];
 
@@ -117,6 +136,8 @@ export default function TourSystem() {
   const [currentStep, setCurrentStep] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
+  const [waitingForClick, setWaitingForClick] = useState(false);
+  const [location, setLocation] = useLocation();
   
   const totalSteps = TOUR_STEPS.length;
   
@@ -191,13 +212,45 @@ export default function TourSystem() {
     console.log('All available tour elements:', Array.from(allTourElements).map(el => el.getAttribute('data-tour')));
     
     if (element) {
-      // Remove existing highlights
+      // Remove existing highlights and click handlers
       document.querySelectorAll('.tour-highlight').forEach(el => {
         el.classList.remove('tour-highlight');
+        el.classList.remove('tour-click-required');
       });
       
       // Add highlight to current element
       element.classList.add('tour-highlight');
+      
+      // If this step requires a click, add click handler
+      if (currentStepData.requiresClick) {
+        setWaitingForClick(true);
+        
+        // Add click event listener
+        const handleClick = (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          // Remove click handler
+          element.removeEventListener('click', handleClick);
+          setWaitingForClick(false);
+          
+          // Navigate to target path if specified
+          if (currentStepData.targetPath) {
+            console.log('Navigating to:', currentStepData.targetPath);
+            setLocation(currentStepData.targetPath);
+          }
+          
+          // Continue to next step after a short delay
+          setTimeout(() => {
+            nextStep();
+          }, 500);
+        };
+        
+        element.addEventListener('click', handleClick);
+        
+        // Add visual indication that click is required
+        element.classList.add('tour-click-required');
+      }
       
       // Scroll element into view smoothly
       element.scrollIntoView({ 
@@ -308,6 +361,16 @@ export default function TourSystem() {
         <CardContent className="pt-0">
           <CardDescription className="text-sm text-gray-600 mb-3">
             {currentStepData.description}
+            {currentStepData.requiresClick && waitingForClick && (
+              <div className="mt-3 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <MousePointer2 className="w-4 h-4 text-orange-600" />
+                  <span className="text-sm font-medium text-orange-800">
+                    Klik menu ini untuk melanjutkan tour
+                  </span>
+                </div>
+              </div>
+            )}
           </CardDescription>
           
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
@@ -323,8 +386,11 @@ export default function TourSystem() {
               variant="outline"
               size="sm"
               onClick={previousStep}
-              disabled={currentStep === 0}
-              className="flex items-center gap-1"
+              disabled={currentStep === 0 || waitingForClick}
+              className={cn(
+                "flex items-center gap-1",
+                waitingForClick && "opacity-50 cursor-not-allowed"
+              )}
             >
               <ChevronLeft className="h-4 w-4" />
               Sebelumnya
@@ -343,7 +409,11 @@ export default function TourSystem() {
               <Button
                 size="sm"
                 onClick={nextStep}
-                className="bg-orange-600 hover:bg-orange-700 text-white flex items-center gap-1"
+                disabled={waitingForClick}
+                className={cn(
+                  "bg-orange-600 hover:bg-orange-700 text-white flex items-center gap-1",
+                  waitingForClick && "opacity-50 cursor-not-allowed"
+                )}
               >
                 {currentStep === totalSteps - 1 ? (
                   <>
