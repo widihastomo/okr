@@ -102,7 +102,8 @@ const TOUR_STEPS: TourStep[] = [
     icon: TrendingUp,
     selector: '[data-tour="update-progress-tab"]',
     position: 'bottom',
-    category: 'action'
+    category: 'action',
+    requiresClick: true
   },
   {
     id: 'kelola-inisiatif-tab',
