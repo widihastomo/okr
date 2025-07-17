@@ -555,25 +555,45 @@ export default function TourSystem() {
       console.log("closeSidebarForMobile: Mobile detected, checking sidebar");
       // Find the hamburger menu button and click it to close sidebar
       const hamburgerButton = document.querySelector('[data-tour="hamburger-menu"]');
-      const sidebar = document.querySelector('[data-sidebar="sidebar"]');
+      
+      // Try multiple selectors for sidebar
+      const sidebarSelectors = [
+        '[data-sidebar="sidebar"]',
+        '.sidebar',
+        '[data-sidebar]',
+        'aside',
+        '.group'
+      ];
+      
+      let sidebar = null;
+      let sidebarSelector = '';
+      
+      for (const selector of sidebarSelectors) {
+        sidebar = document.querySelector(selector);
+        if (sidebar) {
+          sidebarSelector = selector;
+          break;
+        }
+      }
       
       console.log("closeSidebarForMobile: hamburgerButton found:", !!hamburgerButton);
-      console.log("closeSidebarForMobile: sidebar found:", !!sidebar);
+      console.log("closeSidebarForMobile: sidebar found:", !!sidebar, "with selector:", sidebarSelector);
       
-      if (hamburgerButton && sidebar) {
-        const isOpen = sidebar.classList.contains('translate-x-0');
-        console.log("closeSidebarForMobile: sidebar is open:", isOpen);
+      if (hamburgerButton) {
+        // Check if sidebar is currently visible (different approach)
+        const sidebarGroup = document.querySelector('group[data-state="open"]') || 
+                            document.querySelector('.group[data-state="open"]') ||
+                            document.querySelector('[data-state="open"]');
         
-        if (isOpen) {
-          console.log("closeSidebarForMobile: Clicking hamburger to close sidebar");
-          (hamburgerButton as HTMLElement).click();
-          // Return promise to wait for sidebar animation
-          return new Promise(resolve => setTimeout(resolve, 300));
-        } else {
-          console.log("closeSidebarForMobile: Sidebar already closed");
-        }
+        console.log("closeSidebarForMobile: sidebar group with open state:", !!sidebarGroup);
+        
+        // Just click hamburger button to toggle sidebar regardless of state detection
+        console.log("closeSidebarForMobile: Clicking hamburger to close sidebar");
+        (hamburgerButton as HTMLElement).click();
+        // Return promise to wait for sidebar animation
+        return new Promise(resolve => setTimeout(resolve, 300));
       } else {
-        console.log("closeSidebarForMobile: hamburger button or sidebar not found");
+        console.log("closeSidebarForMobile: hamburger button not found");
       }
     } else {
       console.log("closeSidebarForMobile: Not mobile, skipping");
