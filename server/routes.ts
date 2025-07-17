@@ -7096,13 +7096,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .where(eq(organizationSubscriptions.organizationId, user.organizationId));
       
       const currentUsers = userCount.count || 0;
-      const maxUsers = orgSubscription?.subscription_plans?.maxUsers || 3; // Default to trial limit
+      const maxUsers = orgSubscription?.subscription_plans?.maxUsers || 999999; // Default to unlimited for trial
+      const isUnlimited = maxUsers >= 999999;
       
       res.json({
         currentUsers,
-        maxUsers,
-        canAddUsers: currentUsers < maxUsers,
-        usersRemaining: Math.max(0, maxUsers - currentUsers)
+        maxUsers: isUnlimited ? "Unlimited" : maxUsers,
+        canAddUsers: isUnlimited || currentUsers < maxUsers,
+        usersRemaining: isUnlimited ? "Unlimited" : Math.max(0, maxUsers - currentUsers)
       });
       
     } catch (error) {
@@ -9654,10 +9655,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .where(eq(organizationSubscriptions.organizationId, user.organizationId));
       
       const currentUsers = userCount.count || 0;
-      const maxUsers = orgSubscription?.subscription_plans?.maxUsers || 3; // Default to trial limit
+      const maxUsers = orgSubscription?.subscription_plans?.maxUsers || 999999; // Default to unlimited for trial
+      const isUnlimited = maxUsers >= 999999;
       
-      // Check if adding new user would exceed limit
-      if (currentUsers >= maxUsers) {
+      // Check if adding new user would exceed limit (only for non-unlimited plans)
+      if (!isUnlimited && currentUsers >= maxUsers) {
         return res.status(400).json({ 
           error: `Batas pengguna tercapai. Paket Anda memungkinkan maksimal ${maxUsers} pengguna aktif. Upgrade paket untuk menambah lebih banyak pengguna.`,
           currentUsers,

@@ -191,7 +191,7 @@ async function createSubscriptionPlans() {
       name: 'Free Trial',
       slug: 'free-trial',
       price: "0",
-      maxUsers: 3,
+      maxUsers: 999999, // Unlimited users for free trial
       features: ['Basic OKR Management', 'Team Collaboration', 'Progress Tracking', 'Email Support'],
       isActive: true,
       isDefault: true, // Free Trial is the default package for new users

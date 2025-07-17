@@ -286,7 +286,7 @@ The system includes comprehensive database connection troubleshooting tools:
 - July 17, 2025. **CLIENT REGISTRATION LOGIC UPDATED** - Successfully modified registration flow to use trial packages with proper flagging system:
   * UPDATED: Registration now uses packages with is_trial=true and is_default=true flags instead of application settings
   * REMOVED: Invoice creation for trial users - trial subscriptions no longer generate invoices during registration
-  * ENHANCED: User limit enforcement based on maxUsers from selected trial package (typically 3 users for free trial)
+  * ENHANCED: User limit enforcement based on maxUsers from selected trial package (unlimited users for free trial)
   * IMPROVED: Trial package selection logic with fallback to Free Trial slug if flags not found
   * STREAMLINED: Registration flow now creates subscription without invoice for cleaner trial experience
   * RESULT: New trial users get subscription with proper user limits without invoice generation
