@@ -145,7 +145,11 @@ export default function TourSystem() {
     const currentStepData = TOUR_STEPS[currentStep];
     const element = document.querySelector(currentStepData.selector);
     
-    console.log(`Looking for element: ${currentStepData.selector}`, element);
+    console.log(`Step ${currentStep + 1}: Looking for element: ${currentStepData.selector}`, element);
+    
+    // Debug: Show all available data-tour elements
+    const allTourElements = document.querySelectorAll('[data-tour]');
+    console.log('All available tour elements:', Array.from(allTourElements).map(el => el.getAttribute('data-tour')));
     
     if (element) {
       // Remove existing highlights
