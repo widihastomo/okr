@@ -2,24 +2,48 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Tour System Highlight Effects */
+/* Tour System Pulse Effects */
 .tour-highlight {
   position: relative !important;
-  z-index: 10001 !important;
-  animation: tourHighlight 2s infinite;
+  z-index: 50 !important;
+  animation: tourPulse 2s infinite;
   border-radius: 8px;
-  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.8) !important;
-  background: rgba(255, 255, 255, 0.95) !important;
   pointer-events: auto !important;
+  cursor: pointer !important;
 }
 
-@keyframes tourHighlight {
+@keyframes tourPulse {
+  0% { 
+    box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.7);
+  }
+  70% { 
+    box-shadow: 0 0 0 10px rgba(249, 115, 22, 0);
+  }
+  100% { 
+    box-shadow: 0 0 0 0 rgba(249, 115, 22, 0);
+  }
+}
+
+.tour-highlight::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  background: linear-gradient(45deg, rgba(249, 115, 22, 0.3), rgba(251, 146, 60, 0.3));
+  border-radius: 12px;
+  z-index: -1;
+  animation: tourGlow 2s infinite;
+}
+
+@keyframes tourGlow {
   0%, 100% { 
-    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.8), 0 0 15px rgba(249, 115, 22, 0.4) !important;
+    opacity: 0.3;
     transform: scale(1);
   }
   50% { 
-    box-shadow: 0 0 0 5px rgba(249, 115, 22, 1), 0 0 25px rgba(249, 115, 22, 0.6) !important;
+    opacity: 0.6;
     transform: scale(1.05);
   }
 }

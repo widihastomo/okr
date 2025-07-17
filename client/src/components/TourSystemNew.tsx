@@ -22,7 +22,7 @@ const TOUR_STEPS: TourStep[] = [
   {
     id: 'daily-focus',
     title: 'Daily Focus',
-    description: 'Mulai hari Anda dengan fokus pada tugas prioritas dan progress yang perlu diperbarui.',
+    description: 'Klik menu Daily Focus untuk melihat tugas harian dan prioritas Anda.',
     icon: Sun,
     selector: '[data-tour="daily-focus"]',
     position: 'right',
@@ -31,7 +31,7 @@ const TOUR_STEPS: TourStep[] = [
   {
     id: 'goals',
     title: 'Goals',
-    description: 'Kelola tujuan organisasi dengan sistem OKR yang terstruktur dan mudah dipahami.',
+    description: 'Klik menu Goals untuk mengelola tujuan organisasi dengan sistem OKR.',
     icon: Flag,
     selector: '[data-tour="goals"]',
     position: 'right',
@@ -40,7 +40,7 @@ const TOUR_STEPS: TourStep[] = [
   {
     id: 'tasks',
     title: 'Tasks',
-    description: 'Pantau dan kelola semua tugas yang terkait dengan objectives Anda.',
+    description: 'Klik menu Tasks untuk melihat dan mengelola semua tugas tim.',
     icon: CheckSquare,
     selector: '[data-tour="tasks"]',
     position: 'right',
@@ -49,7 +49,7 @@ const TOUR_STEPS: TourStep[] = [
   {
     id: 'timeline',
     title: 'Timeline',
-    description: 'Lihat perkembangan progress dalam format timeline yang mudah dipahami.',
+    description: 'Klik menu Timeline untuk melihat progress dalam format kronologis.',
     icon: Clock,
     selector: '[data-tour="timeline"]',
     position: 'right',
@@ -58,7 +58,7 @@ const TOUR_STEPS: TourStep[] = [
   {
     id: 'cycles',
     title: 'Siklus',
-    description: 'Atur periode waktu untuk goals (bulanan, kuartalan, tahunan).',
+    description: 'Klik menu Siklus untuk mengatur periode waktu goals Anda.',
     icon: Calendar,
     selector: '[data-tour="cycles"]',
     position: 'right',
@@ -67,7 +67,7 @@ const TOUR_STEPS: TourStep[] = [
   {
     id: 'achievements',
     title: 'Pencapaian',
-    description: 'Lihat badges dan rewards yang telah diraih untuk motivasi tim.',
+    description: 'Klik menu Pencapaian untuk melihat badges dan rewards tim.',
     icon: Trophy,
     selector: '[data-tour="achievements"]',
     position: 'right',
@@ -76,7 +76,7 @@ const TOUR_STEPS: TourStep[] = [
   {
     id: 'analytics',
     title: 'Analytics',
-    description: 'Analisis performa dan pencapaian tim melalui dashboard yang komprehensif.',
+    description: 'Klik menu Analytics untuk melihat dashboard performa tim.',
     icon: BarChart3,
     selector: '[data-tour="analytics"]',
     position: 'right',
@@ -85,7 +85,7 @@ const TOUR_STEPS: TourStep[] = [
   {
     id: 'users',
     title: 'Kelola Pengguna',
-    description: 'Undang anggota tim, kelola peran, dan atur akses pengguna.',
+    description: 'Klik menu Kelola Pengguna untuk mengundang dan mengelola anggota tim.',
     icon: Users,
     selector: '[data-tour="users"]',
     position: 'right',
@@ -94,7 +94,7 @@ const TOUR_STEPS: TourStep[] = [
   {
     id: 'notifications',
     title: 'Notifikasi',
-    description: 'Dapatkan update terbaru tentang aktivitas tim dan perkembangan objectives.',
+    description: 'Klik ikon notifikasi untuk melihat update terbaru aktivitas tim.',
     icon: Bell,
     selector: '[data-tour="notifications"]',
     position: 'bottom',
@@ -103,7 +103,7 @@ const TOUR_STEPS: TourStep[] = [
   {
     id: 'settings',
     title: 'Pengaturan',
-    description: 'Kelola preferensi organisasi, billing, dan konfigurasi sistem.',
+    description: 'Klik menu Pengaturan untuk mengelola konfigurasi organisasi.',
     icon: Settings,
     selector: '[data-tour="settings"]',
     position: 'right',
@@ -146,13 +146,17 @@ export default function TourSystem() {
     const element = document.querySelector(currentStepData.selector);
     
     if (element) {
-      // Remove existing highlights
+      // Remove existing highlights and click listeners
       document.querySelectorAll('.tour-highlight').forEach(el => {
         el.classList.remove('tour-highlight');
+        el.removeEventListener('click', handleElementClick);
       });
       
       // Add highlight to current element
       element.classList.add('tour-highlight');
+      
+      // Add click listener to highlighted element
+      element.addEventListener('click', handleElementClick);
       
       // Scroll element into view smoothly
       element.scrollIntoView({ 
@@ -165,7 +169,7 @@ export default function TourSystem() {
       setTimeout(() => {
         const rect = element.getBoundingClientRect();
         const tooltipWidth = 320;
-        const tooltipHeight = 180;
+        const tooltipHeight = 160;
         
         let x = rect.left + rect.width / 2 - tooltipWidth / 2;
         let y = rect.top - tooltipHeight - 15;
@@ -198,13 +202,20 @@ export default function TourSystem() {
     }
   };
 
+  const handleElementClick = (e: Event) => {
+    e.stopPropagation();
+    // Auto advance to next step when element is clicked
+    nextStep();
+  };
+
   const cleanupHighlights = () => {
     document.querySelectorAll('.tour-highlight').forEach(el => {
       el.classList.remove('tour-highlight');
+      el.removeEventListener('click', handleElementClick);
     });
   };
 
-  // Handle window resize
+  // Handle window resize and cleanup
   useEffect(() => {
     if (isActive) {
       const handleResize = () => {
@@ -212,7 +223,12 @@ export default function TourSystem() {
       };
       
       window.addEventListener('resize', handleResize);
-      return () => window.removeEventListener('resize', handleResize);
+      
+      // Cleanup on unmount
+      return () => {
+        window.removeEventListener('resize', handleResize);
+        cleanupHighlights();
+      };
     }
   }, [isActive, currentStep]);
 
@@ -223,16 +239,9 @@ export default function TourSystem() {
 
   return (
     <>
-      {/* Overlay backdrop */}
-      <div 
-        className="fixed inset-0 bg-black bg-opacity-60 z-[9999]" 
-        onClick={skipTour}
-        style={{ pointerEvents: 'auto' }}
-      />
-      
-      {/* Tour tooltip */}
+      {/* Tour tooltip - floating without backdrop */}
       <div
-        className="fixed z-[10002] bg-white rounded-xl shadow-2xl border border-gray-200"
+        className="fixed z-[100] bg-white rounded-xl shadow-2xl border border-orange-200 border-2"
         style={{
           left: `${tooltipPosition.x}px`,
           top: `${tooltipPosition.y}px`,
@@ -261,11 +270,17 @@ export default function TourSystem() {
         </CardHeader>
         
         <CardContent className="pt-0">
-          <CardDescription className="text-sm text-gray-600 mb-4">
+          <CardDescription className="text-sm text-gray-600 mb-3">
             {currentStepData.description}
           </CardDescription>
           
-          <Progress value={progress} className="h-1 mb-4" />
+          <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 mb-3">
+            <p className="text-sm text-orange-700 font-medium">
+              💡 Klik pada menu yang berkedip untuk melanjutkan
+            </p>
+          </div>
+          
+          <Progress value={progress} className="h-1 mb-3" />
           
           <div className="flex justify-between items-center">
             <Button
