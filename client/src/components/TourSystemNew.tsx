@@ -145,6 +145,8 @@ export default function TourSystem() {
     const currentStepData = TOUR_STEPS[currentStep];
     const element = document.querySelector(currentStepData.selector);
     
+    console.log(`Looking for element: ${currentStepData.selector}`, element);
+    
     if (element) {
       // Remove existing highlights
       document.querySelectorAll('.tour-highlight').forEach(el => {
@@ -195,6 +197,8 @@ export default function TourSystem() {
         
         setTooltipPosition({ x, y });
       }, 300);
+    } else {
+      console.warn(`Element not found for selector: ${currentStepData.selector}`);
     }
   };
 
