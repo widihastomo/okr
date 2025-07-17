@@ -609,7 +609,7 @@ export default function Dashboard() {
           </div>
 
           {/* Filter Controls */}
-          <div className="flex flex-col gap-2 sm:flex-row sm:gap-3 w-full">
+          <div className="flex flex-col gap-2 sm:flex-row sm:gap-3 w-full" data-tour="goals-filter">
             <Select
               value={statusFilter}
               onValueChange={handleStatusFilterChange}
@@ -657,7 +657,9 @@ export default function Dashboard() {
       </div>
 
       {/* Stats Overview */}
-      <StatsOverview goals={filteredGoals} isLoading={isLoading} />
+      <div data-tour="goals-overview-card">
+        <StatsOverview goals={filteredGoals} isLoading={isLoading} />
+      </div>
 
       {/* View Tabs */}
       <div className="mt-4 sm:mt-6 w-full">
@@ -670,6 +672,7 @@ export default function Dashboard() {
                   ? "border-orange-500 text-orange-600"
                   : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
               }`}
+              data-tour="goals-list-view"
             >
               <div className="flex items-center space-x-2">
                 <List className="w-4 h-4" />
@@ -683,6 +686,7 @@ export default function Dashboard() {
                   ? "border-orange-500 text-orange-600"
                   : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
               }`}
+              data-tour="goals-hierarchy-view"
             >
               <div className="flex items-center space-x-2">
                 <Network className="w-4 h-4" />

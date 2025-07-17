@@ -249,6 +249,7 @@ export default function GoalCard({ goal, onEditProgress, onEditKeyResult, onDele
                 size="sm"
                 onClick={() => setIsExpanded(!isExpanded)}
                 className="p-2 hover:bg-blue-100 rounded-md transition-colors"
+                data-tour="goals-expand-card"
               >
                 {isExpanded ? (
                   <ChevronUp className="w-6 h-6 text-gray-600 hover:text-blue-600" />

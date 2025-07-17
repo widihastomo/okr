@@ -164,7 +164,7 @@ const TOUR_STEPS: TourStep[] = [
     requiresClick: true,
   },
   {
-    id: "goals-content",
+    id: "goals-add-button",
     title: "Goals - Tambah Tujuan Baru",
     description:
       'Tombol "Tambah Tujuan Baru" memungkinkan Anda membuat objectives dan key results baru. Setiap tujuan dapat memiliki multiple key results untuk pengukuran yang lebih akurat.',
@@ -172,6 +172,58 @@ const TOUR_STEPS: TourStep[] = [
     selector: '[data-tour="add-goal"]',
     position: "bottom",
     category: "feature",
+  },
+  {
+    id: "goals-filter",
+    title: "Goals - Filter & Pencarian",
+    description:
+      "Gunakan filter untuk mencari goals berdasarkan status, siklus, dan penanggungjawab. Filter membantu Anda fokus pada goals yang relevan dengan prioritas saat ini.",
+    icon: Flag,
+    selector: '[data-tour="goals-filter"]',
+    position: "bottom",
+    category: "feature",
+  },
+  {
+    id: "goals-overview",
+    title: "Goals - Ringkasan Overview",
+    description:
+      "Kartu overview menampilkan statistik keseluruhan goals Anda termasuk jumlah total, progress rata-rata, dan distribusi status. Informasi ini memberikan gambaran cepat tentang performa organisasi.",
+    icon: Flag,
+    selector: '[data-tour="goals-overview-card"]',
+    position: "bottom",
+    category: "feature",
+  },
+  {
+    id: "goals-list-view-tab",
+    title: "Goals - Tampilan List",
+    description:
+      "Tampilan List menampilkan semua goals dalam format kartu yang mudah dipahami. Setiap kartu menunjukkan detail lengkap termasuk progress, key results, dan informasi penanggungjawab.",
+    icon: Flag,
+    selector: '[data-tour="goals-list-view"]',
+    position: "bottom",
+    category: "feature",
+  },
+  {
+    id: "goals-expand-card",
+    title: "Goals - Expand Detail Card",
+    description:
+      "Klik tombol expand untuk melihat detail lengkap goal termasuk key results, progress tracking, dan informasi tambahan. Fitur ini membantu Anda memahami status dan perkembangan setiap tujuan.",
+    icon: Flag,
+    selector: '[data-tour="goals-expand-card"]',
+    position: "bottom",
+    category: "feature",
+    requiresClick: true,
+  },
+  {
+    id: "goals-hierarchy-view-tab",
+    title: "Goals - Tampilan Hierarchy",
+    description:
+      "Tampilan Hierarchy menunjukkan struktur hubungan antar goals dalam bentuk visual yang mudah dipahami. Fitur ini membantu Anda memahami bagaimana goals saling terkait dan mendukung satu sama lain.",
+    icon: Flag,
+    selector: '[data-tour="goals-hierarchy-view"]',
+    position: "bottom",
+    category: "feature",
+    requiresClick: true,
   },
   {
     id: "timeline",
