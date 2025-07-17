@@ -382,6 +382,20 @@ export default function TourSystem() {
 
   const totalSteps = TOUR_STEPS.length;
 
+  // Function to check if two steps are on the same page
+  const areStepsOnSamePage = (step1Index: number, step2Index: number) => {
+    if (step1Index < 0 || step1Index >= TOUR_STEPS.length || 
+        step2Index < 0 || step2Index >= TOUR_STEPS.length) {
+      return false;
+    }
+    
+    const step1 = TOUR_STEPS[step1Index];
+    const step2 = TOUR_STEPS[step2Index];
+    
+    // Check if both steps have the same targetPath or both don't have targetPath
+    return step1.targetPath === step2.targetPath;
+  };
+
   // Tour control functions
   const nextStep = () => {
     // Clean up highlights from previous step
@@ -565,17 +579,35 @@ export default function TourSystem() {
       Array.from(allTourElements).map((el) => el.getAttribute("data-tour")),
     );
 
-    // Expand sidebar on mobile if highlighting a menu item and wait for animation
-    if (isMenuStep(currentStepData.id)) {
-      expandSidebarForMobile().then(() => {
-        // Re-highlight after sidebar animation completes
-        setTimeout(() => {
-          const updatedElement = document.querySelector(currentStepData.selector);
-          if (updatedElement) {
-            updatedElement.classList.add("tour-highlight");
-          }
-        }, 100);
-      });
+    // Handle sidebar expansion/closing logic for mobile
+    if (isMobile()) {
+      const previousStepData = currentStep > 0 ? TOUR_STEPS[currentStep - 1] : null;
+      const isCurrentMenuStep = isMenuStep(currentStepData.id);
+      const isPreviousMenuStep = previousStepData ? isMenuStep(previousStepData.id) : false;
+      const areOnSamePage = previousStepData ? areStepsOnSamePage(currentStep - 1, currentStep) : false;
+      
+      if (isCurrentMenuStep) {
+        // Expand sidebar for menu items
+        expandSidebarForMobile().then(() => {
+          // Re-highlight after sidebar animation completes
+          setTimeout(() => {
+            const updatedElement = document.querySelector(currentStepData.selector);
+            if (updatedElement) {
+              updatedElement.classList.add("tour-highlight");
+            }
+          }, 100);
+        });
+      } else if (isPreviousMenuStep && !areOnSamePage) {
+        // Only close sidebar if transitioning from menu step to non-menu step AND changing pages
+        console.log(`Closing sidebar: moving from ${previousStepData?.id} to ${currentStepData.id} (different pages)`);
+        const hamburgerButton = document.querySelector('[data-tour="hamburger-menu"]');
+        if (hamburgerButton) {
+          (hamburgerButton as HTMLElement).click();
+        }
+      } else if (isPreviousMenuStep && areOnSamePage) {
+        // Keep sidebar open when transitioning between steps on the same page
+        console.log(`Keeping sidebar open: moving from ${previousStepData?.id} to ${currentStepData.id} (same page)`);
+      }
     }
 
     if (element) {

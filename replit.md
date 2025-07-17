@@ -283,6 +283,12 @@ The system includes comprehensive database connection troubleshooting tools:
 
 ## Changelog
 ```
+- July 17, 2025. **MOBILE TOUR SIDEBAR TOGGLE FIX** - Successfully fixed unwanted sidebar toggle when transitioning between same-page steps:
+  * FIXED: Sidebar no longer closes when moving from menu step to non-menu step on the same page
+  * ADDED: areStepsOnSamePage() function to detect same-page transitions
+  * ENHANCED: Smart sidebar management prevents unwanted toggles during Daily Focus tour steps
+  * IMPROVED: Sidebar only closes when transitioning between different pages, not within same page
+  * RESULT: Smooth tour experience without disruptive sidebar toggles between steps 4-5 (Daily Focus)
 - July 17, 2025. **MOBILE TOUR POSITIONING ENHANCEMENT** - Successfully fixed tooltip positioning to prevent covering highlighted menu items on mobile:
   * FIXED: Mobile tooltip positioning logic to prevent covering highlighted menu items
   * ENHANCED: Mobile menu items now show tooltip to the right of sidebar or at bottom to avoid overlapping
