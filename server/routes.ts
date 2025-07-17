@@ -252,32 +252,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log("Starting trial subscription creation for organization:", organizationId);
         const { subscriptionPlans, organizationSubscriptions, invoices, invoiceLineItems } = await import("@shared/schema");
         
-        // Get default plan from application settings
-        const [defaultPlanSetting] = await db.select()
-          .from(applicationSettings)
-          .where(eq(applicationSettings.key, 'default_trial_plan'))
+        // Get trial plan based on is_trial and is_default flags
+        const [trialPlan] = await db.select()
+          .from(subscriptionPlans)
+          .where(
+            and(
+              eq(subscriptionPlans.isTrial, true),
+              eq(subscriptionPlans.isDefault, true),
+              eq(subscriptionPlans.isActive, true)
+            )
+          )
           .limit(1);
         
-        let finalTrialPlan = null;
+        let finalTrialPlan = trialPlan;
+        console.log("Using trial plan with flags (is_trial=true, is_default=true):", finalTrialPlan ? { id: finalTrialPlan.id, name: finalTrialPlan.name, maxUsers: finalTrialPlan.maxUsers } : "Trial plan not found");
         
-        if (defaultPlanSetting) {
-          // Use the configured default plan
-          const [defaultPlan] = await db.select()
-            .from(subscriptionPlans)
-            .where(
-              and(
-                eq(subscriptionPlans.id, defaultPlanSetting.value),
-                eq(subscriptionPlans.isActive, true)
-              )
-            )
-            .limit(1);
-          finalTrialPlan = defaultPlan;
-          console.log("Using configured default plan:", finalTrialPlan ? { id: finalTrialPlan.id, name: finalTrialPlan.name, price: finalTrialPlan.price } : "Default plan not found");
-        }
-        
-        // Fallback 1: Try Free Trial plan if no default plan is configured
+        // Fallback: Try Free Trial plan by slug if no flagged plan is found
         if (!finalTrialPlan) {
-          const [trialPlan] = await db.select()
+          const [fallbackTrialPlan] = await db.select()
             .from(subscriptionPlans)
             .where(
               and(
@@ -286,19 +278,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
               )
             )
             .limit(1);
-          finalTrialPlan = trialPlan;
-          console.log("Using fallback Free Trial plan:", finalTrialPlan ? { id: finalTrialPlan.id, name: finalTrialPlan.name, price: finalTrialPlan.price } : "Free Trial plan not found");
-        }
-        
-        // Fallback 2: Use cheapest plan if neither default nor Free Trial is available
-        if (!finalTrialPlan) {
-          const [cheapestPlan] = await db.select()
-            .from(subscriptionPlans)
-            .where(eq(subscriptionPlans.isActive, true))
-            .orderBy(subscriptionPlans.price)
-            .limit(1);
-          finalTrialPlan = cheapestPlan;
-          console.log("Using cheapest plan as final fallback:", finalTrialPlan ? { id: finalTrialPlan.id, name: finalTrialPlan.name, price: finalTrialPlan.price } : "No active plans found");
+          finalTrialPlan = fallbackTrialPlan;
+          console.log("Using fallback Free Trial plan by slug:", finalTrialPlan ? { id: finalTrialPlan.id, name: finalTrialPlan.name, maxUsers: finalTrialPlan.maxUsers } : "Free Trial plan not found");
         }
         
         if (finalTrialPlan && finalTrialPlan.isActive) {
@@ -319,69 +300,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }).returning();
           
           console.log("Created trial subscription for organization:", organizationId);
-          
-          // Create free trial invoice with paid status
-          const currentYear = new Date().getFullYear();
-          const currentMonth = String(new Date().getMonth() + 1).padStart(2, '0');
-          const invoiceNumber = `INV-${currentYear}-${currentMonth}-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`;
-          
-          // Create invoice for free trial (amount: 0, status: paid)
-          const [newInvoice] = await db.insert(invoices).values({
-            invoiceNumber: invoiceNumber,
-            organizationId: organizationId,
-            subscriptionPlanId: finalTrialPlan.id,
-            organizationSubscriptionId: newSubscription.id,
-            amount: "0.00", // Free trial - no cost
-            subtotal: "0.00",
-            taxAmount: "0.00",
-            taxRate: "0.00",
-            currency: "IDR",
-            status: "paid", // Mark as paid immediately
-            issueDate: new Date(),
-            dueDate: new Date(), // Same as issue date since it's free
-            paidDate: new Date(), // Mark as paid immediately
-            description: "Free Trial - 30 Hari Gratis",
-            notes: "Invoice otomatis untuk paket trial gratis",
-            paymentMethod: "Free Trial",
-            createdBy: userId,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          }).returning();
-          
-          // Create invoice line item for free trial using direct SQL to avoid schema mismatch
-          await db.execute(sql`
-            INSERT INTO invoice_line_items (
-              invoice_id,
-              description,
-              quantity,
-              unit_price,
-              total_price,
-              discount_amount,
-              discount_percentage,
-              period_start,
-              period_end,
-              subscription_plan_id,
-              metadata
-            ) VALUES (
-              ${newInvoice.id},
-              'Free Trial - 7 Hari Gratis',
-              1,
-              ${finalTrialPlan.price || "0.00"},
-              '0.00',
-              ${parseFloat(finalTrialPlan.price || "0")},
-              100,
-              ${trialStartDate},
-              ${trialEndDate},
-              ${finalTrialPlan.id},
-              ${JSON.stringify({
-                trial: true,
-                originalPrice: parseFloat(finalTrialPlan.price || "0"),
-                discountReason: "Free Trial Registration"
-              })}
-            )
-          `);
-          
-          console.log("Created free trial invoice:", invoiceNumber, "for organization:", organizationId);
+          console.log("Trial plan user limit:", finalTrialPlan.maxUsers);
+          console.log("Trial subscription setup completed - no invoice created for trial users");
         }
       } catch (subscriptionError) {
         console.error("Error creating trial subscription and invoice:", subscriptionError);
