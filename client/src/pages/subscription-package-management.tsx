@@ -15,7 +15,8 @@ import {
   Crown,
   Check,
   X,
-  Eye
+  Eye,
+  MoreHorizontal
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -50,6 +51,13 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import type { SubscriptionPlan, BillingPeriod } from "@shared/schema";
@@ -914,49 +922,53 @@ export default function SubscriptionPackageManagement() {
                   </TableCell>
 
                   <TableCell className="text-right">
-                    <div className="flex justify-end space-x-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => setLocation(`/package-detail/${pkg.id}`)}
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => toggleStatusMutation.mutate(pkg.id)}
-                        disabled={toggleStatusMutation.isPending}
-                      >
-                        {pkg.isActive ? <ToggleLeft className="h-4 w-4" /> : <ToggleRight className="h-4 w-4" />}
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => handleEdit(pkg)}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      {/* Hide delete button for default packages */}
-                      {!['free-trial', 'starter', 'growth', 'enterprise'].includes(pkg.slug) ? (
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => setDeletePackageId(pkg.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <span className="sr-only">Open menu</span>
+                          <MoreHorizontal className="h-4 w-4" />
                         </Button>
-                      ) : (
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          disabled
-                          title="Paket default tidak dapat dihapus"
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => setLocation(`/package-detail/${pkg.id}`)}>
+                          <Eye className="mr-2 h-4 w-4" />
+                          Lihat Detail
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleEdit(pkg)}>
+                          <Edit className="mr-2 h-4 w-4" />
+                          Edit Paket
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          onClick={() => toggleStatusMutation.mutate(pkg.id)}
+                          disabled={toggleStatusMutation.isPending}
                         >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      )}
-                    </div>
+                          {pkg.isActive ? (
+                            <>
+                              <ToggleLeft className="mr-2 h-4 w-4" />
+                              Nonaktifkan
+                            </>
+                          ) : (
+                            <>
+                              <ToggleRight className="mr-2 h-4 w-4" />
+                              Aktifkan
+                            </>
+                          )}
+                        </DropdownMenuItem>
+                        {/* Only show delete option for non-default packages */}
+                        {!['free-trial', 'starter', 'growth', 'enterprise'].includes(pkg.slug) && (
+                          <>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem 
+                              onClick={() => setDeletePackageId(pkg.id)}
+                              className="text-red-600 focus:text-red-600"
+                            >
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              Hapus Paket
+                            </DropdownMenuItem>
+                          </>
+                        )}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </TableCell>
                 </TableRow>
               ))}
