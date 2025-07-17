@@ -41,6 +41,15 @@ const TOUR_STEPS: TourStep[] = [
     requiresClick: true
   },
   {
+    id: 'daily-focus-content',
+    title: 'Daily Focus - Tab Prioritas',
+    description: 'Tiga tab utama membantu Anda mengatur fokus harian: Task Prioritas untuk tugas yang harus diselesaikan, Update Progress untuk key results yang perlu diperbarui, dan Kelola Inisiatif untuk proyek yang sedang berjalan.',
+    icon: Sun,
+    selector: '[data-tour="daily-focus-tabs"]',
+    position: 'bottom',
+    category: 'feature'
+  },
+  {
     id: 'timeline',
     title: 'Timeline - Riwayat Progress',
     description: 'Visualisasi kronologis dari semua aktivitas dan progress yang telah dicapai. Lihat check-in, pencapaian milestone, dan perkembangan key results dalam format timeline yang mudah dipahami. Fitur ini memberikan gambaran historis yang komprehensif tentang perjalanan organisasi.',
@@ -50,6 +59,15 @@ const TOUR_STEPS: TourStep[] = [
     category: 'feature',
     targetPath: '/timeline',
     requiresClick: true
+  },
+  {
+    id: 'timeline-content',
+    title: 'Timeline - Daily Check-in',
+    description: 'Tombol Daily Check-in memungkinkan Anda mencatat progress harian dengan mudah. Setiap check-in akan ditampilkan dalam timeline kronologis untuk tracking yang lebih baik.',
+    icon: Clock,
+    selector: '[data-tour="timeline-checkin"]',
+    position: 'bottom',
+    category: 'feature'
   },
   {
     id: 'tasks',
@@ -63,6 +81,15 @@ const TOUR_STEPS: TourStep[] = [
     requiresClick: true
   },
   {
+    id: 'tasks-content',
+    title: 'Tasks - Filter & Pencarian',
+    description: 'Gunakan filter dan pencarian untuk menemukan tugas dengan cepat. Anda dapat memfilter berdasarkan status, prioritas, penanggungjawab, dan tim untuk manajemen yang lebih efisien.',
+    icon: CheckSquare,
+    selector: '[data-tour="tasks-filter"]',
+    position: 'bottom',
+    category: 'feature'
+  },
+  {
     id: 'goals',
     title: 'Goals - Manajemen Tujuan',
     description: 'Kelola seluruh tujuan organisasi menggunakan metodologi OKR (Objectives and Key Results). Buat objectives yang inspiratif dan tentukan key results yang terukur untuk melacak pencapaian. Sistem ini membantu menyelaraskan visi organisasi dengan eksekusi yang nyata dan terukur.',
@@ -72,6 +99,15 @@ const TOUR_STEPS: TourStep[] = [
     category: 'feature',
     targetPath: '/goals',
     requiresClick: true
+  },
+  {
+    id: 'goals-content',
+    title: 'Goals - Tambah Tujuan Baru',
+    description: 'Tombol "Tambah Tujuan Baru" memungkinkan Anda membuat objectives dan key results baru. Setiap tujuan dapat memiliki multiple key results untuk pengukuran yang lebih akurat.',
+    icon: Flag,
+    selector: '[data-tour="add-goal"]',
+    position: 'bottom',
+    category: 'feature'
   },
   {
     id: 'cycles',
@@ -85,6 +121,15 @@ const TOUR_STEPS: TourStep[] = [
     requiresClick: true
   },
   {
+    id: 'cycles-content',
+    title: 'Siklus - Kelola Periode',
+    description: 'Tabel siklus menampilkan semua periode waktu yang telah dibuat. Anda dapat melihat tanggal mulai, berakhir, dan status setiap siklus untuk perencanaan yang lebih baik.',
+    icon: Calendar,
+    selector: '[data-tour="cycles-table"]',
+    position: 'top',
+    category: 'feature'
+  },
+  {
     id: 'achievements',
     title: 'Pencapaian - Sistem Reward',
     description: 'Lihat badges, rewards, dan pencapaian yang telah diraih oleh tim. Sistem gamifikasi ini dirancang untuk meningkatkan motivasi dan engagement anggota tim. Setiap pencapaian mencerminkan kontribusi nyata terhadap tujuan organisasi.',
@@ -94,6 +139,15 @@ const TOUR_STEPS: TourStep[] = [
     category: 'feature',
     targetPath: '/achievements',
     requiresClick: true
+  },
+  {
+    id: 'achievements-content',
+    title: 'Pencapaian - Leaderboard',
+    description: 'Leaderboard menampilkan ranking anggota tim berdasarkan poin yang diperoleh. Sistem ini menciptakan kompetisi sehat dan memotivasi tim untuk mencapai target lebih baik.',
+    icon: Trophy,
+    selector: '[data-tour="leaderboard"]',
+    position: 'top',
+    category: 'feature'
   },
   {
     id: 'analytics',
@@ -107,6 +161,15 @@ const TOUR_STEPS: TourStep[] = [
     requiresClick: true
   },
   {
+    id: 'analytics-content',
+    title: 'Analytics - Grafik Performa',
+    description: 'Grafik dan chart memberikan visualisasi performa tim dalam bentuk yang mudah dipahami. Analisis tren ini membantu dalam pengambilan keputusan strategis.',
+    icon: BarChart3,
+    selector: '[data-tour="analytics-chart"]',
+    position: 'top',
+    category: 'feature'
+  },
+  {
     id: 'users',
     title: 'Kelola Pengguna - Tim Management',
     description: 'Undang anggota tim baru, kelola peran dan permissions, serta atur akses pengguna ke berbagai fitur. Sistem role-based access control memastikan setiap anggota tim memiliki akses yang tepat sesuai dengan tanggung jawab mereka dalam organisasi.',
@@ -118,6 +181,15 @@ const TOUR_STEPS: TourStep[] = [
     requiresClick: true
   },
   {
+    id: 'users-content',
+    title: 'Kelola Pengguna - Undang Tim',
+    description: 'Tombol "Undang Pengguna" memungkinkan Anda menambahkan anggota tim baru dengan mengatur peran dan permissions yang sesuai. Setiap pengguna dapat memiliki akses yang berbeda sesuai tanggung jawabnya.',
+    icon: Users,
+    selector: '[data-tour="invite-user"]',
+    position: 'bottom',
+    category: 'feature'
+  },
+  {
     id: 'settings',
     title: 'Pengaturan - Konfigurasi Sistem',
     description: 'Kelola preferensi organisasi, konfigurasi billing dan subscription, pengaturan security, dan customization sistem. Area ini memberikan kontrol penuh terhadap bagaimana platform OKR bekerja sesuai dengan kebutuhan spesifik organisasi Anda.',
@@ -127,6 +199,15 @@ const TOUR_STEPS: TourStep[] = [
     category: 'navigation',
     targetPath: '/settings',
     requiresClick: true
+  },
+  {
+    id: 'settings-content',
+    title: 'Pengaturan - Organisasi',
+    description: 'Pengaturan organisasi memungkinkan Anda mengonfigurasi nama perusahaan, informasi kontak, dan preferensi sistem yang akan mempengaruhi seluruh tim dalam organisasi.',
+    icon: Settings,
+    selector: '[data-tour="org-settings"]',
+    position: 'top',
+    category: 'feature'
   }
 ];
 

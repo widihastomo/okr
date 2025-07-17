@@ -264,7 +264,7 @@ export default function TimelinePage() {
               <TimelineIcon size="md" variant="primary" />
               <h1 className="text-2xl font-bold text-gray-900">Timeline</h1>
             </div>
-            <DailyCheckInButton />
+            <DailyCheckInButton data-tour="timeline-checkin" />
           </div>
           <p className="text-gray-600">Timeline progress dan interaksi tim</p>
         </div>

@@ -604,7 +604,7 @@ export default function Dashboard() {
 
             </div>
             <div className="flex-shrink-0 flex gap-2">
-              <CreateGoalButton />
+              <CreateGoalButton data-tour="add-goal" />
             </div>
           </div>
 

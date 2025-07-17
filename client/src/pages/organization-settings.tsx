@@ -585,7 +585,7 @@ export default function OrganizationSettings() {
           (user as any)?.role === "member" 
             ? "grid-cols-1" 
             : "grid-cols-2 sm:grid-cols-3 lg:grid-cols-5"
-        }`}>
+        }`} data-tour="org-settings">
           {(user as any)?.role !== "member" && (
             <>
               <TabsTrigger value="general" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 p-2 sm:p-3">

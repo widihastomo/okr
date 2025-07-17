@@ -119,7 +119,9 @@ export default function AchievementsPage() {
           </TabsContent>
 
           <TabsContent value="leaderboard" className="space-y-6">
-            <Leaderboard />
+            <div data-tour="leaderboard">
+              <Leaderboard />
+            </div>
           </TabsContent>
         </Tabs>
       </div>

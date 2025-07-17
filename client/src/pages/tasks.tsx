@@ -1189,7 +1189,7 @@ const TasksPage = () => {
       </div>
 
       {/* Filters */}
-      <Card>
+      <Card data-tour="tasks-filter">
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             <div className="flex items-center">

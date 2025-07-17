@@ -557,7 +557,7 @@ export default function ClientUserManagement() {
                 {isOwner && (
                   <Dialog open={showInviteModal} onOpenChange={setShowInviteModal}>
                     <DialogTrigger asChild>
-                      <Button className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600">
+                      <Button className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600" data-tour="invite-user">
                         <UserPlus className="h-4 w-4 mr-2" />
                         Undang Pengguna
                       </Button>

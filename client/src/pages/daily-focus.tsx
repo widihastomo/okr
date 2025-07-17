@@ -1535,7 +1535,7 @@ export default function DailyFocusPage() {
       </Card>
       {/* Main Content Tabs */}
       <Tabs defaultValue="tasks" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-3" data-tour="daily-focus-tabs">
           <TabsTrigger value="tasks">
             Task Prioritas ({overdueTasks.length + todayTasks.length + tomorrowTasks.length})
           </TabsTrigger>
