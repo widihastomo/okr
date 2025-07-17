@@ -283,6 +283,14 @@ The system includes comprehensive database connection troubleshooting tools:
 
 ## Changelog
 ```
+- July 17, 2025. **MOBILE SIDEBAR EXPANSION FOR TOUR** - Successfully implemented automatic sidebar expansion on mobile devices during tour:
+  * ADDED: isMobile() function to detect mobile viewport (window width <= 768px)
+  * ADDED: isMenuStep() function to identify menu-related tour steps
+  * ADDED: expandSidebarForMobile() function to automatically expand sidebar on mobile
+  * IMPLEMENTED: Automatic sidebar expansion when highlighting menu items on mobile devices
+  * ENHANCED: Tour now clicks hamburger menu button to expand sidebar only when needed
+  * IMPROVED: Better mobile tour experience with visible menu items during tour
+  * RESULT: Mobile users can now clearly see menu items when highlighted during tour
 - July 17, 2025. **TOUR STEP 16 REMOVAL** - Successfully removed goals-expand-card tour step to streamline tour experience:
   * REMOVED: goals-expand-card tour step (step 16) from TourSystemNew.tsx
   * UPDATED: Tour system now has 30 total steps instead of 31

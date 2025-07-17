@@ -510,6 +510,42 @@ export default function TourSystem() {
     };
   }, []);
 
+  // Function to detect if we're on mobile
+  const isMobile = () => {
+    return window.innerWidth <= 768; // Tailwind's md breakpoint
+  };
+
+  // Function to check if the current step is a menu item
+  const isMenuStep = (stepId: string) => {
+    const menuSteps = [
+      "daily-focus",
+      "goals", 
+      "tasks",
+      "timeline",
+      "cycles",
+      "achievements",
+      "analytics",
+      "users",
+      "settings"
+    ];
+    return menuSteps.includes(stepId);
+  };
+
+  // Function to expand sidebar on mobile for menu items
+  const expandSidebarForMobile = () => {
+    if (isMobile()) {
+      // Find the hamburger menu button and click it to expand sidebar
+      const hamburgerButton = document.querySelector('[data-tour="hamburger-menu"]');
+      if (hamburgerButton) {
+        // Only click if sidebar is not already open
+        const sidebar = document.querySelector('[data-sidebar="sidebar"]');
+        if (!sidebar || !sidebar.classList.contains('translate-x-0')) {
+          (hamburgerButton as HTMLElement).click();
+        }
+      }
+    }
+  };
+
   const highlightCurrentStep = () => {
     const currentStepData = TOUR_STEPS[currentStep];
     const element = document.querySelector(currentStepData.selector);
@@ -525,6 +561,11 @@ export default function TourSystem() {
       "All available tour elements:",
       Array.from(allTourElements).map((el) => el.getAttribute("data-tour")),
     );
+
+    // Expand sidebar on mobile if highlighting a menu item
+    if (isMenuStep(currentStepData.id)) {
+      expandSidebarForMobile();
+    }
 
     if (element) {
       // Remove existing highlights and click handlers
