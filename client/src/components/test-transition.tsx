@@ -37,12 +37,26 @@ export default function TestTransition() {
       if (state) {
         const parsed = JSON.parse(state);
         addTestResult(`📊 State guided highlights: ${parsed.isActive ? 'Aktif' : 'Tidak aktif'}`);
+        
+        // Tambahkan debug info untuk element yang dicari
+        const firstElement = document.querySelector('[data-tour="today-tasks-card"]');
+        if (firstElement) {
+          addTestResult('✅ Element pertama ditemukan: today-tasks-card');
+        } else {
+          addTestResult('❌ Element pertama tidak ditemukan');
+        }
       }
     }, 500);
   };
 
   const testStepNavigation = () => {
     addTestResult('🎯 Testing navigasi langkah-langkah...');
+    
+    // Cek apakah guided highlights aktif
+    if (!guidedHighlights.isActive) {
+      addTestResult('❌ Guided highlights tidak aktif, mulai dulu');
+      guidedHighlights.startGuidedHighlights();
+    }
     
     // Test next step
     guidedHighlights.setCurrentStep(1);

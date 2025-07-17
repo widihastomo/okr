@@ -12,7 +12,7 @@ import ClientSidebar from "@/components/client-sidebar";
 import SystemAdminSidebar from "@/components/system-admin-sidebar";
 import { NotificationProvider } from "@/components/notifications/notification-provider";
 import TourSystemNew from "@/components/TourSystemNew";
-import GuidedHighlights from "@/components/onboarding/guided-highlights";
+import SimpleGuidedHighlights from "@/components/simple-guided-highlights";
 import TransitionManager from "@/components/onboarding/transition-manager";
 import { useGuidedHighlights } from "@/hooks/useGuidedHighlights";
 
@@ -318,8 +318,8 @@ function Router() {
       </div>
       <TourSystemNew />
       
-      {/* Guided Highlights System */}
-      <GuidedHighlights
+      {/* Simple Guided Highlights System */}
+      <SimpleGuidedHighlights
         isActive={guidedHighlights.isActive}
         onComplete={guidedHighlights.completeGuidedHighlights}
         onSkip={guidedHighlights.skipGuidedHighlights}
