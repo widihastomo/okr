@@ -284,7 +284,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         if (finalTrialPlan && finalTrialPlan.isActive) {
           const trialStartDate = new Date();
-          const trialEndDate = new Date(trialStartDate.getTime() + (7 * 24 * 60 * 60 * 1000)); // 7 days trial
+          const trialDurationDays = finalTrialPlan.trialDuration || 7; // Use plan's trial duration or default to 7 days
+          const trialEndDate = new Date(trialStartDate.getTime() + (trialDurationDays * 24 * 60 * 60 * 1000));
           
           // Create organization subscription for free trial
           const [newSubscription] = await db.insert(organizationSubscriptions).values({
@@ -10053,7 +10054,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         if (finalTrialPlan && finalTrialPlan.isActive) {
           const trialStartDate = new Date();
-          const trialEndDate = new Date(trialStartDate.getTime() + (7 * 24 * 60 * 60 * 1000)); // 7 days from now
+          const trialDurationDays = finalTrialPlan.trialDuration || 7; // Use plan's trial duration or default to 7 days
+          const trialEndDate = new Date(trialStartDate.getTime() + (trialDurationDays * 24 * 60 * 60 * 1000));
           
           console.log("📅 Trial period:", trialStartDate.toISOString(), "to", trialEndDate.toISOString());
           

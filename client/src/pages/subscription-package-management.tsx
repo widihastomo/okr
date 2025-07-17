@@ -71,6 +71,7 @@ interface PackageFormData {
   features: string[];
   isActive: boolean;
   isTrial: boolean;
+  trialDuration: number | null;
   billingPeriods: BillingPeriodData[];
 }
 
@@ -100,6 +101,7 @@ function PackageFormModal({
     features: [],
     isActive: true,
     isTrial: false,
+    trialDuration: null,
     billingPeriods: [],
   });
   const [newFeature, setNewFeature] = useState("");
@@ -114,6 +116,7 @@ function PackageFormModal({
         features: pkg.features as string[] || [],
         isActive: pkg.isActive ?? true,
         isTrial: (pkg as any).isTrial ?? false,
+        trialDuration: (pkg as any).trialDuration || null,
         billingPeriods: (pkg as any).billingPeriods || [],
       });
     } else {
@@ -124,6 +127,7 @@ function PackageFormModal({
         features: [],
         isActive: true,
         isTrial: false,
+        trialDuration: null,
         billingPeriods: [],
       });
     }
@@ -436,6 +440,27 @@ function PackageFormModal({
               </p>
             </div>
           </div>
+
+          {/* Trial Duration Input - Only show if isTrial is checked */}
+          {formData.isTrial && (
+            <div>
+              <Label htmlFor="trialDuration" className="text-sm font-medium">Durasi Free Trial (Hari)</Label>
+              <Input
+                id="trialDuration"
+                type="number"
+                min="1"
+                max="365"
+                value={formData.trialDuration || ""}
+                onChange={(e) => setFormData({ 
+                  ...formData, 
+                  trialDuration: e.target.value ? parseInt(e.target.value) : null 
+                })}
+                placeholder="Contoh: 7, 14, 30"
+                className="mt-1"
+              />
+              <p className="text-xs text-gray-500 mt-1">Durasi trial dalam hari (default: 7 hari)</p>
+            </div>
+          )}
 
           {/* Information for Free Trial packages */}
           {formData.isTrial && (
@@ -851,6 +876,7 @@ export default function SubscriptionPackageManagement() {
                 <TableHead>Status</TableHead>
                 <TableHead>Default</TableHead>
                 <TableHead>Free Trial</TableHead>
+                <TableHead>Durasi Trial</TableHead>
                 <TableHead className="text-right">Aksi</TableHead>
               </TableRow>
             </TableHeader>
@@ -919,6 +945,16 @@ export default function SubscriptionPackageManagement() {
                     <Badge variant={(pkg as any).isTrial ? "default" : "secondary"}>
                       {(pkg as any).isTrial ? "Ya" : "Tidak"}
                     </Badge>
+                  </TableCell>
+                  
+                  <TableCell>
+                    {(pkg as any).isTrial && (pkg as any).trialDuration ? (
+                      <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                        {(pkg as any).trialDuration} hari
+                      </Badge>
+                    ) : (
+                      <span className="text-gray-400 text-sm">-</span>
+                    )}
                   </TableCell>
 
                   <TableCell className="text-right">

@@ -195,7 +195,8 @@ async function createSubscriptionPlans() {
       features: ['Basic OKR Management', 'Team Collaboration', 'Progress Tracking', 'Email Support'],
       isActive: true,
       isDefault: true, // Free Trial is the default package for new users
-      isTrial: true // Flag untuk standar free trial package
+      isTrial: true, // Flag untuk standar free trial package
+      trialDuration: 7 // Default 7 days trial duration
     },
     {
       id: randomUUID(),
@@ -206,7 +207,8 @@ async function createSubscriptionPlans() {
       features: ['Advanced OKR Management', 'Team Collaboration', 'Progress Tracking', 'Analytics Dashboard', 'Email Support'],
       isActive: true,
       isDefault: false,
-      isTrial: false
+      isTrial: false,
+      trialDuration: null // Not a trial package
     },
     {
       id: randomUUID(),
@@ -217,7 +219,8 @@ async function createSubscriptionPlans() {
       features: ['Premium OKR Management', 'Advanced Analytics', 'Custom Reports', 'Priority Support', 'API Access'],
       isActive: true,
       isDefault: false,
-      isTrial: false
+      isTrial: false,
+      trialDuration: null // Not a trial package
     },
     {
       id: randomUUID(),
@@ -228,7 +231,8 @@ async function createSubscriptionPlans() {
       features: ['Enterprise OKR Management', 'Custom Integration', 'Dedicated Support', 'Custom Training', 'SLA Guarantee'],
       isActive: true,
       isDefault: false,
-      isTrial: false
+      isTrial: false,
+      trialDuration: null // Not a trial package
     }
   ];
 

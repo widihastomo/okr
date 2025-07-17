@@ -69,6 +69,7 @@ export const subscriptionPlans = pgTable("subscription_plans", {
   isActive: boolean("is_active").default(true),
   isDefault: boolean("is_default").default(false), // Only one package can be default for new user registrations
   isTrial: boolean("is_trial").default(false), // Flag for standard free trial package
+  trialDuration: integer("trial_duration"), // Trial duration in days (only for trial packages)
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
