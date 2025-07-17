@@ -141,6 +141,18 @@ export default function TourSystem() {
     }
   }, [currentStep]);
 
+  // Listen for start tour event
+  useEffect(() => {
+    const handleStartTour = () => {
+      setIsActive(true);
+      setCurrentStep(0);
+      localStorage.removeItem('tour-completed');
+    };
+
+    window.addEventListener('startTour', handleStartTour);
+    return () => window.removeEventListener('startTour', handleStartTour);
+  }, []);
+
   const highlightCurrentStep = () => {
     const currentStepData = TOUR_STEPS[currentStep];
     const element = document.querySelector(currentStepData.selector);

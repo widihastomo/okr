@@ -1,7 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Play } from 'lucide-react';
-import { useTour } from '@/hooks/useTour';
 
 interface TourStartButtonProps {
   className?: string;
@@ -10,7 +9,10 @@ interface TourStartButtonProps {
 }
 
 export default function TourStartButton({ className, variant = 'outline', size = 'default' }: TourStartButtonProps) {
-  const { startTour } = useTour();
+  const startTour = () => {
+    // Dispatch custom event to start tour
+    window.dispatchEvent(new CustomEvent('startTour'));
+  };
 
   return (
     <Button
