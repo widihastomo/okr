@@ -552,17 +552,31 @@ export default function TourSystem() {
   // Function to close sidebar on mobile when moving away from menu items
   const closeSidebarForMobile = () => {
     if (isMobile()) {
+      console.log("closeSidebarForMobile: Mobile detected, checking sidebar");
       // Find the hamburger menu button and click it to close sidebar
       const hamburgerButton = document.querySelector('[data-tour="hamburger-menu"]');
-      if (hamburgerButton) {
-        // Only click if sidebar is currently open
-        const sidebar = document.querySelector('[data-sidebar="sidebar"]');
-        if (sidebar && sidebar.classList.contains('translate-x-0')) {
+      const sidebar = document.querySelector('[data-sidebar="sidebar"]');
+      
+      console.log("closeSidebarForMobile: hamburgerButton found:", !!hamburgerButton);
+      console.log("closeSidebarForMobile: sidebar found:", !!sidebar);
+      
+      if (hamburgerButton && sidebar) {
+        const isOpen = sidebar.classList.contains('translate-x-0');
+        console.log("closeSidebarForMobile: sidebar is open:", isOpen);
+        
+        if (isOpen) {
+          console.log("closeSidebarForMobile: Clicking hamburger to close sidebar");
           (hamburgerButton as HTMLElement).click();
           // Return promise to wait for sidebar animation
           return new Promise(resolve => setTimeout(resolve, 300));
+        } else {
+          console.log("closeSidebarForMobile: Sidebar already closed");
         }
+      } else {
+        console.log("closeSidebarForMobile: hamburger button or sidebar not found");
       }
+    } else {
+      console.log("closeSidebarForMobile: Not mobile, skipping");
     }
     return Promise.resolve();
   };
