@@ -7,7 +7,7 @@ channel = "stable-24_05"
 
 [deployment]
 deploymentTarget = "cloudrun"
-build = ["sh", "-c", "node build-deploy-fixed.js"]
+build = ["sh", "-c", "node build-production-fixed.js"]
 run = ["sh", "-c", "NODE_ENV=production node dist/index.cjs"]
 
 [[ports]]
@@ -25,6 +25,10 @@ externalPort = 3002
 [[ports]]
 localPort = 3003
 externalPort = 3003
+
+[[ports]]
+localPort = 3030
+externalPort = 3000
 
 [[ports]]
 localPort = 5000
