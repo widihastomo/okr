@@ -129,12 +129,35 @@ process.on('SIGTERM', () => {
   });
 });
 
-const server = app.listen(PORT, '0.0.0.0', () => {
-  console.log('🚀 Enhanced production server running on port', PORT);
-  console.log('📍 Environment: production');
-  console.log('🌍 Health check: http://localhost:' + PORT + '/health');
-  console.log('🔧 Build type: Enhanced fallback production server');
-});
+// Start server with port retry logic
+const startServerWithRetry = (port) => {
+  const server = app.listen(port, '0.0.0.0', () => {
+    console.log('🚀 Enhanced production server running on port', port);
+    console.log('📍 Environment: production');
+    console.log('🌍 Health check: http://localhost:' + port + '/health');
+    console.log('🔧 Build type: Enhanced fallback production server');
+  });
+  
+  server.on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+      console.log('📍 Port', port, 'is busy, trying next port...');
+      const nextPort = port + 1;
+      if (nextPort <= 65535) {
+        startServerWithRetry(nextPort);
+      } else {
+        console.error('❌ No available ports found');
+        process.exit(1);
+      }
+    } else {
+      console.error('❌ Server error:', err);
+      process.exit(1);
+    }
+  });
+  
+  return server;
+};
+
+const server = startServerWithRetry(PORT);
 `;
     
     writeFileSync('dist/server/index.js', enhancedServer);
@@ -214,8 +237,19 @@ const startServer = () => {
         res.sendFile(path.join(__dirname, 'public', 'index.html'));
       });
       
-      app.listen(PORT, '0.0.0.0', () => {
+      const server = app.listen(PORT, '0.0.0.0', () => {
         console.log('🚀 Fallback server running on port', PORT);
+      });
+      
+      server.on('error', (err) => {
+        if (err.code === 'EADDRINUSE') {
+          console.log('📍 Port', PORT, 'is busy, trying port', PORT + 1);
+          app.listen(PORT + 1, '0.0.0.0', () => {
+            console.log('🚀 Fallback server running on port', PORT + 1);
+          });
+        } else {
+          console.error('❌ Fallback server error:', err);
+        }
       });
     }
   } else {
