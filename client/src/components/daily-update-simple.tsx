@@ -243,19 +243,19 @@ export function DailyUpdateSimple() {
       keyResults: keyResults.map((kr: any) => ({
         id: kr.id,
         title: kr.title,
-        currentValue: kr.currentValue,
-        targetValue: kr.targetValue,
-        unit: kr.unit,
-        newValue: kr.currentValue, // Start with current value
+        currentValue: kr.currentValue || 0,
+        targetValue: kr.targetValue || 0,
+        unit: kr.unit || '',
+        newValue: kr.currentValue || 0, // Start with current value, ensure it's never undefined
         notes: ''
       })),
       successMetrics: successMetrics.map((sm: any) => ({
         id: sm.id,
-        name: sm.name,
-        target: sm.target,
-        achievement: sm.achievement,
-        initiativeTitle: sm.initiativeTitle,
-        newValue: sm.achievement || '', // Start with current achievement
+        name: sm.name || '',
+        target: sm.target || '',
+        achievement: sm.achievement || '',
+        initiativeTitle: sm.initiativeTitle || '',
+        newValue: sm.achievement || '', // Start with current achievement, ensure it's never undefined
         notes: ''
       })),
       tasks: [], // Will be populated when status is changed
@@ -436,10 +436,10 @@ export function DailyUpdateSimple() {
                             <div className="flex items-center">
                               <input
                                 type="number"
-                                value={kr.newValue}
+                                value={kr.newValue || 0}
                                 onChange={(e) => {
                                   const newKeyResults = [...updateData.keyResults];
-                                  newKeyResults[index].newValue = Number(e.target.value);
+                                  newKeyResults[index].newValue = Number(e.target.value) || 0;
                                   setUpdateData({ ...updateData, keyResults: newKeyResults });
                                 }}
                                 className="w-16 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
@@ -452,10 +452,10 @@ export function DailyUpdateSimple() {
                           <td className="p-2">
                             <input
                               type="text"
-                              value={kr.notes}
+                              value={kr.notes || ''}
                               onChange={(e) => {
                                 const newKeyResults = [...updateData.keyResults];
-                                newKeyResults[index].notes = e.target.value;
+                                newKeyResults[index].notes = e.target.value || '';
                                 setUpdateData({ ...updateData, keyResults: newKeyResults });
                               }}
                               placeholder="Catatan..."
@@ -501,10 +501,10 @@ export function DailyUpdateSimple() {
                           <td className="p-2">
                             <input
                               type="text"
-                              value={sm.newValue}
+                              value={sm.newValue || ''}
                               onChange={(e) => {
                                 const newMetrics = [...updateData.successMetrics];
-                                newMetrics[index].newValue = e.target.value;
+                                newMetrics[index].newValue = e.target.value || '';
                                 setUpdateData({ ...updateData, successMetrics: newMetrics });
                               }}
                               className="w-24 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-green-500"
@@ -513,10 +513,10 @@ export function DailyUpdateSimple() {
                           <td className="p-2">
                             <input
                               type="text"
-                              value={sm.notes}
+                              value={sm.notes || ''}
                               onChange={(e) => {
                                 const newMetrics = [...updateData.successMetrics];
-                                newMetrics[index].notes = e.target.value;
+                                newMetrics[index].notes = e.target.value || '';
                                 setUpdateData({ ...updateData, successMetrics: newMetrics });
                               }}
                               placeholder="Catatan..."
