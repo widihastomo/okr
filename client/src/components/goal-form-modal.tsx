@@ -1289,6 +1289,8 @@ export function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult,
 
   // Watch for keyResultType changes and clear inappropriate fields
   const currentKeyResultType = keyResultForm.watch("keyResultType");
+  const currentTargetValue = keyResultForm.watch("targetValue");
+  
   useEffect(() => {
     // Clear validation errors when type changes
     keyResultForm.clearErrors("baseValue");
@@ -1305,7 +1307,16 @@ export function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult,
     } else if (currentKeyResultType === "should_stay_above" || currentKeyResultType === "should_stay_below") {
       // For stay above/below types, we only need target value
       keyResultForm.setValue("baseValue", "");
-      keyResultForm.setValue("currentValue", "0");
+      
+      // For should_stay_below, currentValue should default to targetValue
+      // For should_stay_above, currentValue should default to "0"
+      if (currentKeyResultType === "should_stay_below") {
+        const targetValue = keyResultForm.getValues("targetValue") || "0";
+        keyResultForm.setValue("currentValue", targetValue);
+      } else {
+        keyResultForm.setValue("currentValue", "0");
+      }
+      
       // Reset target value to empty string to allow fresh input
       if (!isEditing) {
         keyResultForm.setValue("targetValue", "");
@@ -1329,6 +1340,13 @@ export function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult,
       }
     }
   }, [currentKeyResultType, keyResultForm, isEditing]);
+
+  // Watch for targetValue changes to update currentValue for should_stay_below
+  useEffect(() => {
+    if (currentKeyResultType === "should_stay_below" && currentTargetValue) {
+      keyResultForm.setValue("currentValue", currentTargetValue);
+    }
+  }, [currentTargetValue, currentKeyResultType, keyResultForm]);
 
   // Watch for baseValue changes and update currentValue for decrease_to type
   const currentBaseValue = keyResultForm.watch("baseValue");
