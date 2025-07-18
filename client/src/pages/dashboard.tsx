@@ -238,42 +238,6 @@ export default function Dashboard() {
   const closestCycleId = findClosestCycle(cycles);
   const defaultCycle = cycles.find(cycle => cycle.id === closestCycleId) || null;
 
-  // Initialize cycle filter with closest cycle on first load only if no URL param exists
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const cycleParam = urlParams.get("cycle");
-
-    // Only auto-select if no URL parameter exists and filter is empty
-    if (
-      cycleFilter.length === 0 &&
-      cycles.length > 0 &&
-      !hasAutoSelected &&
-      !cycleParam &&
-      allGoals.length > 0
-    ) {
-      // Check if there are goals with cycles, prioritize those cycles
-      const goalsWithCycles = allGoals.filter(goal => goal.cycleId);
-      
-      if (goalsWithCycles.length > 0) {
-        // Find the cycle used by the first goal
-        const goalCycle = cycles.find(c => c.id === goalsWithCycles[0].cycleId);
-        if (goalCycle) {
-          console.log('Goals Page - Using cycle from existing goal:', goalCycle.name, goalCycle.id);
-          setCycleFilter([goalCycle.id]);
-          setHasAutoSelected(true);
-          return;
-        }
-      }
-      
-      // Fallback to closest cycle if no goals have cycles
-      if (defaultCycle) {
-        console.log('Goals Page - Using default closest cycle:', defaultCycle.name, defaultCycle.id);
-        setCycleFilter([defaultCycle.id]);
-        setHasAutoSelected(true);
-      }
-    }
-  }, [defaultCycle?.id, hasAutoSelected, allGoals.length, cycles.length]); // Include allGoals in dependency
-
   // Set default user filter to current user on first load only if no URL param exists
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -299,7 +263,39 @@ export default function Dashboard() {
     queryKey: ["/api/okrs"],
   });
 
+  // Initialize cycle filter with closest cycle on first load only if no URL param exists
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const cycleParam = urlParams.get("cycle");
 
+    // Only auto-select if no URL parameter exists and filter is empty
+    if (
+      cycleFilter.length === 0 &&
+      cycles.length > 0 &&
+      !hasAutoSelected &&
+      !cycleParam &&
+      allGoals.length > 0
+    ) {
+      // Check if there are goals with cycles, prioritize those cycles
+      const goalsWithCycles = allGoals.filter(goal => goal.cycleId);
+      
+      if (goalsWithCycles.length > 0) {
+        // Find the cycle used by the first goal
+        const goalCycle = cycles.find(c => c.id === goalsWithCycles[0].cycleId);
+        if (goalCycle) {
+          setCycleFilter([goalCycle.id]);
+          setHasAutoSelected(true);
+          return;
+        }
+      }
+      
+      // Fallback to closest cycle if no goals have cycles
+      if (defaultCycle) {
+        setCycleFilter([defaultCycle.id]);
+        setHasAutoSelected(true);
+      }
+    }
+  }, [defaultCycle?.id, hasAutoSelected, allGoals.length, cycles.length, cycleFilter.length]); // Include allGoals in dependency
 
   // Helper function to check if a cycle is related to selected cycles
   const isRelatedCycle = (
