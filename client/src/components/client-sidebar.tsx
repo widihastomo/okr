@@ -296,20 +296,19 @@ export default function Sidebar({
                   <li key={item.path}>
                     {/* Show tooltip only on desktop when collapsed */}
                     {isCollapsed ? (
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <div className="lg:block hidden">{menuItem}</div>
-                        </TooltipTrigger>
-                        <TooltipContent side="right">
-                          <p>{item.label}</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    ) : null}
-                    
-                    {/* Show regular menu item when not collapsed on desktop OR always on mobile */}
-                    <div className={cn(isCollapsed ? "lg:hidden" : "")}>
-                      {menuItem}
-                    </div>
+                      <div className="lg:block hidden">
+                        <Tooltip>
+                          <TooltipTrigger asChild>{menuItem}</TooltipTrigger>
+                          <TooltipContent side="right">
+                            <p>{item.label}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
+                    ) : (
+                      menuItem
+                    )}
+                    {/* On mobile, always show the menu item without tooltip */}
+                    <div className="lg:hidden">{menuItem}</div>
                   </li>
                 );
               })}

@@ -6,138 +6,21 @@
 .tour-highlight {
   position: relative !important;
   z-index: 50 !important;
-  animation: tourPulse 2s infinite !important;
-  border-radius: 8px !important;
+  animation: tourPulse 2s infinite;
+  border-radius: 8px;
   pointer-events: auto !important;
   cursor: pointer !important;
-  box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.7) !important;
-}
-
-/* Specific styling for menu items in tour */
-[data-tour="daily-focus"].tour-highlight,
-[data-tour="goals"].tour-highlight,
-[data-tour="tasks"].tour-highlight,
-[data-tour="timeline"].tour-highlight,
-[data-tour="cycles"].tour-highlight,
-[data-tour="achievements"].tour-highlight,
-[data-tour="analytics"].tour-highlight,
-[data-tour="users"].tour-highlight,
-[data-tour="settings"].tour-highlight {
-  animation: tourPulse 2s infinite !important;
-  box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.7) !important;
-  background-color: rgba(249, 115, 22, 0.2) !important;
-  border: 2px solid rgba(249, 115, 22, 0.8) !important;
-  outline: 2px solid rgba(249, 115, 22, 0.5) !important;
-  outline-offset: 2px !important;
-  transform: scale(1.05) !important;
-  position: relative !important;
-  z-index: 1000 !important;
-}
-
-/* Mobile specific pulse effect */
-@media (max-width: 768px) {
-  [data-tour="daily-focus"].tour-highlight,
-  [data-tour="goals"].tour-highlight,
-  [data-tour="tasks"].tour-highlight,
-  [data-tour="timeline"].tour-highlight,
-  [data-tour="cycles"].tour-highlight,
-  [data-tour="achievements"].tour-highlight,
-  [data-tour="analytics"].tour-highlight,
-  [data-tour="users"].tour-highlight,
-  [data-tour="settings"].tour-highlight {
-    animation: mobileTourPulse 1.2s infinite !important;
-    /* Use contrasting colors - white/yellow for better visibility */
-    box-shadow: 0 0 0 4px rgba(255, 255, 255, 1), 
-                0 0 0 8px rgba(255, 193, 7, 0.8),
-                0 0 0 12px rgba(255, 193, 7, 0.4) !important;
-    border: 3px solid rgba(255, 255, 255, 1) !important;
-    outline: 3px solid rgba(255, 193, 7, 0.9) !important;
-    outline-offset: 2px !important;
-    transform: scale(1.08) !important;
-    /* Override transition to prevent interference */
-    transition: none !important;
-  }
-  
-  /* Add a very visible pulsing indicator */
-  [data-tour="daily-focus"].tour-highlight::after,
-  [data-tour="goals"].tour-highlight::after,
-  [data-tour="tasks"].tour-highlight::after,
-  [data-tour="timeline"].tour-highlight::after,
-  [data-tour="cycles"].tour-highlight::after,
-  [data-tour="achievements"].tour-highlight::after,
-  [data-tour="analytics"].tour-highlight::after,
-  [data-tour="users"].tour-highlight::after,
-  [data-tour="settings"].tour-highlight::after {
-    content: '●';
-    position: absolute;
-    top: -10px;
-    right: -10px;
-    width: 20px;
-    height: 20px;
-    background: radial-gradient(circle, #ff0000, #ff6b6b);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    color: white;
-    z-index: 1001;
-    animation: mobilePulsingDot 0.8s infinite !important;
-    box-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
-  }
-}
-
-@keyframes mobileTourPulse {
-  0% { 
-    box-shadow: 0 0 0 0 rgba(255, 255, 255, 1), 
-                0 0 0 0 rgba(255, 193, 7, 0.8),
-                0 0 0 0 rgba(255, 193, 7, 0.4);
-    transform: scale(1.08);
-    outline-offset: 2px;
-  }
-  50% { 
-    box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.8), 
-                0 0 0 16px rgba(255, 193, 7, 0.6),
-                0 0 0 24px rgba(255, 193, 7, 0.2);
-    transform: scale(1.12);
-    outline-offset: 4px;
-  }
-  100% { 
-    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0), 
-                0 0 0 0 rgba(255, 193, 7, 0),
-                0 0 0 0 rgba(255, 193, 7, 0);
-    transform: scale(1.08);
-    outline-offset: 2px;
-  }
-}
-
-@keyframes mobilePulsingDot {
-  0% { 
-    transform: scale(1);
-    opacity: 1;
-  }
-  50% { 
-    transform: scale(1.5);
-    opacity: 0.7;
-  }
-  100% { 
-    transform: scale(1);
-    opacity: 1;
-  }
 }
 
 @keyframes tourPulse {
   0% { 
-    box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.8), 0 0 0 0 rgba(249, 115, 22, 0.4);
-    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.7);
   }
-  50% { 
-    box-shadow: 0 0 0 8px rgba(249, 115, 22, 0.3), 0 0 0 16px rgba(249, 115, 22, 0.1);
-    transform: scale(1.02);
+  70% { 
+    box-shadow: 0 0 0 10px rgba(249, 115, 22, 0);
   }
   100% { 
-    box-shadow: 0 0 0 0 rgba(249, 115, 22, 0), 0 0 0 0 rgba(249, 115, 22, 0);
-    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(249, 115, 22, 0);
   }
 }
 
