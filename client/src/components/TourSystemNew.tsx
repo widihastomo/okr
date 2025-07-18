@@ -133,23 +133,21 @@ const TOUR_STEPS: TourStep[] = [
     id: "update-progress-tab",
     title: "Tab Update Progress - Update Capaian Angka Target",
     description:
-      "Tab Update Progress memungkinkan Anda memperbarui capaian angka target yang sedang aktif. Klik tab ini untuk melakukan update capaian pada angka target. Fitur ini penting untuk melacak kemajuan menuju target yang telah ditetapkan.",
+      "Tab Update Progress memungkinkan Anda memperbarui capaian angka target yang sedang aktif. Tab ini menampilkan angka target yang memerlukan update. Fitur ini penting untuk melacak kemajuan menuju target yang telah ditetapkan.",
     icon: TrendingUp,
     selector: '[data-tour="update-progress-tab"]',
     position: "bottom",
     category: "action",
-    requiresClick: true,
   },
   {
     id: "kelola-inisiatif-tab",
     title: "Tab Kelola Inisiatif - Manajemen Proyek",
     description:
-      "Tab Kelola Inisiatif menampilkan semua inisiatif (proyek) yang sedang berjalan dan memerlukan perhatian. Klik tab ini untuk mengelola inisiatif, memperbarui success metrics, dan melacak progress proyek. Fitur ini membantu koordinasi tim dalam menjalankan inisiatif strategis.",
+      "Tab Kelola Inisiatif menampilkan semua inisiatif (proyek) yang sedang berjalan dan memerlukan perhatian. Tab ini menampilkan inisiatif yang dapat dikelola, success metrics yang dapat diperbarui, dan progress proyek. Fitur ini membantu koordinasi tim dalam menjalankan inisiatif strategis.",
     icon: Rocket,
     selector: '[data-tour="kelola-inisiatif-tab"]',
     position: "bottom",
     category: "action",
-    requiresClick: true,
   },
   {
     id: "goals",
