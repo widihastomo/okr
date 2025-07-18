@@ -290,6 +290,8 @@ The system includes comprehensive database connection troubleshooting tools:
   * IMPROVED: Sidebar only closes when transitioning between different pages, not within same page
   * FIXED: Menu item highlighting on mobile - step 4 (daily-focus) now properly highlights after sidebar expansion
   * ENHANCED: Separate highlighting logic for mobile menu items with proper timing delays
+  * ENHANCED: Mobile tour pulse animation with enhanced visibility (mobileTourPulse 1.2s + border + enhanced glow)
+  * FIXED: Pulse animation now persists when sidebar expands on mobile with stronger CSS specificity
   * RESULT: Smooth tour experience without disruptive sidebar toggles between steps 4-5 (Daily Focus)
 - July 17, 2025. **MOBILE TOUR POSITIONING ENHANCEMENT** - Successfully fixed tooltip positioning to prevent covering highlighted menu items on mobile:
   * FIXED: Mobile tooltip positioning logic to prevent covering highlighted menu items
