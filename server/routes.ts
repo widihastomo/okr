@@ -4012,7 +4012,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Check-in routes
-  app.post("/api/check-ins", async (req, res) => {
+  app.post("/api/check-ins", requireAuth, async (req, res) => {
     try {
       const result = insertCheckInSchema.safeParse(req.body);
       if (!result.success) {
