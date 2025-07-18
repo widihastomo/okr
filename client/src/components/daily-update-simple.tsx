@@ -49,6 +49,9 @@ export function DailyUpdateSimple() {
   const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   
+  // Test input state
+  const [testValue, setTestValue] = useState('');
+  
   const initialUpdateData: SimpleUpdateData = {
     keyResults: [],
     successMetrics: [],
@@ -294,6 +297,23 @@ export function DailyUpdateSimple() {
         </DialogHeader>
         
         <div className="space-y-6">
+          {/* Test Input */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Test Input</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <input
+                type="text"
+                value={testValue}
+                onChange={(e) => setTestValue(e.target.value)}
+                placeholder="Test ketik di sini..."
+                className="w-full px-3 py-2 border border-gray-300 rounded"
+              />
+              <p className="mt-2 text-sm text-gray-600">Test value: {testValue}</p>
+            </CardContent>
+          </Card>
+          
           {/* Tasks Summary */}
           <Card>
             <CardHeader>
@@ -439,17 +459,17 @@ export function DailyUpdateSimple() {
                             <div className="flex items-center">
                               <input
                                 type="number"
-                                value={kr.newValue || ''}
+                                step="0.01"
+                                value={kr.newValue}
                                 onChange={(e) => {
-                                  console.log('Input changed:', e.target.value);
                                   const newKeyResults = [...updateData.keyResults];
                                   newKeyResults[index].newValue = e.target.value;
-                                  setUpdateData({ ...updateData, keyResults: newKeyResults });
-                                  console.log('Updated data:', { ...updateData, keyResults: newKeyResults });
+                                  setUpdateData(prevData => ({
+                                    ...prevData,
+                                    keyResults: newKeyResults
+                                  }));
                                 }}
-                                onFocus={() => console.log('Input focused')}
-                                onBlur={() => console.log('Input blurred')}
-                                className="w-16 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                className="w-16 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-orange-500"
                               />
                               <span className="ml-1 text-gray-600 text-sm">
                                 {kr.unit === 'percentage' ? '%' : kr.unit}
