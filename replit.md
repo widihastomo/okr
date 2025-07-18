@@ -283,6 +283,11 @@ The system includes comprehensive database connection troubleshooting tools:
 
 ## Changelog
 ```
+- July 17, 2025. **MOBILE SIDEBAR DUPLICATION FIX** - Successfully fixed duplicate menu items in mobile sidebar:
+  * FIXED: Removed redundant mobile rendering that caused each menu item to appear twice
+  * CLEANED: Eliminated duplicate `<div className="lg:hidden">{menuItem}</div>` line
+  * SIMPLIFIED: Conditional logic now properly handles both desktop and mobile cases without duplication
+  * RESULT: Clean mobile sidebar with single menu item display
 - July 17, 2025. **MOBILE TOUR SIDEBAR TOGGLE FIX** - Successfully fixed unwanted sidebar toggle when transitioning between same-page steps:
   * FIXED: Sidebar no longer closes when moving from menu step to non-menu step on the same page
   * ADDED: areStepsOnSamePage() function to detect same-page transitions

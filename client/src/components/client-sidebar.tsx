@@ -307,8 +307,6 @@ export default function Sidebar({
                     ) : (
                       menuItem
                     )}
-                    {/* On mobile, always show the menu item without tooltip */}
-                    <div className="lg:hidden">{menuItem}</div>
                   </li>
                 );
               })}
