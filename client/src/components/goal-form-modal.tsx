@@ -164,6 +164,11 @@ function findClosestCycle(cycles: Cycle[]): string {
     
     // Check if today is within the cycle
     if (today >= startDate && today <= endDate) {
+      console.log('Goal Form Modal - Found cycle containing today:', cycle.name, cycle.id, {
+        today: today.toISOString(),
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
+      });
       return cycle.id; // Return immediately if today is within a cycle
     }
     
@@ -178,6 +183,7 @@ function findClosestCycle(cycles: Cycle[]): string {
     }
   }
   
+  console.log('Goal Form Modal - Selected closest cycle:', closestCycle.name, closestCycle.id);
   return closestCycle.id;
 }
 
