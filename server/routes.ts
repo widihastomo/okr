@@ -4284,17 +4284,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
+      // Extract success metrics from request body
+      const { successMetrics, ...initiativeBody } = req.body;
+      
       // Process the initiative data with authentication
       const initiativeData = {
-        ...req.body,
+        ...initiativeBody,
         createdBy: currentUser.id,
-        picId: req.body.picId === "none" || !req.body.picId ? null : req.body.picId,
-        budget: req.body.budget ? req.body.budget.toString() : null,
-        startDate: req.body.startDate ? new Date(req.body.startDate) : null,
-        dueDate: req.body.dueDate ? new Date(req.body.dueDate) : null,
+        picId: initiativeBody.picId === "none" || !initiativeBody.picId ? null : initiativeBody.picId,
+        budget: initiativeBody.budget ? initiativeBody.budget.toString() : null,
+        startDate: initiativeBody.startDate ? new Date(initiativeBody.startDate) : null,
+        dueDate: initiativeBody.dueDate ? new Date(initiativeBody.dueDate) : null,
         priorityScore: calculatedPriorityScore,
         priority: calculatedPriorityLevel,
-        status: req.body.status || "draft", // Ensure default status is "draft"
+        status: initiativeBody.status || "draft", // Ensure default status is "draft"
       };
       
       const result = insertInitiativeSchema.safeParse(initiativeData);
@@ -4304,6 +4307,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const initiative = await storage.createInitiative(result.data);
+      
+      // Create success metrics if provided
+      if (successMetrics && Array.isArray(successMetrics) && successMetrics.length > 0) {
+        console.log("Creating success metrics:", successMetrics);
+        
+        for (const metric of successMetrics) {
+          try {
+            const metricData = {
+              ...metric,
+              initiativeId: initiative.id,
+              createdBy: currentUser.id,
+              organizationId: currentUser.organizationId,
+              achievement: metric.achievement || "0", // Default value if not provided
+            };
+            
+            const metricResult = insertSuccessMetricSchema.safeParse(metricData);
+            if (metricResult.success) {
+              await storage.createSuccessMetric(metricResult.data);
+              console.log("Success metric created:", metricResult.data.name);
+            } else {
+              console.error("Success metric validation error:", metricResult.error.errors);
+            }
+          } catch (metricError) {
+            console.error("Error creating success metric:", metricError);
+          }
+        }
+      }
       
       // Award points for creating an initiative
       try {
