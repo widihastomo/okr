@@ -17,7 +17,7 @@ interface SimpleUpdateData {
     currentValue: number;
     targetValue: number;
     unit: string;
-    newValue: number;
+    newValue: string; // Changed to string for proper input handling
     notes: string;
   }>;
   successMetrics: Array<{
@@ -239,6 +239,8 @@ export function DailyUpdateSimple() {
 
   const handleOpenDialog = () => {
     // Reset form data and populate with current values when opening dialog
+    console.log('Opening dialog with data:', { keyResults, successMetrics, relevantTasks });
+    
     const initialData: SimpleUpdateData = {
       keyResults: keyResults.map((kr: any) => ({
         id: kr.id,
@@ -246,7 +248,7 @@ export function DailyUpdateSimple() {
         currentValue: kr.currentValue || 0,
         targetValue: kr.targetValue || 0,
         unit: kr.unit || '',
-        newValue: kr.currentValue || 0, // Start with current value, ensure it's never undefined
+        newValue: String(kr.currentValue || 0), // Start with current value as string, ensure it's never undefined
         notes: ''
       })),
       successMetrics: successMetrics.map((sm: any) => ({
@@ -267,6 +269,7 @@ export function DailyUpdateSimple() {
       totalTasks: relevantTasks.length
     };
     
+    console.log('Initial data:', initialData);
     setUpdateData(initialData);
     setIsOpen(true);
   };
@@ -436,10 +439,10 @@ export function DailyUpdateSimple() {
                             <div className="flex items-center">
                               <input
                                 type="number"
-                                value={kr.newValue || 0}
+                                value={kr.newValue || ''}
                                 onChange={(e) => {
                                   const newKeyResults = [...updateData.keyResults];
-                                  newKeyResults[index].newValue = Number(e.target.value) || 0;
+                                  newKeyResults[index].newValue = e.target.value;
                                   setUpdateData({ ...updateData, keyResults: newKeyResults });
                                 }}
                                 className="w-16 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
