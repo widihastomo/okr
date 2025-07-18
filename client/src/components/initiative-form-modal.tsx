@@ -498,43 +498,6 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
                   )}
                 />
 
-                {/* PIC Selection */}
-                <FormField
-                  control={form.control}
-                  name="picId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center gap-2">
-                        Penanggung Jawab*
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <button 
-                              type="button" 
-                              className="inline-flex items-center justify-center"
-                            >
-                              <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                            </button>
-                          </PopoverTrigger>
-                          <PopoverContent side="right" className="max-w-xs">
-                            <p className="text-sm">
-                              Pilih orang yang bertanggung jawab untuk memimpin dan mengeksekusi inisiatif ini.
-                            </p>
-                          </PopoverContent>
-                        </Popover>
-                      </FormLabel>
-                      <FormControl>
-                        <SearchableUserSelect
-                          users={users?.filter(user => user.isActive === true) || []}
-                          value={field.value || ""}
-                          onValueChange={field.onChange}
-                          placeholder="Pilih penanggung jawab"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
                 {/* Grid for dates */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Start Date */}
@@ -627,42 +590,82 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
                   />
                 </div>
 
-                {/* Budget */}
-                <FormField
-                  control={form.control}
-                  name="budget"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center gap-2">
-                        Anggaran
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <button 
-                              type="button" 
-                              className="inline-flex items-center justify-center"
-                            >
-                              <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                            </button>
-                          </PopoverTrigger>
-                          <PopoverContent side="right" className="max-w-xs">
-                            <p className="text-sm">
-                              Estimasi anggaran yang dibutuhkan untuk melaksanakan inisiatif ini dalam Rupiah.
-                            </p>
-                          </PopoverContent>
-                        </Popover>
-                      </FormLabel>
-                      <FormControl>
-                        <Input 
-                          type="text"
-                          placeholder="Contoh: 5.000.000" 
-                          value={formatNumberWithSeparator(field.value || "")}
-                          onChange={(e) => handleNumberInputChange(e.target.value, field.onChange)}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {/* Grid for PIC and Budget */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* PIC Selection */}
+                  <FormField
+                    control={form.control}
+                    name="picId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center gap-2">
+                          Penanggung Jawab*
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <button 
+                                type="button" 
+                                className="inline-flex items-center justify-center"
+                              >
+                                <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                              </button>
+                            </PopoverTrigger>
+                            <PopoverContent side="right" className="max-w-xs">
+                              <p className="text-sm">
+                                Pilih orang yang bertanggung jawab untuk memimpin dan mengeksekusi inisiatif ini.
+                              </p>
+                            </PopoverContent>
+                          </Popover>
+                        </FormLabel>
+                        <FormControl>
+                          <SearchableUserSelect
+                            users={users?.filter(user => user.isActive === true) || []}
+                            value={field.value || ""}
+                            onValueChange={field.onChange}
+                            placeholder="Pilih penanggung jawab"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Budget */}
+                  <FormField
+                    control={form.control}
+                    name="budget"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center gap-2">
+                          Anggaran
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <button 
+                                type="button" 
+                                className="inline-flex items-center justify-center"
+                              >
+                                <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                              </button>
+                            </PopoverTrigger>
+                            <PopoverContent side="right" className="max-w-xs">
+                              <p className="text-sm">
+                                Estimasi anggaran yang dibutuhkan untuk melaksanakan inisiatif ini dalam Rupiah.
+                              </p>
+                            </PopoverContent>
+                          </Popover>
+                        </FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="text"
+                            placeholder="Contoh: 5.000.000" 
+                            value={formatNumberWithSeparator(field.value || "")}
+                            onChange={(e) => handleNumberInputChange(e.target.value, field.onChange)}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
               </CardContent>
             </Card>
 
