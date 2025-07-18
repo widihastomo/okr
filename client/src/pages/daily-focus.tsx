@@ -396,6 +396,14 @@ export default function DailyFocusPage() {
     queryKey: ["/api/okrs"],
   });
 
+  // Debug logging to verify data consistency
+  React.useEffect(() => {
+    if (objectives.length > 0) {
+      console.log('Daily Focus - Objectives loaded:', objectives.length);
+      console.log('Daily Focus - First objective:', objectives[0]);
+    }
+  }, [objectives]);
+
   // Extract key results from objectives data (includes calculated status)
   const keyResults = React.useMemo(() => {
     return objectives.flatMap((obj: any) => obj.keyResults || []);

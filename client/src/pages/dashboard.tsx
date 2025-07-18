@@ -281,6 +281,15 @@ export default function Dashboard() {
     queryKey: ["/api/okrs"],
   });
 
+  // Debug logging to verify data consistency
+  React.useEffect(() => {
+    if (allGoals.length > 0) {
+      console.log('Goals Page - All goals loaded:', allGoals.length);
+      console.log('Goals Page - First goal:', allGoals[0]);
+      console.log('Goals Page - Current cycle filter:', cycleFilter);
+    }
+  }, [allGoals, cycleFilter]);
+
   // Helper function to check if a cycle is related to selected cycles
   const isRelatedCycle = (
     goalCycleId: string | null,
@@ -331,6 +340,19 @@ export default function Dashboard() {
 
     // Cycle filter with related cycle logic
     const cycleMatch = isRelatedCycle(goal.cycleId, cycleFilter);
+
+    // Debug logging for specific goal
+    if (goal.id === '6aabdcfe-cd60-43e4-96b1-ad93669649d3') {
+      console.log('Goals Page - Debug goal 6aabdcfe:', {
+        goalId: goal.id,
+        cycleId: goal.cycleId,
+        statusMatch,
+        cycleMatch,
+        currentCycleFilter: cycleFilter,
+        goalStatus: goal.status,
+        statusFilter: statusFilter
+      });
+    }
 
     // User filter - show Goals where:
     // 1. If userFilter is 'all' or empty, show all Goals
