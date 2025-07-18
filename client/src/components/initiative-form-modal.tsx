@@ -278,15 +278,10 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
         queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiative.id}/history`] });
       }
       
-      // Also invalidate specific objective queries if keyResultId is provided
-      if (keyResultId) {
-        // Get the objective ID from keyResult to invalidate specific objective queries
-        const keyResults = queryClient.getQueryData(["/api/key-results"]) as any[];
-        const keyResult = keyResults?.find(kr => kr.id === keyResultId);
-        if (keyResult?.objectiveId) {
-          queryClient.invalidateQueries({ queryKey: [`/api/initiatives/objective/${keyResult.objectiveId}`] });
-          queryClient.invalidateQueries({ queryKey: [`/api/goals/${keyResult.objectiveId}`] });
-        }
+      // Also invalidate specific objective queries using objectiveId
+      if (objectiveId) {
+        queryClient.invalidateQueries({ queryKey: [`/api/initiatives/objective/${objectiveId}`] });
+        queryClient.invalidateQueries({ queryKey: [`/api/objectives/${objectiveId}`] });
       }
       
       // Force a small delay to ensure queries are fully invalidated
