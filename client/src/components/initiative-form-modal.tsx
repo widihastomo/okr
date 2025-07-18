@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CalendarIcon, Target, HelpCircle } from "lucide-react";
+import { CalendarIcon, Target, HelpCircle, Plus, Trash2, BarChart3 } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
@@ -50,6 +50,13 @@ const initiativeFormSchema = z.object({
   impactScore: z.number().min(1).max(5).default(3),
   effortScore: z.number().min(1).max(5).default(3),
   confidenceScore: z.number().min(1).max(5).default(3),
+  // Success metrics
+  successMetrics: z.array(z.object({
+    name: z.string().min(1, "Nama metrik wajib diisi"),
+    targetValue: z.string().min(1, "Target nilai wajib diisi"),
+    unit: z.string().optional(),
+    description: z.string().optional(),
+  })).default([]),
 }).refine((data) => {
   // Validate that start date is not greater than end date
   return data.startDate <= data.dueDate;
@@ -185,6 +192,7 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
       impactScore: 5,
       effortScore: 5,
       confidenceScore: 5,
+      successMetrics: [],
     },
   });
 
@@ -203,6 +211,7 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
         impactScore: (initiative as any)?.impactScore || 5,
         effortScore: (initiative as any)?.effortScore || 5,
         confidenceScore: (initiative as any)?.confidenceScore || 5,
+        successMetrics: (initiative as any)?.successMetrics || [],
       });
     } else if (!isEditMode) {
       // Reset form for new initiative
@@ -218,6 +227,7 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
         impactScore: 5,
         effortScore: 5,
         confidenceScore: 5,
+        successMetrics: [],
       });
     }
   }, [isEditMode, initiative, keyResultId, currentUserId, form]);
@@ -618,6 +628,127 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
                           onChange={(e) => handleNumberInputChange(e.target.value, field.onChange)}
                         />
                       </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </CardContent>
+            </Card>
+
+            {/* Success Metrics Card */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BarChart3 className="w-5 h-5 text-blue-600" />
+                  Metrik Keberhasilan
+                </CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Definisikan indikator keberhasilan yang dapat diukur untuk inisiatif ini
+                </p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="successMetrics"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="space-y-4">
+                        {field.value.map((metric, index) => (
+                          <div key={index} className="border rounded-lg p-4 space-y-4">
+                            <div className="flex items-center justify-between">
+                              <h4 className="font-medium">Metrik {index + 1}</h4>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  const newMetrics = [...field.value];
+                                  newMetrics.splice(index, 1);
+                                  field.onChange(newMetrics);
+                                }}
+                                className="text-red-600 hover:text-red-700"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div>
+                                <label className="text-sm font-medium mb-1 block">
+                                  Nama Metrik*
+                                </label>
+                                <Input
+                                  value={metric.name}
+                                  onChange={(e) => {
+                                    const newMetrics = [...field.value];
+                                    newMetrics[index] = { ...metric, name: e.target.value };
+                                    field.onChange(newMetrics);
+                                  }}
+                                  placeholder="Contoh: Jumlah Lead Baru"
+                                />
+                              </div>
+                              
+                              <div>
+                                <label className="text-sm font-medium mb-1 block">
+                                  Target Nilai*
+                                </label>
+                                <Input
+                                  value={metric.targetValue}
+                                  onChange={(e) => {
+                                    const newMetrics = [...field.value];
+                                    newMetrics[index] = { ...metric, targetValue: e.target.value };
+                                    field.onChange(newMetrics);
+                                  }}
+                                  placeholder="Contoh: 50"
+                                />
+                              </div>
+                              
+                              <div>
+                                <label className="text-sm font-medium mb-1 block">
+                                  Unit
+                                </label>
+                                <Input
+                                  value={metric.unit || ""}
+                                  onChange={(e) => {
+                                    const newMetrics = [...field.value];
+                                    newMetrics[index] = { ...metric, unit: e.target.value };
+                                    field.onChange(newMetrics);
+                                  }}
+                                  placeholder="Contoh: orang, %, Rp"
+                                />
+                              </div>
+                              
+                              <div>
+                                <label className="text-sm font-medium mb-1 block">
+                                  Deskripsi
+                                </label>
+                                <Input
+                                  value={metric.description || ""}
+                                  onChange={(e) => {
+                                    const newMetrics = [...field.value];
+                                    newMetrics[index] = { ...metric, description: e.target.value };
+                                    field.onChange(newMetrics);
+                                  }}
+                                  placeholder="Penjelasan singkat tentang metrik ini"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                        
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => {
+                            const newMetrics = [...field.value, { name: "", targetValue: "", unit: "", description: "" }];
+                            field.onChange(newMetrics);
+                          }}
+                          className="w-full"
+                        >
+                          <Plus className="w-4 h-4 mr-2" />
+                          Tambah Metrik Keberhasilan
+                        </Button>
+                      </div>
                       <FormMessage />
                     </FormItem>
                   )}
