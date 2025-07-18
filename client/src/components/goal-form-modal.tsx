@@ -1338,10 +1338,6 @@ export function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult,
         } else {
           keyResultForm.setValue("currentValue", "0");
         }
-      } else if (currentKeyResultType === "decrease_to") {
-        // Always sync currentValue with baseValue for decrease_to when baseValue changes
-        const baseValue = keyResultForm.getValues("baseValue") || "0";
-        keyResultForm.setValue("currentValue", baseValue);
       }
     }
   }, [currentKeyResultType, keyResultForm, isEditing]);
@@ -1353,12 +1349,7 @@ export function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult,
     }
   }, [currentTargetValue, currentKeyResultType, keyResultForm]);
 
-  // Watch for baseValue changes to update currentValue for decrease_to
-  useEffect(() => {
-    if (currentKeyResultType === "decrease_to" && currentBaseValue) {
-      keyResultForm.setValue("currentValue", currentBaseValue);
-    }
-  }, [currentBaseValue, currentKeyResultType, keyResultForm]);
+
 
   const handleSubmit = (data: KeyResultFormData) => {
     // Convert formatted values to numeric before submitting
