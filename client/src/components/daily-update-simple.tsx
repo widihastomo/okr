@@ -49,7 +49,7 @@ export function DailyUpdateSimple() {
   const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   
-  const [updateData, setUpdateData] = useState<SimpleUpdateData>({
+  const initialUpdateData: SimpleUpdateData = {
     keyResults: [],
     successMetrics: [],
     tasks: [],
@@ -59,7 +59,9 @@ export function DailyUpdateSimple() {
     },
     tasksCompleted: 0,
     totalTasks: 0
-  });
+  };
+  
+  const [updateData, setUpdateData] = useState<SimpleUpdateData>(initialUpdateData);
 
   // Fetch data
   const { data: allKeyResults = [] } = useQuery({
@@ -235,10 +237,47 @@ export function DailyUpdateSimple() {
     submitMutation.mutate(updateData);
   };
 
+  const handleOpenDialog = () => {
+    // Reset form data and populate with current values when opening dialog
+    const initialData: SimpleUpdateData = {
+      keyResults: keyResults.map((kr: any) => ({
+        id: kr.id,
+        title: kr.title,
+        currentValue: kr.currentValue,
+        targetValue: kr.targetValue,
+        unit: kr.unit,
+        newValue: kr.currentValue, // Start with current value
+        notes: ''
+      })),
+      successMetrics: successMetrics.map((sm: any) => ({
+        id: sm.id,
+        name: sm.name,
+        target: sm.target,
+        achievement: sm.achievement,
+        initiativeTitle: sm.initiativeTitle,
+        newValue: sm.achievement || '', // Start with current achievement
+        notes: ''
+      })),
+      tasks: [], // Will be populated when status is changed
+      reflection: {
+        whatWorkedWell: '',
+        challenges: ''
+      },
+      tasksCompleted: 0,
+      totalTasks: relevantTasks.length
+    };
+    
+    setUpdateData(initialData);
+    setIsOpen(true);
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-orange-600 hover:bg-orange-700 text-white w-full sm:w-auto">
+        <Button 
+          className="bg-orange-600 hover:bg-orange-700 text-white w-full sm:w-auto"
+          onClick={handleOpenDialog}
+        >
           <Zap className="mr-2 h-4 w-4" />
           Update Harian Instan
         </Button>
