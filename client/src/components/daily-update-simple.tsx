@@ -296,7 +296,29 @@ export function DailyUpdateSimple() {
                           </div>
                           <div className="w-36 flex items-center gap-2">
                             <Select
-                              value={updateData.tasks.find(t => t.id === task.id)?.newStatus || task.status}
+                              value={(() => {
+                                const existingTask = updateData.tasks.find(t => t.id === task.id);
+                                const currentStatus = existingTask?.newStatus || task.status;
+                                
+                                // Ensure we have a valid status that matches our SelectItem values
+                                if (['belum_mulai', 'sedang_berjalan', 'selesai', 'dibatalkan'].includes(currentStatus)) {
+                                  return currentStatus;
+                                }
+                                
+                                // Map any other status values to expected ones
+                                switch (currentStatus) {
+                                  case 'belum_dimulai':
+                                    return 'belum_mulai';
+                                  case 'sedang_dikerjakan':
+                                    return 'sedang_berjalan';
+                                  case 'completed':
+                                    return 'selesai';
+                                  case 'cancelled':
+                                    return 'dibatalkan';
+                                  default:
+                                    return 'belum_mulai'; // Default fallback
+                                }
+                              })()}
                               onValueChange={(status) => {
                                 const newTasks = [...updateData.tasks];
                                 const taskIndex = newTasks.findIndex(t => t.id === task.id);
