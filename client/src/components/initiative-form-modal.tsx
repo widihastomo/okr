@@ -53,9 +53,8 @@ const initiativeFormSchema = z.object({
   // Success metrics
   successMetrics: z.array(z.object({
     name: z.string().min(1, "Nama metrik wajib diisi"),
-    targetValue: z.string().min(1, "Target nilai wajib diisi"),
-    unit: z.string().optional(),
-    description: z.string().optional(),
+    target: z.string().min(1, "Target wajib diisi"),
+    achievement: z.string().optional(),
   })).default([]),
 }).refine((data) => {
   // Validate that start date is not greater than end date
@@ -672,7 +671,7 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
                               </Button>
                             </div>
                             
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-4">
                               <div>
                                 <label className="text-sm font-medium mb-1 block">
                                   Nama Metrik*
@@ -684,52 +683,37 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
                                     newMetrics[index] = { ...metric, name: e.target.value };
                                     field.onChange(newMetrics);
                                   }}
-                                  placeholder="Contoh: Jumlah Lead Baru"
+                                  placeholder="Contoh: Tingkat Kepuasan Pelanggan"
                                 />
                               </div>
                               
                               <div>
                                 <label className="text-sm font-medium mb-1 block">
-                                  Target Nilai*
+                                  Target*
                                 </label>
                                 <Input
-                                  value={metric.targetValue}
+                                  value={metric.target}
                                   onChange={(e) => {
                                     const newMetrics = [...field.value];
-                                    newMetrics[index] = { ...metric, targetValue: e.target.value };
+                                    newMetrics[index] = { ...metric, target: e.target.value };
                                     field.onChange(newMetrics);
                                   }}
-                                  placeholder="Contoh: 50"
+                                  placeholder="Contoh: 90% atau 1000 pengguna"
                                 />
                               </div>
                               
                               <div>
                                 <label className="text-sm font-medium mb-1 block">
-                                  Unit
+                                  Capaian Saat Ini
                                 </label>
                                 <Input
-                                  value={metric.unit || ""}
+                                  value={metric.achievement || ""}
                                   onChange={(e) => {
                                     const newMetrics = [...field.value];
-                                    newMetrics[index] = { ...metric, unit: e.target.value };
+                                    newMetrics[index] = { ...metric, achievement: e.target.value };
                                     field.onChange(newMetrics);
                                   }}
-                                  placeholder="Contoh: orang, %, Rp"
-                                />
-                              </div>
-                              
-                              <div>
-                                <label className="text-sm font-medium mb-1 block">
-                                  Deskripsi
-                                </label>
-                                <Input
-                                  value={metric.description || ""}
-                                  onChange={(e) => {
-                                    const newMetrics = [...field.value];
-                                    newMetrics[index] = { ...metric, description: e.target.value };
-                                    field.onChange(newMetrics);
-                                  }}
-                                  placeholder="Penjelasan singkat tentang metrik ini"
+                                  placeholder="Contoh: 75% atau 750 pengguna"
                                 />
                               </div>
                             </div>
@@ -740,7 +724,7 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
                           type="button"
                           variant="outline"
                           onClick={() => {
-                            const newMetrics = [...field.value, { name: "", targetValue: "", unit: "", description: "" }];
+                            const newMetrics = [...field.value, { name: "", target: "", achievement: "" }];
                             field.onChange(newMetrics);
                           }}
                           className="w-full"
