@@ -62,7 +62,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Serve static files
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '..', 'public')));
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -102,11 +102,11 @@ app.use('/api/*', (req, res) => {
 
 // Serve frontend for all other routes
 app.get('*', (req, res) => {
-  const htmlPath = path.join(__dirname, 'public', 'index.html');
+  const htmlPath = path.join(__dirname, '..', 'public', 'index.html');
   if (fs.existsSync(htmlPath)) {
     res.sendFile(htmlPath);
   } else {
-    res.status(404).send('Frontend not found');
+    res.status(404).send('Frontend not found - Path: ' + htmlPath);
   }
 });
 
