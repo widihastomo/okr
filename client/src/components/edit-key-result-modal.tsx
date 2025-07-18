@@ -382,8 +382,9 @@ export default function EditKeyResultModal({
                     )}
                   />
 
-                  {/* Tipe Angka Target dan Nilai */}
+                  {/* Tipe Angka Target dan Unit */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Tipe Angka Target */}
                     <FormField
                       control={form.control}
                       name="keyResultType"
@@ -555,7 +556,7 @@ export default function EditKeyResultModal({
                     )}
                   </div>
 
-                  {/* Conditional Value Fields */}
+                  {/* Nilai-nilai Pengukuran */}
                   {(() => {
                     const keyResultType = form.watch("keyResultType");
                     
@@ -565,8 +566,93 @@ export default function EditKeyResultModal({
                     
                     if (keyResultType === "should_stay_above" || keyResultType === "should_stay_below") {
                       return (
-                        <div className="grid grid-cols-1 gap-4">
-                          {/* Target Value Only */}
+                        <div className="space-y-4">
+                          <div className="flex items-center gap-2 mb-3">
+                            <Target className="w-4 h-4 text-orange-500" />
+                            <span className="text-sm font-medium text-gray-700">Nilai Threshold</span>
+                          </div>
+                          <div className="grid grid-cols-1 gap-4">
+                            <FormField
+                              control={form.control}
+                              name="targetValue"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="flex items-center gap-2 mb-2">
+                                    Target
+                                    <Popover>
+                                      <PopoverTrigger asChild>
+                                        <button type="button" className="inline-flex">
+                                          <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                                        </button>
+                                      </PopoverTrigger>
+                                      <PopoverContent className="w-80" side="right" align="start" sideOffset={10}>
+                                        <div className="text-sm">
+                                          <p className="font-medium mb-2">Target (Threshold)</p>
+                                          <p>Nilai ambang batas yang harus dipertahankan. Untuk "tetap di atas", nilai harus selalu ≥ target. Untuk "tetap di bawah", nilai harus selalu ≤ target.</p>
+                                        </div>
+                                      </PopoverContent>
+                                    </Popover>
+                                  </FormLabel>
+                                  <FormControl>
+                                    <Input 
+                                      placeholder="100"
+                                      required
+                                      value={formatNumberInput(field.value || '')}
+                                      onChange={(e) => field.onChange(parseNumberInput(e.target.value) || '')}
+                                      step="0.1"
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+                        </div>
+                      );
+                    }
+                    
+                    // For increase_to and decrease_to types
+                    return (
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Target className="w-4 h-4 text-orange-500" />
+                          <span className="text-sm font-medium text-gray-700">Nilai Pengukuran</span>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <FormField
+                            control={form.control}
+                            name="baseValue"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="flex items-center gap-2 mb-2">
+                                  Nilai Awal
+                                  <Popover>
+                                    <PopoverTrigger asChild>
+                                      <button type="button" className="inline-flex">
+                                        <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                                      </button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-80" side="right" align="start" sideOffset={10}>
+                                      <div className="text-sm">
+                                        <p className="font-medium mb-2">Nilai Awal (Baseline)</p>
+                                        <p>Titik awal pengukuran sebelum periode dimulai. Contoh: jika target meningkatkan penjualan dari 50 juta ke 100 juta, maka 50 juta adalah nilai awal.</p>
+                                      </div>
+                                    </PopoverContent>
+                                  </Popover>
+                                </FormLabel>
+                                <FormControl>
+                                  <Input 
+                                    placeholder="0"
+                                    value={field.value ? formatNumberInput(field.value) : ''}
+                                    onChange={(e) => field.onChange(parseNumberInput(e.target.value) || '')}
+                                    step="0.1"
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
                           <FormField
                             control={form.control}
                             name="targetValue"
@@ -582,8 +668,8 @@ export default function EditKeyResultModal({
                                     </PopoverTrigger>
                                     <PopoverContent className="w-80" side="right" align="start" sideOffset={10}>
                                       <div className="text-sm">
-                                        <p className="font-medium mb-2">Target (Threshold)</p>
-                                        <p>Nilai ambang batas yang harus dipertahankan. Untuk "tetap di atas", nilai harus selalu ≥ target. Untuk "tetap di bawah", nilai harus selalu ≤ target.</p>
+                                        <p className="font-medium mb-2">Target</p>
+                                        <p>Nilai yang ingin dicapai di akhir periode. Harus ambisius namun realistis. Contoh: meningkatkan penjualan ke 100 juta, menurunkan biaya ke 30 juta, atau mencapai 95% kepuasan pelanggan.</p>
                                       </div>
                                     </PopoverContent>
                                   </Popover>
@@ -592,7 +678,42 @@ export default function EditKeyResultModal({
                                   <Input 
                                     placeholder="100"
                                     required
-                                    value={formatNumberInput(field.value || '')}
+                                    value={formatNumberInput(field.value)}
+                                    onChange={(e) => field.onChange(parseNumberInput(e.target.value) || '')}
+                                    step="0.1"
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={form.control}
+                            name="currentValue"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="flex items-center gap-2 mb-2">
+                                  Nilai Saat Ini
+                                  <Popover>
+                                    <PopoverTrigger asChild>
+                                      <button type="button" className="inline-flex">
+                                        <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                                      </button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-80" side="right" align="start" sideOffset={10}>
+                                      <div className="text-sm">
+                                        <p className="font-medium mb-2">Nilai Saat Ini</p>
+                                        <p>Nilai terkini dari pengukuran ini. Akan terus diperbarui melalui check-in berkala untuk melacak kemajuan menuju target.</p>
+                                      </div>
+                                    </PopoverContent>
+                                  </Popover>
+                                </FormLabel>
+                                <FormControl>
+                                  <Input 
+                                    placeholder="50"
+                                    required
+                                    value={formatNumberInput(field.value)}
                                     onChange={(e) => field.onChange(parseNumberInput(e.target.value) || '')}
                                     step="0.1"
                                   />
@@ -602,118 +723,9 @@ export default function EditKeyResultModal({
                             )}
                           />
                         </div>
-                      );
-                    }
-                    
-                    // For increase_to and decrease_to types
-                    return (
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <FormField
-                          control={form.control}
-                          name="baseValue"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="flex items-center gap-2 mb-2">
-                                Nilai Awal
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <button type="button" className="inline-flex">
-                                <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                              </button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-80" side="right" align="start" sideOffset={10}>
-                              <div className="text-sm">
-                                <p className="font-medium mb-2">Nilai Awal (Baseline)</p>
-                                <p>Titik awal pengukuran sebelum periode dimulai. Contoh: jika target meningkatkan penjualan dari 50 juta ke 100 juta, maka 50 juta adalah nilai awal.</p>
-                              </div>
-                            </PopoverContent>
-                          </Popover>
-                        </FormLabel>
-                        <FormControl>
-                          <Input 
-                            placeholder="0"
-                            value={field.value ? formatNumberInput(field.value) : ''}
-                            onChange={(e) => field.onChange(parseNumberInput(e.target.value) || '')}
-                            step="0.1"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="targetValue"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="flex items-center gap-2 mb-2">
-                          Target
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <button type="button" className="inline-flex">
-                                <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                              </button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-80" side="right" align="start" sideOffset={10}>
-                              <div className="text-sm">
-                                <p className="font-medium mb-2">Target</p>
-                                <p>Nilai yang ingin dicapai di akhir periode. Harus ambisius namun realistis. Contoh: meningkatkan penjualan ke 100 juta, menurunkan biaya ke 30 juta, atau mencapai 95% kepuasan pelanggan.</p>
-                              </div>
-                            </PopoverContent>
-                          </Popover>
-                        </FormLabel>
-                        <FormControl>
-                          <Input 
-                            placeholder="100"
-                            required
-                            value={formatNumberInput(field.value)}
-                            onChange={(e) => field.onChange(parseNumberInput(e.target.value) || '')}
-                            step="0.1"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="currentValue"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="flex items-center gap-2 mb-2">
-                          Nilai Saat Ini
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <button type="button" className="inline-flex">
-                                <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                              </button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-80" side="right" align="start" sideOffset={10}>
-                              <div className="text-sm">
-                                <p className="font-medium mb-2">Nilai Saat Ini</p>
-                                <p>Nilai terkini dari pengukuran ini. Akan terus diperbarui melalui check-in berkala untuk melacak kemajuan menuju target.</p>
-                              </div>
-                            </PopoverContent>
-                          </Popover>
-                        </FormLabel>
-                        <FormControl>
-                          <Input 
-                            placeholder="50"
-                            required
-                            value={formatNumberInput(field.value)}
-                            onChange={(e) => field.onChange(parseNumberInput(e.target.value) || '')}
-                            step="0.1"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              );
-            })()}
+                      </div>
+                    );
+                  })()}
 
             
 
