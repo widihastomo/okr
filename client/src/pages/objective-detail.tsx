@@ -3064,6 +3064,13 @@ export default function GoalDetail() {
         onOpenChange={(open) => setEditKeyResultModal({ open })}
         keyResult={editKeyResultModal.keyResult}
         objectiveId={id}
+        onSuccess={() => {
+          // Invalidate cache to refresh the data
+          queryClient.invalidateQueries({ queryKey: ['/api/objectives', id] });
+          queryClient.invalidateQueries({ queryKey: ['/api/objectives'] });
+          queryClient.invalidateQueries({ queryKey: ['/api/okrs'] });
+          console.log("Cache invalidated after key result edit");
+        }}
       />
       {/* Add Key Result Modal */}
       <KeyResultModal
