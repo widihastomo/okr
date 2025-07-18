@@ -240,7 +240,17 @@ interface MissionCardProps {
 function MissionCard({ missions, className }: MissionCardProps) {
   const completedMissions = missions.filter(m => m.isCompleted).length;
   const totalMissions = missions.length;
-  const [isExpanded, setIsExpanded] = useState(false);
+  
+  // Auto-expand when missions are not completed
+  const shouldAutoExpand = completedMissions < totalMissions;
+  const [isExpanded, setIsExpanded] = useState(shouldAutoExpand);
+  
+  // Update expansion state when mission completion status changes
+  useEffect(() => {
+    if (shouldAutoExpand && !isExpanded) {
+      setIsExpanded(true);
+    }
+  }, [shouldAutoExpand, isExpanded]);
   
   return (
     <div className={className}>
