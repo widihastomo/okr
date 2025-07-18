@@ -1339,7 +1339,7 @@ export function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult,
           keyResultForm.setValue("currentValue", "0");
         }
       } else if (currentKeyResultType === "decrease_to") {
-        // Sync currentValue with baseValue for decrease_to when baseValue changes
+        // Always sync currentValue with baseValue for decrease_to when baseValue changes
         const baseValue = keyResultForm.getValues("baseValue") || "0";
         keyResultForm.setValue("currentValue", baseValue);
       }
@@ -1362,11 +1362,20 @@ export function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult,
 
   const handleSubmit = (data: KeyResultFormData) => {
     // Convert formatted values to numeric before submitting
+    let processedCurrentValue = data.currentValue ? getNumberValueForSubmission(data.currentValue) : "";
+    
+    // For decrease_to type, if currentValue is empty or "0", use baseValue as default
+    if (data.keyResultType === "decrease_to") {
+      if (!processedCurrentValue || processedCurrentValue === "0") {
+        processedCurrentValue = data.baseValue ? getNumberValueForSubmission(data.baseValue) : "0";
+      }
+    }
+    
     const processedData = {
       ...data,
       baseValue: data.baseValue ? getNumberValueForSubmission(data.baseValue) : "",
       targetValue: data.targetValue ? getNumberValueForSubmission(data.targetValue) : "",
-      currentValue: data.currentValue ? getNumberValueForSubmission(data.currentValue) : "",
+      currentValue: processedCurrentValue,
     };
     
     onSubmit(processedData);
