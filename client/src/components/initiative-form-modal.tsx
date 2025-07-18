@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CalendarIcon, Target, HelpCircle } from "lucide-react";
+import { CalendarIcon, Target, HelpCircle, Plus, Trash2, BarChart3, Edit } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
@@ -30,6 +30,7 @@ import { formatNumberWithSeparator, handleNumberInputChange, getNumberValueForSu
 import { useAuth } from "@/hooks/useAuth";
 import type { KeyResult, User, Initiative } from "@shared/schema";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { SuccessMetricsForm } from "./success-metrics-form";
 
 // Form schema matching the actual Initiative database schema
 const initiativeFormSchema = z.object({
@@ -76,9 +77,42 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
   const { user } = useAuth();
   
   const isEditMode = !!initiative;
+  const [successMetricsModalOpen, setSuccessMetricsModalOpen] = useState(false);
+  const [editingMetricIndex, setEditingMetricIndex] = useState<number | null>(null);
+  const [successMetrics, setSuccessMetrics] = useState<Array<{name: string, target: string}>>([]);
   
   // Get current user ID for default assignment
   const currentUserId = user && typeof user === 'object' && 'id' in user ? (user as any).id : null;
+
+  // Success metrics handlers
+  const addMetric = () => {
+    setEditingMetricIndex(null);
+    setSuccessMetricsModalOpen(true);
+  };
+
+  const editMetric = (index: number) => {
+    setEditingMetricIndex(index);
+    setSuccessMetricsModalOpen(true);
+  };
+
+  const removeMetric = (index: number) => {
+    const newMetrics = successMetrics.filter((_, i) => i !== index);
+    setSuccessMetrics(newMetrics);
+  };
+
+  const handleMetricSave = (metricData: {name: string, target: string}) => {
+    if (editingMetricIndex !== null) {
+      // Edit existing metric
+      const newMetrics = [...successMetrics];
+      newMetrics[editingMetricIndex] = metricData;
+      setSuccessMetrics(newMetrics);
+    } else {
+      // Add new metric
+      setSuccessMetrics([...successMetrics, metricData]);
+    }
+    setSuccessMetricsModalOpen(false);
+    setEditingMetricIndex(null);
+  };
 
   // Helper function to get score labels
   const getScoreLabel = (score: number, type: 'impact' | 'effort' | 'confidence'): string => {
@@ -205,6 +239,8 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
         effortScore: (initiative as any)?.effortScore || 5,
         confidenceScore: (initiative as any)?.confidenceScore || 5,
       });
+      // Set successMetrics state from initiative data
+      setSuccessMetrics((initiative as any)?.successMetrics || []);
     } else if (!isEditMode) {
       // Reset form for new initiative
       form.reset({
@@ -220,6 +256,8 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
         effortScore: 5,
         confidenceScore: 5,
       });
+      // Reset successMetrics state
+      setSuccessMetrics([]);
     }
   }, [isEditMode, initiative, keyResultId, currentUserId, form]);
 
@@ -238,6 +276,7 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
         dueDate: data.dueDate ? new Date(data.dueDate) : null,
         priority: calculatedPriority, // Use calculated priority instead of manual selection
         priorityScore: priorityScore.toString(), // Store the calculated score as string
+        successMetrics: successMetrics, // Use successMetrics state instead of form value
       };
 
       if (isEditMode) {
@@ -326,6 +365,7 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
   };
 
   return (
+    <>
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
@@ -629,6 +669,134 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
               </CardContent>
             </Card>
 
+            {/* Success Metrics Card */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BarChart3 className="w-5 h-5 text-blue-600" />
+                  Metrik Keberhasilan
+                </CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Definisikan indikator keberhasilan yang dapat diukur untuk inisiatif ini
+                </p>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {successMetrics.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">
+                    <Target className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                    <p>Belum ada Metrik Keberhasilan</p>
+                    <p className="text-sm">Klik tombol di bawah untuk menambahkan</p>
+                  </div>
+                ) : (
+                  <div>
+                    {/* Desktop Table View */}
+                    <div className="hidden md:block border rounded-lg">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Nama Metrik</TableHead>
+                            <TableHead>Target</TableHead>
+                            <TableHead className="text-center">Aksi</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {successMetrics.map((metric, index) => (
+                            <TableRow key={index}>
+                              <TableCell>
+                                <div className="flex items-center gap-2">
+                                  <Target className="w-4 h-4 text-green-600" />
+                                  <span className="font-medium">{metric.name || `Metrik ${index + 1}`}</span>
+                                </div>
+                              </TableCell>
+                              <TableCell>{metric.target || '-'}</TableCell>
+                              <TableCell className="text-center">
+                                <div className="flex justify-center gap-1">
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => editMetric(index)}
+                                    className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                                  >
+                                    <Edit className="w-4 h-4" />
+                                  </Button>
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => removeMetric(index)}
+                                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </Button>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+
+                    {/* Mobile Card View */}
+                    <div className="md:hidden space-y-4">
+                      {successMetrics.map((metric, index) => (
+                        <div key={index} className="border rounded-lg p-3 bg-gradient-to-r from-green-50 to-white shadow-sm">
+                          <div className="flex items-start justify-between mb-3">
+                            <div className="flex items-start gap-2 flex-1">
+                              <div className="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
+                                <Target className="w-3 h-3 text-green-600" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <h4 className="font-semibold text-sm text-gray-900 leading-tight mb-0.5">
+                                  {metric.name || `Metrik ${index + 1}`}
+                                </h4>
+                              </div>
+                            </div>
+                            <div className="flex gap-1 flex-shrink-0 ml-1">
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => editMetric(index)}
+                                className="text-blue-600 hover:text-blue-700 hover:bg-blue-100 h-6 w-6 p-0"
+                              >
+                                <Edit className="w-3 h-3" />
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => removeMetric(index)}
+                                className="text-red-600 hover:text-red-700 hover:bg-red-100 h-6 w-6 p-0"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </Button>
+                            </div>
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <div className="flex justify-between items-center p-1.5 bg-white rounded-md">
+                              <span className="text-xs font-medium text-gray-600">Target:</span>
+                              <span className="text-xs font-semibold text-gray-900">{metric.target || '-'}</span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {/* Tombol Tambah Metrik */}
+                <div className="pt-4 border-t">
+                  <Button type="button" onClick={addMetric} variant="outline" className="w-full border-green-600 text-green-600 hover:bg-green-50">
+                    <Plus className="w-4 h-4 mr-2" />
+                    <span className="hidden sm:inline">Tambah Metrik Keberhasilan</span>
+                    <span className="sm:hidden">Tambah Metrik</span>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Priority Calculation Card */}
             <Card>
               <CardHeader>
@@ -835,5 +1003,32 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
         </Form>
       </DialogContent>
     </Dialog>
+    
+    {/* Success Metrics Modal */}
+    <Dialog open={successMetricsModalOpen} onOpenChange={setSuccessMetricsModalOpen}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>
+            {editingMetricIndex !== null ? 'Edit Metrik Keberhasilan' : 'Tambah Metrik Keberhasilan'}
+          </DialogTitle>
+          <DialogDescription>
+            {editingMetricIndex !== null 
+              ? 'Perbarui metrik keberhasilan untuk inisiatif ini' 
+              : 'Tambahkan metrik keberhasilan untuk mengukur pencapaian inisiatif'
+            }
+          </DialogDescription>
+        </DialogHeader>
+        
+        <SuccessMetricsForm 
+          metric={editingMetricIndex !== null ? successMetrics[editingMetricIndex] : undefined}
+          onSave={handleMetricSave}
+          onCancel={() => {
+            setSuccessMetricsModalOpen(false);
+            setEditingMetricIndex(null);
+          }}
+        />
+      </DialogContent>
+    </Dialog>
+  </>
   );
 }
