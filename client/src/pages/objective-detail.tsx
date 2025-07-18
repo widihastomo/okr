@@ -3096,7 +3096,7 @@ export default function GoalDetail() {
           // Switch to initiatives tab after successful creation/update
           setActiveTab("initiatives");
         }}
-        keyResultId={goal?.keyResults?.[0]?.id || ""}
+        keyResultId=""
         objectiveId={id}
         initiative={editingInitiative ?? undefined}
       />
