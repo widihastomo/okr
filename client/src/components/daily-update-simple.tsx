@@ -314,18 +314,7 @@ export function DailyUpdateSimple() {
                               }}
                             >
                               <SelectTrigger className="h-8 text-xs">
-                                <SelectValue placeholder="Pilih status">
-                                  {(() => {
-                                    const currentStatus = updateData.tasks.find(t => t.id === task.id)?.newStatus || task.status;
-                                    switch (currentStatus) {
-                                      case 'belum_mulai': return 'Belum Mulai';
-                                      case 'sedang_berjalan': return 'Sedang Berjalan';
-                                      case 'selesai': return 'Selesai';
-                                      case 'dibatalkan': return 'Dibatalkan';
-                                      default: return 'Pilih status';
-                                    }
-                                  })()}
-                                </SelectValue>
+                                <SelectValue placeholder="Pilih status" />
                               </SelectTrigger>
                               <SelectContent>
                                 <SelectItem value="belum_mulai">Belum Mulai</SelectItem>
