@@ -245,16 +245,34 @@ export default function Dashboard() {
 
     // Only auto-select if no URL parameter exists and filter is empty
     if (
-      defaultCycle &&
       cycleFilter.length === 0 &&
       cycles.length > 0 &&
       !hasAutoSelected &&
-      !cycleParam
+      !cycleParam &&
+      allGoals.length > 0
     ) {
-      setCycleFilter([defaultCycle.id]);
-      setHasAutoSelected(true);
+      // Check if there are goals with cycles, prioritize those cycles
+      const goalsWithCycles = allGoals.filter(goal => goal.cycleId);
+      
+      if (goalsWithCycles.length > 0) {
+        // Find the cycle used by the first goal
+        const goalCycle = cycles.find(c => c.id === goalsWithCycles[0].cycleId);
+        if (goalCycle) {
+          console.log('Goals Page - Using cycle from existing goal:', goalCycle.name, goalCycle.id);
+          setCycleFilter([goalCycle.id]);
+          setHasAutoSelected(true);
+          return;
+        }
+      }
+      
+      // Fallback to closest cycle if no goals have cycles
+      if (defaultCycle) {
+        console.log('Goals Page - Using default closest cycle:', defaultCycle.name, defaultCycle.id);
+        setCycleFilter([defaultCycle.id]);
+        setHasAutoSelected(true);
+      }
     }
-  }, [defaultCycle?.id, hasAutoSelected]); // Only auto-select once
+  }, [defaultCycle?.id, hasAutoSelected, allGoals.length, cycles.length]); // Include allGoals in dependency
 
   // Set default user filter to current user on first load only if no URL param exists
   useEffect(() => {
@@ -281,16 +299,7 @@ export default function Dashboard() {
     queryKey: ["/api/okrs"],
   });
 
-  // Debug logging to verify data consistency
-  React.useEffect(() => {
-    if (allGoals.length > 0) {
-      console.log('Goals Page - All goals loaded:', allGoals.length);
-      console.log('Goals Page - First goal:', allGoals[0]);
-      console.log('Goals Page - Current cycle filter:', cycleFilter);
-      console.log('Goals Page - Available cycles:', cycles.map(c => ({id: c.id, name: c.name, startDate: c.startDate, endDate: c.endDate})));
-      console.log('Goals Page - Default cycle selected:', defaultCycle);
-    }
-  }, [allGoals, cycleFilter, cycles, defaultCycle]);
+
 
   // Helper function to check if a cycle is related to selected cycles
   const isRelatedCycle = (
@@ -343,18 +352,7 @@ export default function Dashboard() {
     // Cycle filter with related cycle logic
     const cycleMatch = isRelatedCycle(goal.cycleId, cycleFilter);
 
-    // Debug logging for specific goal
-    if (goal.id === '6aabdcfe-cd60-43e4-96b1-ad93669649d3') {
-      console.log('Goals Page - Debug goal 6aabdcfe:', {
-        goalId: goal.id,
-        cycleId: goal.cycleId,
-        statusMatch,
-        cycleMatch,
-        currentCycleFilter: cycleFilter,
-        goalStatus: goal.status,
-        statusFilter: statusFilter
-      });
-    }
+
 
     // User filter - show Goals where:
     // 1. If userFilter is 'all' or empty, show all Goals
