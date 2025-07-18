@@ -2672,7 +2672,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Organization ID is required" });
       }
 
-      if (!req.session.user?.id) {
+      const user = req.user as User;
+      if (!user?.id) {
         return res.status(401).json({ message: "User not authenticated" });
       }
 
@@ -2681,7 +2682,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         value: req.body.value,
         notes: req.body.notes || null,
         confidence: req.body.confidence || 5,
-        createdBy: req.session.user.id,
+        createdBy: user.id,
         organizationId: req.body.organizationId
       };
       
