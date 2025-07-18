@@ -606,7 +606,7 @@ export default function GoalDetail() {
         variant: "default",
         className: "border-green-200 bg-green-50 text-green-800",
       });
-      queryClient.invalidateQueries({ queryKey: [`/api/okrs/${id}`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/objectives/${id}`] });
       setAddKeyResultModal({ open: false });
       
       // Switch to key-results tab after successful creation
@@ -652,7 +652,7 @@ export default function GoalDetail() {
         variant: "default",
         className: "border-green-200 bg-green-50 text-green-800",
       });
-      queryClient.invalidateQueries({ queryKey: [`/api/okrs/${id}`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/objectives/${id}`] });
       queryClient.invalidateQueries({ queryKey: ["/api/objectives"] });
     },
     onError: (error: Error) => {
@@ -683,7 +683,7 @@ export default function GoalDetail() {
       queryClient.invalidateQueries({ queryKey: ["/api/okrs"] });
       if (id) {
         queryClient.invalidateQueries({ queryKey: [`/api/initiatives/objective/${id}`] });
-        queryClient.invalidateQueries({ queryKey: [`/api/okrs/${id}`] });
+        queryClient.invalidateQueries({ queryKey: [`/api/objectives/${id}`] });
       }
       
       setDeletingInitiative(null);
