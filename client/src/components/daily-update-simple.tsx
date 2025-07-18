@@ -429,18 +429,25 @@ export function DailyUpdateSimple() {
                       {updateData.keyResults.map((kr, index) => (
                         <tr key={kr.id} className="border-b">
                           <td className="p-2 font-medium text-gray-900">{kr.title}</td>
-                          <td className="p-2 text-gray-600">{kr.currentValue} {kr.unit}</td>
+                          <td className="p-2 text-gray-600">
+                            {kr.currentValue}{kr.unit === 'percentage' ? '%' : ` ${kr.unit}`}
+                          </td>
                           <td className="p-2">
-                            <input
-                              type="number"
-                              value={kr.newValue}
-                              onChange={(e) => {
-                                const newKeyResults = [...updateData.keyResults];
-                                newKeyResults[index].newValue = Number(e.target.value);
-                                setUpdateData({ ...updateData, keyResults: newKeyResults });
-                              }}
-                              className="w-20 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                            />
+                            <div className="flex items-center">
+                              <input
+                                type="number"
+                                value={kr.newValue}
+                                onChange={(e) => {
+                                  const newKeyResults = [...updateData.keyResults];
+                                  newKeyResults[index].newValue = Number(e.target.value);
+                                  setUpdateData({ ...updateData, keyResults: newKeyResults });
+                                }}
+                                className="w-16 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                              />
+                              <span className="ml-1 text-gray-600 text-sm">
+                                {kr.unit === 'percentage' ? '%' : kr.unit}
+                              </span>
+                            </div>
                           </td>
                           <td className="p-2">
                             <input
