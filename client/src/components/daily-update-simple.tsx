@@ -245,10 +245,10 @@ export function DailyUpdateSimple() {
       keyResults: keyResults.map((kr: any) => ({
         id: kr.id,
         title: kr.title,
-        currentValue: kr.currentValue || 0,
-        targetValue: kr.targetValue || 0,
+        currentValue: parseFloat(kr.currentValue) || 0,
+        targetValue: parseFloat(kr.targetValue) || 0,
         unit: kr.unit || '',
-        newValue: String(kr.currentValue || 0), // Start with current value as string, ensure it's never undefined
+        newValue: String(parseFloat(kr.currentValue) || 0), // Start with current value as string, ensure it's never undefined
         notes: ''
       })),
       successMetrics: successMetrics.map((sm: any) => ({
@@ -433,7 +433,7 @@ export function DailyUpdateSimple() {
                         <tr key={kr.id} className="border-b">
                           <td className="p-2 font-medium text-gray-900">{kr.title}</td>
                           <td className="p-2 text-gray-600">
-                            {kr.currentValue}{kr.unit === 'percentage' ? '%' : ` ${kr.unit}`}
+                            {parseFloat(kr.currentValue) || 0}{kr.unit === 'percentage' ? '%' : ` ${kr.unit}`}
                           </td>
                           <td className="p-2">
                             <div className="flex items-center">
@@ -441,10 +441,14 @@ export function DailyUpdateSimple() {
                                 type="number"
                                 value={kr.newValue || ''}
                                 onChange={(e) => {
+                                  console.log('Input changed:', e.target.value);
                                   const newKeyResults = [...updateData.keyResults];
                                   newKeyResults[index].newValue = e.target.value;
                                   setUpdateData({ ...updateData, keyResults: newKeyResults });
+                                  console.log('Updated data:', { ...updateData, keyResults: newKeyResults });
                                 }}
+                                onFocus={() => console.log('Input focused')}
+                                onBlur={() => console.log('Input blurred')}
                                 className="w-16 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
                               />
                               <span className="ml-1 text-gray-600 text-sm">
