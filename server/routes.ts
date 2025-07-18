@@ -2215,9 +2215,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           ...krData,
           objectiveId: objective.id,
           baseValue: krData.baseValue === "" ? null : krData.baseValue,
-          // For achieve_or_not type, targetValue can be empty/null, otherwise use "0" as default
-          targetValue: krData.keyResultType === "achieve_or_not" ? (krData.targetValue || null) : (krData.targetValue === "" ? "0" : krData.targetValue),
-          currentValue: krData.keyResultType === "achieve_or_not" ? (krData.currentValue || null) : (krData.currentValue === "" ? "0" : krData.currentValue),
+          // For achieve_or_not type, targetValue should be "1" (binary achievement), otherwise use "0" as default
+          targetValue: krData.keyResultType === "achieve_or_not" ? "1" : (krData.targetValue === "" ? "0" : krData.targetValue),
+          currentValue: krData.keyResultType === "achieve_or_not" ? "0" : (krData.currentValue === "" ? "0" : krData.currentValue),
           // Handle empty assignedTo field - convert empty string to null
           assignedTo: krData.assignedTo === "" ? null : krData.assignedTo,
           createdBy: currentUser.id, // Add created_by field
@@ -2303,9 +2303,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const processedKrData = {
           ...krData,
           baseValue: krData.baseValue === "" ? null : krData.baseValue,
-          // For achieve_or_not type, numeric values can be null, otherwise use "0" as default
-          targetValue: krData.keyResultType === "achieve_or_not" ? (krData.targetValue || null) : (krData.targetValue === "" ? "0" : krData.targetValue),
-          currentValue: krData.keyResultType === "achieve_or_not" ? (krData.currentValue || null) : (krData.currentValue === "" ? "0" : krData.currentValue),
+          // For achieve_or_not type, targetValue should be "1" (binary achievement), otherwise use "0" as default
+          targetValue: krData.keyResultType === "achieve_or_not" ? "1" : (krData.targetValue === "" ? "0" : krData.targetValue),
+          currentValue: krData.keyResultType === "achieve_or_not" ? "0" : (krData.currentValue === "" ? "0" : krData.currentValue),
           // Handle empty assignedTo field - convert empty string to null
           assignedTo: krData.assignedTo === "" ? null : krData.assignedTo,
           // Add UPDATE audit trail fields for key results
@@ -2324,9 +2324,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
               ...processedKrData,
               objectiveId: id,
               title: krData.title,
-              targetValue: krData.keyResultType === "achieve_or_not" ? (krData.targetValue || null) : (krData.targetValue || "0"),
+              targetValue: krData.keyResultType === "achieve_or_not" ? "1" : (krData.targetValue || "0"),
               // Ensure numeric fields have proper defaults
-              currentValue: krData.keyResultType === "achieve_or_not" ? (krData.currentValue || null) : (krData.currentValue === "" ? "0" : krData.currentValue || "0"),
+              currentValue: krData.keyResultType === "achieve_or_not" ? "0" : (krData.currentValue === "" ? "0" : krData.currentValue || "0"),
               createdBy: currentUser.id, // Add created_by field for new key results
               organizationId: currentUser.organizationId // Add organization_id field
             });
