@@ -30,6 +30,50 @@
   outline: 2px solid rgba(249, 115, 22, 0.5) !important;
   outline-offset: 2px !important;
   transform: scale(1.05) !important;
+  position: relative !important;
+  z-index: 1000 !important;
+}
+
+/* Mobile specific pulse effect */
+@media (max-width: 768px) {
+  [data-tour="daily-focus"].tour-highlight,
+  [data-tour="goals"].tour-highlight,
+  [data-tour="tasks"].tour-highlight,
+  [data-tour="timeline"].tour-highlight,
+  [data-tour="cycles"].tour-highlight,
+  [data-tour="achievements"].tour-highlight,
+  [data-tour="analytics"].tour-highlight,
+  [data-tour="users"].tour-highlight,
+  [data-tour="settings"].tour-highlight {
+    animation: mobileTourPulse 1.5s infinite !important;
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.9), 
+                0 0 0 6px rgba(249, 115, 22, 0.5),
+                0 0 0 9px rgba(249, 115, 22, 0.2) !important;
+    background-color: rgba(249, 115, 22, 0.3) !important;
+    border: 3px solid rgba(249, 115, 22, 1) !important;
+    transform: scale(1.1) !important;
+  }
+}
+
+@keyframes mobileTourPulse {
+  0% { 
+    box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.9), 
+                0 0 0 0 rgba(249, 115, 22, 0.5),
+                0 0 0 0 rgba(249, 115, 22, 0.2);
+    transform: scale(1.1);
+  }
+  50% { 
+    box-shadow: 0 0 0 6px rgba(249, 115, 22, 0.6), 
+                0 0 0 12px rgba(249, 115, 22, 0.3),
+                0 0 0 18px rgba(249, 115, 22, 0.1);
+    transform: scale(1.15);
+  }
+  100% { 
+    box-shadow: 0 0 0 0 rgba(249, 115, 22, 0), 
+                0 0 0 0 rgba(249, 115, 22, 0),
+                0 0 0 0 rgba(249, 115, 22, 0);
+    transform: scale(1.1);
+  }
 }
 
 @keyframes tourPulse {

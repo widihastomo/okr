@@ -603,6 +603,7 @@ export default function TourSystem() {
               console.log(`Mobile: Re-highlighted menu item ${currentStepData.id} after sidebar expansion`);
               console.log(`Mobile: Element classes after highlight:`, updatedElement.classList.toString());
               console.log(`Mobile: Element selector matched:`, updatedElement.getAttribute('data-tour'));
+              console.log(`Mobile: Element computed styles:`, window.getComputedStyle(updatedElement).animation);
             }
           }, 200);
         });
