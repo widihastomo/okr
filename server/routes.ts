@@ -2753,10 +2753,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update Key Result (full update)
-  app.patch("/api/key-results/:id", async (req, res) => {
+  app.patch("/api/key-results/:id", requireAuth, async (req, res) => {
     try {
       const keyResultId = req.params.id;
+      const currentUser = req.user as User;
       const updateData = req.body;
+      
+      console.log("Update key result request:", {
+        keyResultId,
+        userId: currentUser.id,
+        updateData: JSON.stringify(updateData, null, 2)
+      });
       
       // Convert numeric strings to numbers
       if (updateData.currentValue) updateData.currentValue = parseFloat(updateData.currentValue).toString();
@@ -2768,14 +2775,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         updateData.unit = "number";
       }
       
+      // Add audit trail fields
+      const updatedData = {
+        ...updateData,
+        updatedAt: new Date(),
+        lastUpdateBy: currentUser.id
+      };
+      
+      console.log("Processed key result update data:", JSON.stringify(updatedData, null, 2));
 
-
-      const updatedKeyResult = await storage.updateKeyResult(keyResultId, updateData);
+      const updatedKeyResult = await storage.updateKeyResult(keyResultId, updatedData);
       
       if (!updatedKeyResult) {
         return res.status(404).json({ message: "Key result not found" });
       }
       
+      console.log("Updated key result:", JSON.stringify(updatedKeyResult, null, 2));
       res.json(updatedKeyResult);
     } catch (error) {
       console.error("Error updating key result:", error);

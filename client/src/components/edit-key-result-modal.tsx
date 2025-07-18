@@ -237,10 +237,11 @@ export default function EditKeyResultModal({
     const parsedData = {
       ...data,
       baseValue: data.baseValue ? data.baseValue.replace(/[.,]/g, '') : undefined,
-      targetValue: data.targetValue ? data.targetValue.replace(/[.,]/g, '') : data.targetValue,
-      currentValue: data.currentValue ? data.currentValue.replace(/[.,]/g, '') : data.currentValue,
+      targetValue: data.targetValue ? data.targetValue.replace(/[.,]/g, '') : undefined,
+      currentValue: data.currentValue ? data.currentValue.replace(/[.,]/g, '') : undefined,
     };
     
+    console.log("Submitting edit key result data:", JSON.stringify(parsedData, null, 2));
     updateKeyResultMutation.mutate(parsedData);
   };
 
