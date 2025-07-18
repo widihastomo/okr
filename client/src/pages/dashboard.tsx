@@ -287,8 +287,10 @@ export default function Dashboard() {
       console.log('Goals Page - All goals loaded:', allGoals.length);
       console.log('Goals Page - First goal:', allGoals[0]);
       console.log('Goals Page - Current cycle filter:', cycleFilter);
+      console.log('Goals Page - Available cycles:', cycles.map(c => ({id: c.id, name: c.name, startDate: c.startDate, endDate: c.endDate})));
+      console.log('Goals Page - Default cycle selected:', defaultCycle);
     }
-  }, [allGoals, cycleFilter]);
+  }, [allGoals, cycleFilter, cycles, defaultCycle]);
 
   // Helper function to check if a cycle is related to selected cycles
   const isRelatedCycle = (
