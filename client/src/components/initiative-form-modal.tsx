@@ -79,7 +79,7 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
   const isEditMode = !!initiative;
   const [successMetricsModalOpen, setSuccessMetricsModalOpen] = useState(false);
   const [editingMetricIndex, setEditingMetricIndex] = useState<number | null>(null);
-  const [successMetrics, setSuccessMetrics] = useState<Array<{name: string, target: string, achievement: string}>>([]);
+  const [successMetrics, setSuccessMetrics] = useState<Array<{name: string, target: string}>>([]);
   
   // Get current user ID for default assignment
   const currentUserId = user && typeof user === 'object' && 'id' in user ? (user as any).id : null;
@@ -100,7 +100,7 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
     setSuccessMetrics(newMetrics);
   };
 
-  const handleMetricSave = (metricData: {name: string, target: string, achievement: string}) => {
+  const handleMetricSave = (metricData: {name: string, target: string}) => {
     if (editingMetricIndex !== null) {
       // Edit existing metric
       const newMetrics = [...successMetrics];
@@ -693,7 +693,6 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
                           <TableRow>
                             <TableHead>Nama Metrik</TableHead>
                             <TableHead>Target</TableHead>
-                            <TableHead>Capaian Saat Ini</TableHead>
                             <TableHead className="text-center">Aksi</TableHead>
                           </TableRow>
                         </TableHeader>
@@ -707,7 +706,6 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
                                 </div>
                               </TableCell>
                               <TableCell>{metric.target || '-'}</TableCell>
-                              <TableCell>{metric.achievement || '-'}</TableCell>
                               <TableCell className="text-center">
                                 <div className="flex justify-center gap-1">
                                   <Button
@@ -777,10 +775,6 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
                             <div className="flex justify-between items-center p-1.5 bg-white rounded-md">
                               <span className="text-xs font-medium text-gray-600">Target:</span>
                               <span className="text-xs font-semibold text-gray-900">{metric.target || '-'}</span>
-                            </div>
-                            <div className="flex justify-between items-center p-1.5 bg-white rounded-md">
-                              <span className="text-xs font-medium text-gray-600">Capaian:</span>
-                              <span className="text-xs font-semibold text-gray-900">{metric.achievement || '-'}</span>
                             </div>
                           </div>
                         </div>
