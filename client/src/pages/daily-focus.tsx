@@ -957,10 +957,9 @@ export default function DailyFocusPage() {
   });
 
   const activeKeyResults = filteredKeyResults.filter((kr: any) => {
-    const progress = calculateKeyResultProgress(kr);
-    return (
-      progress < 100 && kr.status !== "completed" && kr.status !== "cancelled"
-    );
+    // Include key results that are not completed or cancelled
+    // This allows showing all active key results regardless of progress percentage
+    return kr.status !== "completed" && kr.status !== "cancelled";
   });
 
   const activeInitiatives = filteredInitiatives.filter((init: any) => {
