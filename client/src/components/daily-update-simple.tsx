@@ -375,44 +375,52 @@ export function DailyUpdateSimple() {
                   Key Results
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                {updateData.keyResults.map((kr, index) => (
-                  <div key={kr.id} className="border rounded-lg p-4">
-                    <div className="font-medium text-gray-900 mb-2">{kr.title}</div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="text-sm text-gray-600">Nilai Saat Ini</label>
-                        <div className="text-lg font-semibold">{kr.currentValue} {kr.unit}</div>
-                      </div>
-                      <div>
-                        <label className="text-sm text-gray-600">Nilai Baru</label>
-                        <input
-                          type="number"
-                          value={kr.newValue}
-                          onChange={(e) => {
-                            const newKeyResults = [...updateData.keyResults];
-                            newKeyResults[index].newValue = Number(e.target.value);
-                            setUpdateData({ ...updateData, keyResults: newKeyResults });
-                          }}
-                          className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                      </div>
-                    </div>
-                    <div className="mt-2">
-                      <label className="text-sm text-gray-600">Catatan (Opsional)</label>
-                      <Textarea
-                        value={kr.notes}
-                        onChange={(e) => {
-                          const newKeyResults = [...updateData.keyResults];
-                          newKeyResults[index].notes = e.target.value;
-                          setUpdateData({ ...updateData, keyResults: newKeyResults });
-                        }}
-                        placeholder="Tambahkan catatan untuk perubahan ini..."
-                        className="mt-1"
-                      />
-                    </div>
-                  </div>
-                ))}
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b">
+                        <th className="text-left p-2 font-medium text-gray-900">Key Result</th>
+                        <th className="text-left p-2 font-medium text-gray-900">Saat Ini</th>
+                        <th className="text-left p-2 font-medium text-gray-900">Nilai Baru</th>
+                        <th className="text-left p-2 font-medium text-gray-900">Catatan</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {updateData.keyResults.map((kr, index) => (
+                        <tr key={kr.id} className="border-b">
+                          <td className="p-2 font-medium text-gray-900">{kr.title}</td>
+                          <td className="p-2 text-gray-600">{kr.currentValue} {kr.unit}</td>
+                          <td className="p-2">
+                            <input
+                              type="number"
+                              value={kr.newValue}
+                              onChange={(e) => {
+                                const newKeyResults = [...updateData.keyResults];
+                                newKeyResults[index].newValue = Number(e.target.value);
+                                setUpdateData({ ...updateData, keyResults: newKeyResults });
+                              }}
+                              className="w-20 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            />
+                          </td>
+                          <td className="p-2">
+                            <input
+                              type="text"
+                              value={kr.notes}
+                              onChange={(e) => {
+                                const newKeyResults = [...updateData.keyResults];
+                                newKeyResults[index].notes = e.target.value;
+                                setUpdateData({ ...updateData, keyResults: newKeyResults });
+                              }}
+                              placeholder="Catatan..."
+                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            />
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </CardContent>
             </Card>
           )}
@@ -426,45 +434,54 @@ export function DailyUpdateSimple() {
                   Success Metrics
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                {updateData.successMetrics.map((sm, index) => (
-                  <div key={sm.id} className="border rounded-lg p-4">
-                    <div className="font-medium text-gray-900 mb-1">{sm.name}</div>
-                    <div className="text-sm text-gray-600 mb-2">Inisiatif: {sm.initiativeTitle}</div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="text-sm text-gray-600">Target</label>
-                        <div className="text-sm font-medium">{sm.target}</div>
-                      </div>
-                      <div>
-                        <label className="text-sm text-gray-600">Pencapaian Baru</label>
-                        <input
-                          type="text"
-                          value={sm.newValue}
-                          onChange={(e) => {
-                            const newMetrics = [...updateData.successMetrics];
-                            newMetrics[index].newValue = e.target.value;
-                            setUpdateData({ ...updateData, successMetrics: newMetrics });
-                          }}
-                          className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                        />
-                      </div>
-                    </div>
-                    <div className="mt-2">
-                      <label className="text-sm text-gray-600">Catatan (Opsional)</label>
-                      <Textarea
-                        value={sm.notes}
-                        onChange={(e) => {
-                          const newMetrics = [...updateData.successMetrics];
-                          newMetrics[index].notes = e.target.value;
-                          setUpdateData({ ...updateData, successMetrics: newMetrics });
-                        }}
-                        placeholder="Tambahkan catatan untuk pencapaian ini..."
-                        className="mt-1"
-                      />
-                    </div>
-                  </div>
-                ))}
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b">
+                        <th className="text-left p-2 font-medium text-gray-900">Metric</th>
+                        <th className="text-left p-2 font-medium text-gray-900">Inisiatif</th>
+                        <th className="text-left p-2 font-medium text-gray-900">Target</th>
+                        <th className="text-left p-2 font-medium text-gray-900">Pencapaian Baru</th>
+                        <th className="text-left p-2 font-medium text-gray-900">Catatan</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {updateData.successMetrics.map((sm, index) => (
+                        <tr key={sm.id} className="border-b">
+                          <td className="p-2 font-medium text-gray-900">{sm.name}</td>
+                          <td className="p-2 text-gray-600 text-xs">{sm.initiativeTitle}</td>
+                          <td className="p-2 text-gray-600">{sm.target}</td>
+                          <td className="p-2">
+                            <input
+                              type="text"
+                              value={sm.newValue}
+                              onChange={(e) => {
+                                const newMetrics = [...updateData.successMetrics];
+                                newMetrics[index].newValue = e.target.value;
+                                setUpdateData({ ...updateData, successMetrics: newMetrics });
+                              }}
+                              className="w-24 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-green-500"
+                            />
+                          </td>
+                          <td className="p-2">
+                            <input
+                              type="text"
+                              value={sm.notes}
+                              onChange={(e) => {
+                                const newMetrics = [...updateData.successMetrics];
+                                newMetrics[index].notes = e.target.value;
+                                setUpdateData({ ...updateData, successMetrics: newMetrics });
+                              }}
+                              placeholder="Catatan..."
+                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-green-500"
+                            />
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </CardContent>
             </Card>
           )}
