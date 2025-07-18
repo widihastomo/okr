@@ -937,6 +937,14 @@ export default function GoalDetail() {
       queryClient.invalidateQueries({ queryKey: ["/api/objectives"] });
       queryClient.invalidateQueries({ queryKey: ["/api/okrs"] });
       queryClient.invalidateQueries({ queryKey: [`/api/objectives/${id}`] });
+      // Invalidate initiatives cache to refresh daily focus page
+      queryClient.invalidateQueries({ queryKey: ["/api/initiatives"] });
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/objective/${id}`] });
+      // Invalidate tasks cache to refresh daily focus page
+      queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
+      queryClient.invalidateQueries({ queryKey: [`/api/tasks/objective/${id}`] });
+      // Invalidate key results cache
+      queryClient.invalidateQueries({ queryKey: ["/api/key-results"] });
     },
     onError: (error: any) => {
       toast({
