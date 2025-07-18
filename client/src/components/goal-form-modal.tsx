@@ -1318,10 +1318,28 @@ export function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult,
         keyResultForm.setValue("targetValue", "0");
       }
       if (!keyResultForm.getValues("currentValue")) {
-        keyResultForm.setValue("currentValue", "0");
+        // For decrease_to, set currentValue to baseValue to prevent instant 100% progress
+        if (currentKeyResultType === "decrease_to") {
+          const baseValue = keyResultForm.getValues("baseValue") || "0";
+          keyResultForm.setValue("currentValue", baseValue);
+        } else {
+          keyResultForm.setValue("currentValue", "0");
+        }
       }
     }
   }, [currentKeyResultType, keyResultForm, isEditing]);
+
+  // Watch for baseValue changes and update currentValue for decrease_to type
+  const currentBaseValue = keyResultForm.watch("baseValue");
+  useEffect(() => {
+    if (currentKeyResultType === "decrease_to" && currentBaseValue) {
+      // Only update currentValue if it's still the default (same as old baseValue)
+      const currentValue = keyResultForm.getValues("currentValue");
+      if (!currentValue || currentValue === "0") {
+        keyResultForm.setValue("currentValue", currentBaseValue);
+      }
+    }
+  }, [currentBaseValue, currentKeyResultType, keyResultForm]);
 
   const handleSubmit = (data: KeyResultFormData) => {
     // Convert formatted values to numeric before submitting
