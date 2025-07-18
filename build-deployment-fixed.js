@@ -4,6 +4,11 @@
 // Fixed deployment build script for Replit
 import { existsSync, mkdirSync, writeFileSync, readFileSync, readdirSync, statSync } from 'fs';
 import { execSync } from 'child_process';
+import { fileURLToPath } from 'url';
+import { dirname, resolve } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 console.log('🚀 Fixed Deployment Build for Replit Starting...');
 console.log('📍 Working directory:', process.cwd());
@@ -29,6 +34,7 @@ const path = require('path');
 
 console.log('🚀 OKR Management System - Replit Deployment');
 console.log('🌍 Environment:', process.env.NODE_ENV || 'production');
+console.log('📡 Host: 0.0.0.0');
 console.log('📡 Port:', process.env.PORT || 5000);
 
 // Set production environment
@@ -51,7 +57,8 @@ const server = spawn('npx', ['tsx', serverPath], {
   env: {
     ...process.env,
     NODE_ENV: 'production',
-    PORT: process.env.PORT || '5000'
+    PORT: process.env.PORT || '5000',
+    HOST: '0.0.0.0'
   },
   cwd: path.resolve(__dirname, '..'),
   shell: true
@@ -64,7 +71,7 @@ server.on('error', (err) => {
 
 server.on('close', (code) => {
   console.log('🔄 Server closed with code:', code);
-  if (code !== 0) process.exit(code);
+  if (code !== 0 && code !== null) process.exit(code);
 });
 
 // Graceful shutdown
@@ -78,9 +85,14 @@ const shutdown = (signal) => {
 
 process.on('SIGTERM', () => shutdown('SIGTERM'));
 process.on('SIGINT', () => shutdown('SIGINT'));
+process.on('uncaughtException', (err) => {
+  console.error('❌ Uncaught Exception:', err);
+  shutdown('SIGTERM');
+});
 `;
 
   writeFileSync('dist/index.cjs', serverLauncher);
+  execSync('chmod +x dist/index.cjs', { stdio: 'pipe' });
   console.log('✅ Server launcher created');
 
   // Create production frontend
@@ -206,14 +218,6 @@ process.on('SIGINT', () => shutdown('SIGINT'));
     console.log(`✅ ${file} (${stats.size} bytes)`);
   }
 
-  // Set permissions
-  try {
-    execSync('chmod +x dist/index.cjs', { stdio: 'pipe' });
-    console.log('✅ Permissions set');
-  } catch (error) {
-    console.warn('⚠️  Permission warning:', error.message);
-  }
-
   console.log('');
   console.log('✅ ========================================');
   console.log('✅ REPLIT DEPLOYMENT BUILD SUCCESS');
@@ -225,6 +229,7 @@ process.on('SIGINT', () => shutdown('SIGINT'));
   console.log('  - dist/deploy-info.json (metadata)');
   console.log('');
   console.log('🚀 Ready for Replit deployment!');
+  console.log('🔧 Start command: node dist/index.cjs');
 
 } catch (error) {
   console.error('');
