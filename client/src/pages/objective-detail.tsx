@@ -3066,10 +3066,16 @@ export default function GoalDetail() {
         objectiveId={id}
         onSuccess={() => {
           // Invalidate cache to refresh the data
-          queryClient.invalidateQueries({ queryKey: ['/api/objectives', id] });
+          console.log("🔄 Starting cache invalidation for objective:", id);
+          queryClient.invalidateQueries({ queryKey: [`/api/objectives/${id}`] });
+          queryClient.invalidateQueries({ queryKey: [`/api/cycles/${goal?.cycleId}`] });
           queryClient.invalidateQueries({ queryKey: ['/api/objectives'] });
           queryClient.invalidateQueries({ queryKey: ['/api/okrs'] });
-          console.log("Cache invalidated after key result edit");
+          console.log("✅ Cache invalidated after key result edit");
+          
+          // Also refetch the current query to ensure immediate refresh
+          queryClient.refetchQueries({ queryKey: [`/api/objectives/${id}`] });
+          console.log("🔄 Refetching objective data for immediate refresh");
         }}
       />
       {/* Add Key Result Modal */}
