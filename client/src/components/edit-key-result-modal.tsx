@@ -389,7 +389,7 @@ export default function EditKeyResultModal({
                       control={form.control}
                       name="keyResultType"
                       render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="flex flex-col">
                           <FormLabel className="flex items-center gap-2 mb-2">
                             Tipe Angka Target
                             <Popover>
@@ -413,40 +413,42 @@ export default function EditKeyResultModal({
                               </PopoverContent>
                             </Popover>
                           </FormLabel>
-                          {(checkInData?.count || 0) > 0 ? (
-                            <div className="space-y-2">
-                              <Input
-                                value={
-                                  field.value === "increase_to" ? "Naik ke (Increase To)" :
-                                  field.value === "decrease_to" ? "Turun ke (Decrease To)" :
-                                  field.value === "should_stay_above" ? "Harus tetap di atas (Stay Above)" :
-                                  field.value === "should_stay_below" ? "Harus tetap di bawah (Stay Below)" :
-                                  field.value === "achieve_or_not" ? "Ya/Tidak (Achieve or Not)" :
-                                  field.value
-                                }
-                                disabled
-                                className="bg-gray-100 text-gray-500"
-                              />
-                              <p className="text-xs text-gray-500">
-                                Tipe tidak dapat diubah karena sudah ada {checkInData.count} check-in yang tercatat.
-                              </p>
-                            </div>
-                          ) : (
-                            <Select onValueChange={field.onChange} value={field.value}>
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Pilih tipe" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                <SelectItem value="increase_to">Naik ke (Increase To)</SelectItem>
-                                <SelectItem value="decrease_to">Turun ke (Decrease To)</SelectItem>
-                                <SelectItem value="should_stay_above">Harus tetap di atas (Stay Above)</SelectItem>
-                                <SelectItem value="should_stay_below">Harus tetap di bawah (Stay Below)</SelectItem>
-                                <SelectItem value="achieve_or_not">Ya/Tidak (Achieve or Not)</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          )}
+                          <div className="flex-1">
+                            {(checkInData?.count || 0) > 0 ? (
+                              <div className="space-y-2">
+                                <Input
+                                  value={
+                                    field.value === "increase_to" ? "Naik ke (Increase To)" :
+                                    field.value === "decrease_to" ? "Turun ke (Decrease To)" :
+                                    field.value === "should_stay_above" ? "Harus tetap di atas (Stay Above)" :
+                                    field.value === "should_stay_below" ? "Harus tetap di bawah (Stay Below)" :
+                                    field.value === "achieve_or_not" ? "Ya/Tidak (Achieve or Not)" :
+                                    field.value
+                                  }
+                                  disabled
+                                  className="bg-gray-100 text-gray-500"
+                                />
+                                <p className="text-xs text-gray-500">
+                                  Tipe tidak dapat diubah karena sudah ada {checkInData.count} check-in yang tercatat.
+                                </p>
+                              </div>
+                            ) : (
+                              <Select onValueChange={field.onChange} value={field.value}>
+                                <FormControl>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Pilih tipe" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  <SelectItem value="increase_to">Naik ke (Increase To)</SelectItem>
+                                  <SelectItem value="decrease_to">Turun ke (Decrease To)</SelectItem>
+                                  <SelectItem value="should_stay_above">Harus tetap di atas (Stay Above)</SelectItem>
+                                  <SelectItem value="should_stay_below">Harus tetap di bawah (Stay Below)</SelectItem>
+                                  <SelectItem value="achieve_or_not">Ya/Tidak (Achieve or Not)</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            )}
+                          </div>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -458,7 +460,7 @@ export default function EditKeyResultModal({
                         control={form.control}
                         name="unit"
                         render={({ field }) => (
-                          <FormItem>
+                          <FormItem className="flex flex-col">
                             <FormLabel className="flex items-center gap-2 mb-2">
                               Unit (Opsional)
                               <Popover>
@@ -483,72 +485,74 @@ export default function EditKeyResultModal({
                                 </PopoverContent>
                               </Popover>
                             </FormLabel>
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <FormControl>
-                                  <Button
-                                    variant="outline"
-                                    role="combobox"
-                                    className={cn(
-                                      "w-full justify-between",
-                                      !field.value && "text-muted-foreground"
-                                    )}
-                                  >
-                                    {field.value || "Pilih atau ketik unit..."}
-                                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                  </Button>
-                                </FormControl>
-                              </PopoverTrigger>
-                              <PopoverContent className="w-full p-0">
-                                <Command>
-                                  <CommandInput 
-                                    placeholder="Cari atau ketik unit baru..." 
-                                    onValueChange={(value: string) => {
-                                      if (value && !unitOptions.includes(value)) {
-                                        field.onChange(value);
-                                      }
-                                    }}
-                                  />
-                                  <CommandList>
-                                    <CommandEmpty>
-                                      <Button
-                                        variant="ghost"
-                                        className="w-full text-left justify-start h-auto p-2"
-                                        onClick={() => {
-                                          const input = document.querySelector('[placeholder="Cari atau ketik unit baru..."]') as HTMLInputElement;
-                                          if (input && input.value) {
-                                            field.onChange(input.value);
-                                          }
-                                        }}
-                                      >
-                                        Tambah unit baru
-                                      </Button>
-                                    </CommandEmpty>
-                                    <CommandGroup>
-                                      {unitOptions.map((unit: string) => (
-                                        <CommandItem
-                                          value={unit}
-                                          key={unit}
-                                          onSelect={() => {
-                                            field.onChange(unit);
+                            <div className="flex-1">
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <FormControl>
+                                    <Button
+                                      variant="outline"
+                                      role="combobox"
+                                      className={cn(
+                                        "w-full justify-between",
+                                        !field.value && "text-muted-foreground"
+                                      )}
+                                    >
+                                      {field.value || "Pilih atau ketik unit..."}
+                                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                    </Button>
+                                  </FormControl>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-full p-0">
+                                  <Command>
+                                    <CommandInput 
+                                      placeholder="Cari atau ketik unit baru..." 
+                                      onValueChange={(value: string) => {
+                                        if (value && !unitOptions.includes(value)) {
+                                          field.onChange(value);
+                                        }
+                                      }}
+                                    />
+                                    <CommandList>
+                                      <CommandEmpty>
+                                        <Button
+                                          variant="ghost"
+                                          className="w-full text-left justify-start h-auto p-2"
+                                          onClick={() => {
+                                            const input = document.querySelector('[placeholder="Cari atau ketik unit baru..."]') as HTMLInputElement;
+                                            if (input && input.value) {
+                                              field.onChange(input.value);
+                                            }
                                           }}
                                         >
-                                          <Check
-                                            className={cn(
-                                              "mr-2 h-4 w-4",
-                                              unit === field.value
-                                                ? "opacity-100"
-                                                : "opacity-0"
-                                            )}
-                                          />
-                                          {unit}
-                                        </CommandItem>
-                                      ))}
-                                    </CommandGroup>
-                                  </CommandList>
-                                </Command>
-                              </PopoverContent>
-                            </Popover>
+                                          Tambah unit baru
+                                        </Button>
+                                      </CommandEmpty>
+                                      <CommandGroup>
+                                        {unitOptions.map((unit: string) => (
+                                          <CommandItem
+                                            value={unit}
+                                            key={unit}
+                                            onSelect={() => {
+                                              field.onChange(unit);
+                                            }}
+                                          >
+                                            <Check
+                                              className={cn(
+                                                "mr-2 h-4 w-4",
+                                                unit === field.value
+                                                  ? "opacity-100"
+                                                  : "opacity-0"
+                                              )}
+                                            />
+                                            {unit}
+                                          </CommandItem>
+                                        ))}
+                                      </CommandGroup>
+                                    </CommandList>
+                                  </Command>
+                                </PopoverContent>
+                              </Popover>
+                            </div>
                             <FormMessage />
                           </FormItem>
                         )}
