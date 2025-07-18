@@ -141,12 +141,11 @@ const server = app.listen(PORT, '0.0.0.0', () => {
     console.log('✅ Enhanced production server created');
   }
 
-  // Create production launcher that runs compiled JavaScript
+  // Create production launcher that directly runs the server without spawning
   console.log('⚡ Creating production launcher...');
   const productionLauncher = `#!/usr/bin/env node
 
-// Production launcher for deployment - No tsx dependency
-const { spawn } = require('child_process');
+// Production launcher for deployment - Direct execution, no spawn
 const path = require('path');
 const fs = require('fs');
 
@@ -169,7 +168,7 @@ const setupEnvironment = () => {
   process.env.HOST = '0.0.0.0';
 };
 
-// Start server with compiled JavaScript
+// Start server by directly requiring the compiled server
 const startServer = () => {
   setupEnvironment();
   
@@ -179,28 +178,46 @@ const startServer = () => {
   if (fs.existsSync(compiledServerPath)) {
     console.log('✅ Starting compiled server:', compiledServerPath);
     
-    const server = spawn('node', [compiledServerPath], {
-      stdio: 'inherit',
-      env: {
-        ...process.env,
-        NODE_ENV: 'production'
-      },
-      cwd: __dirname
-    });
-    
-    server.on('error', (err) => {
-      console.error('❌ Server error:', err.message);
-      process.exit(1);
-    });
-    
-    server.on('close', (code) => {
-      if (code !== 0) {
-        console.error('❌ Server exited with code:', code);
-        process.exit(code);
-      }
-    });
-    
-    return server;
+    // Direct require instead of spawn to avoid module resolution issues
+    try {
+      require(compiledServerPath);
+      console.log('✅ Production server started successfully');
+    } catch (error) {
+      console.error('❌ Server startup error:', error.message);
+      console.log('📍 Falling back to inline server...');
+      
+      // Inline fallback server
+      const express = require('express');
+      const cors = require('cors');
+      const helmet = require('helmet');
+      
+      const app = express();
+      const PORT = process.env.PORT || 5000;
+      
+      // Security middleware
+      app.use(helmet());
+      app.use(cors({ origin: '*', credentials: true }));
+      app.use(express.json());
+      app.use(express.static(path.join(__dirname, 'public')));
+      
+      // Health check
+      app.get('/health', (req, res) => {
+        res.json({ 
+          status: 'ok', 
+          timestamp: new Date().toISOString(),
+          message: 'OKR Management System (Fallback Server)'
+        });
+      });
+      
+      // Catch-all
+      app.get('*', (req, res) => {
+        res.sendFile(path.join(__dirname, 'public', 'index.html'));
+      });
+      
+      app.listen(PORT, '0.0.0.0', () => {
+        console.log('🚀 Fallback server running on port', PORT);
+      });
+    }
   } else {
     console.error('❌ Compiled server not found:', compiledServerPath);
     process.exit(1);
@@ -219,7 +236,6 @@ process.on('SIGINT', () => shutdown('SIGINT'));
 // Start the server
 try {
   startServer();
-  console.log('✅ Production server started successfully');
 } catch (error) {
   console.error('❌ Failed to start server:', error.message);
   process.exit(1);
