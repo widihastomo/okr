@@ -601,6 +601,8 @@ export default function TourSystem() {
               // Then highlight the current element
               updatedElement.classList.add("tour-highlight");
               console.log(`Mobile: Re-highlighted menu item ${currentStepData.id} after sidebar expansion`);
+              console.log(`Mobile: Element classes after highlight:`, updatedElement.classList.toString());
+              console.log(`Mobile: Element selector matched:`, updatedElement.getAttribute('data-tour'));
             }
           }, 200);
         });
