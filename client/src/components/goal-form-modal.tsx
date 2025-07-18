@@ -1296,10 +1296,11 @@ export function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult,
     keyResultForm.clearErrors("currentValue");
     
     if (currentKeyResultType === "achieve_or_not") {
-      // Clear target, base, and current values for achieve_or_not type
+      // Clear target, base, and unit values for achieve_or_not type
+      // Set currentValue to "0" as default for "not achieved"
       keyResultForm.setValue("targetValue", "");
       keyResultForm.setValue("baseValue", "");
-      keyResultForm.setValue("currentValue", "");
+      keyResultForm.setValue("currentValue", "0");
       keyResultForm.setValue("unit", "");
     } else if (currentKeyResultType === "should_stay_above" || currentKeyResultType === "should_stay_below") {
       // For stay above/below types, we only need target value
