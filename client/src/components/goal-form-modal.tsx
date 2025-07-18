@@ -1290,6 +1290,7 @@ export function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult,
   // Watch for keyResultType changes and clear inappropriate fields
   const currentKeyResultType = keyResultForm.watch("keyResultType");
   const currentTargetValue = keyResultForm.watch("targetValue");
+  const currentBaseValue = keyResultForm.watch("baseValue");
   
   useEffect(() => {
     // Clear validation errors when type changes
@@ -1337,6 +1338,10 @@ export function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult,
         } else {
           keyResultForm.setValue("currentValue", "0");
         }
+      } else if (currentKeyResultType === "decrease_to") {
+        // Sync currentValue with baseValue for decrease_to when baseValue changes
+        const baseValue = keyResultForm.getValues("baseValue") || "0";
+        keyResultForm.setValue("currentValue", baseValue);
       }
     }
   }, [currentKeyResultType, keyResultForm, isEditing]);
@@ -1348,13 +1353,9 @@ export function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult,
     }
   }, [currentTargetValue, currentKeyResultType, keyResultForm]);
 
-  // Watch for baseValue changes and update currentValue for decrease_to type
-  const currentBaseValue = keyResultForm.watch("baseValue");
-  const currentCurrentValue = keyResultForm.watch("currentValue");
+  // Watch for baseValue changes to update currentValue for decrease_to
   useEffect(() => {
     if (currentKeyResultType === "decrease_to" && currentBaseValue) {
-      // Auto-update currentValue to match baseValue for decrease_to type
-      // This ensures progress starts at 0% instead of 100%
       keyResultForm.setValue("currentValue", currentBaseValue);
     }
   }, [currentBaseValue, currentKeyResultType, keyResultForm]);
