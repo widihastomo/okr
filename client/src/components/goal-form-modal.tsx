@@ -1331,13 +1331,12 @@ export function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult,
 
   // Watch for baseValue changes and update currentValue for decrease_to type
   const currentBaseValue = keyResultForm.watch("baseValue");
+  const currentCurrentValue = keyResultForm.watch("currentValue");
   useEffect(() => {
     if (currentKeyResultType === "decrease_to" && currentBaseValue) {
-      // Only update currentValue if it's still the default (same as old baseValue)
-      const currentValue = keyResultForm.getValues("currentValue");
-      if (!currentValue || currentValue === "0") {
-        keyResultForm.setValue("currentValue", currentBaseValue);
-      }
+      // Auto-update currentValue to match baseValue for decrease_to type
+      // This ensures progress starts at 0% instead of 100%
+      keyResultForm.setValue("currentValue", currentBaseValue);
     }
   }, [currentBaseValue, currentKeyResultType, keyResultForm]);
 
