@@ -45,7 +45,6 @@ import {
   ChevronDown,
   ChevronRight,
   Network,
-  ArrowLeft,
 } from "lucide-react";
 
 import { useAuth } from "@/hooks/useAuth";
@@ -608,16 +607,7 @@ export default function Dashboard() {
         <div className="flex flex-col space-y-3 sm:space-y-4">
           {/* Title and Create Button Row */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
-            <div className="flex items-center gap-4">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setLocation("/")}
-                className="flex items-center gap-2"
-              >
-                <ArrowLeft className="h-4 w-4" />
-                Dashboard
-              </Button>
+            <div className="flex items-center">
               <div>
                 <h1
                   className="text-2xl font-bold text-gray-900"
@@ -629,6 +619,7 @@ export default function Dashboard() {
                   Kelola objective, angka target, dan inisiatif Anda
                 </p>
               </div>
+
             </div>
             <div className="flex-shrink-0 flex gap-2">
               <CreateGoalButton data-tour="add-goal" />
