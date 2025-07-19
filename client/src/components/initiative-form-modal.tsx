@@ -18,7 +18,6 @@ import { Calendar } from "@/components/ui/calendar";
 import { HelpCircle, Plus, ChevronRight, ChevronLeft, Target, Trash2, CalendarIcon, Edit, TrendingUp, ListTodo } from "lucide-react";
 import InitiativeTaskModal from "@/components/initiative-task-modal";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { DefinitionOfDoneTable } from "@/components/definition-of-done-table";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { cn } from "@/lib/utils";
@@ -28,7 +27,7 @@ import { useAuth } from "@/hooks/useAuth";
 
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
-import type { Initiative, KeyResult, User, DefinitionOfDoneItem } from "@shared/schema";
+import type { Initiative, KeyResult, User } from "@shared/schema";
 
 // Helper function to get user name with fallback
 const getUserName = (user: User): string => {
@@ -113,6 +112,7 @@ const initiativeFormSchema = z.object({
     title: z.string().min(1, "Judul inisiatif wajib diisi"),
     description: z.string().optional(),
     implementationPlan: z.string().optional(),
+    definitionOfDone: z.array(z.string()).optional().default([]),
     keyResultId: z.string().min(1, "Angka target wajib dipilih"),
     picId: z.string().min(1, "Penanggung jawab wajib dipilih"),
     startDate: z.date({
@@ -158,9 +158,6 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
   
   // Task modal state
   const [showTaskModal, setShowTaskModal] = useState(false);
-  
-  // Definition of Done state
-  const [definitionOfDoneItems, setDefinitionOfDoneItems] = useState<DefinitionOfDoneItem[]>([]);
 
   
   // For creating initiative, we need a temporary ID
@@ -169,12 +166,6 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
   // Fetch data yang diperlukan
   const { data: keyResults } = useQuery<KeyResult[]>({ queryKey: ["/api/key-results"] });
   const { data: users } = useQuery<User[]>({ queryKey: ["/api/users"] });
-  
-  // Fetch existing Definition of Done items in edit mode
-  const { data: existingDodItems } = useQuery<DefinitionOfDoneItem[]>({ 
-    queryKey: [`/api/initiatives/${initiative?.id}/definition-of-done`],
-    enabled: isEditMode && !!initiative?.id
-  });
 
   // Priority calculation functions
   const calculatePriorityScore = (): number => {
@@ -230,6 +221,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
         title: initiative.title,
         description: initiative.description || "",
         implementationPlan: initiative.implementationPlan || "",
+        definitionOfDone: initiative.definitionOfDone || "",
         keyResultId: initiative.keyResultId,
         picId: initiative.picId,
         startDate: new Date(initiative.startDate),
@@ -247,6 +239,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
         title: "",
         description: "",
         implementationPlan: "",
+        definitionOfDone: [""],
         keyResultId: keyResultId || "",
         picId: user?.id || "",
         startDate: new Date(),
@@ -262,15 +255,6 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
     },
   });
 
-  // Populate Definition of Done items when editing
-  useEffect(() => {
-    if (isEditMode && existingDodItems) {
-      setDefinitionOfDoneItems(existingDodItems);
-    } else if (!isEditMode) {
-      setDefinitionOfDoneItems([]);
-    }
-  }, [isEditMode, existingDodItems]);
-
   // Reset form when initiative prop changes or dialog opens
   useEffect(() => {
     if (open) {
@@ -281,6 +265,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
             title: initiative.title,
             description: initiative.description || "",
             implementationPlan: initiative.implementationPlan || "",
+            definitionOfDone: Array.isArray(initiative.definitionOfDone) ? initiative.definitionOfDone : [initiative.definitionOfDone || ""],
             keyResultId: initiative.keyResultId,
             picId: initiative.picId,
             startDate: new Date(initiative.startDate),
@@ -300,6 +285,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
             title: "",
             description: "",
             implementationPlan: "",
+            definitionOfDone: [""],
             keyResultId: keyResultId || "",
             picId: user?.id || "",
             startDate: new Date(),
@@ -342,7 +328,25 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
   };
 
   // Definition of Done management functions
-  // Definition of Done management is now handled by the DefinitionOfDoneTable component
+  const addDefinitionItem = () => {
+    const items = form.watch("initiative.definitionOfDone") || [];
+    form.setValue("initiative.definitionOfDone", [...items, ""]);
+  };
+
+  const updateDefinitionItem = (index: number, value: string) => {
+    const items = form.watch("initiative.definitionOfDone") || [];
+    const updatedItems = [...items];
+    updatedItems[index] = value;
+    form.setValue("initiative.definitionOfDone", updatedItems);
+  };
+
+  const removeDefinitionItem = (index: number) => {
+    const items = form.watch("initiative.definitionOfDone") || [];
+    if (items.length > 1) {
+      const updatedItems = items.filter((_, i) => i !== index);
+      form.setValue("initiative.definitionOfDone", updatedItems);
+    }
+  };
 
   // Task management functions (simplified for form data)
   const addTask = () => {
@@ -388,6 +392,8 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
           ...data.initiative,
           pic: picName,
           organizationId: user?.organizationId, // Add missing organizationId
+          // Convert definition of done array to JSON string for backend
+          definitionOfDone: JSON.stringify(data.initiative.definitionOfDone || []),
           // Format dates for API
           startDate: data.initiative.startDate.toISOString(),
           dueDate: data.initiative.dueDate.toISOString(),
@@ -395,37 +401,11 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
 
         console.log("Initiative form payload:", payload);
 
-        let result;
         if (isEditMode && initiative) {
-          result = await apiRequest("PATCH", `/api/initiatives/${initiative.id}`, payload);
+          return apiRequest("PATCH", `/api/initiatives/${initiative.id}`, payload);
         } else {
-          result = await apiRequest("POST", "/api/initiatives", payload);
+          return apiRequest("POST", "/api/initiatives", payload);
         }
-
-        // After initiative is saved, create Definition of Done items
-        if (definitionOfDoneItems.length > 0) {
-          const initiativeId = isEditMode ? initiative.id : result.id;
-          
-          // Create each Definition of Done item
-          for (const item of definitionOfDoneItems) {
-            if (item.title.trim()) {
-              const dodPayload = {
-                title: item.title,
-                isCompleted: item.isCompleted,
-                order: item.order
-              };
-              
-              try {
-                await apiRequest("POST", `/api/initiatives/${initiativeId}/definition-of-done`, dodPayload);
-              } catch (error) {
-                console.error("Error creating Definition of Done item:", error);
-                // Continue with other items even if one fails
-              }
-            }
-          }
-        }
-
-        return result;
       } catch (error) {
         console.error("Initiative mutation error:", error);
         throw error;
@@ -865,10 +845,10 @@ Contoh: Wilayah timur memiliki potensi pasar yang besar namun kontribusi penjual
                     )}
                   />
 
-                  {/* Definition of Done - New Table Component */}
+                  {/* Definition of Done - Dynamic List */}
                   <div className="space-y-4">
                     <div className="flex items-center gap-2">
-                      <FormLabel>Definition of Done</FormLabel>
+                      <FormLabel>Deliverables (Output Inisiatif)</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
                           <button 
@@ -880,18 +860,54 @@ Contoh: Wilayah timur memiliki potensi pasar yang besar namun kontribusi penjual
                         </PopoverTrigger>
                         <PopoverContent side="right" className="max-w-xs">
                           <p className="text-sm">
-                            Kriteria penyelesaian yang harus dipenuhi untuk menandakan bahwa inisiatif ini telah selesai. Setiap item dapat ditandai sebagai selesai atau belum selesai.
+                            Apa output / keluaran dari inisiatif untuk dapat menyatakan bahwa inisiatif ini selesai dan tereksekusi dengan baik terlepas dari hasilnya.
                           </p>
                         </PopoverContent>
                       </Popover>
                     </div>
                     
-                    <DefinitionOfDoneTable 
-                      items={definitionOfDoneItems}
-                      onItemsChange={setDefinitionOfDoneItems}
-                      canEdit={true}
-                      mode="form"
-                    />
+                    {/* Definition of Done Dynamic List */}
+                    <div>
+                      {/* Desktop/Mobile Unified View */}
+                      <div className="space-y-3">
+                        {(form.watch("initiative.definitionOfDone") || [""]).map((item, index) => (
+                          <div key={index} className="flex items-center gap-2">
+                            <div className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-xs font-medium text-blue-600">
+                              {index + 1}
+                            </div>
+                            <Input
+                              placeholder="Contoh: 100 calon reseller sudah dihubungi"
+                              value={item}
+                              onChange={(e) => updateDefinitionItem(index, e.target.value)}
+                              className="flex-1 border border-gray-300 p-2"
+                            />
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeDefinitionItem(index)}
+                              className="text-red-600 hover:text-red-700 hover:bg-red-50 flex-shrink-0"
+                              disabled={(form.watch("initiative.definitionOfDone") || []).length <= 1}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Add Definition Item Button */}
+                      <div className="mt-3">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={addDefinitionItem}
+                          className="w-full flex items-center justify-center gap-2 border-blue-600 text-blue-600 hover:bg-blue-50"
+                        >
+                          <Plus className="w-4 h-4" />
+                          Tambah Kriteria
+                        </Button>
+                      </div>
+                    </div>
                   </div>
 
                   {/* Task Management */}

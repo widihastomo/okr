@@ -2,7 +2,7 @@ import {
   cycles, templates, objectives, keyResults, users, teams, teamMembers, checkIns, initiatives, tasks, taskComments, taskAuditTrail,
   initiativeMembers, initiativeDocuments, initiativeNotes, initiativeComments, initiativeSuccessMetrics, successMetricUpdates,
   notifications, notificationPreferences, userOnboardingProgress, organizations, applicationSettings, auditTrail,
-  subscriptionPlans, billingPeriods, organizationSubscriptions, timelineComments, timelineReactions, definitionOfDoneItems,
+  subscriptionPlans, billingPeriods, organizationSubscriptions, timelineComments, timelineReactions,
   type Cycle, type Template, type Objective, type KeyResult, type User, type Team, type TeamMember,
   type CheckIn, type Initiative, type Task, type TaskComment, type TaskAuditTrail, type KeyResultWithDetails, type InitiativeMember, type InitiativeDocument,
   type InitiativeNote, type InitiativeComment, type InsertCycle, type InsertTemplate, type InsertObjective, type InsertKeyResult, 
@@ -13,8 +13,7 @@ import {
   type Notification, type InsertNotification, type NotificationPreferences, type InsertNotificationPreferences,
   type UserOnboardingProgress, type InsertUserOnboardingProgress, type UpdateOnboardingProgress,
   type ApplicationSetting, type InsertApplicationSetting, type UpdateApplicationSetting,
-  type Organization, type TimelineComment, type TimelineReaction, type InsertTimelineComment, type InsertTimelineReaction,
-  type DefinitionOfDoneItem, type InsertDefinitionOfDoneItem
+  type Organization, type TimelineComment, type TimelineReaction, type InsertTimelineComment, type InsertTimelineReaction
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, asc, inArray, count } from "drizzle-orm";
@@ -143,13 +142,6 @@ export interface IStorage {
   
   // Initiative History
   getInitiativeHistory(initiativeId: string): Promise<any[]>;
-  
-  // Definition of Done Items
-  getDefinitionOfDoneItems(initiativeId: string): Promise<DefinitionOfDoneItem[]>;
-  createDefinitionOfDoneItem(item: InsertDefinitionOfDoneItem): Promise<DefinitionOfDoneItem>;
-  updateDefinitionOfDoneItem(id: string, item: Partial<InsertDefinitionOfDoneItem>): Promise<DefinitionOfDoneItem | undefined>;
-  toggleDefinitionOfDoneItem(id: string, isCompleted: boolean, completedBy?: string): Promise<DefinitionOfDoneItem | undefined>;
-  deleteDefinitionOfDoneItem(id: string): Promise<boolean>;
   
   // Success Metrics
   getSuccessMetricsByInitiativeId(initiativeId: string): Promise<SuccessMetric[]>;
@@ -2896,70 +2888,6 @@ export class DatabaseStorage implements IStorage {
       console.error("Error fetching initiative history:", error);
       return [];
     }
-  }
-
-  // Definition of Done Items
-  async getDefinitionOfDoneItems(initiativeId: string): Promise<DefinitionOfDoneItem[]> {
-    return await db
-      .select()
-      .from(definitionOfDoneItems)
-      .where(eq(definitionOfDoneItems.initiativeId, initiativeId))
-      .orderBy(asc(definitionOfDoneItems.order), asc(definitionOfDoneItems.createdAt));
-  }
-
-  async createDefinitionOfDoneItem(item: InsertDefinitionOfDoneItem): Promise<DefinitionOfDoneItem> {
-    const [newItem] = await db
-      .insert(definitionOfDoneItems)
-      .values({
-        ...item,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      })
-      .returning();
-    return newItem;
-  }
-
-  async updateDefinitionOfDoneItem(id: string, item: Partial<InsertDefinitionOfDoneItem>): Promise<DefinitionOfDoneItem | undefined> {
-    const [updatedItem] = await db
-      .update(definitionOfDoneItems)
-      .set({
-        ...item,
-        updatedAt: new Date()
-      })
-      .where(eq(definitionOfDoneItems.id, id))
-      .returning();
-    return updatedItem;
-  }
-
-  async toggleDefinitionOfDoneItem(id: string, isCompleted: boolean, completedBy?: string): Promise<DefinitionOfDoneItem | undefined> {
-    const updateData: any = {
-      isCompleted,
-      updatedAt: new Date()
-    };
-
-    if (isCompleted) {
-      updateData.completedAt = new Date();
-      if (completedBy) {
-        updateData.completedBy = completedBy;
-      }
-    } else {
-      updateData.completedAt = null;
-      updateData.completedBy = null;
-    }
-
-    const [updatedItem] = await db
-      .update(definitionOfDoneItems)
-      .set(updateData)
-      .where(eq(definitionOfDoneItems.id, id))
-      .returning();
-    return updatedItem;
-  }
-
-  async deleteDefinitionOfDoneItem(id: string): Promise<boolean> {
-    const result = await db
-      .delete(definitionOfDoneItems)
-      .where(eq(definitionOfDoneItems.id, id));
-    return result.count > 0;
   }
 
   // Audit Trail
