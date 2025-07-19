@@ -59,15 +59,8 @@ import {
 } from "@/lib/number-utils";
 import { useAuth } from "@/hooks/useAuth";
 import type { KeyResult, User, Initiative } from "@shared/schema";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { SuccessMetricsForm } from "./success-metrics-form";
+
+
 
 // Form schema matching the actual Initiative database schema
 const initiativeFormSchema = z
@@ -127,13 +120,9 @@ export default function InitiativeFormModal({
   const { user } = useAuth();
 
   const isEditMode = !!initiative;
-  const [successMetricsModalOpen, setSuccessMetricsModalOpen] = useState(false);
-  const [editingMetricIndex, setEditingMetricIndex] = useState<number | null>(
-    null,
-  );
   const [successMetrics, setSuccessMetrics] = useState<
     Array<{ name: string; target: string }>
-  >([]);
+  >([{ name: "", target: "" }]);
 
   // Get current user ID for default assignment
   const currentUserId =
@@ -141,32 +130,20 @@ export default function InitiativeFormModal({
 
   // Success metrics handlers
   const addMetric = () => {
-    setEditingMetricIndex(null);
-    setSuccessMetricsModalOpen(true);
-  };
-
-  const editMetric = (index: number) => {
-    setEditingMetricIndex(index);
-    setSuccessMetricsModalOpen(true);
+    setSuccessMetrics([...successMetrics, { name: "", target: "" }]);
   };
 
   const removeMetric = (index: number) => {
-    const newMetrics = successMetrics.filter((_, i) => i !== index);
-    setSuccessMetrics(newMetrics);
+    if (successMetrics.length > 1) {
+      const newMetrics = successMetrics.filter((_, i) => i !== index);
+      setSuccessMetrics(newMetrics);
+    }
   };
 
-  const handleMetricSave = (metricData: { name: string; target: string }) => {
-    if (editingMetricIndex !== null) {
-      // Edit existing metric
-      const newMetrics = [...successMetrics];
-      newMetrics[editingMetricIndex] = metricData;
-      setSuccessMetrics(newMetrics);
-    } else {
-      // Add new metric
-      setSuccessMetrics([...successMetrics, metricData]);
-    }
-    setSuccessMetricsModalOpen(false);
-    setEditingMetricIndex(null);
+  const updateMetric = (index: number, field: "name" | "target", value: string) => {
+    const newMetrics = [...successMetrics];
+    newMetrics[index][field] = value;
+    setSuccessMetrics(newMetrics);
   };
 
   // Helper function to get score labels
@@ -334,7 +311,7 @@ export default function InitiativeFormModal({
         confidenceScore: (initiative as any)?.confidenceScore || 5,
       });
       // Set successMetrics state from initiative data
-      setSuccessMetrics((initiative as any)?.successMetrics || []);
+      setSuccessMetrics((initiative as any)?.successMetrics || [{ name: "", target: "" }]);
     } else if (!isEditMode) {
       // Reset form for new initiative
       form.reset({
@@ -654,13 +631,6 @@ Contoh : Wilayah timur memiliki potensi pasar yang besar namun kontribusi penjua
                                 Langkah-langkah konkret yang akan dilakukan untuk
                                 melaksanakan inisiatif ini. Jelaskan tahapan,
                                 aktivitas utama, dan pendekatan yang akan digunakan.
-                                <br />
-                                <br />
-                                <strong>Contoh:</strong> "1. Survey dan analisis
-                                kondisi reseller eksisting, 2. Develop materi
-                                training dan incentive program, 3. Roadshow ke
-                                5 kota prioritas, 4. Onboarding dan aktivasi
-                                reseller baru"
                               </p>
                             </PopoverContent>
                           </Popover>
@@ -670,10 +640,7 @@ Contoh : Wilayah timur memiliki potensi pasar yang besar namun kontribusi penjua
                             className="min-h-[120px] resize-y"
                             placeholder="Bagaimana rencana pelaksanaan inisiatif ini?
 Contoh: 
-1. Survey dan analisis kondisi reseller eksisting di wilayah timur
-2. Develop materi training dan incentive program untuk reseller baru
-3. Roadshow ke 5 kota prioritas untuk rekrutmen reseller
-4. Onboarding dan aktivasi reseller baru dengan target 50 reseller aktif"
+Tim akan mulai dengan mengumpulkan database reseller wilayah timur, mengirim starter kit ke 10 reseller terpilih, dan menjadwalkan onboarding melalui Zoom supaya efisien."
                             {...field}
                           />
                         </FormControl>
@@ -887,140 +854,75 @@ Contoh:
                     yang bisa mengukurnya secara obyektif.
                   </p>
                 </CardHeader>
-                <CardContent className="space-y-6">
-                  {successMetrics.length === 0 ? (
-                    <div className="text-center py-8 text-gray-500">
-                      <Target className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-                      <p>Belum ada Metrik Keberhasilan</p>
-                      <p className="text-sm">
-                        Klik tombol di bawah untuk menambahkan
-                      </p>
-                    </div>
-                  ) : (
-                    <div>
-                      {/* Desktop Table View */}
-                      <div className="hidden md:block border rounded-lg">
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead>Nama Metrik</TableHead>
-                              <TableHead>Target</TableHead>
-                              <TableHead className="text-center">
-                                Aksi
-                              </TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {successMetrics.map((metric, index) => (
-                              <TableRow key={index}>
-                                <TableCell>
-                                  <div className="flex items-center gap-2">
-                                    <Target className="w-4 h-4 text-green-600" />
-                                    <span className="font-medium">
-                                      {metric.name || `Metrik ${index + 1}`}
-                                    </span>
-                                  </div>
-                                </TableCell>
-                                <TableCell>{metric.target || "-"}</TableCell>
-                                <TableCell className="text-center">
-                                  <div className="flex justify-center gap-1">
-                                    <Button
-                                      type="button"
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={() => editMetric(index)}
-                                      className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                                    >
-                                      <Edit className="w-4 h-4" />
-                                    </Button>
-                                    <Button
-                                      type="button"
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={() => removeMetric(index)}
-                                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                                    >
-                                      <Trash2 className="w-4 h-4" />
-                                    </Button>
-                                  </div>
-                                </TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </div>
-
-                      {/* Mobile Card View */}
-                      <div className="md:hidden space-y-4">
-                        {successMetrics.map((metric, index) => (
-                          <div
-                            key={index}
-                            className="border rounded-lg p-3 bg-gradient-to-r from-green-50 to-white shadow-sm"
-                          >
-                            <div className="flex items-start justify-between mb-3">
-                              <div className="flex items-start gap-2 flex-1">
-                                <div className="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                                  <Target className="w-3 h-3 text-green-600" />
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <h4 className="font-semibold text-sm text-gray-900 leading-tight mb-0.5">
-                                    {metric.name || `Metrik ${index + 1}`}
-                                  </h4>
-                                </div>
-                              </div>
-                              <div className="flex gap-1 flex-shrink-0 ml-1">
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => editMetric(index)}
-                                  className="text-blue-600 hover:text-blue-700 hover:bg-blue-100 h-6 w-6 p-0"
-                                >
-                                  <Edit className="w-3 h-3" />
-                                </Button>
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => removeMetric(index)}
-                                  className="text-red-600 hover:text-red-700 hover:bg-red-100 h-6 w-6 p-0"
-                                >
-                                  <Trash2 className="w-3 h-3" />
-                                </Button>
-                              </div>
-                            </div>
-
-                            <div className="space-y-2">
-                              <div className="flex justify-between items-center p-1.5 bg-white rounded-md">
-                                <span className="text-xs font-medium text-gray-600">
-                                  Target:
-                                </span>
-                                <span className="text-xs font-semibold text-gray-900">
-                                  {metric.target || "-"}
-                                </span>
-                              </div>
-                            </div>
+                <CardContent className="space-y-4">
+                  {/* Dynamic Inline Form Table */}
+                  <div className="space-y-4">
+                    {successMetrics.map((metric, index) => (
+                      <div
+                        key={index}
+                        className="border rounded-lg p-4 bg-gradient-to-r from-green-50 to-white"
+                      >
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex items-center gap-2">
+                            <Target className="w-4 h-4 text-green-600" />
+                            <span className="font-medium text-sm text-gray-700">
+                              Metrik {index + 1}
+                            </span>
                           </div>
-                        ))}
+                          {successMetrics.length > 1 && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeMetric(index)}
+                              className="text-red-600 hover:text-red-700 hover:bg-red-100 h-8 w-8 p-0"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          )}
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-700">
+                              Nama Metrik *
+                            </label>
+                            <Input
+                              value={metric.name}
+                              onChange={(e) => updateMetric(index, "name", e.target.value)}
+                              placeholder="Contoh: Tingkat konversi leads"
+                              className="w-full"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-700">
+                              Target *
+                            </label>
+                            <Input
+                              value={metric.target}
+                              onChange={(e) => updateMetric(index, "target", e.target.value)}
+                              placeholder="Contoh: 15% atau 100 leads"
+                              className="w-full"
+                            />
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    ))}
+                  </div>
 
                   {/* Tombol Tambah Metrik */}
-                  <div className="pt-4 border-t">
-                    <Button
-                      type="button"
-                      onClick={addMetric}
-                      variant="outline"
-                      className="w-full border-green-600 text-green-600 hover:bg-green-50"
-                    >
-                      <Plus className="w-4 h-4 mr-2" />
-                      <span className="hidden sm:inline">
-                        Tambah Metrik Keberhasilan
-                      </span>
-                      <span className="sm:hidden">Tambah Metrik</span>
-                    </Button>
-                  </div>
+                  <Button
+                    type="button"
+                    onClick={addMetric}
+                    variant="outline"
+                    className="w-full border-green-600 text-green-600 hover:bg-green-50"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    <span className="hidden sm:inline">
+                      Tambah Metrik Keberhasilan
+                    </span>
+                    <span className="sm:hidden">Tambah Metrik</span>
+                  </Button>
                 </CardContent>
               </Card>
 
@@ -1254,39 +1156,7 @@ Contoh:
         </DialogContent>
       </Dialog>
 
-      {/* Success Metrics Modal */}
-      <Dialog
-        open={successMetricsModalOpen}
-        onOpenChange={setSuccessMetricsModalOpen}
-      >
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>
-              {editingMetricIndex !== null
-                ? "Edit Metrik Keberhasilan"
-                : "Tambah Metrik Keberhasilan"}
-            </DialogTitle>
-            <DialogDescription>
-              {editingMetricIndex !== null
-                ? "Perbarui metrik keberhasilan untuk inisiatif ini"
-                : "Tambahkan metrik keberhasilan untuk mengukur pencapaian inisiatif"}
-            </DialogDescription>
-          </DialogHeader>
 
-          <SuccessMetricsForm
-            metric={
-              editingMetricIndex !== null
-                ? successMetrics[editingMetricIndex]
-                : undefined
-            }
-            onSave={handleMetricSave}
-            onCancel={() => {
-              setSuccessMetricsModalOpen(false);
-              setEditingMetricIndex(null);
-            }}
-          />
-        </DialogContent>
-      </Dialog>
     </>
   );
 }
