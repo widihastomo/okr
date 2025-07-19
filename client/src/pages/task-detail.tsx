@@ -33,7 +33,7 @@ import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import { TaskCommentList } from "@/components/task-comment-list";
 import { TaskCommentEditor } from "@/components/task-comment-editor";
-import SimpleTaskModal from "@/components/simple-task-modal";
+import TaskModal from "@/components/task-modal";
 
 // UI Components
 import { 
@@ -698,18 +698,18 @@ export default function TaskDetailPage() {
       </div>
 
       {/* Edit Task Dialog */}
-      <SimpleTaskModal
+      <TaskModal
         open={showEditDialog}
-        onOpenChange={setShowEditDialog}
-        task={taskData}
-        initiativeId={taskData?.initiativeId}
-        onSuccess={() => {
+        onClose={() => {
+          setShowEditDialog(false);
           // Refresh task data after edit
           queryClient.invalidateQueries({ queryKey: [`/api/tasks/${id}`] });
           queryClient.invalidateQueries({ queryKey: [`/api/tasks/${id}/audit-trail`] });
           queryClient.invalidateQueries({ queryKey: ['/api/tasks'] });
-          setShowEditDialog(false);
         }}
+        task={taskData}
+        initiativeId={taskData?.initiativeId}
+        isAdding={false}
       />
 
       {/* Delete Confirmation Dialog */}

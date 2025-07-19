@@ -26,7 +26,6 @@ import { useAuth } from "@/hooks/useAuth";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import type { Initiative, KeyResult, User } from "@shared/schema";
-import SimpleTaskModal from "@/components/simple-task-modal";
 
 // Helper function to get user name with fallback
 const getUserName = (user: User): string => {
@@ -149,8 +148,6 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
   const isEditMode = !!initiative;
   
   // Task modal state
-  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
-  const [selectedTask, setSelectedTask] = useState<any>(null);
 
   
   // For creating initiative, we need a temporary ID
@@ -282,57 +279,37 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
     }
   };
 
-  // Task management functions (modal-based)
-  const openAddTaskModal = () => {
-    setSelectedTask(null);
-    setIsTaskModalOpen(true);
+  // Task management functions (simplified for form data)
+  const addTask = () => {
+    const currentTasks = form.getValues("tasks") || [];
+    form.setValue("tasks", [...currentTasks, {
+      title: "",
+      description: "",
+      status: "not_started" as const,
+      priority: "medium" as const,
+      assignedTo: user?.id || "",
+      dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+    }]);
   };
 
-  const openEditTaskModal = (index: number) => {
-    const currentTasks = form.getValues("tasks") || [];
-    const task = currentTasks[index];
-    if (task) {
-      setSelectedTask({ ...task, index });
-      setIsTaskModalOpen(true);
-    }
-  };
-
-  const handleTaskModalSuccess = (taskData: any) => {
-    const currentTasks = form.getValues("tasks") || [];
-    
-    if (selectedTask?.index !== undefined) {
-      // Edit existing task
-      const updatedTasks = [...currentTasks];
-      updatedTasks[selectedTask.index] = {
-        title: taskData.title,
-        description: taskData.description || "",
-        status: taskData.status,
-        priority: taskData.priority,
-        assignedTo: taskData.assignedTo || "",
-        dueDate: taskData.dueDate ? new Date(taskData.dueDate) : null,
-      };
-      form.setValue("tasks", updatedTasks);
-    } else {
-      // Add new task
-      const newTask = {
-        title: taskData.title,
-        description: taskData.description || "",
-        status: taskData.status,
-        priority: taskData.priority,
-        assignedTo: taskData.assignedTo || "",
-        dueDate: taskData.dueDate ? new Date(taskData.dueDate) : null,
-      };
-      form.setValue("tasks", [...currentTasks, newTask]);
-    }
-    
-    setIsTaskModalOpen(false);
-    setSelectedTask(null);
+  const editTask = (index: number) => {
+    // For now, tasks are edited inline - no modal needed
+    // This function is kept for future modal implementation if needed
   };
 
   const removeTask = (index: number) => {
     const currentTasks = form.getValues("tasks") || [];
     const updatedTasks = currentTasks.filter((_, i) => i !== index);
     form.setValue("tasks", updatedTasks);
+  };
+
+  const updateTask = (index: number, field: keyof TaskFormData, value: any) => {
+    const currentTasks = form.getValues("tasks") || [];
+    const updatedTasks = [...currentTasks];
+    if (updatedTasks[index]) {
+      updatedTasks[index] = { ...updatedTasks[index], [field]: value };
+      form.setValue("tasks", updatedTasks);
+    }
   };
 
   const mutation = useMutation({
@@ -882,162 +859,251 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                       </div>
                     ) : (
                       <div>
-                        {/* Desktop Table View */}
-                        <div className="hidden md:block border rounded-lg">
-                          <Table>
-                            <TableHeader>
-                              <TableRow>
-                                <TableHead>Task</TableHead>
-                                <TableHead className="text-center">Status</TableHead>
-                                <TableHead className="text-center">Prioritas</TableHead>
-                                <TableHead className="text-center">Assigned To</TableHead>
-                                <TableHead className="text-center">Deadline</TableHead>
-                                <TableHead className="text-center">Aksi</TableHead>
-                              </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                              {(form.watch("tasks") || []).map((task, index) => (
-                                <TableRow key={index}>
-                                  <TableCell>
-                                    <div className="flex items-center gap-2">
-                                      <ListTodo className="w-4 h-4 text-green-600" />
-                                      <div>
-                                        <p className="font-medium">
-                                          {task.title || `Task ${index + 1}`}
-                                        </p>
-                                        {task.description && (
-                                          <p className="text-sm text-gray-500 mt-1">
-                                            {task.description}
-                                          </p>
-                                        )}
-                                      </div>
-                                    </div>
-                                  </TableCell>
-                                  <TableCell className="text-center">
-                                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                                      task.status === 'completed' ? 'bg-green-100 text-green-800' :
-                                      task.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
-                                      task.status === 'cancelled' ? 'bg-red-100 text-red-800' :
-                                      'bg-gray-100 text-gray-800'
-                                    }`}>
-                                      {getTaskStatusLabel(task.status)}
-                                    </span>
-                                  </TableCell>
-                                  <TableCell className="text-center">
-                                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                                      task.priority === 'high' ? 'bg-red-100 text-red-800' :
-                                      task.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-                                      'bg-green-100 text-green-800'
-                                    }`}>
-                                      {getTaskPriorityLabel(task.priority)}
-                                    </span>
-                                  </TableCell>
-                                  <TableCell className="text-center">
-                                    {task.assignedTo ? (
-                                      <div className="flex items-center justify-center gap-2">
-                                        <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center">
-                                          <span className="text-xs font-medium text-green-600">
-                                            {users?.find(u => u.id === task.assignedTo) ? getUserInitials(users.find(u => u.id === task.assignedTo)!) : '?'}
-                                          </span>
-                                        </div>
-                                        <span className="text-sm text-gray-600 truncate max-w-20">
-                                          {users?.find(u => u.id === task.assignedTo) ? getUserName(users.find(u => u.id === task.assignedTo)!) : 'Unknown'}
-                                        </span>
-                                      </div>
-                                    ) : (
-                                      <span className="text-sm text-gray-400">-</span>
-                                    )}
-                                  </TableCell>
-                                  <TableCell className="text-center">
-                                    {task.dueDate ? (
-                                      <span className="text-sm text-gray-600">
-                                        {format(new Date(task.dueDate), "dd/MM/yyyy", { locale: id })}
-                                      </span>
-                                    ) : (
-                                      <span className="text-sm text-gray-400">-</span>
-                                    )}
-                                  </TableCell>
-                                  <TableCell className="text-center">
-                                    <div className="flex justify-center gap-1">
-                                      <Button
-                                        type="button"
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => openEditTaskModal(index)}
-                                        className="text-green-600 hover:text-green-700 hover:bg-green-50"
-                                      >
-                                        <Edit className="w-4 h-4" />
-                                      </Button>
-                                      <Button
-                                        type="button"
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => removeTask(index)}
-                                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                                      >
-                                        <Trash2 className="w-4 h-4" />
-                                      </Button>
-                                    </div>
-                                  </TableCell>
-                                </TableRow>
-                              ))}
-                            </TableBody>
-                          </Table>
-                        </div>
-
-                        {/* Mobile Card View */}
-                        <div className="md:hidden space-y-3">
+                        {/* Desktop Card View with Inline Editing */}
+                        <div className="hidden md:block space-y-4">
                           {(form.watch("tasks") || []).map((task, index) => (
                             <div key={index} className="border rounded-lg p-4 bg-gradient-to-r from-green-50 to-white shadow-sm">
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-3 flex-1">
-                                  <ListTodo className="w-4 h-4 text-green-600 flex-shrink-0" />
-                                  <div className="flex-1 min-w-0">
-                                    <p className="font-medium text-sm truncate">
-                                      {task.title || `Task ${index + 1}`}
-                                    </p>
-                                    {task.description && (
-                                      <p className="text-xs text-gray-500 mt-1 line-clamp-2">
-                                        {task.description}
-                                      </p>
-                                    )}
-                                    <div className="flex items-center gap-2 mt-2">
-                                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                                        task.status === 'completed' ? 'bg-green-100 text-green-800' :
-                                        task.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
-                                        task.status === 'cancelled' ? 'bg-red-100 text-red-800' :
-                                        'bg-gray-100 text-gray-800'
-                                      }`}>
-                                        {getTaskStatusLabel(task.status)}
-                                      </span>
-                                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                                        task.priority === 'high' ? 'bg-red-100 text-red-800' :
-                                        task.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-                                        'bg-green-100 text-green-800'
-                                      }`}>
-                                        {getTaskPriorityLabel(task.priority)}
-                                      </span>
+                              <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                                {/* Task Title */}
+                                <div className="lg:col-span-3">
+                                  <label className="text-xs font-medium text-green-700 mb-1 block">Judul Task</label>
+                                  <Input
+                                    placeholder="Judul task..."
+                                    value={task.title || ""}
+                                    onChange={(e) => updateTask(index, "title", e.target.value)}
+                                    className="font-medium bg-white border-green-300 focus:border-green-500"
+                                  />
+                                </div>
+                                
+                                {/* Task Description */}
+                                <div className="lg:col-span-3">
+                                  <label className="text-xs font-medium text-green-700 mb-1 block">Deskripsi</label>
+                                  <Textarea
+                                    placeholder="Deskripsi task..."
+                                    value={task.description || ""}
+                                    onChange={(e) => updateTask(index, "description", e.target.value)}
+                                    className="bg-white border-green-300 focus:border-green-500 resize-none"
+                                    rows={1}
+                                  />
+                                </div>
+                                
+                                {/* Status */}
+                                <div className="lg:col-span-2">
+                                  <label className="text-xs font-medium text-green-700 mb-1 block">Status</label>
+                                  <Select
+                                    value={task.status}
+                                    onValueChange={(value) => updateTask(index, "status", value)}
+                                  >
+                                    <SelectTrigger className="bg-white border-green-300 focus:border-green-500">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="not_started">Belum Dimulai</SelectItem>
+                                      <SelectItem value="in_progress">Sedang Dikerjakan</SelectItem>
+                                      <SelectItem value="completed">Selesai</SelectItem>
+                                      <SelectItem value="cancelled">Dibatalkan</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                
+                                {/* Priority */}
+                                <div className="lg:col-span-2">
+                                  <label className="text-xs font-medium text-green-700 mb-1 block">Prioritas</label>
+                                  <Select
+                                    value={task.priority}
+                                    onValueChange={(value) => updateTask(index, "priority", value)}
+                                  >
+                                    <SelectTrigger className="bg-white border-green-300 focus:border-green-500">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="low">Rendah</SelectItem>
+                                      <SelectItem value="medium">Sedang</SelectItem>
+                                      <SelectItem value="high">Tinggi</SelectItem>
+                                      <SelectItem value="critical">Kritis</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                
+                                {/* Assignee */}
+                                <div className="lg:col-span-2">
+                                  <label className="text-xs font-medium text-green-700 mb-1 block">Ditugaskan Kepada</label>
+                                  <SearchableUserSelect
+                                    users={users}
+                                    value={task.assignedTo || ""}
+                                    onValueChange={(value) => updateTask(index, "assignedTo", value)}
+                                    placeholder="Pilih pengguna..."
+                                    currentUser={user}
+                                    className="bg-white border-green-300 focus:border-green-500"
+                                  />
+                                </div>
+                                
+                                {/* Remove Task Button */}
+                                <div className="lg:col-span-12 flex justify-end pt-2 border-t border-green-200">
+                                  <div className="flex items-center gap-3">
+                                    {/* Due Date */}
+                                    <div className="flex items-center gap-2">
+                                      <label className="text-xs font-medium text-green-700">Deadline:</label>
+                                      <Popover>
+                                        <PopoverTrigger asChild>
+                                          <Button
+                                            variant="outline"
+                                            size="sm"
+                                            className={cn(
+                                              "justify-start text-left font-normal bg-white border-green-300 focus:border-green-500",
+                                              !task.dueDate && "text-muted-foreground"
+                                            )}
+                                          >
+                                            <CalendarIcon className="mr-2 h-4 w-4" />
+                                            {task.dueDate ? format(task.dueDate, "dd MMM yyyy", { locale: id }) : "Pilih tanggal"}
+                                          </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-auto p-0">
+                                          <Calendar
+                                            mode="single"
+                                            selected={task.dueDate}
+                                            onSelect={(date) => updateTask(index, "dueDate", date)}
+                                            initialFocus
+                                          />
+                                        </PopoverContent>
+                                      </Popover>
                                     </div>
+                                    
+                                    <Button
+                                      type="button"
+                                      size="sm"
+                                      variant="ghost"
+                                      onClick={() => removeTask(index)}
+                                      className="text-red-600 hover:text-red-800 hover:bg-red-100"
+                                    >
+                                      <Trash2 className="w-4 h-4 mr-1" />
+                                      Hapus Task
+                                    </Button>
                                   </div>
                                 </div>
-                                <div className="flex flex-col gap-1 ml-2">
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Mobile Card View with Inline Editing */}
+                        <div className="md:hidden space-y-4">
+                          {(form.watch("tasks") || []).map((task, index) => (
+                            <div key={index} className="border rounded-lg p-4 bg-gradient-to-r from-green-50 to-white shadow-sm">
+                              <div className="space-y-3">
+                                {/* Task Title */}
+                                <div>
+                                  <label className="text-xs font-medium text-green-700 mb-1 block">Judul Task</label>
+                                  <Input
+                                    placeholder="Judul task..."
+                                    value={task.title || ""}
+                                    onChange={(e) => updateTask(index, "title", e.target.value)}
+                                    className="font-medium bg-white border-green-300 focus:border-green-500"
+                                  />
+                                </div>
+                                
+                                {/* Task Description */}
+                                <div>
+                                  <label className="text-xs font-medium text-green-700 mb-1 block">Deskripsi</label>
+                                  <Textarea
+                                    placeholder="Deskripsi task (opsional)..."
+                                    value={task.description || ""}
+                                    onChange={(e) => updateTask(index, "description", e.target.value)}
+                                    className="bg-white border-green-300 focus:border-green-500 resize-none"
+                                    rows={2}
+                                  />
+                                </div>
+                                
+                                {/* Status and Priority Row */}
+                                <div className="grid grid-cols-2 gap-3">
+                                  <div>
+                                    <label className="text-xs font-medium text-green-700 mb-1 block">Status</label>
+                                    <Select
+                                      value={task.status}
+                                      onValueChange={(value) => updateTask(index, "status", value)}
+                                    >
+                                      <SelectTrigger className="bg-white border-green-300 focus:border-green-500 text-xs">
+                                        <SelectValue />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="not_started">Belum Dimulai</SelectItem>
+                                        <SelectItem value="in_progress">Sedang Dikerjakan</SelectItem>
+                                        <SelectItem value="completed">Selesai</SelectItem>
+                                        <SelectItem value="cancelled">Dibatalkan</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                  
+                                  <div>
+                                    <label className="text-xs font-medium text-green-700 mb-1 block">Prioritas</label>
+                                    <Select
+                                      value={task.priority}
+                                      onValueChange={(value) => updateTask(index, "priority", value)}
+                                    >
+                                      <SelectTrigger className="bg-white border-green-300 focus:border-green-500 text-xs">
+                                        <SelectValue />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="low">Rendah</SelectItem>
+                                        <SelectItem value="medium">Sedang</SelectItem>
+                                        <SelectItem value="high">Tinggi</SelectItem>
+                                        <SelectItem value="critical">Kritis</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                </div>
+                                
+                                {/* Assignee */}
+                                <div>
+                                  <label className="text-xs font-medium text-green-700 mb-1 block">Ditugaskan Kepada</label>
+                                  <SearchableUserSelect
+                                    users={users}
+                                    value={task.assignedTo || ""}
+                                    onValueChange={(value) => updateTask(index, "assignedTo", value)}
+                                    placeholder="Pilih pengguna..."
+                                    currentUser={user}
+                                    className="bg-white border-green-300 focus:border-green-500"
+                                  />
+                                </div>
+                                
+                                {/* Due Date */}
+                                <div>
+                                  <label className="text-xs font-medium text-green-700 mb-1 block">Tanggal Deadline</label>
+                                  <Popover>
+                                    <PopoverTrigger asChild>
+                                      <Button
+                                        variant="outline"
+                                        className={cn(
+                                          "w-full justify-start text-left font-normal bg-white border-green-300 focus:border-green-500",
+                                          !task.dueDate && "text-muted-foreground"
+                                        )}
+                                      >
+                                        <CalendarIcon className="mr-2 h-4 w-4" />
+                                        {task.dueDate ? format(task.dueDate, "dd MMM yyyy", { locale: id }) : "Pilih tanggal"}
+                                      </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-auto p-0">
+                                      <Calendar
+                                        mode="single"
+                                        selected={task.dueDate}
+                                        onSelect={(date) => updateTask(index, "dueDate", date)}
+                                        initialFocus
+                                      />
+                                    </PopoverContent>
+                                  </Popover>
+                                </div>
+                                
+                                {/* Remove Task Button */}
+                                <div className="flex justify-end pt-2 border-t border-green-200">
                                   <Button
                                     type="button"
-                                    variant="ghost"
                                     size="sm"
-                                    onClick={() => openEditTaskModal(index)}
-                                    className="text-green-600 hover:text-green-700 hover:bg-green-50 h-8 w-8 p-0"
-                                  >
-                                    <Edit className="w-4 h-4" />
-                                  </Button>
-                                  <Button
-                                    type="button"
                                     variant="ghost"
-                                    size="sm"
                                     onClick={() => removeTask(index)}
-                                    className="text-red-600 hover:text-red-700 hover:bg-red-50 h-8 w-8 p-0"
+                                    className="text-red-600 hover:text-red-800 hover:bg-red-100"
                                   >
-                                    <Trash2 className="w-4 h-4" />
+                                    <Trash2 className="w-4 h-4 mr-1" />
+                                    Hapus Task
                                   </Button>
                                 </div>
                               </div>
@@ -1051,7 +1117,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                     <div className="pt-4 border-t">
                       <Button 
                         type="button" 
-                        onClick={openAddTaskModal} 
+                        onClick={addTask} 
                         variant="outline" 
                         className="w-full border-green-600 text-green-600 hover:bg-green-50"
                       >
@@ -1256,14 +1322,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
         </Form>
       </DialogContent>
       
-      {/* Task Modal */}
-      <SimpleTaskModal
-        open={isTaskModalOpen}
-        onOpenChange={setIsTaskModalOpen}
-        task={selectedTask}
-        onSuccess={handleTaskModalSuccess}
-        initiativeId={initiativeId}
-      />
+
 
     </Dialog>
   );
