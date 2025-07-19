@@ -1971,7 +1971,10 @@ export default function GoalDetail() {
                 </p>
               </div>
               <Button
-                onClick={() => setShowInitiativeFormModal(true)}
+                onClick={() => {
+                  console.log("Button clicked - opening initiative modal");
+                  setShowInitiativeFormModal(true);
+                }}
                 className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white w-full sm:w-auto sm:ml-4 shrink-0"
               >
                 <Plus className="w-4 h-4 mr-2" />
@@ -3086,9 +3089,11 @@ export default function GoalDetail() {
         users={users}
       />
       {/* Initiative Form Modal */}
+      {console.log("Modal state - showInitiativeFormModal:", showInitiativeFormModal)}
       <InitiativeFormModal
         isOpen={showInitiativeFormModal}
         onClose={() => {
+          console.log("Modal closing - setting showInitiativeFormModal to false");
           setShowInitiativeFormModal(false);
           setEditingInitiative(null);
         }}
