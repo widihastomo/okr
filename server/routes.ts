@@ -3406,9 +3406,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/initiatives/:initiativeId/definition-of-done", async (req, res) => {
     try {
       const initiativeId = req.params.initiativeId;
-      console.log('DoD API called for initiative:', initiativeId);
       const items = await storage.getDefinitionOfDoneItems(initiativeId);
-      console.log('DoD items returned:', items, 'Count:', items?.length);
       res.json(items);
     } catch (error) {
       console.error("Error fetching definition of done items:", error);

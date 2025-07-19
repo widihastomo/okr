@@ -341,6 +341,15 @@ The system includes comprehensive database connection troubleshooting tools:
 
 ## Changelog
 ```
+- July 19, 2025. **DOD FIELD MAPPING BUG COMPLETELY FIXED** - Successfully resolved critical DoD data display bug in edit initiative form:
+  * FIXED: DoD field mapping from "description" to "title" to match API response structure
+  * RESOLVED: API returns DoD items with "title" field, but form was mapping from non-existent "description" field
+  * ENHANCED: Added comprehensive debugging system to track data flow from API to form initialization
+  * UPDATED: TanStack Query v5 implementation by removing deprecated onSuccess/onError callbacks
+  * VERIFIED: DoD input fields now populate correctly with existing data ("asdasd", "sdasd")
+  * CLEANED: Removed all debugging logs after successful bug resolution
+  * REMOVED: Toast success message when adding tasks in initiative form per user request
+  * RESULT: Edit initiative form now properly displays Definition of Done items with correct field mapping
 - July 19, 2025. **INITIATIVE EDIT FUNCTIONALITY FIX** - Successfully fixed broken edit initiative functionality:
   * FIXED: Initiative edit modal was not opening due to incorrect prop names (isOpen/onClose vs open/onOpenChange)
   * CORRECTED: Updated InitiativeFormModal props to match expected interface in initiative-detail.tsx

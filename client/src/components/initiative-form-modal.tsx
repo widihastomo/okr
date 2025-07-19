@@ -183,18 +183,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
     enabled: !!(isEditMode && initiative?.id),
   });
 
-  // Debug DoD data when it changes
-  useEffect(() => {
-    if (isEditMode && initiative?.id) {
-      console.log('DoD Query Result:', {
-        existingDoDItems,
-        isDoDLoading,
-        isArray: Array.isArray(existingDoDItems),
-        length: existingDoDItems?.length,
-        items: existingDoDItems
-      });
-    }
-  }, [existingDoDItems, isDoDLoading, isEditMode, initiative?.id]);
+
 
   // Priority calculation functions
   const calculatePriorityScore = (): number => {
@@ -293,14 +282,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
       const shouldReset = !isEditMode || (existingSuccessMetrics !== undefined && existingTasks !== undefined && existingDoDItems !== undefined);
       
       if (shouldReset) {
-        console.log('Resetting form with data:', {
-          existingSuccessMetrics,
-          existingTasks,
-          existingDoDItems,
-          mappedDoDItems: existingDoDItems?.map(item => item.title),
-          isDoDArray: Array.isArray(existingDoDItems),
-          doDLength: existingDoDItems?.length
-        });
+
         
         form.reset({
           initiative: {
@@ -400,11 +382,6 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
     const currentTasks = form.getValues("tasks") || [];
     form.setValue("tasks", [...currentTasks, taskData]);
     setShowTaskModal(false);
-    toast({
-      title: "Task berhasil ditambahkan",
-      description: "Task telah ditambahkan ke daftar inisiatif",
-      variant: "default",
-    });
   };
 
   const editTask = (index: number) => {
