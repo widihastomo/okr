@@ -341,6 +341,15 @@ The system includes comprehensive database connection troubleshooting tools:
 
 ## Changelog
 ```
+- July 19, 2025. **AUTOMATIC PRIORITY CALCULATION SYSTEM IMPLEMENTED** - Successfully implemented comprehensive automatic priority calculation for initiatives based on business impact, difficulty, and belief levels:
+  * ADDED: Three-factor priority calculation system using business impact (40%), ease/difficulty (30%), and belief level (30%)
+  * IMPLEMENTED: Dynamic priority scores on 1-5 scale with automatic priority assignment (Low, Medium, High, Critical)
+  * ENHANCED: Real-time priority calculation with visual feedback showing formula and score
+  * ADDED: Comprehensive UI with tooltips and informational displays for each factor
+  * INTEGRATED: Priority calculation fields into initiative form schema with proper validation
+  * CREATED: Helper functions for priority calculation, labeling, and badge styling
+  * DISPLAYED: Formula breakdown showing exact calculation: (Dampak×0.4) + (Kemudahan×0.3) + (Keyakinan×0.3)
+  * RESULT: Users can now get intelligent priority recommendations based on quantitative business factors instead of manual priority selection
 - July 19, 2025. **INITIATIVE TASK CARDS VISUAL ENHANCEMENT** - Successfully enhanced task card display with avatar integration and layout improvements:
   * REPLACED: "PIC:" text with user profile avatar (w-4 h-4) showing user initials in blue theme
   * REORGANIZED: Task card layout - task title on left, avatar + name + date + delete button on right

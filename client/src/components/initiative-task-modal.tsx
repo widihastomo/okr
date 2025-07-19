@@ -112,7 +112,7 @@ export default function InitiativeTaskModal({ open, onOpenChange, onTaskAdd }: I
                 <FormItem>
                   <FormLabel>Judul Task</FormLabel>
                   <FormControl>
-                    <Input placeholder="Masukkan judul task..." {...field} />
+                    <Input placeholder="Contoh : Membuat skema penawaran paket reseller" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

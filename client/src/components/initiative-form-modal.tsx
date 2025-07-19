@@ -124,6 +124,9 @@ const initiativeFormSchema = z.object({
     priority: z.enum(["low", "medium", "high", "critical"]).default("medium"),
     budget: z.string().optional(),
   }),
+  businessImpact: z.number().min(1).max(5).optional(),
+  difficultyLevel: z.number().min(1).max(5).optional(),
+  beliefLevel: z.number().min(1).max(5).optional(),
   successMetrics: z.array(successMetricSchema).optional().default([]),
   tasks: z.array(taskSchema).optional().default([]),
 }).refine(
@@ -164,6 +167,53 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
   const { data: keyResults } = useQuery<KeyResult[]>({ queryKey: ["/api/key-results"] });
   const { data: users } = useQuery<User[]>({ queryKey: ["/api/users"] });
 
+  // Priority calculation functions
+  const calculatePriorityScore = (): number => {
+    const businessImpact = form.watch("businessImpact") || 0;
+    const difficultyLevel = form.watch("difficultyLevel") || 0;
+    const beliefLevel = form.watch("beliefLevel") || 0;
+    
+    if (!businessImpact || !difficultyLevel || !beliefLevel) return 0;
+    
+    // Convert difficulty to ease (higher difficulty = lower ease)
+    const ease = 6 - difficultyLevel;
+    
+    // Calculate weighted score: Business Impact (40%) + Ease (30%) + Belief (30%)
+    return (businessImpact * 0.4) + (ease * 0.3) + (beliefLevel * 0.3);
+  };
+
+  const calculatePriority = () => {
+    const score = calculatePriorityScore();
+    let priority = "medium";
+    
+    if (score >= 4.5) priority = "critical";
+    else if (score >= 3.5) priority = "high";
+    else if (score >= 2.5) priority = "medium";
+    else priority = "low";
+    
+    form.setValue("initiative.priority", priority as "low" | "medium" | "high" | "critical");
+  };
+
+  const getPriorityLabel = (priority: string): string => {
+    const labels = {
+      low: "Rendah",
+      medium: "Sedang", 
+      high: "Tinggi",
+      critical: "Kritis"
+    };
+    return labels[priority as keyof typeof labels] || "Sedang";
+  };
+
+  const getPriorityBadgeColor = (priority: string): string => {
+    const colors = {
+      low: "bg-gray-100 text-gray-800",
+      medium: "bg-yellow-100 text-yellow-800",
+      high: "bg-orange-100 text-orange-800", 
+      critical: "bg-red-100 text-red-800"
+    };
+    return colors[priority as keyof typeof colors] || "bg-yellow-100 text-yellow-800";
+  };
+
   const form = useForm<InitiativeFormData>({
     resolver: zodResolver(initiativeFormSchema),
     defaultValues: isEditMode ? {
@@ -179,6 +229,9 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
         priority: initiative.priority,
         budget: initiative.budget || "",
       },
+      businessImpact: undefined,
+      difficultyLevel: undefined,
+      beliefLevel: undefined,
       successMetrics: [{ name: "", target: "" }],
       tasks: [],
     } : {
@@ -194,6 +247,9 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
         priority: "medium",
         budget: "",
       },
+      businessImpact: undefined,
+      difficultyLevel: undefined,
+      beliefLevel: undefined,
       successMetrics: [{ name: "", target: "" }],
       tasks: [],
     },
@@ -217,6 +273,9 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
             priority: initiative.priority,
             budget: initiative.budget || "",
           },
+          businessImpact: undefined,
+          difficultyLevel: undefined,
+          beliefLevel: undefined,
           successMetrics: [{ name: "", target: "" }],
           tasks: [],
         });
@@ -234,6 +293,9 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
             priority: "medium",
             budget: "",
           },
+          businessImpact: undefined,
+          difficultyLevel: undefined,
+          beliefLevel: undefined,
           successMetrics: [{ name: "", target: "" }],
           tasks: [],
         });
@@ -500,7 +562,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="flex items-center gap-2">
-                          Judul Inisiatif*
+                          Nama Inisiatif*
                           <Popover>
                             <PopoverTrigger asChild>
                               <button 
@@ -520,7 +582,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                           </Popover>
                         </FormLabel>
                         <FormControl>
-                          <Input placeholder="Contoh: Implementasi Chatbot Customer Service" {...field} />
+                          <Input placeholder="Contoh: Aktivasi Reseller Baru di Wilayah Timur" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -568,7 +630,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="flex items-center gap-2">
-                          Deskripsi Inisiatif
+                          Tujuan Inisiatif
                           <Popover>
                             <PopoverTrigger asChild>
                               <button 
@@ -587,7 +649,8 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                         </FormLabel>
                         <FormControl>
                           <Textarea 
-                            placeholder="Contoh: Inisiatif ini bertujuan untuk meningkatkan response time customer service melalui implementasi chatbot AI yang dapat menangani 70% pertanyaan umum..." 
+                            placeholder="Kenapa inisiatif ini diperlukan?
+Contoh: Wilayah timur memiliki potensi pasar yang besar namun kontribusi penjualannya masih rendah dan masih berpotensi untuk diakselerasi" 
                             {...field} 
                           />
                         </FormControl>
@@ -600,7 +663,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                   <div className="space-y-4">
                     <div className="flex items-center gap-2">
                       <FormLabel>
-                        Metrik Keberhasilan
+                        Outcome / Hasil Yang Diharapkan
                       </FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
@@ -613,7 +676,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                         </PopoverTrigger>
                         <PopoverContent side="right" className="max-w-xs">
                           <p className="text-sm">
-                            Metrik yang akan digunakan untuk mengukur keberhasilan inisiatif ini. Buat metrik yang spesifik dan terukur.
+                            Metrik / ukuran yang bisa digunakan untuk mengukur apakan inisiatif ini berhasil, gagal, atau perlu diulangi. Buat metrik yang spesifik dan terukur.
                           </p>
                         </PopoverContent>
                       </Popover>
@@ -634,8 +697,8 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                             <Table>
                               <TableHeader>
                                 <TableRow>
-                                  <TableHead>Nama Metrik</TableHead>
-                                  <TableHead className="text-center">Target</TableHead>
+                                  <TableHead>Nama Metrik / Ukuran</TableHead>
+                                  <TableHead className="text-center">Target / Hasil Yang Diharapkan</TableHead>
                                   <TableHead className="text-center">Aksi</TableHead>
                                 </TableRow>
                               </TableHeader>
@@ -644,7 +707,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                               <TableRow key={index}>
                                 <TableCell>
                                   <Input
-                                    placeholder="Contoh: Tingkat Kepuasan Customer"
+                                    placeholder="Contoh: Jumlah reseller bergabung"
                                     value={metric.name}
                                     onChange={(e) => updateSuccessMetric(index, "name", e.target.value)}
                                     className="border border-gray-300 p-2"
@@ -652,7 +715,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                                 </TableCell>
                                 <TableCell className="text-center">
                                   <Input
-                                    placeholder="Contoh: 90%"
+                                    placeholder="Contoh: 30 Orang"
                                     value={metric.target}
                                     onChange={(e) => updateSuccessMetric(index, "target", e.target.value)}
                                     className="border border-gray-300 p-2 text-center"
@@ -769,7 +832,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                         </FormLabel>
                         <FormControl>
                           <Textarea 
-                            placeholder="Contoh: 1. Research & analisis kebutuhan (Week 1-2), 2. Design & prototyping (Week 3-4), 3. Development (Week 5-8), 4. Testing & deployment (Week 9-10)..." 
+                            placeholder="Contoh: Untuk mempercepat penetrasi pasar di wilayah timur, kami akan menghubungi 100 calon reseller potensial dan menawarkan paket reseller serta pendampingan khusus selama 2 minggu. Setelah itu, kami akan melakukan follow-up berkala untuk memastikan keberhasilan program." 
                             {...field} 
                           />
                         </FormControl>
@@ -781,7 +844,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                   {/* Definition of Done - Dynamic List */}
                   <div className="space-y-4">
                     <div className="flex items-center gap-2">
-                      <FormLabel>Definition of Done</FormLabel>
+                      <FormLabel>Deliverables (Output Inisiatif)</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
                           <button 
@@ -793,7 +856,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                         </PopoverTrigger>
                         <PopoverContent side="right" className="max-w-xs">
                           <p className="text-sm">
-                            Kriteria spesifik yang harus dipenuhi untuk menganggap inisiatif ini berhasil dan selesai. Buat daftar yang jelas dan terukur.
+                            Apa output / keluaran dari inisiatif untuk dapat menyatakan bahwa inisiatif ini selesai dan tereksekusi dengan baik terlepas dari hasilnya.
                           </p>
                         </PopoverContent>
                       </Popover>
@@ -809,7 +872,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                               {index + 1}
                             </div>
                             <Input
-                              placeholder="Contoh: User dapat login dengan chatbot"
+                              placeholder="Contoh: 100 calon reseller sudah dihubungi"
                               value={item}
                               onChange={(e) => updateDefinitionItem(index, e.target.value)}
                               className="flex-1 border border-gray-300 p-2"
@@ -846,7 +909,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                   {/* Task Management */}
                   <div className="space-y-4">
                     <div className="flex items-center gap-2">
-                      <FormLabel>Task Management</FormLabel>
+                      <FormLabel>Breakdown Tugas / Task</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
                           <button 
@@ -858,7 +921,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                         </PopoverTrigger>
                         <PopoverContent side="right" className="max-w-xs">
                           <p className="text-sm">
-                            Task-task yang perlu dikerjakan untuk menyelesaikan inisiatif ini. Klik tombol untuk menambah task baru.
+                            Task / tugas apa saja yang perlu dikerjakan untuk menyelesaikan inisiatif ini. Bagi tugas menjadi bagian-bagian kecil dan siapa yang bertanggung jawab terhadap tugas tersebut.
                           </p>
                         </PopoverContent>
                       </Popover>
@@ -867,7 +930,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                     {(form.watch("tasks") || []).length === 0 ? (
                       <div className="text-center py-8 text-gray-500">
                         <ListTodo className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-                        <p>Belum ada Task</p>
+                        <p>Belum ada Tugas / Task</p>
                         <p className="text-sm">Klik tombol di bawah untuk menambahkan</p>
                       </div>
                     ) : (
@@ -1042,25 +1105,133 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                   />
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="initiative.priority"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Prioritas</FormLabel>
-                          <Select onValueChange={field.onChange} value={field.value}>
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Pilih prioritas" />
-                              </SelectTrigger>
-                            </FormControl>
+                    {/* Priority Calculation System */}
+                    <div className="col-span-full">
+                      <FormLabel className="text-base font-semibold mb-4 block">
+                        Perhitungan Prioritas Otomatis
+                      </FormLabel>
+                      <p className="text-sm text-gray-600 mb-6">
+                        Prioritas akan dihitung otomatis berdasarkan dampak bisnis, tingkat kesulitan, dan keyakinan (skala 1-5)
+                      </p>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        {/* Business Impact */}
+                        <div>
+                          <FormLabel className="text-sm font-medium text-gray-700 mb-2 block">
+                            Dampak Bisnis
+                            <span className="ml-1 text-blue-500 cursor-help" title="Seberapa besar dampak inisiatif ini terhadap bisnis">ⓘ</span>
+                          </FormLabel>
+                          <Select 
+                            onValueChange={(value) => {
+                              form.setValue("businessImpact", Number(value));
+                              calculatePriority();
+                            }} 
+                            value={form.watch("businessImpact")?.toString() || ""}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Pilih dampak bisnis" />
+                            </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="low">Rendah</SelectItem>
-                              <SelectItem value="medium">Sedang</SelectItem>
-                              <SelectItem value="high">Tinggi</SelectItem>
-                              <SelectItem value="critical">Kritis</SelectItem>
+                              <SelectItem value="1">1 - Sangat Rendah</SelectItem>
+                              <SelectItem value="2">2 - Rendah</SelectItem>
+                              <SelectItem value="3">3 - Sedang</SelectItem>
+                              <SelectItem value="4">4 - Tinggi</SelectItem>
+                              <SelectItem value="5">5 - Sangat Tinggi</SelectItem>
                             </SelectContent>
                           </Select>
+                        </div>
+
+                        {/* Difficulty Level */}
+                        <div>
+                          <FormLabel className="text-sm font-medium text-gray-700 mb-2 block">
+                            Tingkat Kesulitan
+                            <span className="ml-1 text-blue-500 cursor-help" title="Seberapa sulit implementasi inisiatif ini">ⓘ</span>
+                          </FormLabel>
+                          <Select 
+                            onValueChange={(value) => {
+                              form.setValue("difficultyLevel", Number(value));
+                              calculatePriority();
+                            }} 
+                            value={form.watch("difficultyLevel")?.toString() || ""}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Pilih tingkat kesulitan" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="1">1 - Sangat Mudah</SelectItem>
+                              <SelectItem value="2">2 - Mudah</SelectItem>
+                              <SelectItem value="3">3 - Sedang</SelectItem>
+                              <SelectItem value="4">4 - Sulit</SelectItem>
+                              <SelectItem value="5">5 - Sangat Sulit</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        {/* Belief Level */}
+                        <div>
+                          <FormLabel className="text-sm font-medium text-gray-700 mb-2 block">
+                            Tingkat Keyakinan
+                            <span className="ml-1 text-blue-500 cursor-help" title="Seberapa yakin tim dapat menyelesaikan inisiatif ini">ⓘ</span>
+                          </FormLabel>
+                          <Select 
+                            onValueChange={(value) => {
+                              form.setValue("beliefLevel", Number(value));
+                              calculatePriority();
+                            }} 
+                            value={form.watch("beliefLevel")?.toString() || ""}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Pilih tingkat keyakinan" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="1">1 - Sangat Rendah</SelectItem>
+                              <SelectItem value="2">2 - Rendah</SelectItem>
+                              <SelectItem value="3">3 - Sedang</SelectItem>
+                              <SelectItem value="4">4 - Tinggi</SelectItem>
+                              <SelectItem value="5">5 - Sangat Tinggi</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+
+                      {/* Priority Result */}
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="w-2 h-2 bg-blue-600 rounded-full"></span>
+                          <span className="font-medium text-blue-800">Prioritas Otomatis</span>
+                        </div>
+                        
+                        {form.watch("businessImpact") && form.watch("difficultyLevel") && form.watch("beliefLevel") ? (
+                          <div>
+                            <div className="flex items-center gap-2 mb-2">
+                              <span className={`px-3 py-1 rounded-full text-sm font-medium ${getPriorityBadgeColor(form.watch("initiative.priority"))}`}>
+                                {getPriorityLabel(form.watch("initiative.priority"))}
+                              </span>
+                              <span className="text-sm text-gray-600">
+                                Skor: {calculatePriorityScore().toFixed(2)}/5
+                              </span>
+                            </div>
+                            <div className="text-xs text-gray-600">
+                              Formula: (Dampak×0.4) + (Kemudahan×0.3) + (Keyakinan×0.3) = ({form.watch("businessImpact")}×0.4) + ({(6 - form.watch("difficultyLevel"))}×0.3) + ({form.watch("beliefLevel")}×0.3) = {calculatePriorityScore().toFixed(2)}
+                            </div>
+                          </div>
+                        ) : (
+                          <p className="text-sm text-gray-600">
+                            Pilih semua kriteria di atas untuk melihat hasil prioritas otomatis
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <FormField
+                      control={form.control}
+                      name="initiative.budget"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Budget (Opsional)</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Contoh: Rp 50.000.000" {...field} />
+                          </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
