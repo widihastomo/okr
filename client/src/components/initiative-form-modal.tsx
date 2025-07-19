@@ -530,7 +530,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
     
     return (
       <div className="flex items-center justify-center mb-6">
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-2 sm:space-x-4">
           {/* Step 1 */}
           <div className="flex items-center">
             <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
@@ -538,15 +538,20 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
             }`}>
               1
             </div>
-            <span className={`ml-2 text-sm font-medium ${
+            <span className={`ml-2 text-sm font-medium hidden sm:inline ${
               currentStep >= 1 ? 'text-orange-600' : 'text-gray-500'
             }`}>
               Informasi Dasar
             </span>
+            <span className={`ml-2 text-xs font-medium sm:hidden ${
+              currentStep >= 1 ? 'text-orange-600' : 'text-gray-500'
+            }`}>
+              Info
+            </span>
           </div>
           
           {/* Connector */}
-          <ChevronRight className="w-5 h-5 text-gray-400" />
+          <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
           
           {/* Step 2 */}
           <div className="flex items-center">
@@ -555,15 +560,20 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
             }`}>
               2
             </div>
-            <span className={`ml-2 text-sm font-medium ${
+            <span className={`ml-2 text-sm font-medium hidden sm:inline ${
               currentStep >= 2 ? 'text-orange-600' : 'text-gray-500'
             }`}>
               Rencana & Metrik
             </span>
+            <span className={`ml-2 text-xs font-medium sm:hidden ${
+              currentStep >= 2 ? 'text-orange-600' : 'text-gray-500'
+            }`}>
+              Rencana
+            </span>
           </div>
 
           {/* Connector */}
-          <ChevronRight className="w-5 h-5 text-gray-400" />
+          <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
           
           {/* Step 3 */}
           <div className="flex items-center">
@@ -572,10 +582,15 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
             }`}>
               3
             </div>
-            <span className={`ml-2 text-sm font-medium ${
+            <span className={`ml-2 text-sm font-medium hidden sm:inline ${
               currentStep >= 3 ? 'text-orange-600' : 'text-gray-500'
             }`}>
               Timeline & PIC
+            </span>
+            <span className={`ml-2 text-xs font-medium sm:hidden ${
+              currentStep >= 3 ? 'text-orange-600' : 'text-gray-500'
+            }`}>
+              Timeline
             </span>
           </div>
         </div>

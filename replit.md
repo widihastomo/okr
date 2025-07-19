@@ -360,6 +360,12 @@ The system includes comprehensive database connection troubleshooting tools:
   * FIXED: Browser focus management that was causing page to automatically scroll down when detail page loads
   * ENHANCED: 100ms delay to allow all components to render before re-enabling scroll functionality
   * RESULT: Initiative detail page now loads at the top without unwanted automatic scrolling behavior
+- July 19, 2025. **INITIATIVE FORM MOBILE OPTIMIZATION** - Successfully optimized step indicator for mobile devices:
+  * OPTIMIZED: Reduced spacing between step elements from space-x-4 to space-x-2 on mobile
+  * SHORTENED: Mobile-specific condensed labels (Info, Rencana, Timeline) while maintaining full labels on desktop
+  * REDUCED: Connector chevron size from w-5 h-5 to w-4 h-4 on mobile for better space utilization
+  * IMPLEMENTED: Responsive text display with hidden sm:inline for desktop and sm:hidden for mobile labels
+  * RESULT: Step indicator now displays compactly on mobile without overcrowding while preserving full information on desktop
 - July 19, 2025. **DOD FIELD MAPPING BUG COMPLETELY FIXED** - Successfully resolved critical DoD data display bug in edit initiative form:
   * FIXED: DoD field mapping from "description" to "title" to match API response structure
   * RESOLVED: API returns DoD items with "title" field, but form was mapping from non-existent "description" field
