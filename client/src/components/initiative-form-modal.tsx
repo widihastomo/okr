@@ -473,7 +473,7 @@ export default function InitiativeFormModal({
 
   const handleTaskAdd = (taskData: any) => {
     const currentTasks = form.getValues("tasks") || [];
-    
+
     if (editingTaskIndex !== null) {
       // Edit existing task
       const updatedTasks = [...currentTasks];
@@ -486,7 +486,7 @@ export default function InitiativeFormModal({
       // Add new task
       form.setValue("tasks", [...currentTasks, taskData]);
     }
-    
+
     setShowTaskModal(false);
     setEditingTaskIndex(null);
   };
@@ -877,6 +877,7 @@ export default function InitiativeFormModal({
                           <Textarea
                             placeholder="Kenapa inisiatif ini diperlukan?
 Contoh: Wilayah timur memiliki potensi pasar yang besar namun kontribusi penjualannya masih rendah dan masih berpotensi untuk diakselerasi"
+                            className="min-h-[120px] md:min-h-[100px] resize-y"
                             {...field}
                           />
                         </FormControl>
@@ -1228,7 +1229,7 @@ Contoh: Untuk mempercepat penetrasi pasar di wilayah timur, kami akan menghubung
                     </div>
 
                     {(form.watch("tasks") || []).length === 0 ? (
-                      <div className="text-center py-8 text-gray-500">
+                      <div className="text-center py-2 text-gray-500">
                         <ListTodo className="w-8 h-8 mx-auto mb-2 text-gray-300" />
                         <p>Belum ada Tugas / Task</p>
                         <p className="text-sm">
@@ -1830,7 +1831,11 @@ Contoh: Untuk mempercepat penetrasi pasar di wilayah timur, kami akan menghubung
         open={showTaskModal}
         onOpenChange={setShowTaskModal}
         onTaskAdd={handleTaskAdd}
-        editingTask={editingTaskIndex !== null ? (form.getValues("tasks") || [])[editingTaskIndex] : undefined}
+        editingTask={
+          editingTaskIndex !== null
+            ? (form.getValues("tasks") || [])[editingTaskIndex]
+            : undefined
+        }
         isEditing={editingTaskIndex !== null}
       />
     </Dialog>
