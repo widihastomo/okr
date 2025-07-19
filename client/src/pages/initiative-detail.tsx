@@ -1099,11 +1099,7 @@ export default function InitiativeDetailPage() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem
-                  onClick={() => {
-                    console.log('Edit initiative clicked, current state:', isEditInitiativeModalOpen);
-                    console.log('Initiative data:', initiativeData);
-                    setIsEditInitiativeModalOpen(true);
-                  }}
+                  onClick={() => setIsEditInitiativeModalOpen(true)}
                   disabled={initiativeData.status === 'selesai'}
                 >
                   <Edit className="w-4 h-4 mr-2" />
@@ -1726,20 +1722,15 @@ export default function InitiativeDetailPage() {
         isAdding={false}
       />
 
-      {console.log('Modal render check:', {
-        isEditInitiativeModalOpen,
-        hasInitiative: !!initiative,
-        initiativeStatus: initiativeData?.status,
-        shouldShow: isEditInitiativeModalOpen && initiativeData?.status !== 'selesai' && initiativeData?.status !== 'dibatalkan'
-      })}
-      
       {initiative && (
         <InitiativeFormModal
           initiative={initiative}
-          isOpen={isEditInitiativeModalOpen && initiativeData.status !== 'selesai' && initiativeData.status !== 'dibatalkan'}
-          onClose={() => {
-            console.log('Closing edit initiative modal');
-            setIsEditInitiativeModalOpen(false);
+          open={isEditInitiativeModalOpen && initiativeData.status !== 'selesai' && initiativeData.status !== 'dibatalkan'}
+          onOpenChange={(open) => {
+            if (!open) {
+              console.log('Closing edit initiative modal');
+              setIsEditInitiativeModalOpen(false);
+            }
           }}
           onSuccess={() => {
             console.log('Edit initiative success');
