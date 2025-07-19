@@ -449,6 +449,40 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                     )}
                   />
 
+                  <FormField
+                    control={form.control}
+                    name="initiative.description"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center gap-2">
+                          Deskripsi Inisiatif
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <button 
+                                type="button" 
+                                className="inline-flex items-center justify-center"
+                              >
+                                <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                              </button>
+                            </PopoverTrigger>
+                            <PopoverContent side="right" className="max-w-xs">
+                              <p className="text-sm">
+                                Penjelasan detail tentang inisiatif ini, latar belakang, dan tujuan yang ingin dicapai.
+                              </p>
+                            </PopoverContent>
+                          </Popover>
+                        </FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            placeholder="Contoh: Inisiatif ini bertujuan untuk meningkatkan response time customer service melalui implementasi chatbot AI yang dapat menangani 70% pertanyaan umum..." 
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
                   {/* Success Metrics Management - Dynamic Table Form */}
                   <div className="space-y-4">
                     <div className="flex items-center gap-2">
@@ -566,13 +600,11 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                       </div>
 
                       {/* Add Button Below Table */}
-                      <div className="flex justify-center mt-3">
+                      <div className="mt-3">
                         <Button
                           type="button"
-                          variant="outline"
-                          size="sm"
                           onClick={addSuccessMetric}
-                          className="flex items-center gap-2"
+                          className="w-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center gap-2"
                         >
                           <Plus className="w-4 h-4" />
                           Tambah Metrik
@@ -580,40 +612,6 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                       </div>
                     </div>
                   </div>
-
-                  <FormField
-                    control={form.control}
-                    name="initiative.description"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="flex items-center gap-2">
-                          Deskripsi Inisiatif
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <button 
-                                type="button" 
-                                className="inline-flex items-center justify-center"
-                              >
-                                <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                              </button>
-                            </PopoverTrigger>
-                            <PopoverContent side="right" className="max-w-xs">
-                              <p className="text-sm">
-                                Penjelasan detail tentang inisiatif ini, latar belakang, dan tujuan yang ingin dicapai.
-                              </p>
-                            </PopoverContent>
-                          </Popover>
-                        </FormLabel>
-                        <FormControl>
-                          <Textarea 
-                            placeholder="Contoh: Inisiatif ini bertujuan untuk meningkatkan response time customer service melalui implementasi chatbot AI yang dapat menangani 70% pertanyaan umum..." 
-                            {...field} 
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
                 </CardContent>
               </Card>
             )}
