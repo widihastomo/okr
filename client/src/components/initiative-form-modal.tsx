@@ -15,6 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { HelpCircle, Plus, ChevronRight, ChevronLeft, Target, Trash2, CalendarIcon, Edit, TrendingUp, ListTodo } from "lucide-react";
+import StandaloneTaskModal from "@/components/standalone-task-modal";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
@@ -148,6 +149,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
   const isEditMode = !!initiative;
   
   // Task modal state
+  const [showTaskModal, setShowTaskModal] = useState(false);
 
   
   // For creating initiative, we need a temporary ID
@@ -281,15 +283,17 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
 
   // Task management functions (simplified for form data)
   const addTask = () => {
-    const currentTasks = form.getValues("tasks") || [];
-    form.setValue("tasks", [...currentTasks, {
-      title: "",
-      description: "",
-      status: "not_started" as const,
-      priority: "medium" as const,
-      assignedTo: user?.id || "",
-      dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
-    }]);
+    setShowTaskModal(true);
+  };
+
+  const handleTaskCreated = () => {
+    setShowTaskModal(false);
+    // Since StandaloneTaskModal creates standalone tasks, we don't need to update form data
+    toast({
+      title: "Task berhasil dibuat",
+      description: "Task telah ditambahkan ke sistem",
+      variant: "default",
+    });
   };
 
   const editTask = (index: number) => {
@@ -1322,7 +1326,12 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
         </Form>
       </DialogContent>
       
-
+      {/* Standalone Task Modal */}
+      <StandaloneTaskModal
+        open={showTaskModal}
+        onOpenChange={setShowTaskModal}
+        onSuccess={handleTaskCreated}
+      />
 
     </Dialog>
   );
