@@ -3099,6 +3099,7 @@ export default function GoalDetail() {
           setActiveTab("initiatives");
         }}
         keyResultId=""
+        objectiveId={id}
         initiative={editingInitiative ?? undefined}
       />
       {/* Edit Objective Modal */}

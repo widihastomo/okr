@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -210,6 +210,7 @@ interface InitiativeFormModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   keyResultId?: string;
+  objectiveId?: string;
   onSuccess?: () => void;
 }
 
@@ -218,6 +219,7 @@ export default function InitiativeFormModal({
   open,
   onOpenChange,
   keyResultId,
+  objectiveId,
   onSuccess,
 }: InitiativeFormModalProps) {
   const { toast } = useToast();
@@ -234,10 +236,23 @@ export default function InitiativeFormModal({
   const initiativeId = initiative?.id || "temp-initiative-id";
 
   // Fetch data yang diperlukan
-  const { data: keyResults } = useQuery<KeyResult[]>({
+  const { data: allKeyResults } = useQuery<KeyResult[]>({
     queryKey: ["/api/key-results"],
   });
   const { data: users } = useQuery<User[]>({ queryKey: ["/api/users"] });
+
+  // Filter key results based on objective context
+  const keyResults = useMemo(() => {
+    if (!allKeyResults) return [];
+    
+    // If objectiveId is provided, only show key results from that objective
+    if (objectiveId) {
+      return allKeyResults.filter(kr => kr.objectiveId === objectiveId);
+    }
+    
+    // Otherwise, show all key results (for global initiative creation)
+    return allKeyResults;
+  }, [allKeyResults, objectiveId]);
 
   // Fetch existing success metrics, tasks, and DoD items for edit mode
   const { data: existingSuccessMetrics } = useQuery({
@@ -857,6 +872,7 @@ export default function InitiativeFormModal({
                           keyResults={keyResults || []}
                           value={field.value}
                           onValueChange={field.onChange}
+                          objectiveId={objectiveId}
                         />
                         <FormMessage />
                       </FormItem>
