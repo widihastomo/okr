@@ -4,7 +4,7 @@ import { formatDistanceToNow } from "date-fns";
 import { id } from "date-fns/locale";
 import { TaskComment, User } from "@shared/schema";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { MoreVertical, Edit2, Trash2, User as UserIcon, Reply, MessageCircle } from "lucide-react";
@@ -62,6 +62,45 @@ export function TaskCommentList({ taskId }: TaskCommentListProps) {
   };
 
   const threadedComments = organizeComments(comments);
+
+  // Helper function to get user name
+  const getUserName = (user: User): string => {
+    if (user?.name && user.name.trim() !== "") {
+      return user.name.trim();
+    }
+    
+    if (user?.email) {
+      return user.email.split('@')[0];
+    }
+    
+    return "User";
+  };
+
+  // Helper function to get user initials for avatar
+  const getUserInitials = (user: User): string => {
+    if (!user) return "?";
+
+    if (user?.name && user.name.trim() !== "") {
+      const nameParts = user.name.trim().split(' ');
+      if (nameParts.length >= 2) {
+        return `${nameParts[0].charAt(0)}${nameParts[nameParts.length - 1].charAt(0)}`.toUpperCase();
+      } else {
+        return nameParts[0].charAt(0).toUpperCase();
+      }
+    }
+
+    if (user?.email) {
+      return user.email.charAt(0).toUpperCase();
+    }
+
+    return "U";
+  };
+
+  // Helper function to get user profile image URL
+  const getUserProfileImage = (user: User): string | undefined => {
+    if (!user) return undefined;
+    return user?.profileImageUrl || undefined;
+  };
 
   const toggleReplies = (commentId: string) => {
     const newExpanded = new Set(expandedReplies);
@@ -196,8 +235,12 @@ export function TaskCommentList({ taskId }: TaskCommentListProps) {
       className={`flex gap-3 group ${isReply ? 'ml-8' : ''}`}
     >
       <Avatar className="w-8 h-8 flex-shrink-0">
+        <AvatarImage 
+          src={getUserProfileImage(comment.user)} 
+          alt={getUserName(comment.user)}
+        />
         <AvatarFallback className="bg-blue-100 text-blue-700 text-xs">
-          {(comment.user.firstName || 'U')?.charAt(0).toUpperCase()}
+          {getUserInitials(comment.user)}
         </AvatarFallback>
       </Avatar>
 
@@ -205,9 +248,7 @@ export function TaskCommentList({ taskId }: TaskCommentListProps) {
         <div className="bg-gray-50 rounded-lg px-3 py-2 relative">
           <div className="flex items-center gap-2 mb-1 pr-8">
             <span className="font-medium text-sm text-gray-900">
-              {comment.user.firstName && comment.user.lastName
-                ? `${comment.user.firstName} ${comment.user.lastName}`
-                : comment.user.firstName || 'User'}
+              {getUserName(comment.user)}
             </span>
             <span className="text-xs text-gray-500">
               {formatDistanceToNow(comment.createdAt ? new Date(comment.createdAt) : new Date(), {

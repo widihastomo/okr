@@ -4,10 +4,10 @@ import { formatDistanceToNow } from "date-fns";
 import { id } from "date-fns/locale";
 import { User } from "@shared/schema";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { MoreVertical, Edit2, Trash2, User as UserIcon } from "lucide-react";
+import { MoreVertical, Edit2, Trash2, User as UserIcon, MessageCircle } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -152,6 +152,12 @@ export function InitiativeCommentList({ initiativeId }: InitiativeCommentListPro
     return user.email?.split('@')[0] || 'User';
   };
 
+  // Helper function to get user profile image URL
+  const getUserProfileImage = (user: User): string | undefined => {
+    if (!user) return undefined;
+    return user?.profileImageUrl || undefined;
+  };
+
   if (isLoading) {
     return (
       <div className="space-y-4">
@@ -195,6 +201,10 @@ export function InitiativeCommentList({ initiativeId }: InitiativeCommentListPro
           >
             <div className="flex items-start space-x-3">
               <Avatar className="w-8 h-8 flex-shrink-0">
+                <AvatarImage 
+                  src={getUserProfileImage(comment.user)} 
+                  alt={getUserName(comment.user)}
+                />
                 <AvatarFallback className="bg-orange-100 text-orange-700 text-sm font-medium">
                   {getUserInitials(comment.user)}
                 </AvatarFallback>
