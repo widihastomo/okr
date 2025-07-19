@@ -130,7 +130,7 @@ export default function InitiativeFormModal({
   const isEditMode = !!initiative;
   const [successMetrics, setSuccessMetrics] = useState<
     Array<{ name: string; target: string }>
-  >([{ name: "", target: "" }]);
+  >([]);
 
   // Get current user ID for default assignment
   const currentUserId =
@@ -149,9 +149,14 @@ export default function InitiativeFormModal({
   };
 
   const updateMetric = (index: number, field: "name" | "target", value: string) => {
-    const newMetrics = [...successMetrics];
-    newMetrics[index][field] = value;
-    setSuccessMetrics(newMetrics);
+    // Ensure we have at least one metric to update
+    if (successMetrics.length === 0) {
+      setSuccessMetrics([{ name: field === "name" ? value : "", target: field === "target" ? value : "" }]);
+    } else {
+      const newMetrics = [...successMetrics];
+      newMetrics[index][field] = value;
+      setSuccessMetrics(newMetrics);
+    }
   };
 
   // Helper function to get score labels
@@ -335,8 +340,8 @@ export default function InitiativeFormModal({
         effortScore: 5,
         confidenceScore: 5,
       });
-      // Reset successMetrics state
-      setSuccessMetrics([]);
+      // Reset successMetrics state with default 1 row
+      setSuccessMetrics([{ name: "", target: "" }]);
     }
   }, [isEditMode, initiative, keyResultId, currentUserId, form]);
 
@@ -875,7 +880,7 @@ Tim akan mulai dengan mengumpulkan database reseller wilayah timur, mengirim sta
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {successMetrics.map((metric, index) => (
+                        {(successMetrics.length === 0 ? [{ name: "", target: "" }] : successMetrics).map((metric, index) => (
                           <TableRow key={index}>
                             <TableCell className="text-center">
                               <div className="flex items-center justify-center">
