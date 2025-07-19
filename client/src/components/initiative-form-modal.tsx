@@ -15,12 +15,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { HelpCircle, Plus, ChevronRight, ChevronLeft, Target, Trash2, CalendarIcon, Edit, TrendingUp } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { cn } from "@/lib/utils";
 import { SearchableUserSelect } from "@/components/ui/searchable-user-select";
 import { SearchableKeyResultSelect } from "@/components/ui/searchable-key-result-select";
-import SuccessMetricsModal from "@/components/success-metrics-modal-simple";
 import { useAuth } from "@/hooks/useAuth";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
@@ -35,95 +35,17 @@ const getUserName = (user: User): string => {
   return user.email?.split('@')[0] || 'Unknown';
 };
 
-// Success Metrics List Component
-interface SuccessMetricsListProps {
-  initiativeId: string;
-  onEditMetric: (metric: any) => void;
-}
+// Success Metrics Schema
+const successMetricSchema = z.object({
+  id: z.string().optional(), // untuk edit mode
+  name: z.string().min(1, "Nama metrik wajib diisi"),
+  target: z.string().min(1, "Target wajib diisi"),
+  achievement: z.string().default("0"),
+});
 
-function SuccessMetricsList({ initiativeId, onEditMetric }: SuccessMetricsListProps) {
-  const { data: metrics = [] } = useQuery<any[]>({ 
-    queryKey: [`/api/initiatives/${initiativeId}/success-metrics`],
-    enabled: initiativeId !== "temp-initiative-id"
-  });
-  const queryClient = useQueryClient();
-  const { toast } = useToast();
+type SuccessMetricFormData = z.infer<typeof successMetricSchema>;
 
-  const deleteMutation = useMutation({
-    mutationFn: async (metricId: string) => {
-      return apiRequest("DELETE", `/api/success-metrics/${metricId}`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}/success-metrics`] });
-      toast({
-        title: "Berhasil",
-        description: "Metrik keberhasilan berhasil dihapus",
-        className: "border-green-200 bg-green-50 text-green-800",
-      });
-    },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Gagal menghapus metrik keberhasilan",
-        variant: "destructive",
-      });
-    },
-  });
 
-  if (metrics.length === 0) {
-    return (
-      <div className="border-2 border-dashed border-gray-200 rounded-lg p-6 text-center text-gray-500">
-        <TrendingUp className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-        <p className="text-sm mb-2">Belum ada metrik keberhasilan</p>
-        <p className="text-xs text-gray-400">Tambahkan metrik untuk mengukur keberhasilan inisiatif</p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-3">
-      {metrics.map((metric) => (
-        <div key={metric.id} className="border border-gray-200 rounded-lg p-4">
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <h4 className="font-medium text-gray-900">{metric.name}</h4>
-              <div className="mt-2 grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <span className="text-gray-600">Target: </span>
-                  <span className="font-medium">{metric.target}</span>
-                </div>
-                <div>
-                  <span className="text-gray-600">Capaian: </span>
-                  <span className="font-medium text-blue-600">{metric.achievement}</span>
-                </div>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 ml-4">
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => onEditMetric(metric)}
-                className="h-8 w-8 p-0"
-              >
-                <Edit className="w-4 h-4" />
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => deleteMutation.mutate(metric.id)}
-                className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-              >
-                <Trash2 className="w-4 h-4" />
-              </Button>
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
 
 // Form schema for initiative
 const initiativeFormSchema = z.object({
@@ -143,6 +65,7 @@ const initiativeFormSchema = z.object({
     priority: z.enum(["low", "medium", "high", "critical"]).default("medium"),
     budget: z.string().optional(),
   }),
+  successMetrics: z.array(successMetricSchema).optional().default([]),
 }).refine(
   (data) => {
     return data.initiative.startDate <= data.initiative.dueDate;
@@ -167,8 +90,6 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [currentStep, setCurrentStep] = useState(1);
-  const [isSuccessMetricsModalOpen, setIsSuccessMetricsModalOpen] = useState(false);
-  const [editingMetric, setEditingMetric] = useState(null);
   const { user } = useAuth();
   const isEditMode = !!initiative;
   
@@ -194,6 +115,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
         priority: initiative.priority,
         budget: initiative.budget || "",
       },
+      successMetrics: [],
     } : {
       initiative: {
         title: "",
@@ -207,6 +129,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
         priority: "medium",
         budget: "",
       },
+      successMetrics: [],
     },
   });
 
@@ -228,6 +151,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
             priority: initiative.priority,
             budget: initiative.budget || "",
           },
+          successMetrics: [],
         });
       } else {
         form.reset({
@@ -243,10 +167,34 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
             priority: "medium",
             budget: "",
           },
+          successMetrics: [],
         });
       }
     }
   }, [open, initiative, isEditMode, form, keyResultId, user?.id]);
+
+  // Success Metrics management functions
+  const addSuccessMetric = () => {
+    const currentMetrics = form.getValues("successMetrics") || [];
+    form.setValue("successMetrics", [...currentMetrics, {
+      name: "",
+      target: "",
+      achievement: "0",
+    }]);
+  };
+
+  const removeSuccessMetric = (index: number) => {
+    const currentMetrics = form.getValues("successMetrics") || [];
+    const updatedMetrics = currentMetrics.filter((_, i) => i !== index);
+    form.setValue("successMetrics", updatedMetrics);
+  };
+
+  const updateSuccessMetric = (index: number, field: keyof SuccessMetricFormData, value: string) => {
+    const currentMetrics = form.getValues("successMetrics") || [];
+    const updatedMetrics = [...currentMetrics];
+    updatedMetrics[index] = { ...updatedMetrics[index], [field]: value };
+    form.setValue("successMetrics", updatedMetrics);
+  };
 
   const mutation = useMutation({
     mutationFn: async (data: InitiativeFormData) => {
@@ -501,7 +449,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                     )}
                   />
 
-                  {/* Success Metrics Management */}
+                  {/* Success Metrics Management - Dynamic Table Form */}
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
@@ -528,7 +476,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                         type="button"
                         variant="outline"
                         size="sm"
-                        onClick={() => setIsSuccessMetricsModalOpen(true)}
+                        onClick={addSuccessMetric}
                         className="flex items-center gap-2"
                       >
                         <Plus className="w-4 h-4" />
@@ -536,22 +484,123 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                       </Button>
                     </div>
                     
-                    {/* Success Metrics List */}
-                    {isEditMode && (
-                      <SuccessMetricsList 
-                        initiativeId={initiativeId} 
-                        onEditMetric={(metric) => {
-                          setEditingMetric(metric);
-                          setIsSuccessMetricsModalOpen(true);
-                        }}
-                      />
-                    )}
-                    
-                    {!isEditMode && (
+                    {/* Success Metrics Dynamic Table */}
+                    {(form.watch("successMetrics") || []).length === 0 ? (
                       <div className="border-2 border-dashed border-gray-200 rounded-lg p-6 text-center text-gray-500">
                         <TrendingUp className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-                        <p className="text-sm mb-2">Metrik akan dapat ditambahkan setelah inisiatif dibuat</p>
-                        <p className="text-xs text-gray-400">Buat inisiatif terlebih dahulu, lalu kelola metrik keberhasilan</p>
+                        <p className="text-sm mb-2">Belum ada metrik keberhasilan</p>
+                        <p className="text-xs text-gray-400">Klik "Tambah Metrik" untuk menambah metrik keberhasilan</p>
+                      </div>
+                    ) : (
+                      <div>
+                        {/* Desktop Table View */}
+                        <div className="hidden md:block border rounded-lg">
+                          <Table>
+                            <TableHeader>
+                              <TableRow>
+                                <TableHead>Nama Metrik</TableHead>
+                                <TableHead className="text-center">Target</TableHead>
+                                <TableHead className="text-center">Capaian Saat Ini</TableHead>
+                                <TableHead className="text-center">Aksi</TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {(form.watch("successMetrics") || []).map((metric, index) => (
+                                <TableRow key={index}>
+                                  <TableCell>
+                                    <Input
+                                      placeholder="Contoh: Tingkat Kepuasan Customer"
+                                      value={metric.name}
+                                      onChange={(e) => updateSuccessMetric(index, "name", e.target.value)}
+                                      className="border-0 shadow-none p-0"
+                                    />
+                                  </TableCell>
+                                  <TableCell className="text-center">
+                                    <Input
+                                      placeholder="Contoh: 90%"
+                                      value={metric.target}
+                                      onChange={(e) => updateSuccessMetric(index, "target", e.target.value)}
+                                      className="border-0 shadow-none p-0 text-center"
+                                    />
+                                  </TableCell>
+                                  <TableCell className="text-center">
+                                    <Input
+                                      placeholder="0"
+                                      value={metric.achievement}
+                                      onChange={(e) => updateSuccessMetric(index, "achievement", e.target.value)}
+                                      className="border-0 shadow-none p-0 text-center"
+                                    />
+                                  </TableCell>
+                                  <TableCell className="text-center">
+                                    <Button
+                                      type="button"
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => removeSuccessMetric(index)}
+                                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                    </Button>
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </div>
+
+                        {/* Mobile Card View */}
+                        <div className="md:hidden space-y-4">
+                          {(form.watch("successMetrics") || []).map((metric, index) => (
+                            <div key={index} className="border rounded-lg p-3 bg-gradient-to-r from-blue-50 to-white shadow-sm">
+                              <div className="flex items-center justify-between mb-3">
+                                <div className="flex items-center gap-2">
+                                  <TrendingUp className="w-4 h-4 text-blue-600" />
+                                  <span className="text-sm font-medium text-gray-700">Metrik {index + 1}</span>
+                                </div>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => removeSuccessMetric(index)}
+                                  className="text-red-600 hover:text-red-700 hover:bg-red-100 h-6 w-6 p-0"
+                                >
+                                  <Trash2 className="w-3 h-3" />
+                                </Button>
+                              </div>
+                              <div className="space-y-2">
+                                <div>
+                                  <label className="text-xs font-medium text-gray-600">Nama Metrik:</label>
+                                  <Input
+                                    placeholder="Contoh: Tingkat Kepuasan Customer"
+                                    value={metric.name}
+                                    onChange={(e) => updateSuccessMetric(index, "name", e.target.value)}
+                                    className="mt-1"
+                                  />
+                                </div>
+                                <div className="grid grid-cols-2 gap-2">
+                                  <div>
+                                    <label className="text-xs font-medium text-gray-600">Target:</label>
+                                    <Input
+                                      placeholder="Contoh: 90%"
+                                      value={metric.target}
+                                      onChange={(e) => updateSuccessMetric(index, "target", e.target.value)}
+                                      className="mt-1"
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="text-xs font-medium text-gray-600">Capaian:</label>
+                                    <Input
+                                      placeholder="0"
+                                      value={metric.achievement}
+                                      onChange={(e) => updateSuccessMetric(index, "achievement", e.target.value)}
+                                      className="mt-1"
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     )}
                   </div>
@@ -831,20 +880,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
         </Form>
       </DialogContent>
       
-      {/* Success Metrics Modal */}
-      {isEditMode && (
-        <SuccessMetricsModal
-          open={isSuccessMetricsModalOpen}
-          onOpenChange={(open) => {
-            setIsSuccessMetricsModalOpen(open);
-            if (!open) {
-              setEditingMetric(null);
-            }
-          }}
-          initiativeId={initiativeId}
-          metric={editingMetric}
-        />
-      )}
+
     </Dialog>
   );
 }
