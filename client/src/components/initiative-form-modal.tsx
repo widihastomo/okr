@@ -178,16 +178,23 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
     enabled: !!(isEditMode && initiative?.id),
   });
 
-  const { data: existingDoDItems } = useQuery({
+  const { data: existingDoDItems, isLoading: isDoDLoading } = useQuery({
     queryKey: [`/api/initiatives/${initiative?.id}/definition-of-done`],
     enabled: !!(isEditMode && initiative?.id),
-    onSuccess: (data) => {
-      console.log('DoD API response:', data);
-    },
-    onError: (error) => {
-      console.error('DoD API error:', error);
-    }
   });
+
+  // Debug DoD data when it changes
+  useEffect(() => {
+    if (isEditMode && initiative?.id) {
+      console.log('DoD Query Result:', {
+        existingDoDItems,
+        isDoDLoading,
+        isArray: Array.isArray(existingDoDItems),
+        length: existingDoDItems?.length,
+        items: existingDoDItems
+      });
+    }
+  }, [existingDoDItems, isDoDLoading, isEditMode, initiative?.id]);
 
   // Priority calculation functions
   const calculatePriorityScore = (): number => {
@@ -243,7 +250,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
         title: initiative.title,
         description: initiative.description || "",
         implementationPlan: initiative.implementationPlan || "",
-        definitionOfDone: existingDoDItems?.map(item => item.description) || [""],
+        definitionOfDone: existingDoDItems?.map(item => item.title) || [""],
         keyResultId: initiative.keyResultId,
         picId: initiative.picId,
         startDate: new Date(initiative.startDate),
@@ -290,7 +297,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
           existingSuccessMetrics,
           existingTasks,
           existingDoDItems,
-          mappedDoDItems: existingDoDItems?.map(item => item.description),
+          mappedDoDItems: existingDoDItems?.map(item => item.title),
           isDoDArray: Array.isArray(existingDoDItems),
           doDLength: existingDoDItems?.length
         });
@@ -300,7 +307,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
             title: initiative.title,
             description: initiative.description || "",
             implementationPlan: initiative.implementationPlan || "",
-            definitionOfDone: existingDoDItems?.map(item => item.description) || [""],
+            definitionOfDone: existingDoDItems?.map(item => item.title) || [""],
             keyResultId: initiative.keyResultId,
             picId: initiative.picId,
             startDate: new Date(initiative.startDate),
