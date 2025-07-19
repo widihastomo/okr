@@ -2380,7 +2380,7 @@ export default function InitiativeDetailPage() {
               </Button>
               <Button 
                 type="submit"
-                className="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600"
+                className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
                 disabled={addDeliverableMutation.isPending}
               >
                 {addDeliverableMutation.isPending ? "Menambah..." : "Tambah Deliverable"}
