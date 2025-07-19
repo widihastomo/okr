@@ -374,13 +374,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
             {/* Step 1: Basic Information */}
             {(currentStep === 1 || isEditMode) && (
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Target className="w-5 h-5" />
-                    Informasi Dasar & Metrik Keberhasilan
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
+                <CardContent className="space-y-6 pt-6">
                   <FormField
                     control={form.control}
                     name="initiative.title"
@@ -603,8 +597,9 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                       <div className="mt-3">
                         <Button
                           type="button"
+                          variant="outline"
                           onClick={addSuccessMetric}
-                          className="w-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center gap-2"
+                          className="w-full flex items-center justify-center gap-2"
                         >
                           <Plus className="w-4 h-4" />
                           Tambah Metrik
