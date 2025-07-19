@@ -341,6 +341,14 @@ The system includes comprehensive database connection troubleshooting tools:
 
 ## Changelog
 ```
+- July 19, 2025. **INITIATIVE TASK DATE RANGE ENHANCEMENT** - Successfully implemented flexible date selection for initiative tasks with today as default and date range picker capabilities:
+  * UPDATED: Task schema to include optional startDate field for date range selection
+  * ENHANCED: Default values now set both start and due dates to today for immediate task planning
+  * IMPLEMENTED: Date range picker with start date and due date fields in responsive grid layout
+  * ADDED: Smart date validation - start date cannot be before today, due date cannot be before start date
+  * IMPROVED: Better date labels and placeholders ("Tanggal Mulai", "Tanggal Deadline") with proper Indonesian formatting
+  * ENHANCED: Calendar component with proper date restrictions and validation for realistic task scheduling
+  * RESULT: Users can now create tasks with flexible date ranges starting from today with intelligent date validation
 - July 19, 2025. **AUTOMATIC PRIORITY CALCULATION SYSTEM IMPLEMENTED** - Successfully implemented comprehensive automatic priority calculation for initiatives based on business impact, difficulty, and belief levels:
   * ADDED: Three-factor priority calculation system using business impact (40%), ease/difficulty (30%), and belief level (30%)
   * IMPLEMENTED: Dynamic priority scores on 1-5 scale with automatic priority assignment (Low, Medium, High, Critical)

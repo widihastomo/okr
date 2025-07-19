@@ -45,6 +45,7 @@ const taskSchema = z.object({
   priority: z.enum(["low", "medium", "high", "critical"]).default("medium"),
   assignedTo: z.string().optional(),
   dueDate: z.date({ required_error: "Tanggal deadline harus diisi" }),
+  startDate: z.date().optional(),
 });
 
 type TaskFormData = z.infer<typeof taskSchema>;
@@ -75,7 +76,8 @@ export default function InitiativeTaskModal({ open, onOpenChange, onTaskAdd }: I
       status: "not_started",
       priority: "medium",
       assignedTo: userId || "",
-      dueDate: undefined,
+      dueDate: new Date(), // Default to today
+      startDate: new Date(), // Default to today
     },
   });
 
@@ -190,23 +192,65 @@ export default function InitiativeTaskModal({ open, onOpenChange, onTaskAdd }: I
               />
             </div>
 
+            {/* Assigned To */}
+            <FormField
+              control={form.control}
+              name="assignedTo"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Ditugaskan Kepada</FormLabel>
+                  <FormControl>
+                    <SearchableUserSelect
+                      users={users}
+                      value={field.value || ""}
+                      onValueChange={field.onChange}
+                      currentUser={user || undefined}
+                      placeholder="Pilih pengguna..."
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Date Range Selection */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Assigned To */}
+              {/* Start Date */}
               <FormField
                 control={form.control}
-                name="assignedTo"
+                name="startDate"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Ditugaskan Kepada</FormLabel>
-                    <FormControl>
-                      <SearchableUserSelect
-                        users={users}
-                        value={field.value || ""}
-                        onValueChange={field.onChange}
-                        currentUser={user || undefined}
-                        placeholder="Pilih pengguna..."
-                      />
-                    </FormControl>
+                    <FormLabel>Tanggal Mulai</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              "w-full justify-start text-left font-normal",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {field.value ? format(field.value, "PPP", { locale: id }) : "Pilih tanggal mulai"}
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <CalendarComponent
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          disabled={(date) => {
+                            const today = new Date();
+                            today.setHours(0, 0, 0, 0);
+                            return date < today;
+                          }}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -230,7 +274,7 @@ export default function InitiativeTaskModal({ open, onOpenChange, onTaskAdd }: I
                             )}
                           >
                             <CalendarIcon className="mr-2 h-4 w-4" />
-                            {field.value ? format(field.value, "PPP", { locale: id }) : "Pilih tanggal"}
+                            {field.value ? format(field.value, "PPP", { locale: id }) : "Pilih tanggal deadline"}
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
@@ -239,7 +283,12 @@ export default function InitiativeTaskModal({ open, onOpenChange, onTaskAdd }: I
                           mode="single"
                           selected={field.value}
                           onSelect={field.onChange}
-                          disabled={(date) => date < new Date("1900-01-01")}
+                          disabled={(date) => {
+                            const today = new Date();
+                            today.setHours(0, 0, 0, 0);
+                            const startDate = form.watch("startDate");
+                            return date < today || (startDate && date < startDate);
+                          }}
                           initialFocus
                         />
                       </PopoverContent>
