@@ -379,32 +379,33 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
 
   const mutation = useMutation({
     mutationFn: async (data: InitiativeFormData) => {
-      // Calculate the PIC display name
-      let picName = "";
-      if (data.initiative.picId) {
-        const picUser = users?.find(u => u.id === data.initiative.picId);
-        picName = picUser ? getUserName(picUser) : "";
-      }
+      try {
+        // Calculate the PIC display name
+        let picName = "";
+        if (data.initiative.picId) {
+          const picUser = users?.find(u => u.id === data.initiative.picId);
+          picName = picUser ? getUserName(picUser) : "";
+        }
 
-      // Prepare the payload
-      const payload = {
-        ...data.initiative,
-        pic: picName,
-        // Format dates for API
-        startDate: data.initiative.startDate.toISOString(),
-        dueDate: data.initiative.dueDate.toISOString(),
-      };
+        // Prepare the payload
+        const payload = {
+          ...data.initiative,
+          pic: picName,
+          // Format dates for API
+          startDate: data.initiative.startDate.toISOString(),
+          dueDate: data.initiative.dueDate.toISOString(),
+        };
 
-      if (isEditMode && initiative) {
-        return apiRequest(`/api/initiatives/${initiative.id}`, {
-          method: "PATCH",
-          body: JSON.stringify(payload),
-        });
-      } else {
-        return apiRequest("/api/initiatives", {
-          method: "POST", 
-          body: JSON.stringify(payload),
-        });
+        console.log("Initiative form payload:", payload);
+
+        if (isEditMode && initiative) {
+          return apiRequest("PATCH", `/api/initiatives/${initiative.id}`, payload);
+        } else {
+          return apiRequest("POST", "/api/initiatives", payload);
+        }
+      } catch (error) {
+        console.error("Initiative mutation error:", error);
+        throw error;
       }
     },
     onSuccess: () => {
