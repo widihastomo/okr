@@ -1247,9 +1247,10 @@ Contoh: Untuk mempercepat penetrasi pasar di wilayah timur, kami akan menghubung
                           return (
                             <div
                               key={index}
-                              className="border rounded-lg p-2 bg-gradient-to-r from-green-50 to-white shadow-sm"
+                              className="border rounded-lg p-3 bg-gradient-to-r from-green-50 to-white shadow-sm"
                             >
-                              <div className="flex items-center justify-between gap-2">
+                              {/* Desktop Layout */}
+                              <div className="hidden sm:flex items-center justify-between gap-2">
                                 <h4 className="font-medium text-green-800 text-sm truncate flex-1 min-w-0">
                                   {task.title || "Task tanpa judul"}
                                 </h4>
@@ -1293,6 +1294,58 @@ Contoh: Untuk mempercepat penetrasi pasar di wilayah timur, kami akan menghubung
                                   >
                                     <Trash2 className="w-3 h-3" />
                                   </Button>
+                                </div>
+                              </div>
+
+                              {/* Mobile Layout */}
+                              <div className="sm:hidden space-y-2">
+                                <div className="flex items-center justify-between">
+                                  <h4 className="font-medium text-green-800 text-sm flex-1 min-w-0">
+                                    {task.title || "Task tanpa judul"}
+                                  </h4>
+                                  <div className="flex items-center gap-1 shrink-0">
+                                    <Button
+                                      type="button"
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => editTask(index)}
+                                      className="text-blue-600 hover:text-blue-800 hover:bg-blue-100 h-6 w-6 p-0"
+                                    >
+                                      <Edit className="w-3 h-3" />
+                                    </Button>
+                                    <Button
+                                      type="button"
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => removeTask(index)}
+                                      className="text-red-600 hover:text-red-800 hover:bg-red-100 h-6 w-6 p-0"
+                                    >
+                                      <Trash2 className="w-3 h-3" />
+                                    </Button>
+                                  </div>
+                                </div>
+                                <div className="flex items-center justify-between text-xs">
+                                  {assignedUser && (
+                                    <div className="flex items-center gap-1">
+                                      <Avatar className="w-4 h-4">
+                                        <AvatarFallback className="text-xs bg-blue-100 text-blue-700">
+                                          {getUserInitials(assignedUser)}
+                                        </AvatarFallback>
+                                      </Avatar>
+                                      <span className="text-blue-600">
+                                        {getUserName(assignedUser)}
+                                      </span>
+                                    </div>
+                                  )}
+                                  {task.dueDate && (
+                                    <span className="text-gray-500">
+                                      {format(
+                                        new Date(task.dueDate),
+                                        "dd MMM yyyy",
+                                        { locale: id },
+                                      )}
+                                    </span>
+                                  )}
                                 </div>
                               </div>
                             </div>
