@@ -994,7 +994,7 @@ Contoh: Wilayah timur memiliki potensi pasar yang besar namun kontribusi penjual
             {/* Step 3: Timeline & PIC */}
             {(currentStep === 3 || isEditMode) && (
               <Card>
-                <CardContent className="space-y-6">
+                <CardContent className="pt-6 space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
