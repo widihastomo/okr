@@ -14,7 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { HelpCircle, Plus, ChevronRight, ChevronLeft, Target, Trash2, CalendarIcon, Edit, TrendingUp } from "lucide-react";
+import { HelpCircle, Plus, ChevronRight, ChevronLeft, Target, Trash2, CalendarIcon, Edit, TrendingUp, ListTodo } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
@@ -35,6 +35,35 @@ const getUserName = (user: User): string => {
   return user.email?.split('@')[0] || 'Unknown';
 };
 
+// Helper functions for task labels
+const getTaskStatusLabel = (status: string) => {
+  switch (status) {
+    case "not_started":
+      return "Belum Dimulai";
+    case "in_progress":
+      return "Sedang Dikerjakan";
+    case "completed":
+      return "Selesai";
+    case "cancelled":
+      return "Dibatalkan";
+    default:
+      return status;
+  }
+};
+
+const getTaskPriorityLabel = (priority: string) => {
+  switch (priority) {
+    case "low":
+      return "Rendah";
+    case "medium":
+      return "Sedang";
+    case "high":
+      return "Tinggi";
+    default:
+      return priority;
+  }
+};
+
 // Success Metrics Schema
 const successMetricSchema = z.object({
   id: z.string().optional(), // untuk edit mode
@@ -43,6 +72,19 @@ const successMetricSchema = z.object({
 });
 
 type SuccessMetricFormData = z.infer<typeof successMetricSchema>;
+
+// Task Schema for form
+const taskSchema = z.object({
+  id: z.string().optional(), // untuk edit mode
+  title: z.string().min(1, "Judul task wajib diisi"),
+  description: z.string().optional(),
+  status: z.enum(["not_started", "in_progress", "completed", "cancelled"]).default("not_started"),
+  priority: z.enum(["low", "medium", "high"]).default("medium"),
+  assignedTo: z.string().optional(),
+  dueDate: z.date().optional(),
+});
+
+type TaskFormData = z.infer<typeof taskSchema>;
 
 
 
@@ -65,6 +107,7 @@ const initiativeFormSchema = z.object({
     budget: z.string().optional(),
   }),
   successMetrics: z.array(successMetricSchema).optional().default([]),
+  tasks: z.array(taskSchema).optional().default([]),
 }).refine(
   (data) => {
     return data.initiative.startDate <= data.initiative.dueDate;
@@ -115,6 +158,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
         budget: initiative.budget || "",
       },
       successMetrics: [{ name: "", target: "" }],
+      tasks: [],
     } : {
       initiative: {
         title: "",
@@ -129,6 +173,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
         budget: "",
       },
       successMetrics: [{ name: "", target: "" }],
+      tasks: [],
     },
   });
 
@@ -151,6 +196,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
             budget: initiative.budget || "",
           },
           successMetrics: [{ name: "", target: "" }],
+          tasks: [],
         });
       } else {
         form.reset({
@@ -167,6 +213,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
             budget: "",
           },
           successMetrics: [{ name: "", target: "" }],
+          tasks: [],
         });
       }
     }
@@ -194,6 +241,31 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
     const updatedMetrics = [...currentMetrics];
     updatedMetrics[index] = { ...updatedMetrics[index], [field]: value };
     form.setValue("successMetrics", updatedMetrics);
+  };
+
+  // Task management functions
+  const addTask = () => {
+    const currentTasks = form.getValues("tasks") || [];
+    form.setValue("tasks", [...currentTasks, {
+      title: "",
+      description: "",
+      status: "not_started" as const,
+      priority: "medium" as const,
+      assignedTo: user?.id || "",
+    }]);
+  };
+
+  const removeTask = (index: number) => {
+    const currentTasks = form.getValues("tasks") || [];
+    const updatedTasks = currentTasks.filter((_, i) => i !== index);
+    form.setValue("tasks", updatedTasks);
+  };
+
+  const updateTask = (index: number, field: keyof TaskFormData, value: any) => {
+    const currentTasks = form.getValues("tasks") || [];
+    const updatedTasks = [...currentTasks];
+    updatedTasks[index] = { ...updatedTasks[index], [field]: value };
+    form.setValue("tasks", updatedTasks);
   };
 
   const mutation = useMutation({
@@ -614,13 +686,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
             {/* Step 2: Implementation Plan */}
             {(currentStep === 2 || isEditMode) && (
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Target className="w-5 h-5" />
-                    Rencana Implementasi
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
+                <CardContent className="space-y-6 pt-6">
                   <FormField
                     control={form.control}
                     name="initiative.implementationPlan"
@@ -654,6 +720,240 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                       </FormItem>
                     )}
                   />
+
+                  {/* Definition of Done CRUD */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2">
+                      <FormLabel>Definition of Done</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <button 
+                            type="button" 
+                            className="inline-flex items-center justify-center"
+                          >
+                            <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                          </button>
+                        </PopoverTrigger>
+                        <PopoverContent side="right" className="max-w-xs">
+                          <p className="text-sm">
+                            Kriteria yang harus dipenuhi agar inisiatif ini dianggap selesai. Buat kriteria yang spesifik dan terukur.
+                          </p>
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                    
+                    <FormField
+                      control={form.control}
+                      name="initiative.definitionOfDone"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Textarea 
+                              placeholder="Contoh: 1. Chatbot dapat menangani minimal 70% pertanyaan umum, 2. Response time rata-rata di bawah 2 detik, 3. User satisfaction rating minimal 4.5/5, 4. Dokumentasi teknis lengkap tersedia..." 
+                              {...field}
+                              className="min-h-[100px]"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  {/* Tasks CRUD - Dynamic Table Form */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2">
+                      <FormLabel>Task Management</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <button 
+                            type="button" 
+                            className="inline-flex items-center justify-center"
+                          >
+                            <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                          </button>
+                        </PopoverTrigger>
+                        <PopoverContent side="right" className="max-w-xs">
+                          <p className="text-sm">
+                            Task-task yang perlu dikerjakan untuk menyelesaikan inisiatif ini. Buat task yang spesifik dan dapat diassign ke anggota tim.
+                          </p>
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                    
+                    {/* Tasks Dynamic Table */}
+                    <div>
+                      {/* Desktop Table View */}
+                      <div className="hidden lg:block border rounded-lg">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Judul Task</TableHead>
+                              <TableHead className="text-center">Status</TableHead>
+                              <TableHead className="text-center">Prioritas</TableHead>
+                              <TableHead className="text-center">Assigned To</TableHead>
+                              <TableHead className="text-center">Aksi</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {(form.watch("tasks") || []).map((task, index) => (
+                              <TableRow key={index}>
+                                <TableCell>
+                                  <Input
+                                    placeholder="Contoh: Setup Development Environment"
+                                    value={task.title}
+                                    onChange={(e) => updateTask(index, "title", e.target.value)}
+                                    className="border border-gray-300 p-2"
+                                  />
+                                </TableCell>
+                                <TableCell className="text-center">
+                                  <Select
+                                    value={task.status}
+                                    onValueChange={(value) => updateTask(index, "status", value)}
+                                  >
+                                    <SelectTrigger className="h-9">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="not_started">Belum Dimulai</SelectItem>
+                                      <SelectItem value="in_progress">Sedang Dikerjakan</SelectItem>
+                                      <SelectItem value="completed">Selesai</SelectItem>
+                                      <SelectItem value="cancelled">Dibatalkan</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </TableCell>
+                                <TableCell className="text-center">
+                                  <Select
+                                    value={task.priority}
+                                    onValueChange={(value) => updateTask(index, "priority", value)}
+                                  >
+                                    <SelectTrigger className="h-9">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="low">Rendah</SelectItem>
+                                      <SelectItem value="medium">Sedang</SelectItem>
+                                      <SelectItem value="high">Tinggi</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </TableCell>
+                                <TableCell className="text-center">
+                                  <SearchableUserSelect
+                                    users={users || []}
+                                    value={task.assignedTo || ""}
+                                    onValueChange={(value) => updateTask(index, "assignedTo", value)}
+                                    currentUser={user || undefined}
+                                  />
+                                </TableCell>
+                                <TableCell className="text-center">
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => removeTask(index)}
+                                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </Button>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+
+                      {/* Mobile Card View */}
+                      <div className="lg:hidden space-y-4">
+                        {(form.watch("tasks") || []).map((task, index) => (
+                          <div key={index} className="border rounded-lg p-4 bg-gradient-to-r from-green-50 to-white shadow-sm">
+                            <div className="flex items-center justify-between mb-3">
+                              <div className="flex items-center gap-2">
+                                <ListTodo className="w-4 h-4 text-green-600" />
+                                <span className="text-sm font-medium text-gray-700">Task {index + 1}</span>
+                              </div>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => removeTask(index)}
+                                className="text-red-600 hover:text-red-700 hover:bg-red-100 h-6 w-6 p-0"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </Button>
+                            </div>
+                            <div className="space-y-3">
+                              <div>
+                                <label className="text-xs font-medium text-gray-600">Judul Task:</label>
+                                <Input
+                                  placeholder="Contoh: Setup Development Environment"
+                                  value={task.title}
+                                  onChange={(e) => updateTask(index, "title", e.target.value)}
+                                  className="mt-1"
+                                />
+                              </div>
+                              <div className="grid grid-cols-2 gap-2">
+                                <div>
+                                  <label className="text-xs font-medium text-gray-600">Status:</label>
+                                  <Select
+                                    value={task.status}
+                                    onValueChange={(value) => updateTask(index, "status", value)}
+                                  >
+                                    <SelectTrigger className="mt-1 h-9">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="not_started">Belum Dimulai</SelectItem>
+                                      <SelectItem value="in_progress">Sedang Dikerjakan</SelectItem>
+                                      <SelectItem value="completed">Selesai</SelectItem>
+                                      <SelectItem value="cancelled">Dibatalkan</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                <div>
+                                  <label className="text-xs font-medium text-gray-600">Prioritas:</label>
+                                  <Select
+                                    value={task.priority}
+                                    onValueChange={(value) => updateTask(index, "priority", value)}
+                                  >
+                                    <SelectTrigger className="mt-1 h-9">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="low">Rendah</SelectItem>
+                                      <SelectItem value="medium">Sedang</SelectItem>
+                                      <SelectItem value="high">Tinggi</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                              </div>
+                              <div>
+                                <label className="text-xs font-medium text-gray-600">Assigned To:</label>
+                                <SearchableUserSelect
+                                  users={users || []}
+                                  value={task.assignedTo || ""}
+                                  onValueChange={(value) => updateTask(index, "assignedTo", value)}
+                                  currentUser={user || undefined}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Add Task Button */}
+                      <div className="mt-3">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={addTask}
+                          className="w-full flex items-center justify-center gap-2 border-blue-600 text-blue-600 hover:bg-blue-50"
+                        >
+                          <Plus className="w-4 h-4" />
+                          Tambah Task
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             )}
