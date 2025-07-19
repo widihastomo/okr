@@ -1729,8 +1729,9 @@ export default function InitiativeDetailPage() {
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Rocket className="h-4 w-4 text-blue-500" />
-                  <span className="text-sm font-medium text-gray-700">Rencana Pelaksanaan & Task</span>
+                  <span className="text-sm font-medium text-gray-700">
+                    Rencana Eksekusi Inisiatif
+                  </span>
                 </div>
               </div>
             </CardHeader>
@@ -1757,8 +1758,43 @@ export default function InitiativeDetailPage() {
                     <div className="flex items-center gap-2 mb-2">
                       <CheckSquare className="h-4 w-4 text-green-500" />
                       <span className="text-sm font-medium text-gray-700">
-                        Definition of Done
+                        Deliverables (Output Inisiatif) - Centang Jika Sudah
+                        Selesai
                       </span>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <button
+                            type="button"
+                            className="inline-flex items-center justify-center ml-1"
+                          >
+                            <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                          </button>
+                        </PopoverTrigger>
+                        <PopoverContent side="right" className="max-w-sm">
+                          <div className="space-y-2">
+                            <h4 className="font-medium text-sm">
+                              Deliverables / Output Inisiatif
+                            </h4>
+                            <p className="text-sm text-gray-600">
+                              Deliverables adalah hasil konkret yang harus dicapai dari inisiatif ini. 
+                              Berbeda dengan task yang merupakan aktivitas, deliverables adalah output atau produk akhir.
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              <strong>Contoh Deliverables:</strong>
+                            </p>
+                            <ul className="text-sm text-gray-600 space-y-1 list-disc pl-4">
+                              <li>Laporan analisis pasar yang lengkap</li>
+                              <li>Website baru dengan fitur tertentu</li>
+                              <li>Sistem inventory yang terintegrasi</li>
+                              <li>Kampanye marketing dengan materi promosi</li>
+                              <li>Training manual untuk karyawan</li>
+                            </ul>
+                            <p className="text-sm text-gray-600">
+                              <strong>Cara Penggunaan:</strong> Centang kotak di samping deliverable ketika sudah benar-benar selesai dan siap diserahkan/digunakan.
+                            </p>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
                     </div>
                     <div className="bg-green-50 p-3 rounded-lg border border-green-200">
                       <div className="space-y-2">
