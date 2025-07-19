@@ -74,6 +74,7 @@ const initiativeFormSchema = z
   .object({
     title: z.string().min(1, "Judul inisiatif wajib diisi"),
     description: z.string().optional(),
+    implementationPlan: z.string().optional(),
     keyResultId: z.string().min(1, "Angka target wajib dipilih"),
     picId: z.string().min(1, "Penanggung jawab wajib dipilih"),
     startDate: z.date({
@@ -298,6 +299,7 @@ export default function InitiativeFormModal({
     defaultValues: {
       title: "",
       description: "",
+      implementationPlan: "",
       keyResultId: keyResultId || "",
       picId: currentUserId || "",
       startDate: new Date(),
@@ -316,6 +318,7 @@ export default function InitiativeFormModal({
       form.reset({
         title: initiative.title || "",
         description: initiative.description || "",
+        implementationPlan: (initiative as any)?.implementationPlan || "",
         keyResultId: initiative.keyResultId || keyResultId || "",
         picId: initiative.picId || "",
         startDate: initiative.startDate
