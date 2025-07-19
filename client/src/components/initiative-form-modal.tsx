@@ -411,7 +411,6 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
             if (item.title.trim()) {
               const dodPayload = {
                 title: item.title,
-                description: item.description || "",
                 isCompleted: item.isCompleted,
                 order: item.order
               };

@@ -19,7 +19,6 @@ interface DefinitionOfDoneTableProps {
 interface LocalDoD {
   id: string;
   title: string;
-  description: string;
   isCompleted: boolean;
   order: number;
   isNew?: boolean;
@@ -36,7 +35,7 @@ export function DefinitionOfDoneTable({
   const [localItems, setLocalItems] = useState<LocalDoD[]>(items || []);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
-  const [editDescription, setEditDescription] = useState('');
+
 
   // Update local items when items prop changes
   useEffect(() => {
@@ -48,7 +47,6 @@ export function DefinitionOfDoneTable({
     const newItem: LocalDoD = {
       id: `temp-${Date.now()}`,
       title: '',
-      description: '',
       isCompleted: false,
       order: localItems.length,
       isNew: true,
@@ -59,7 +57,7 @@ export function DefinitionOfDoneTable({
   };
 
   // Save item (new or edited)
-  const saveItem = (id: string, title: string, description: string) => {
+  const saveItem = (id: string, title: string) => {
     if (!title.trim()) return;
 
     const updatedItems = localItems.map(item => {
@@ -67,7 +65,6 @@ export function DefinitionOfDoneTable({
         return {
           ...item,
           title: title.trim(),
-          description: description.trim(),
           isNew: false,
           isEditing: false
         };
@@ -78,7 +75,6 @@ export function DefinitionOfDoneTable({
     setLocalItems(updatedItems);
     setEditingId(null);
     setEditTitle('');
-    setEditDescription('');
     onItemsChange(updatedItems);
   };
 
@@ -98,7 +94,6 @@ export function DefinitionOfDoneTable({
     }
     setEditingId(null);
     setEditTitle('');
-    setEditDescription('');
   };
 
   // Delete item
@@ -126,7 +121,6 @@ export function DefinitionOfDoneTable({
     const item = localItems.find(item => item.id === id);
     if (item) {
       setEditTitle(item.title);
-      setEditDescription(item.description);
     }
     setEditingId(id);
     setLocalItems(prev => prev.map(item => 
@@ -169,8 +163,7 @@ export function DefinitionOfDoneTable({
               <TableHeader>
                 <TableRow>
                   <TableHead>Kriteria / Item</TableHead>
-                  <TableHead>Deskripsi</TableHead>
-                  <TableHead className="w-20">Aksi</TableHead>
+                  <TableHead className="text-center">Aksi</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -181,69 +174,57 @@ export function DefinitionOfDoneTable({
                         <Input
                           value={editTitle}
                           onChange={(e) => setEditTitle(e.target.value)}
-                          placeholder="Kriteria penyelesaian..."
+                          placeholder="Contoh: Semua dokumentasi selesai"
                           autoFocus
-                          className="text-sm"
+                          className="border border-gray-300 p-2"
                         />
                       ) : (
                         <span className="text-sm font-medium">{item.title}</span>
                       )}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="text-center">
                       {item.isEditing ? (
-                        <Textarea
-                          value={editDescription}
-                          onChange={(e) => setEditDescription(e.target.value)}
-                          placeholder="Deskripsi detail (opsional)..."
-                          rows={2}
-                          className="text-sm"
-                        />
-                      ) : (
-                        <span className="text-sm text-gray-600">{item.description || '-'}</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {item.isEditing ? (
-                        <div className="flex gap-1">
+                        <div className="flex gap-1 justify-center">
                           <Button
                             type="button"
-                            onClick={() => saveItem(item.id, editTitle, editDescription)}
+                            onClick={() => saveItem(item.id, editTitle)}
                             size="sm"
                             variant="ghost"
-                            className="h-6 w-6 p-0 hover:bg-green-100"
+                            className="text-green-600 hover:text-green-700 hover:bg-green-50"
                             disabled={!editTitle.trim()}
                           >
-                            <Save className="w-3 h-3 text-green-600" />
+                            <Save className="w-4 h-4" />
                           </Button>
                           <Button
                             type="button"
                             onClick={() => cancelEdit(item.id)}
                             size="sm"
                             variant="ghost"
-                            className="h-6 w-6 p-0 hover:bg-red-100"
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
                           >
-                            <X className="w-3 h-3 text-red-600" />
+                            <X className="w-4 h-4" />
                           </Button>
                         </div>
                       ) : (
-                        <div className="flex gap-1">
+                        <div className="flex gap-1 justify-center">
                           <Button
                             type="button"
                             onClick={() => startEdit(item.id)}
                             size="sm"
                             variant="ghost"
-                            className="h-6 w-6 p-0 hover:bg-blue-100"
+                            className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
                           >
-                            <Edit2 className="w-3 h-3 text-blue-600" />
+                            <Edit2 className="w-4 h-4" />
                           </Button>
                           <Button
                             type="button"
                             onClick={() => deleteItem(item.id)}
                             size="sm"
                             variant="ghost"
-                            className="h-6 w-6 p-0 hover:bg-red-100"
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            disabled={localItems.length <= 1}
                           >
-                            <Trash2 className="w-3 h-3 text-red-600" />
+                            <Trash2 className="w-4 h-4" />
                           </Button>
                         </div>
                       )}
@@ -270,7 +251,7 @@ export function DefinitionOfDoneTable({
                 index={index}
                 isEditing={item.isEditing || false}
                 canEdit={canEdit}
-                onSave={(title, description) => saveItem(item.id, title, description)}
+                onSave={(title) => saveItem(item.id, title)}
                 onCancel={() => cancelEdit(item.id)}
                 onEdit={() => startEdit(item.id)}
                 onDelete={() => deleteItem(item.id)}
@@ -289,7 +270,7 @@ interface DoD_ItemProps {
   index: number;
   isEditing: boolean;
   canEdit: boolean;
-  onSave: (title: string, description: string) => void;
+  onSave: (title: string) => void;
   onCancel: () => void;
   onEdit: () => void;
   onDelete: () => void;
@@ -308,11 +289,10 @@ function DoD_Item({
   onToggle 
 }: DoD_ItemProps) {
   const [editTitle, setEditTitle] = useState(item.title);
-  const [editDescription, setEditDescription] = useState(item.description);
 
   const handleSave = () => {
     if (editTitle.trim()) {
-      onSave(editTitle, editDescription);
+      onSave(editTitle);
     }
   };
 
@@ -338,16 +318,7 @@ function DoD_Item({
               className="text-sm"
             />
           </div>
-          <div>
-            <Textarea
-              value={editDescription}
-              onChange={(e) => setEditDescription(e.target.value)}
-              placeholder="Deskripsi detail (opsional)..."
-              rows={2}
-              onKeyDown={handleKeyDown}
-              className="text-sm"
-            />
-          </div>
+
           <div className="flex justify-end gap-2">
             <Button
               type="button"
@@ -397,13 +368,7 @@ function DoD_Item({
               }`}>
                 {item.title}
               </p>
-              {item.description && (
-                <p className={`text-xs mt-1 ${
-                  item.isCompleted ? 'line-through text-gray-400' : 'text-gray-600'
-                }`}>
-                  {item.description}
-                </p>
-              )}
+
             </div>
             
             <div className="flex items-center gap-1">
