@@ -582,6 +582,13 @@ export default function GoalDetail() {
     return "U";
   };
 
+  // Helper function to get user profile image URL
+  const getUserProfileImage = (userId: string): string | undefined => {
+    if (!userId || !users) return undefined;
+    const user = users.find((u: any) => u.id === userId);
+    return user?.profileImageUrl || undefined;
+  };
+
   // Calculate days remaining based on cycle end date
   const calculateDaysRemaining = () => {
     const today = new Date();
@@ -2809,7 +2816,7 @@ export default function GoalDetail() {
                                   <div className="flex items-center gap-2">
                                     <Avatar className="w-8 h-8">
                                       <AvatarImage
-                                        src={`https://api.dicebear.com/7.x/initials/svg?seed=${getUserName(task.assignedTo)}`}
+                                        src={getUserProfileImage(task.assignedTo)} alt={getUserName(task.assignedTo)}
                                       />
                                       <AvatarFallback className="bg-blue-100 text-blue-700 text-xs font-medium">
                                         {getUserInitials(task.assignedTo)}
@@ -2985,7 +2992,7 @@ export default function GoalDetail() {
                                 <div className="flex items-center gap-2">
                                   <Avatar className="w-5 h-5">
                                     <AvatarImage
-                                      src={`https://api.dicebear.com/7.x/initials/svg?seed=${getUserName(task.assignedTo)}`}
+                                      src={getUserProfileImage(task.assignedTo)} alt={getUserName(task.assignedTo)}
                                     />
                                     <AvatarFallback className="bg-blue-100 text-blue-700 text-xs font-medium">
                                       {getUserInitials(task.assignedTo)}

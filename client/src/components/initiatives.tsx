@@ -23,7 +23,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Building2,
   Calendar,
@@ -216,10 +216,26 @@ export default function Inisiatif({ userFilter, filteredKeyResultIds }: Inisiati
 
   // Helper function to get user initials
   const getUserInitials = (user: User): string => {
-    if (user.firstName && user.lastName) {
-      return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
+    // Use consolidated name field
+    if (user.name && user.name.trim() !== '') {
+      const nameParts = user.name.trim().split(' ');
+      if (nameParts.length >= 2) {
+        return (nameParts[0].charAt(0) + nameParts[nameParts.length - 1].charAt(0)).toUpperCase();
+      }
+      return nameParts[0].charAt(0).toUpperCase();
     }
-    return user.email.slice(0, 2).toUpperCase();
+    
+    // Fallback to email
+    if (user.email) {
+      return user.email.charAt(0).toUpperCase();
+    }
+    
+    return 'U';
+  };
+
+  // Helper function to get user profile image URL
+  const getUserProfileImage = (user: User): string | undefined => {
+    return user.profileImageUrl || undefined;
   };
 
   // Helper function to get status color
@@ -524,6 +540,7 @@ export default function Inisiatif({ userFilter, filteredKeyResultIds }: Inisiati
                                 key={user.id}
                                 className="w-8 h-8 border-2 border-white"
                               >
+                                <AvatarImage src={getUserProfileImage(user)} alt={getUserName(user.id)} />
                                 <AvatarFallback className="bg-gray-200 text-gray-700 text-xs">
                                   {getUserInitials(user)}
                                 </AvatarFallback>
@@ -602,6 +619,7 @@ export default function Inisiatif({ userFilter, filteredKeyResultIds }: Inisiati
                 selectedInitiativeMembers.members.map((user) => (
                   <div key={user.id} className="flex items-center gap-3">
                     <Avatar className="w-10 h-10">
+                      <AvatarImage src={getUserProfileImage(user)} alt={getUserName(user.id)} />
                       <AvatarFallback className="bg-blue-100 text-blue-700">
                         {getUserInitials(user)}
                       </AvatarFallback>

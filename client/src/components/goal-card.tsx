@@ -75,6 +75,13 @@ export default function GoalCard({ goal, onEditProgress, onEditKeyResult, onDele
     return userId.charAt(0).toUpperCase();
   };
 
+  // Helper function to get user profile image URL
+  const getUserProfileImage = (userId: string): string | undefined => {
+    if (!users) return undefined;
+    const user = users.find((u: any) => u.id === userId);
+    return user?.profileImageUrl || undefined;
+  };
+
   // Helper function to truncate text with character limit (responsive)
   const truncateText = (text: string, maxLength: number, mobileLength?: number) => {
     // Use shorter length for mobile if provided
@@ -424,7 +431,7 @@ export default function GoalCard({ goal, onEditProgress, onEditKeyResult, onDele
               </div>
             ) : (
               <Avatar className="w-6 h-6">
-                <AvatarImage src="" alt={goal.owner} />
+                <AvatarImage src={getUserProfileImage(goal.ownerId || goal.owner)} alt={goal.owner} />
                 <AvatarFallback className="bg-blue-100 text-blue-700 text-xs font-medium">
                   {getUserInitials(goal.ownerId || goal.owner)}
                 </AvatarFallback>

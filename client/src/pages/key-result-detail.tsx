@@ -590,6 +590,13 @@ export default function KeyResultDetailPage() {
     return user.email ? user.email[0].toUpperCase() : 'U';
   };
 
+  // Helper function to get user profile image URL
+  const getUserProfileImage = (userId: string): string | undefined => {
+    if (!userId || !users) return undefined;
+    const user = users.find((u: any) => u.id === userId);
+    return user?.profileImageUrl || undefined;
+  };
+
   // Helper function to get tasks for a specific initiative
   const getTasksForInitiative = (initiativeId: string) => {
     if (!expandedInitiatives.has(initiativeId)) return [];
@@ -2024,6 +2031,7 @@ export default function KeyResultDetailPage() {
                     <p className="text-sm font-medium text-gray-700">Assigned To</p>
                     <div className="flex items-center gap-2 mt-1">
                       <Avatar className="h-6 w-6">
+                        <AvatarImage src={getUserProfileImage(selectedTask.assignedTo)} alt={getUserName(selectedTask.assignedTo)} />
                         <AvatarFallback className="text-xs bg-blue-100 text-blue-600">
                           {getUserInitials(selectedTask.assignedTo)}
                         </AvatarFallback>

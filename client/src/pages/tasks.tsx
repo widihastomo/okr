@@ -172,6 +172,13 @@ const TasksPage = () => {
     return user.email ? user.email[0].toUpperCase() : 'U';
   };
 
+  // Helper function to get user profile image URL
+  const getUserProfileImage = (userId: string): string | undefined => {
+    if (!userId || !users) return undefined;
+    const user = users.find((u: any) => u.id === userId);
+    return user?.profileImageUrl || undefined;
+  };
+
   // Helper function to get team names for a user
   const getUserTeams = (userId: string) => {
     return teams.filter(team => 
@@ -410,9 +417,7 @@ const TasksPage = () => {
           <div className="flex items-center gap-2">
             {task.assignedTo ? (
               <Avatar className="w-5 h-5">
-                <AvatarImage
-                  src={`https://api.dicebear.com/7.x/initials/svg?seed=${getUserName(task.assignedTo)}`}
-                />
+                <AvatarImage src={getUserProfileImage(task.assignedTo)} alt={getUserName(task.assignedTo)} />
                 <AvatarFallback className="bg-blue-100 text-blue-700 text-xs font-medium">
                   {getUserInitials(task.assignedTo)}
                 </AvatarFallback>
@@ -656,9 +661,7 @@ const TasksPage = () => {
         <div className="flex items-center gap-2">
           {task.assignedTo ? (
             <Avatar className="w-6 h-6">
-              <AvatarImage
-                src={`https://api.dicebear.com/7.x/initials/svg?seed=${getUserName(task.assignedTo)}`}
-              />
+              <AvatarImage src={getUserProfileImage(task.assignedTo)} alt={getUserName(task.assignedTo)} />
               <AvatarFallback className="bg-blue-100 text-blue-700 text-xs font-medium">
                 {getUserInitials(task.assignedTo)}
               </AvatarFallback>
@@ -758,9 +761,7 @@ const TasksPage = () => {
         <div className="flex items-center gap-2">
           {task.assignedTo ? (
             <Avatar className="w-5 h-5">
-              <AvatarImage
-                src={`https://api.dicebear.com/7.x/initials/svg?seed=${getUserName(task.assignedTo)}`}
-              />
+              <AvatarImage src={getUserProfileImage(task.assignedTo)} alt={getUserName(task.assignedTo)} />
               <AvatarFallback className="bg-blue-100 text-blue-700 text-xs font-medium">
                 {getUserInitials(task.assignedTo)}
               </AvatarFallback>

@@ -176,6 +176,11 @@ export default function SystemRoleManagement() {
     return matchesSearch && matchesRole && matchesStatus && matchesOrganization;
   });
 
+  // Helper function to get user profile image URL
+  const getUserProfileImage = (user: UserWithPermissions): string | undefined => {
+    return (user as any).profileImageUrl || undefined;
+  };
+
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
       case "owner":
@@ -424,7 +429,7 @@ export default function SystemRoleManagement() {
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <Avatar className="h-8 w-8">
-                          <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`} />
+                          <AvatarImage src={getUserProfileImage(user)} alt={user.name || user.email} />
                           <AvatarFallback>
                             {user.name 
                               ? user.name.trim().split(' ').map(n => n[0]).join('').toUpperCase()
