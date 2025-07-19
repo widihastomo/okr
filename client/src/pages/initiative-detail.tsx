@@ -1908,7 +1908,7 @@ export default function InitiativeDetailPage() {
                     <Button
                       onClick={() => setIsAddDeliverableModalOpen(true)}
                       size="sm"
-                      className="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white"
+                      className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
                       disabled={
                         initiativeData.status === "selesai" ||
                         initiativeData.status === "dibatalkan"
