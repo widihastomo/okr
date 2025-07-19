@@ -476,13 +476,13 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
               </Card>
             )}
 
-            {/* Step 2: Implementation Plan & Success Metrics */}
+            {/* Step 2: Implementation Plan */}
             {(currentStep === 2 || isEditMode) && (
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Target className="w-5 h-5" />
-                    Rencana & Metrik Sukses
+                    Rencana Implementasi
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -512,40 +512,6 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                         <FormControl>
                           <Textarea 
                             placeholder="Contoh: 1. Research & analisis kebutuhan (Week 1-2), 2. Design & prototyping (Week 3-4), 3. Development (Week 5-8), 4. Testing & deployment (Week 9-10)..." 
-                            {...field} 
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="initiative.definitionOfDone"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="flex items-center gap-2">
-                          Definition of Done
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <button 
-                                type="button" 
-                                className="inline-flex items-center justify-center"
-                              >
-                                <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                              </button>
-                            </PopoverTrigger>
-                            <PopoverContent side="right" className="max-w-xs">
-                              <p className="text-sm">
-                                Kriteria yang harus dipenuhi agar inisiatif ini dianggap selesai. Buat criteria yang spesifik dan terukur.
-                              </p>
-                            </PopoverContent>
-                          </Popover>
-                        </FormLabel>
-                        <FormControl>
-                          <Textarea 
-                            placeholder="Contoh: 1. Chatbot dapat menjawab minimal 70% pertanyaan FAQ, 2. Response time rata-rata <30 detik, 3. User satisfaction score >4.0, 4. Dokumentasi lengkap tersedia..." 
                             {...field} 
                           />
                         </FormControl>
