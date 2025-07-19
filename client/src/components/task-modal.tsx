@@ -473,13 +473,7 @@ export default function TaskModal({
         </DialogHeader>
 
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <CheckCircle2 className="w-5 h-5" />
-              Informasi Task
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4 sm:space-y-6 px-3 sm:px-6">
+          <CardContent className="space-y-4 sm:space-y-6 px-3 sm:px-6 pt-6">
             <div>
               <Label htmlFor="title" className="flex items-center gap-2 mb-2">
                 Judul Task *
