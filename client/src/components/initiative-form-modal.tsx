@@ -40,7 +40,6 @@ const successMetricSchema = z.object({
   id: z.string().optional(), // untuk edit mode
   name: z.string().min(1, "Nama metrik wajib diisi"),
   target: z.string().min(1, "Target wajib diisi"),
-  achievement: z.string().default("0"),
 });
 
 type SuccessMetricFormData = z.infer<typeof successMetricSchema>;
@@ -115,7 +114,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
         priority: initiative.priority,
         budget: initiative.budget || "",
       },
-      successMetrics: [],
+      successMetrics: [{ name: "", target: "" }],
     } : {
       initiative: {
         title: "",
@@ -129,7 +128,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
         priority: "medium",
         budget: "",
       },
-      successMetrics: [],
+      successMetrics: [{ name: "", target: "" }],
     },
   });
 
@@ -151,7 +150,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
             priority: initiative.priority,
             budget: initiative.budget || "",
           },
-          successMetrics: [],
+          successMetrics: [{ name: "", target: "" }],
         });
       } else {
         form.reset({
@@ -167,7 +166,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
             priority: "medium",
             budget: "",
           },
-          successMetrics: [],
+          successMetrics: [{ name: "", target: "" }],
         });
       }
     }
@@ -179,14 +178,15 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
     form.setValue("successMetrics", [...currentMetrics, {
       name: "",
       target: "",
-      achievement: "0",
     }]);
   };
 
   const removeSuccessMetric = (index: number) => {
     const currentMetrics = form.getValues("successMetrics") || [];
-    const updatedMetrics = currentMetrics.filter((_, i) => i !== index);
-    form.setValue("successMetrics", updatedMetrics);
+    if (currentMetrics.length > 1) {
+      const updatedMetrics = currentMetrics.filter((_, i) => i !== index);
+      form.setValue("successMetrics", updatedMetrics);
+    }
   };
 
   const updateSuccessMetric = (index: number, field: keyof SuccessMetricFormData, value: string) => {
@@ -451,158 +451,134 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
 
                   {/* Success Metrics Management - Dynamic Table Form */}
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <FormLabel>
-                          Metrik Keberhasilan
-                        </FormLabel>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <button 
-                              type="button" 
-                              className="inline-flex items-center justify-center"
-                            >
-                              <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                            </button>
-                          </PopoverTrigger>
-                          <PopoverContent side="right" className="max-w-xs">
-                            <p className="text-sm">
-                              Metrik yang akan digunakan untuk mengukur keberhasilan inisiatif ini. Buat metrik yang spesifik dan terukur.
-                            </p>
-                          </PopoverContent>
-                        </Popover>
-                      </div>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={addSuccessMetric}
-                        className="flex items-center gap-2"
-                      >
-                        <Plus className="w-4 h-4" />
-                        Tambah Metrik
-                      </Button>
+                    <div className="flex items-center gap-2">
+                      <FormLabel>
+                        Metrik Keberhasilan
+                      </FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <button 
+                            type="button" 
+                            className="inline-flex items-center justify-center"
+                          >
+                            <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                          </button>
+                        </PopoverTrigger>
+                        <PopoverContent side="right" className="max-w-xs">
+                          <p className="text-sm">
+                            Metrik yang akan digunakan untuk mengukur keberhasilan inisiatif ini. Buat metrik yang spesifik dan terukur.
+                          </p>
+                        </PopoverContent>
+                      </Popover>
                     </div>
                     
                     {/* Success Metrics Dynamic Table */}
-                    {(form.watch("successMetrics") || []).length === 0 ? (
-                      <div className="border-2 border-dashed border-gray-200 rounded-lg p-6 text-center text-gray-500">
-                        <TrendingUp className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-                        <p className="text-sm mb-2">Belum ada metrik keberhasilan</p>
-                        <p className="text-xs text-gray-400">Klik "Tambah Metrik" untuk menambah metrik keberhasilan</p>
-                      </div>
-                    ) : (
-                      <div>
-                        {/* Desktop Table View */}
-                        <div className="hidden md:block border rounded-lg">
-                          <Table>
-                            <TableHeader>
-                              <TableRow>
-                                <TableHead>Nama Metrik</TableHead>
-                                <TableHead className="text-center">Target</TableHead>
-                                <TableHead className="text-center">Capaian Saat Ini</TableHead>
-                                <TableHead className="text-center">Aksi</TableHead>
-                              </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                              {(form.watch("successMetrics") || []).map((metric, index) => (
-                                <TableRow key={index}>
-                                  <TableCell>
-                                    <Input
-                                      placeholder="Contoh: Tingkat Kepuasan Customer"
-                                      value={metric.name}
-                                      onChange={(e) => updateSuccessMetric(index, "name", e.target.value)}
-                                      className="border-0 shadow-none p-0"
-                                    />
-                                  </TableCell>
-                                  <TableCell className="text-center">
-                                    <Input
-                                      placeholder="Contoh: 90%"
-                                      value={metric.target}
-                                      onChange={(e) => updateSuccessMetric(index, "target", e.target.value)}
-                                      className="border-0 shadow-none p-0 text-center"
-                                    />
-                                  </TableCell>
-                                  <TableCell className="text-center">
-                                    <Input
-                                      placeholder="0"
-                                      value={metric.achievement}
-                                      onChange={(e) => updateSuccessMetric(index, "achievement", e.target.value)}
-                                      className="border-0 shadow-none p-0 text-center"
-                                    />
-                                  </TableCell>
-                                  <TableCell className="text-center">
-                                    <Button
-                                      type="button"
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={() => removeSuccessMetric(index)}
-                                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                                    >
-                                      <Trash2 className="w-4 h-4" />
-                                    </Button>
-                                  </TableCell>
-                                </TableRow>
-                              ))}
-                            </TableBody>
-                          </Table>
-                        </div>
-
-                        {/* Mobile Card View */}
-                        <div className="md:hidden space-y-4">
-                          {(form.watch("successMetrics") || []).map((metric, index) => (
-                            <div key={index} className="border rounded-lg p-3 bg-gradient-to-r from-blue-50 to-white shadow-sm">
-                              <div className="flex items-center justify-between mb-3">
-                                <div className="flex items-center gap-2">
-                                  <TrendingUp className="w-4 h-4 text-blue-600" />
-                                  <span className="text-sm font-medium text-gray-700">Metrik {index + 1}</span>
-                                </div>
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => removeSuccessMetric(index)}
-                                  className="text-red-600 hover:text-red-700 hover:bg-red-100 h-6 w-6 p-0"
-                                >
-                                  <Trash2 className="w-3 h-3" />
-                                </Button>
-                              </div>
-                              <div className="space-y-2">
-                                <div>
-                                  <label className="text-xs font-medium text-gray-600">Nama Metrik:</label>
+                    <div>
+                      {/* Desktop Table View */}
+                      <div className="hidden md:block border rounded-lg">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Nama Metrik</TableHead>
+                              <TableHead className="text-center">Target</TableHead>
+                              <TableHead className="text-center">Aksi</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {(form.watch("successMetrics") || []).map((metric, index) => (
+                              <TableRow key={index}>
+                                <TableCell>
                                   <Input
                                     placeholder="Contoh: Tingkat Kepuasan Customer"
                                     value={metric.name}
                                     onChange={(e) => updateSuccessMetric(index, "name", e.target.value)}
-                                    className="mt-1"
+                                    className="border-0 shadow-none p-0"
                                   />
-                                </div>
-                                <div className="grid grid-cols-2 gap-2">
-                                  <div>
-                                    <label className="text-xs font-medium text-gray-600">Target:</label>
-                                    <Input
-                                      placeholder="Contoh: 90%"
-                                      value={metric.target}
-                                      onChange={(e) => updateSuccessMetric(index, "target", e.target.value)}
-                                      className="mt-1"
-                                    />
-                                  </div>
-                                  <div>
-                                    <label className="text-xs font-medium text-gray-600">Capaian:</label>
-                                    <Input
-                                      placeholder="0"
-                                      value={metric.achievement}
-                                      onChange={(e) => updateSuccessMetric(index, "achievement", e.target.value)}
-                                      className="mt-1"
-                                    />
-                                  </div>
-                                </div>
+                                </TableCell>
+                                <TableCell className="text-center">
+                                  <Input
+                                    placeholder="Contoh: 90%"
+                                    value={metric.target}
+                                    onChange={(e) => updateSuccessMetric(index, "target", e.target.value)}
+                                    className="border-0 shadow-none p-0 text-center"
+                                  />
+                                </TableCell>
+                                <TableCell className="text-center">
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => removeSuccessMetric(index)}
+                                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                    disabled={(form.watch("successMetrics") || []).length <= 1}
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </Button>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+
+                      {/* Mobile Card View */}
+                      <div className="md:hidden space-y-4">
+                        {(form.watch("successMetrics") || []).map((metric, index) => (
+                          <div key={index} className="border rounded-lg p-3 bg-gradient-to-r from-blue-50 to-white shadow-sm">
+                            <div className="flex items-center justify-between mb-3">
+                              <div className="flex items-center gap-2">
+                                <TrendingUp className="w-4 h-4 text-blue-600" />
+                                <span className="text-sm font-medium text-gray-700">Metrik {index + 1}</span>
+                              </div>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => removeSuccessMetric(index)}
+                                className="text-red-600 hover:text-red-700 hover:bg-red-100 h-6 w-6 p-0"
+                                disabled={(form.watch("successMetrics") || []).length <= 1}
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </Button>
+                            </div>
+                            <div className="space-y-2">
+                              <div>
+                                <label className="text-xs font-medium text-gray-600">Nama Metrik:</label>
+                                <Input
+                                  placeholder="Contoh: Tingkat Kepuasan Customer"
+                                  value={metric.name}
+                                  onChange={(e) => updateSuccessMetric(index, "name", e.target.value)}
+                                  className="mt-1"
+                                />
+                              </div>
+                              <div>
+                                <label className="text-xs font-medium text-gray-600">Target:</label>
+                                <Input
+                                  placeholder="Contoh: 90%"
+                                  value={metric.target}
+                                  onChange={(e) => updateSuccessMetric(index, "target", e.target.value)}
+                                  className="mt-1"
+                                />
                               </div>
                             </div>
-                          ))}
-                        </div>
+                          </div>
+                        ))}
                       </div>
-                    )}
+
+                      {/* Add Button Below Table */}
+                      <div className="flex justify-center mt-3">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={addSuccessMetric}
+                          className="flex items-center gap-2"
+                        >
+                          <Plus className="w-4 h-4" />
+                          Tambah Metrik
+                        </Button>
+                      </div>
+                    </div>
                   </div>
 
                   <FormField
