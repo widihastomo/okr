@@ -1113,6 +1113,7 @@ Contoh: Wilayah timur memiliki potensi pasar yang besar namun kontribusi penjual
                           <Textarea
                             placeholder="Bagaimana inisiatif akan di eksekusi?
 Contoh: Untuk mempercepat penetrasi pasar di wilayah timur, kami akan menghubungi 100 calon reseller potensial dan menawarkan paket reseller serta pendampingan khusus. Setelah itu, kami akan melakukan follow-up berkala untuk memastikan keberhasilan program."
+                            className="min-h-[160px] resize-y"
                             {...field}
                           />
                         </FormControl>
