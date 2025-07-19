@@ -221,7 +221,14 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
         title: initiative.title,
         description: initiative.description || "",
         implementationPlan: initiative.implementationPlan || "",
-        definitionOfDone: initiative.definitionOfDone || "",
+        definitionOfDone: (() => {
+          try {
+            const parsed = initiative.definitionOfDone ? JSON.parse(initiative.definitionOfDone) : [];
+            return Array.isArray(parsed) ? parsed : [parsed || ""];
+          } catch {
+            return [initiative.definitionOfDone || ""];
+          }
+        })(),
         keyResultId: initiative.keyResultId,
         picId: initiative.picId,
         startDate: new Date(initiative.startDate),
@@ -265,7 +272,14 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
             title: initiative.title,
             description: initiative.description || "",
             implementationPlan: initiative.implementationPlan || "",
-            definitionOfDone: Array.isArray(initiative.definitionOfDone) ? initiative.definitionOfDone : [initiative.definitionOfDone || ""],
+            definitionOfDone: (() => {
+              try {
+                const parsed = initiative.definitionOfDone ? JSON.parse(initiative.definitionOfDone) : [];
+                return Array.isArray(parsed) ? parsed : [parsed || ""];
+              } catch {
+                return [initiative.definitionOfDone || ""];
+              }
+            })(),
             keyResultId: initiative.keyResultId,
             picId: initiative.picId,
             startDate: new Date(initiative.startDate),
@@ -870,7 +884,7 @@ Contoh: Wilayah timur memiliki potensi pasar yang besar namun kontribusi penjual
                     <div>
                       {/* Desktop/Mobile Unified View */}
                       <div className="space-y-3">
-                        {(form.watch("initiative.definitionOfDone") || [""]).map((item, index) => (
+                        {(Array.isArray(form.watch("initiative.definitionOfDone")) ? form.watch("initiative.definitionOfDone") : [""]).map((item, index) => (
                           <div key={index} className="flex items-center gap-2">
                             <div className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-xs font-medium text-blue-600">
                               {index + 1}
@@ -887,7 +901,7 @@ Contoh: Wilayah timur memiliki potensi pasar yang besar namun kontribusi penjual
                               size="sm"
                               onClick={() => removeDefinitionItem(index)}
                               className="text-red-600 hover:text-red-700 hover:bg-red-50 flex-shrink-0"
-                              disabled={(form.watch("initiative.definitionOfDone") || []).length <= 1}
+                              disabled={(Array.isArray(form.watch("initiative.definitionOfDone")) ? form.watch("initiative.definitionOfDone") : []).length <= 1}
                             >
                               <Trash2 className="w-4 h-4" />
                             </Button>
