@@ -550,44 +550,6 @@ export default function InitiativeFormModal({
                     )}
                   />
 
-                  {/* Description */}
-                  <FormField
-                    control={form.control}
-                    name="description"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="flex items-center gap-2">
-                          Kenapa Inisiatif Ini Dibuat?
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <button
-                                type="button"
-                                className="inline-flex items-center justify-center"
-                              >
-                                <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                              </button>
-                            </PopoverTrigger>
-                            <PopoverContent side="right" className="max-w-xs">
-                              <p className="text-sm">
-                                Penjelasan detail tentang inisiatif yang akan
-                                dilakukan, alasan kenapa inisiatif perlu
-                                dilakukan.
-                              </p>
-                            </PopoverContent>
-                          </Popover>
-                        </FormLabel>
-                        <FormControl>
-                          <Textarea
-                            placeholder="Kenapa Inisiatif perlu dilakuan?
-Contoh : Wilayah timur memiliki potensi pasar yang besar namun kontribusi penjualannya masih rendah. Maka dari itu, mengakselerasi akuisisi reseller aktif di wilayah tersebut dengan pendekatan sistematis berpotensi untuk meningkatakan omset."
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
                   {/* Key Result Selection */}
                   <FormField
                     control={form.control}
@@ -626,6 +588,44 @@ Contoh : Wilayah timur memiliki potensi pasar yang besar namun kontribusi penjua
                             placeholder="Pilih angka target"
                             objectiveId={objectiveId}
                             disabled={!!keyResultId}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Description */}
+                  <FormField
+                    control={form.control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center gap-2">
+                          Kenapa Inisiatif Ini Dibuat?
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <button
+                                type="button"
+                                className="inline-flex items-center justify-center"
+                              >
+                                <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                              </button>
+                            </PopoverTrigger>
+                            <PopoverContent side="right" className="max-w-xs">
+                              <p className="text-sm">
+                                Penjelasan detail tentang inisiatif yang akan
+                                dilakukan, alasan kenapa inisiatif perlu
+                                dilakukan.
+                              </p>
+                            </PopoverContent>
+                          </Popover>
+                        </FormLabel>
+                        <FormControl>
+                          <Textarea
+                            placeholder="Kenapa Inisiatif perlu dilakuan?
+Contoh : Wilayah timur memiliki potensi pasar yang besar namun kontribusi penjualannya masih rendah. Maka dari itu, mengakselerasi akuisisi reseller aktif di wilayah tersebut dengan pendekatan sistematis berpotensi untuk meningkatakan omset."
+                            {...field}
                           />
                         </FormControl>
                         <FormMessage />
