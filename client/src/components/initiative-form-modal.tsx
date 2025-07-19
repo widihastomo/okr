@@ -117,6 +117,19 @@ const getTaskPriorityLabel = (priority: string): string => {
   return priorityLabels[priority as keyof typeof priorityLabels] || priority;
 };
 
+// Helper function to format number with thousand separators
+const formatNumberWithSeparator = (value: string): string => {
+  // Remove all non-digits
+  const numbers = value.replace(/\D/g, '');
+  // Add thousand separators
+  return numbers.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+};
+
+// Helper function to parse formatted number back to plain number
+const parseFormattedNumber = (value: string): string => {
+  return value.replace(/\./g, '');
+};
+
 // Success Metrics Schema - fields are optional to allow empty metrics
 const successMetricSchema = z.object({
   id: z.string().optional(), // untuk edit mode
@@ -1570,8 +1583,14 @@ Contoh: Untuk mempercepat penetrasi pasar di wilayah timur, kami akan menghubung
                           </FormLabel>
                           <FormControl>
                             <Input
-                              placeholder="Contoh: Rp 50.000.000"
-                              {...field}
+                              placeholder="Contoh: 50.000.000"
+                              value={field.value ? formatNumberWithSeparator(field.value) : ''}
+                              onChange={(e) => {
+                                const rawValue = parseFormattedNumber(e.target.value);
+                                field.onChange(rawValue);
+                              }}
+                              onBlur={field.onBlur}
+                              name={field.name}
                             />
                           </FormControl>
                           <FormMessage />
