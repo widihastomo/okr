@@ -3770,8 +3770,10 @@ export default function DailyFocusPage() {
         open={isInitiativeModalOpen}
         onOpenChange={setIsInitiativeModalOpen}
         onSuccess={() => {
-          // Invalidate queries to refresh the initiative list
+          // Invalidate queries to refresh the initiative list and related data
           queryClient.invalidateQueries({ queryKey: ["/api/initiatives"] });
+          queryClient.invalidateQueries({ queryKey: ['/api/objectives'] });
+          queryClient.invalidateQueries({ queryKey: ['/api/okrs'] });
         }}
       />
       

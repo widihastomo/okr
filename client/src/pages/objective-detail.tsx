@@ -3097,6 +3097,13 @@ export default function GoalDetail() {
           }
         }}
         onSuccess={() => {
+          // Invalidate queries to refresh the initiative list
+          queryClient.invalidateQueries({ queryKey: [`/api/initiatives/objective/${id}`] });
+          queryClient.invalidateQueries({ queryKey: ["/api/initiatives"] });
+          queryClient.invalidateQueries({ queryKey: [`/api/objectives/${id}`] });
+          queryClient.invalidateQueries({ queryKey: ['/api/objectives'] });
+          queryClient.invalidateQueries({ queryKey: ['/api/okrs'] });
+          
           // Switch to initiatives tab after successful creation/update
           setActiveTab("initiatives");
         }}
