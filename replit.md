@@ -352,7 +352,8 @@ The system includes comprehensive database connection troubleshooting tools:
   * FIXED: Changed delete initiative navigation from navigate("/dashboard") to window.history.back()
   * ENHANCED: Immediate navigation back to previous page after successful deletion
   * REMOVED: Unnecessary setTimeout delay for better user experience
-  * RESULT: Users are now properly redirected to the previous page after deleting an initiative
+  * UPDATED: Delete success message now uses success variant instead of destructive red style
+  * RESULT: Users are now properly redirected to the previous page after deleting an initiative with appropriate green success notification
 - July 19, 2025. **DOD FIELD MAPPING BUG COMPLETELY FIXED** - Successfully resolved critical DoD data display bug in edit initiative form:
   * FIXED: DoD field mapping from "description" to "title" to match API response structure
   * RESOLVED: API returns DoD items with "title" field, but form was mapping from non-existent "description" field

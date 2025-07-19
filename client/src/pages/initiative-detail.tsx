@@ -870,7 +870,7 @@ export default function InitiativeDetailPage() {
       toast({
         title: "Inisiatif dihapus",
         description: "Inisiatif dan semua data terkait telah dihapus secara permanen",
-        className: "border-red-200 bg-red-50 text-red-800",
+        variant: "success",
       });
       // Navigate back to previous page using browser history
       window.history.back();
