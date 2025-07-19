@@ -872,10 +872,8 @@ export default function InitiativeDetailPage() {
         description: "Inisiatif dan semua data terkait telah dihapus secara permanen",
         className: "border-red-200 bg-red-50 text-red-800",
       });
-      // Redirect to dashboard
-      setTimeout(() => {
-        navigate("/dashboard");
-      }, 1000);
+      // Navigate back to previous page using browser history
+      window.history.back();
     },
     onError: (error: any) => {
       toast({

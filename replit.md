@@ -341,6 +341,18 @@ The system includes comprehensive database connection troubleshooting tools:
 
 ## Changelog
 ```
+- July 19, 2025. **MANDATORY PRIORITY VALIDATION IMPLEMENTED** - Successfully implemented mandatory validation for priority calculation fields:
+  * ADDED: Mandatory validation for businessImpact, difficultyLevel, and beliefLevel fields in initiative form
+  * ENHANCED: Red asterisk (*) indicators next to priority field labels to show required status
+  * UPDATED: Form schema with required validation and descriptive error messages in Indonesian
+  * IMPLEMENTED: FormField controls with proper error display using FormMessage components
+  * IMPROVED: Placeholder text updated to emphasize mandatory selection requirement
+  * RESULT: Initiative form now prevents submission until all three priority calculation fields are completed
+- July 19, 2025. **INITIATIVE DELETE NAVIGATION FIX** - Successfully fixed initiative deletion to redirect to previous page using Wouter:
+  * FIXED: Changed delete initiative navigation from navigate("/dashboard") to window.history.back()
+  * ENHANCED: Immediate navigation back to previous page after successful deletion
+  * REMOVED: Unnecessary setTimeout delay for better user experience
+  * RESULT: Users are now properly redirected to the previous page after deleting an initiative
 - July 19, 2025. **DOD FIELD MAPPING BUG COMPLETELY FIXED** - Successfully resolved critical DoD data display bug in edit initiative form:
   * FIXED: DoD field mapping from "description" to "title" to match API response structure
   * RESOLVED: API returns DoD items with "title" field, but form was mapping from non-existent "description" field
