@@ -587,6 +587,7 @@ export default function InitiativeFormModal({
         description: isEditMode
           ? "Perubahan inisiatif telah disimpan"
           : "Inisiatif baru telah ditambahkan ke sistem",
+        variant: "success",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/initiatives"] });
       if (onSuccess) onSuccess();
