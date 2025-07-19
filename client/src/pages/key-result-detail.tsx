@@ -1661,10 +1661,11 @@ export default function KeyResultDetailPage() {
     {editingInitiative && (
       <InitiativeFormModal 
         initiative={editingInitiative}
-        isOpen={true}
-        onClose={() => setEditingInitiative(null)}
+        open={true}
+        onOpenChange={(open) => {
+          if (!open) setEditingInitiative(null);
+        }}
         keyResultId={keyResultId}
-        objectiveId={keyResult?.objectiveId}
         onSuccess={() => {
           setEditingInitiative(null);
           queryClient.invalidateQueries({ queryKey: [`/api/key-results/${keyResultId}/initiatives`] });
@@ -1674,10 +1675,9 @@ export default function KeyResultDetailPage() {
 
     {/* Initiative Form Modal with Success Metrics */}
     <InitiativeFormModal
-      isOpen={showInitiativeFormModal}
-      onClose={() => setShowInitiativeFormModal(false)}
+      open={showInitiativeFormModal}
+      onOpenChange={(open) => setShowInitiativeFormModal(open)}
       keyResultId={keyResultId}
-      objectiveId={keyResult?.objectiveId}
       onSuccess={() => {
         setShowInitiativeFormModal(false);
         queryClient.invalidateQueries({ queryKey: [`/api/key-results/${keyResultId}/initiatives`] });
