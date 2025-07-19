@@ -1005,10 +1005,17 @@ Contoh: Wilayah timur memiliki potensi pasar yang besar namun kontribusi penjual
                             Tanggal Mulai*
                             <Popover>
                               <PopoverTrigger asChild>
-                                <span className="text-blue-500 cursor-help text-sm">ⓘ</span>
+                                <button 
+                                  type="button" 
+                                  className="inline-flex items-center justify-center"
+                                >
+                                  <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                                </button>
                               </PopoverTrigger>
-                              <PopoverContent className="w-64 text-sm">
-                                Pilih tanggal mulai pelaksanaan inisiatif ini. Tanggal ini akan menjadi acuan untuk timeline dan progress tracking.
+                              <PopoverContent side="right" className="max-w-xs">
+                                <p className="text-sm">
+                                  Pilih tanggal mulai pelaksanaan inisiatif ini. Tanggal ini akan menjadi acuan untuk timeline dan progress tracking.
+                                </p>
                               </PopoverContent>
                             </Popover>
                           </FormLabel>
@@ -1057,10 +1064,17 @@ Contoh: Wilayah timur memiliki potensi pasar yang besar namun kontribusi penjual
                             Tanggal Selesai*
                             <Popover>
                               <PopoverTrigger asChild>
-                                <span className="text-blue-500 cursor-help text-sm">ⓘ</span>
+                                <button 
+                                  type="button" 
+                                  className="inline-flex items-center justify-center"
+                                >
+                                  <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                                </button>
                               </PopoverTrigger>
-                              <PopoverContent className="w-64 text-sm">
-                                Tentukan target deadline untuk menyelesaikan inisiatif ini. Pastikan timeline yang realistis sesuai scope pekerjaan.
+                              <PopoverContent side="right" className="max-w-xs">
+                                <p className="text-sm">
+                                  Tentukan target deadline untuk menyelesaikan inisiatif ini. Pastikan timeline yang realistis sesuai scope pekerjaan.
+                                </p>
                               </PopoverContent>
                             </Popover>
                           </FormLabel>
@@ -1111,10 +1125,17 @@ Contoh: Wilayah timur memiliki potensi pasar yang besar namun kontribusi penjual
                             Penanggung Jawab*
                             <Popover>
                               <PopoverTrigger asChild>
-                                <span className="text-blue-500 cursor-help text-sm">ⓘ</span>
+                                <button 
+                                  type="button" 
+                                  className="inline-flex items-center justify-center"
+                                >
+                                  <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                                </button>
                               </PopoverTrigger>
-                              <PopoverContent className="w-64 text-sm">
-                                Pilih anggota tim yang bertanggung jawab memimpin dan memastikan keberhasilan inisiatif ini.
+                              <PopoverContent side="right" className="max-w-xs">
+                                <p className="text-sm">
+                                  Pilih anggota tim yang bertanggung jawab memimpin dan memastikan keberhasilan inisiatif ini.
+                                </p>
                               </PopoverContent>
                             </Popover>
                           </FormLabel>
@@ -1138,10 +1159,17 @@ Contoh: Wilayah timur memiliki potensi pasar yang besar namun kontribusi penjual
                             Budget (Opsional)
                             <Popover>
                               <PopoverTrigger asChild>
-                                <span className="text-blue-500 cursor-help text-sm">ⓘ</span>
+                                <button 
+                                  type="button" 
+                                  className="inline-flex items-center justify-center"
+                                >
+                                  <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                                </button>
                               </PopoverTrigger>
-                              <PopoverContent className="w-64 text-sm">
-                                Masukkan estimasi budget yang dibutuhkan untuk menjalankan inisiatif ini, jika ada.
+                              <PopoverContent side="right" className="max-w-xs">
+                                <p className="text-sm">
+                                  Masukkan estimasi budget yang dibutuhkan untuk menjalankan inisiatif ini, jika ada.
+                                </p>
                               </PopoverContent>
                             </Popover>
                           </FormLabel>
@@ -1167,9 +1195,23 @@ Contoh: Wilayah timur memiliki potensi pasar yang besar namun kontribusi penjual
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                         {/* Business Impact */}
                         <div>
-                          <FormLabel className="text-sm font-medium text-gray-700 mb-2 block">
+                          <FormLabel className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
                             Dampak Bisnis
-                            <span className="ml-1 text-blue-500 cursor-help" title="Seberapa besar dampak inisiatif ini terhadap bisnis">ⓘ</span>
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <button 
+                                  type="button" 
+                                  className="inline-flex items-center justify-center"
+                                >
+                                  <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                                </button>
+                              </PopoverTrigger>
+                              <PopoverContent side="right" className="max-w-xs">
+                                <p className="text-sm">
+                                  Seberapa besar dampak inisiatif ini terhadap bisnis? Pilih skala 1-5 berdasarkan potensi pengaruhnya terhadap tujuan organisasi.
+                                </p>
+                              </PopoverContent>
+                            </Popover>
                           </FormLabel>
                           <Select 
                             onValueChange={(value) => {
@@ -1193,9 +1235,23 @@ Contoh: Wilayah timur memiliki potensi pasar yang besar namun kontribusi penjual
 
                         {/* Difficulty Level */}
                         <div>
-                          <FormLabel className="text-sm font-medium text-gray-700 mb-2 block">
+                          <FormLabel className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
                             Tingkat Kesulitan
-                            <span className="ml-1 text-blue-500 cursor-help" title="Seberapa sulit implementasi inisiatif ini">ⓘ</span>
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <button 
+                                  type="button" 
+                                  className="inline-flex items-center justify-center"
+                                >
+                                  <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                                </button>
+                              </PopoverTrigger>
+                              <PopoverContent side="right" className="max-w-xs">
+                                <p className="text-sm">
+                                  Seberapa sulit implementasi inisiatif ini? Pertimbangkan kompleksitas, sumber daya yang dibutuhkan, dan kemampuan tim.
+                                </p>
+                              </PopoverContent>
+                            </Popover>
                           </FormLabel>
                           <Select 
                             onValueChange={(value) => {
@@ -1219,9 +1275,23 @@ Contoh: Wilayah timur memiliki potensi pasar yang besar namun kontribusi penjual
 
                         {/* Belief Level */}
                         <div>
-                          <FormLabel className="text-sm font-medium text-gray-700 mb-2 block">
+                          <FormLabel className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
                             Tingkat Keyakinan
-                            <span className="ml-1 text-blue-500 cursor-help" title="Seberapa yakin tim dapat menyelesaikan inisiatif ini">ⓘ</span>
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <button 
+                                  type="button" 
+                                  className="inline-flex items-center justify-center"
+                                >
+                                  <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                                </button>
+                              </PopoverTrigger>
+                              <PopoverContent side="right" className="max-w-xs">
+                                <p className="text-sm">
+                                  Seberapa yakin tim dapat menyelesaikan inisiatif ini dengan sukses? Pertimbangkan pengalaman, komitmen, dan kondisi saat ini.
+                                </p>
+                              </PopoverContent>
+                            </Popover>
                           </FormLabel>
                           <Select 
                             onValueChange={(value) => {
