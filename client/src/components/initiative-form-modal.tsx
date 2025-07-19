@@ -862,31 +862,26 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                     ) : (
                       <div className="space-y-2">
                         {(form.watch("tasks") || []).map((task, index) => (
-                          <div key={index} className="border rounded-lg p-3 bg-gradient-to-r from-green-50 to-white shadow-sm">
-                            <div className="flex items-start justify-between">
-                              <div className="flex-1">
-                                <h4 className="font-medium text-green-800 text-sm">{task.title || "Task tanpa judul"}</h4>
-                                {task.description && (
-                                  <p className="text-xs text-gray-600 mt-1 line-clamp-1">{task.description}</p>
+                          <div key={index} className="border rounded-lg p-2 bg-gradient-to-r from-green-50 to-white shadow-sm">
+                            <div className="flex items-center justify-between gap-2">
+                              <div className="flex items-center gap-2 flex-1 min-w-0">
+                                <h4 className="font-medium text-green-800 text-sm truncate">{task.title || "Task tanpa judul"}</h4>
+                                <span className="px-1.5 py-0.5 bg-blue-100 text-blue-800 rounded text-xs shrink-0">
+                                  {getTaskStatusLabel(task.status)}
+                                </span>
+                                <span className="px-1.5 py-0.5 bg-orange-100 text-orange-800 rounded text-xs shrink-0">
+                                  {getTaskPriorityLabel(task.priority)}
+                                </span>
+                                {task.dueDate && (
+                                  <span className="text-xs text-gray-500 shrink-0">📅 {format(new Date(task.dueDate), "dd MMM", { locale: id })}</span>
                                 )}
-                                <div className="flex items-center gap-3 mt-1.5 text-xs text-gray-500">
-                                  <span className="px-1.5 py-0.5 bg-blue-100 text-blue-800 rounded text-xs">
-                                    {getTaskStatusLabel(task.status)}
-                                  </span>
-                                  <span className="px-1.5 py-0.5 bg-orange-100 text-orange-800 rounded text-xs">
-                                    {getTaskPriorityLabel(task.priority)}
-                                  </span>
-                                  {task.dueDate && (
-                                    <span className="text-xs">📅 {format(new Date(task.dueDate), "dd MMM yyyy", { locale: id })}</span>
-                                  )}
-                                </div>
                               </div>
                               <Button
                                 type="button"
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => removeTask(index)}
-                                className="text-red-600 hover:text-red-800 hover:bg-red-100 h-6 w-6 p-0"
+                                className="text-red-600 hover:text-red-800 hover:bg-red-100 h-6 w-6 p-0 shrink-0"
                               >
                                 <Trash2 className="w-3 h-3" />
                               </Button>
