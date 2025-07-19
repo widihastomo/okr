@@ -1897,6 +1897,12 @@ export class DatabaseStorage implements IStorage {
   }
 
   async toggleDefinitionOfDoneItem(id: string, isCompleted: boolean, completedBy?: string): Promise<any> {
+    // Get the item first to access its initiative and title for audit trail
+    const [item] = await db.select().from(definitionOfDoneItems).where(eq(definitionOfDoneItems.id, id));
+    if (!item) {
+      throw new Error('Definition of Done item not found');
+    }
+
     const updates: any = { 
       isCompleted,
       updatedAt: new Date()
@@ -1914,6 +1920,27 @@ export class DatabaseStorage implements IStorage {
       .set(updates)
       .where(eq(definitionOfDoneItems.id, id))
       .returning();
+
+    // Create audit trail entry
+    if (completedBy && updatedItem.initiativeId) {
+      const user = await db.select().from(users).where(eq(users.id, completedBy)).limit(1);
+      const userName = user[0]?.name || user[0]?.email?.split('@')[0] || 'Unknown';
+      
+      const action = isCompleted ? 'dod_completed' : 'dod_unchecked';
+      const changeDescription = isCompleted 
+        ? `Definition of Done "${item.title}" diselesaikan oleh ${userName}`
+        : `Definition of Done "${item.title}" dibatalkan oleh ${userName}`;
+
+      await db.insert(auditTrail).values({
+        entityType: 'initiative',
+        entityId: updatedItem.initiativeId,
+        userId: completedBy,
+        organizationId: updatedItem.organizationId,
+        action,
+        changeDescription
+      });
+    }
+
     return updatedItem;
   }
 
