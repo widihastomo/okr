@@ -35,6 +35,15 @@ import { emailService } from "./email-service";
 import { generateInvitationEmail, generateVerificationEmail, generateResendVerificationEmail, generatePasswordResetEmail } from './email-templates';
 import { setupSubscriptionRoutes } from "./subscription-routes";
 import crypto from "crypto";
+import { 
+  profileImageUpload, 
+  processProfileImage, 
+  generateImageUrl, 
+  cleanupOldProfileImages, 
+  deleteProfileImage,
+  getOrganizationStorageStats
+} from "./image-storage";
+import path from "path";
 
 // Helper function to get task status label
 function getTaskStatusLabel(status: string): string {
@@ -11592,6 +11601,121 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to test email configuration" });
     }
   });
+
+  // Profile Image Upload Routes
+  
+  // Upload profile image
+  app.post("/api/profile/image", requireAuth, profileImageUpload.single('profileImage'), async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      
+      if (!req.file) {
+        return res.status(400).json({ message: "No image file provided" });
+      }
+
+      console.log("Profile image upload started for user:", currentUser.id);
+      
+      // Process the uploaded image
+      const processedImagePath = await processProfileImage(req.file.path);
+      const imageUrl = generateImageUrl(processedImagePath);
+      
+      // Clean up old profile images for this user
+      await cleanupOldProfileImages(currentUser.id, currentUser.organizationId!, processedImagePath);
+      
+      // Update user's profile image URL in database
+      const updatedUser = await storage.updateUserProfileImage(currentUser.id, imageUrl);
+      
+      if (!updatedUser) {
+        // Clean up the uploaded file if database update fails
+        await deleteProfileImage(imageUrl);
+        return res.status(500).json({ message: "Failed to update profile image in database" });
+      }
+
+      console.log("Profile image updated successfully:", imageUrl);
+      
+      res.json({ 
+        message: "Profile image updated successfully",
+        profileImageUrl: imageUrl,
+        user: updatedUser
+      });
+      
+    } catch (error) {
+      console.error("Error uploading profile image:", error);
+      
+      // Clean up uploaded file if it exists
+      if (req.file) {
+        try {
+          const fs = await import('fs');
+          if (fs.existsSync(req.file.path)) {
+            fs.unlinkSync(req.file.path);
+          }
+        } catch (cleanupError) {
+          console.error("Error cleaning up failed upload:", cleanupError);
+        }
+      }
+      
+      res.status(500).json({ message: "Failed to upload profile image" });
+    }
+  });
+
+  // Delete profile image
+  app.delete("/api/profile/image", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      
+      // Get current profile image URL
+      const user = await storage.getUser(currentUser.id);
+      if (!user || !user.profileImageUrl) {
+        return res.status(404).json({ message: "No profile image to delete" });
+      }
+
+      // Delete the image file
+      await deleteProfileImage(user.profileImageUrl);
+      
+      // Update database to remove profile image URL
+      const updatedUser = await storage.updateUserProfileImage(currentUser.id, null);
+      
+      if (!updatedUser) {
+        return res.status(500).json({ message: "Failed to update profile in database" });
+      }
+
+      res.json({ 
+        message: "Profile image deleted successfully",
+        user: updatedUser
+      });
+      
+    } catch (error) {
+      console.error("Error deleting profile image:", error);
+      res.status(500).json({ message: "Failed to delete profile image" });
+    }
+  });
+
+  // Get organization storage statistics (admin only)
+  app.get("/api/admin/storage-stats", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      
+      // Check if user has admin privileges
+      if (currentUser.role !== "owner" && currentUser.role !== "administrator" && !currentUser.isSystemOwner) {
+        return res.status(403).json({ message: "Access denied. Admin privileges required." });
+      }
+      
+      const stats = getOrganizationStorageStats(currentUser.organizationId!);
+      
+      res.json({
+        organizationId: currentUser.organizationId,
+        storage: stats
+      });
+      
+    } catch (error) {
+      console.error("Error getting storage stats:", error);
+      res.status(500).json({ message: "Failed to get storage statistics" });
+    }
+  });
+
+  // Serve uploaded images statically
+  const express = (await import('express')).default;
+  app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
   const httpServer = createServer(app);
   return httpServer;

@@ -69,6 +69,7 @@ export interface IStorage {
   upsertUser(user: UpsertUser): Promise<User>;
   updateUser(id: string, user: Partial<UpsertUser>): Promise<User | undefined>;
   updateUserReminderConfig(userId: string, config: any): Promise<void>;
+  updateUserProfileImage(userId: string, profileImageUrl: string | null): Promise<User | undefined>;
   deleteUser(id: string): Promise<boolean>;
   
   // Organizations
@@ -358,6 +359,15 @@ export class DatabaseStorage implements IStorage {
       .update(users)
       .set({ reminderConfig: config, updatedAt: new Date() })
       .where(eq(users.id, userId));
+  }
+
+  async updateUserProfileImage(userId: string, profileImageUrl: string | null): Promise<User | undefined> {
+    const [user] = await db
+      .update(users)
+      .set({ profileImageUrl, updatedAt: new Date() })
+      .where(eq(users.id, userId))
+      .returning();
+    return user;
   }
 
   async getReminderSettings(userId: string): Promise<any> {

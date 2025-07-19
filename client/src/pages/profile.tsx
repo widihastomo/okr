@@ -13,6 +13,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { LogoutButton } from "@/components/logout-button";
+import { ProfileImageUpload } from "@/components/profile-image-upload";
 
 export default function Profile() {
   const { user } = useAuth();
@@ -362,12 +363,16 @@ export default function Profile() {
               <Card className="shadow-sm border-0 bg-white/80 backdrop-blur-sm">
                 <CardHeader className="text-center pb-4">
                   <div className="flex justify-center mb-4">
-                    <Avatar className="h-20 w-20 ring-4 ring-blue-100">
-                      <AvatarImage src={(user as any)?.profileImageUrl} />
-                      <AvatarFallback className="text-lg bg-blue-600 text-white font-semibold">
-                        {getUserInitials()}
-                      </AvatarFallback>
-                    </Avatar>
+                    <ProfileImageUpload 
+                      currentImageUrl={(user as any)?.profileImageUrl}
+                      onImageUpdate={(newImageUrl) => {
+                        // Update local state immediately for better UX
+                        queryClient.setQueryData(['/api/auth/me'], (oldData: any) => ({
+                          ...oldData,
+                          profileImageUrl: newImageUrl
+                        }));
+                      }}
+                    />
                   </div>
                   <CardTitle className="text-lg font-semibold text-gray-900">
                     {(user as any)?.name && (user as any)?.name.trim() !== ''
