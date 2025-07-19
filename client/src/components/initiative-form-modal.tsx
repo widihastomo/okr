@@ -575,11 +575,6 @@ export default function InitiativeFormModal({
                             </PopoverContent>
                           </Popover>
                         </FormLabel>
-                        <FormDescription>
-                          {keyResultId
-                            ? "Angka target sudah dipilih sesuai dengan konteks halaman"
-                            : "Pilih angka target yang akan didukung oleh inisiatif ini"}
-                        </FormDescription>
                         <FormControl>
                           <SearchableKeyResultSelect
                             keyResults={keyResults}
@@ -623,6 +618,7 @@ export default function InitiativeFormModal({
                         </FormLabel>
                         <FormControl>
                           <Textarea
+                            className="min-h-[120px] resize-y"
                             placeholder="Kenapa Inisiatif perlu dilakuan?
 Contoh : Wilayah timur memiliki potensi pasar yang besar namun kontribusi penjualannya masih rendah. Maka dari itu, mengakselerasi akuisisi reseller aktif di wilayah tersebut dengan pendekatan sistematis berpotensi untuk meningkatakan omset."
                             {...field}
