@@ -270,58 +270,7 @@ export default function InitiativeFormModal({
     enabled: !!(isEditMode && initiative?.id),
   });
 
-  // Priority calculation functions
-  const calculatePriorityScore = (): number => {
-    const businessImpact = form.watch("businessImpact") || 0;
-    const difficultyLevel = form.watch("difficultyLevel") || 0;
-    const beliefLevel = form.watch("beliefLevel") || 0;
-
-    if (!businessImpact || !difficultyLevel || !beliefLevel) return 0;
-
-    // Convert difficulty to ease (higher difficulty = lower ease)
-    const ease = 6 - difficultyLevel;
-
-    // Calculate weighted score: Business Impact (40%) + Ease (30%) + Belief (30%)
-    return businessImpact * 0.4 + ease * 0.3 + beliefLevel * 0.3;
-  };
-
-  const calculatePriority = () => {
-    const score = calculatePriorityScore();
-    let priority = "medium";
-
-    if (score >= 4.5) priority = "critical";
-    else if (score >= 3.5) priority = "high";
-    else if (score >= 2.5) priority = "medium";
-    else priority = "low";
-
-    form.setValue(
-      "initiative.priority",
-      priority as "low" | "medium" | "high" | "critical",
-    );
-  };
-
-  const getPriorityLabel = (priority: string): string => {
-    const labels = {
-      low: "Rendah",
-      medium: "Sedang",
-      high: "Tinggi",
-      critical: "Kritis",
-    };
-    return labels[priority as keyof typeof labels] || "Sedang";
-  };
-
-  const getPriorityBadgeColor = (priority: string): string => {
-    const colors = {
-      low: "bg-gray-100 text-gray-800",
-      medium: "bg-yellow-100 text-yellow-800",
-      high: "bg-orange-100 text-orange-800",
-      critical: "bg-red-100 text-red-800",
-    };
-    return (
-      colors[priority as keyof typeof colors] || "bg-yellow-100 text-yellow-800"
-    );
-  };
-
+  // Initialize form
   const form = useForm<InitiativeFormData>({
     resolver: zodResolver(initiativeFormSchema),
     defaultValues: isEditMode
@@ -435,6 +384,58 @@ export default function InitiativeFormModal({
     existingTasks,
     existingDoDItems,
   ]);
+
+  // Priority calculation functions
+  const calculatePriorityScore = (): number => {
+    const businessImpact = form.watch("businessImpact") || 0;
+    const difficultyLevel = form.watch("difficultyLevel") || 0;
+    const beliefLevel = form.watch("beliefLevel") || 0;
+
+    if (!businessImpact || !difficultyLevel || !beliefLevel) return 0;
+
+    // Convert difficulty to ease (higher difficulty = lower ease)
+    const ease = 6 - difficultyLevel;
+
+    // Calculate weighted score: Business Impact (40%) + Ease (30%) + Belief (30%)
+    return businessImpact * 0.4 + ease * 0.3 + beliefLevel * 0.3;
+  };
+
+  const calculatePriority = () => {
+    const score = calculatePriorityScore();
+    let priority = "medium";
+
+    if (score >= 4.5) priority = "critical";
+    else if (score >= 3.5) priority = "high";
+    else if (score >= 2.5) priority = "medium";
+    else priority = "low";
+
+    form.setValue(
+      "initiative.priority",
+      priority as "low" | "medium" | "high" | "critical",
+    );
+  };
+
+  const getPriorityLabel = (priority: string): string => {
+    const labels = {
+      low: "Rendah",
+      medium: "Sedang",
+      high: "Tinggi",
+      critical: "Kritis",
+    };
+    return labels[priority as keyof typeof labels] || "Sedang";
+  };
+
+  const getPriorityBadgeColor = (priority: string): string => {
+    const colors = {
+      low: "bg-gray-100 text-gray-800",
+      medium: "bg-yellow-100 text-yellow-800",
+      high: "bg-orange-100 text-orange-800",
+      critical: "bg-red-100 text-red-800",
+    };
+    return (
+      colors[priority as keyof typeof colors] || "bg-yellow-100 text-yellow-800"
+    );
+  };
 
   // Success Metrics management functions
   const addSuccessMetric = () => {
