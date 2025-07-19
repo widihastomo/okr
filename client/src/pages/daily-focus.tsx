@@ -3765,12 +3765,11 @@ export default function DailyFocusPage() {
 
       {/* Initiative Creation Modal */}
       <InitiativeFormModal
-        isOpen={isInitiativeModalOpen}
-        onClose={() => setIsInitiativeModalOpen(false)}
+        open={isInitiativeModalOpen}
+        onOpenChange={setIsInitiativeModalOpen}
         onSuccess={() => {
           // Invalidate queries to refresh the initiative list
           queryClient.invalidateQueries({ queryKey: ["/api/initiatives"] });
-          setIsInitiativeModalOpen(false);
         }}
       />
       
