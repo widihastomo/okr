@@ -122,6 +122,7 @@ import { DailyUpdateSimple } from "@/components/daily-update-simple";
 import { useAuth } from "@/hooks/useAuth";
 import GoalFormModal from "@/components/goal-form-modal";
 import TaskModal from "@/components/task-modal";
+import InitiativeFormModal from "@/components/initiative-form-modal";
 import TourStartButton from "@/components/tour-start-button";
 
 // Icon mapping for mission cards
@@ -342,6 +343,9 @@ export default function DailyFocusPage() {
 
   // Goal creation modal state
   const [isGoalModalOpen, setIsGoalModalOpen] = useState(false);
+  
+  // Initiative creation modal state
+  const [isInitiativeModalOpen, setIsInitiativeModalOpen] = useState(false);
 
 
 
@@ -3058,15 +3062,27 @@ export default function DailyFocusPage() {
         <TabsContent value="initiatives" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                Kelola Inisiatif Aktif
-              </CardTitle>
-              <CardDescription>
-                Update metrics dan kelola inisiatif aktif
-                {selectedUserId === "all"
-                  ? " semua anggota tim"
-                  : " yang ditanggung jawabi"}
-              </CardDescription>
+              <div className="flex items-start justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    Kelola Inisiatif Aktif
+                  </CardTitle>
+                  <CardDescription>
+                    Update metrics dan kelola inisiatif aktif
+                    {selectedUserId === "all"
+                      ? " semua anggota tim"
+                      : " yang ditanggung jawabi"}
+                  </CardDescription>
+                </div>
+                <Button
+                  onClick={() => setIsInitiativeModalOpen(true)}
+                  className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  <span className="hidden sm:inline">Tambah Inisiatif</span>
+                  <span className="sm:hidden">Tambah</span>
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
               {isLoadingInitiatives ? (
@@ -3747,8 +3763,16 @@ export default function DailyFocusPage() {
         isAdding={!selectedTask}
       />
 
-
-
+      {/* Initiative Creation Modal */}
+      <InitiativeFormModal
+        isOpen={isInitiativeModalOpen}
+        onClose={() => setIsInitiativeModalOpen(false)}
+        onSuccess={() => {
+          // Invalidate queries to refresh the initiative list
+          queryClient.invalidateQueries({ queryKey: ["/api/initiatives"] });
+          setIsInitiativeModalOpen(false);
+        }}
+      />
       
     </div>
   );
