@@ -215,6 +215,7 @@ export default function InitiativeFormModal({
 
   // Task modal state
   const [showTaskModal, setShowTaskModal] = useState(false);
+  const [editingTaskIndex, setEditingTaskIndex] = useState<number | null>(null);
 
   // For creating initiative, we need a temporary ID
   const initiativeId = initiative?.id || "temp-initiative-id";
@@ -461,18 +462,33 @@ export default function InitiativeFormModal({
 
   // Task management functions (simplified for form data)
   const addTask = () => {
+    setEditingTaskIndex(null); // Reset editing mode
+    setShowTaskModal(true);
+  };
+
+  const editTask = (index: number) => {
+    setEditingTaskIndex(index);
     setShowTaskModal(true);
   };
 
   const handleTaskAdd = (taskData: any) => {
     const currentTasks = form.getValues("tasks") || [];
-    form.setValue("tasks", [...currentTasks, taskData]);
+    
+    if (editingTaskIndex !== null) {
+      // Edit existing task
+      const updatedTasks = [...currentTasks];
+      updatedTasks[editingTaskIndex] = {
+        ...taskData,
+        id: updatedTasks[editingTaskIndex].id, // Preserve existing ID
+      };
+      form.setValue("tasks", updatedTasks);
+    } else {
+      // Add new task
+      form.setValue("tasks", [...currentTasks, taskData]);
+    }
+    
     setShowTaskModal(false);
-  };
-
-  const editTask = (index: number) => {
-    // For now, tasks are edited inline - no modal needed
-    // This function is kept for future modal implementation if needed
+    setEditingTaskIndex(null);
   };
 
   const removeTask = (index: number) => {
@@ -1097,7 +1113,6 @@ Contoh: Wilayah timur memiliki potensi pasar yang besar namun kontribusi penjual
                           <Textarea
                             placeholder="Bagaimana inisiatif akan di eksekusi?
 Contoh: Untuk mempercepat penetrasi pasar di wilayah timur, kami akan menghubungi 100 calon reseller potensial dan menawarkan paket reseller serta pendampingan khusus. Setelah itu, kami akan melakukan follow-up berkala untuk memastikan keberhasilan program."
-                            className="min-h-[120px] resize-y"
                             {...field}
                           />
                         </FormControl>
@@ -1213,7 +1228,7 @@ Contoh: Untuk mempercepat penetrasi pasar di wilayah timur, kami akan menghubung
 
                     {(form.watch("tasks") || []).length === 0 ? (
                       <div className="text-center py-8 text-gray-500">
-                        <ListTodo className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                        <ListTodo className="w-8 h-8 mx-auto mb-2 text-gray-300" />
                         <p>Belum ada Tugas / Task</p>
                         <p className="text-sm">
                           Klik tombol di bawah untuk menambahkan
@@ -1258,6 +1273,15 @@ Contoh: Untuk mempercepat penetrasi pasar di wilayah timur, kami akan menghubung
                                       )}
                                     </span>
                                   )}
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => editTask(index)}
+                                    className="text-blue-600 hover:text-blue-800 hover:bg-blue-100 h-6 w-6 p-0"
+                                  >
+                                    <Edit className="w-3 h-3" />
+                                  </Button>
                                   <Button
                                     type="button"
                                     variant="ghost"
@@ -1805,6 +1829,8 @@ Contoh: Untuk mempercepat penetrasi pasar di wilayah timur, kami akan menghubung
         open={showTaskModal}
         onOpenChange={setShowTaskModal}
         onTaskAdd={handleTaskAdd}
+        editingTask={editingTaskIndex !== null ? (form.getValues("tasks") || [])[editingTaskIndex] : undefined}
+        isEditing={editingTaskIndex !== null}
       />
     </Dialog>
   );

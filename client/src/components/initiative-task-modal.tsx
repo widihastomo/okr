@@ -1,3 +1,4 @@
+import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -54,9 +55,17 @@ interface InitiativeTaskModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onTaskAdd: (task: TaskFormData) => void;
+  editingTask?: TaskFormData;
+  isEditing?: boolean;
 }
 
-export default function InitiativeTaskModal({ open, onOpenChange, onTaskAdd }: InitiativeTaskModalProps) {
+export default function InitiativeTaskModal({ 
+  open, 
+  onOpenChange, 
+  onTaskAdd, 
+  editingTask, 
+  isEditing = false 
+}: InitiativeTaskModalProps) {
   const { user } = useAuth();
 
   // Get current user ID
@@ -70,7 +79,7 @@ export default function InitiativeTaskModal({ open, onOpenChange, onTaskAdd }: I
 
   const form = useForm<TaskFormData>({
     resolver: zodResolver(taskSchema),
-    defaultValues: {
+    defaultValues: editingTask || {
       title: "",
       description: "",
       status: "not_started",
@@ -80,6 +89,23 @@ export default function InitiativeTaskModal({ open, onOpenChange, onTaskAdd }: I
       startDate: new Date(), // Default to today
     },
   });
+
+  // Reset form when editingTask changes
+  React.useEffect(() => {
+    if (editingTask) {
+      form.reset(editingTask);
+    } else {
+      form.reset({
+        title: "",
+        description: "",
+        status: "not_started",
+        priority: "medium",
+        assignedTo: userId || "",
+        dueDate: new Date(),
+        startDate: new Date(),
+      });
+    }
+  }, [editingTask, form, userId]);
 
   const onSubmit = (data: TaskFormData) => {
     onTaskAdd(data);
@@ -97,10 +123,10 @@ export default function InitiativeTaskModal({ open, onOpenChange, onTaskAdd }: I
       <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            Tambah Task ke Inisiatif
+            {isEditing ? 'Edit Task Inisiatif' : 'Tambah Task ke Inisiatif'}
           </DialogTitle>
           <DialogDescription>
-            Buat task baru yang akan ditambahkan ke daftar inisiatif
+            {isEditing ? 'Edit task yang sudah ada dalam inisiatif' : 'Buat task baru yang akan ditambahkan ke daftar inisiatif'}
           </DialogDescription>
         </DialogHeader>
 
@@ -312,7 +338,7 @@ export default function InitiativeTaskModal({ open, onOpenChange, onTaskAdd }: I
                 type="submit"
                 className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
               >
-                Tambah ke Inisiatif
+                {isEditing ? 'Update Task' : 'Tambah ke Inisiatif'}
               </Button>
             </div>
           </form>
