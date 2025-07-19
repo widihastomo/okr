@@ -124,9 +124,9 @@ const initiativeFormSchema = z.object({
     priority: z.enum(["low", "medium", "high", "critical"]).default("medium"),
     budget: z.string().optional(),
   }),
-  businessImpact: z.number().min(1, "Dampak bisnis wajib dipilih").max(5),
-  difficultyLevel: z.number().min(1, "Tingkat kesulitan wajib dipilih").max(5),
-  beliefLevel: z.number().min(1, "Tingkat keyakinan wajib dipilih").max(5),
+  businessImpact: z.number().min(1, "Dampak bisnis wajib dipilih").max(5).optional(),
+  difficultyLevel: z.number().min(1, "Tingkat kesulitan wajib dipilih").max(5).optional(),
+  beliefLevel: z.number().min(1, "Tingkat keyakinan wajib dipilih").max(5).optional(),
   successMetrics: z.array(successMetricSchema).optional().default([]),
   tasks: z.array(taskSchema).optional().default([]),
 }).refine(
@@ -482,6 +482,16 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
   });
 
   const onSubmit = (data: InitiativeFormData) => {
+    // Check if we're on step 3 and the mandatory priority fields are missing
+    if (currentStep === 3 && !isEditMode && (!data.businessImpact || !data.difficultyLevel || !data.beliefLevel)) {
+      toast({
+        title: "Form Tidak Lengkap",
+        description: "Silakan isi semua kriteria prioritas (Dampak Bisnis, Tingkat Kesulitan, Tingkat Keyakinan) sebelum melanjutkan.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (currentStep < 3 && !isEditMode) {
       // If not on final step and not in edit mode, proceed to next step
       nextStep();
@@ -563,7 +573,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
             <span className={`ml-2 text-sm font-medium hidden sm:inline ${
               currentStep >= 2 ? 'text-orange-600' : 'text-gray-500'
             }`}>
-              Rencana & Metrik
+              Rencana Eksekusi
             </span>
             <span className={`ml-2 text-xs font-medium sm:hidden ${
               currentStep >= 2 ? 'text-orange-600' : 'text-gray-500'
@@ -1468,6 +1478,11 @@ Contoh: Wilayah timur memiliki potensi pasar yang besar namun kontribusi penjual
                   type="submit" 
                   disabled={mutation.isPending}
                   className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
+                  onClick={(e) => {
+                    console.log("Button clicked");
+                    console.log("Form errors:", form.formState.errors);
+                    console.log("Form values:", form.getValues());
+                  }}
                 >
                   {mutation.isPending ? "Menyimpan..." : 
                    currentStep === 3 || isEditMode ? 
