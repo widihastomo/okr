@@ -59,6 +59,14 @@ import {
 } from "@/lib/number-utils";
 import { useAuth } from "@/hooks/useAuth";
 import type { KeyResult, User, Initiative } from "@shared/schema";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 
 
@@ -855,59 +863,58 @@ Tim akan mulai dengan mengumpulkan database reseller wilayah timur, mengirim sta
                   </p>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {/* Dynamic Inline Form Table */}
-                  <div className="space-y-4">
-                    {successMetrics.map((metric, index) => (
-                      <div
-                        key={index}
-                        className="border rounded-lg p-4 bg-gradient-to-r from-green-50 to-white"
-                      >
-                        <div className="flex items-start justify-between mb-3">
-                          <div className="flex items-center gap-2">
-                            <Target className="w-4 h-4 text-green-600" />
-                            <span className="font-medium text-sm text-gray-700">
-                              Metrik {index + 1}
-                            </span>
-                          </div>
-                          {successMetrics.length > 1 && (
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => removeMetric(index)}
-                              className="text-red-600 hover:text-red-700 hover:bg-red-100 h-8 w-8 p-0"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          )}
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">
-                              Nama Metrik *
-                            </label>
-                            <Input
-                              value={metric.name}
-                              onChange={(e) => updateMetric(index, "name", e.target.value)}
-                              placeholder="Contoh: Tingkat konversi leads"
-                              className="w-full"
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">
-                              Target *
-                            </label>
-                            <Input
-                              value={metric.target}
-                              onChange={(e) => updateMetric(index, "target", e.target.value)}
-                              placeholder="Contoh: 15% atau 100 leads"
-                              className="w-full"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    ))}
+                  {/* Dynamic Table */}
+                  <div className="border rounded-lg">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="w-16">#</TableHead>
+                          <TableHead>Nama Metrik *</TableHead>
+                          <TableHead>Target *</TableHead>
+                          <TableHead className="w-16">Aksi</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {successMetrics.map((metric, index) => (
+                          <TableRow key={index}>
+                            <TableCell className="text-center">
+                              <div className="flex items-center justify-center">
+                                <Target className="w-4 h-4 text-green-600" />
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <Input
+                                value={metric.name}
+                                onChange={(e) => updateMetric(index, "name", e.target.value)}
+                                placeholder="Contoh: Tingkat konversi leads"
+                                className="w-full border-0 focus:ring-1 focus:ring-green-500"
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <Input
+                                value={metric.target}
+                                onChange={(e) => updateMetric(index, "target", e.target.value)}
+                                placeholder="Contoh: 15% atau 100 leads"
+                                className="w-full border-0 focus:ring-1 focus:ring-green-500"
+                              />
+                            </TableCell>
+                            <TableCell className="text-center">
+                              {successMetrics.length > 1 && (
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => removeMetric(index)}
+                                  className="text-red-600 hover:text-red-700 hover:bg-red-100 h-8 w-8 p-0"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
                   </div>
 
                   {/* Tombol Tambah Metrik */}
