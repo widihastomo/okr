@@ -44,7 +44,7 @@ const taskSchema = z.object({
   status: z.enum(["not_started", "in_progress", "completed", "cancelled"]).default("not_started"),
   priority: z.enum(["low", "medium", "high", "critical"]).default("medium"),
   assignedTo: z.string().optional(),
-  dueDate: z.date().optional(),
+  dueDate: z.date({ required_error: "Tanggal deadline harus diisi" }),
 });
 
 type TaskFormData = z.infer<typeof taskSchema>;
@@ -219,7 +219,7 @@ export default function InitiativeTaskModal({ open, onOpenChange, onTaskAdd }: I
                 name="dueDate"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Tanggal Deadline (Opsional)</FormLabel>
+                    <FormLabel>Tanggal Deadline*</FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
                         <FormControl>
@@ -262,7 +262,7 @@ export default function InitiativeTaskModal({ open, onOpenChange, onTaskAdd }: I
               </Button>
               <Button
                 type="submit"
-                className="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600"
+                className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
               >
                 Tambah ke Inisiatif
               </Button>
