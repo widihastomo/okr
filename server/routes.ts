@@ -3436,11 +3436,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const newItem = await storage.createDefinitionOfDoneItem(dodData);
       
       // Add audit trail entry
-      await storage.addAuditTrailEntry({
-        initiativeId,
+      await storage.createAuditTrail({
+        entityType: 'initiative',
+        entityId: initiativeId,
         userId: currentUser.id,
+        organizationId: currentUser.organizationId,
         action: 'add_deliverable',
-        changes: { deliverable: title.trim() }
+        changeDescription: `Added deliverable: ${title.trim()}`
       });
 
       res.json(newItem);
