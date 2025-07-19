@@ -124,9 +124,9 @@ const initiativeFormSchema = z.object({
     priority: z.enum(["low", "medium", "high", "critical"]).default("medium"),
     budget: z.string().optional(),
   }),
-  businessImpact: z.number().min(1).max(5).optional(),
-  difficultyLevel: z.number().min(1).max(5).optional(),
-  beliefLevel: z.number().min(1).max(5).optional(),
+  businessImpact: z.number().min(1, "Dampak bisnis wajib dipilih").max(5),
+  difficultyLevel: z.number().min(1, "Tingkat kesulitan wajib dipilih").max(5),
+  beliefLevel: z.number().min(1, "Tingkat keyakinan wajib dipilih").max(5),
   successMetrics: z.array(successMetricSchema).optional().default([]),
   tasks: z.array(taskSchema).optional().default([]),
 }).refine(
@@ -1248,124 +1248,151 @@ Contoh: Wilayah timur memiliki potensi pasar yang besar namun kontribusi penjual
                       
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                         {/* Business Impact */}
-                        <div>
-                          <FormLabel className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                            Dampak Bisnis
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <button 
-                                  type="button" 
-                                  className="inline-flex items-center justify-center"
+                        <FormField
+                          control={form.control}
+                          name="businessImpact"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                                Dampak Bisnis <span className="text-red-500">*</span>
+                                <Popover>
+                                  <PopoverTrigger asChild>
+                                    <button 
+                                      type="button" 
+                                      className="inline-flex items-center justify-center"
+                                    >
+                                      <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                                    </button>
+                                  </PopoverTrigger>
+                                  <PopoverContent side="right" className="max-w-xs">
+                                    <p className="text-sm">
+                                      Seberapa besar dampak inisiatif ini terhadap bisnis? Pilih skala 1-5 berdasarkan potensi pengaruhnya terhadap tujuan organisasi.
+                                    </p>
+                                  </PopoverContent>
+                                </Popover>
+                              </FormLabel>
+                              <FormControl>
+                                <Select 
+                                  onValueChange={(value) => {
+                                    field.onChange(Number(value));
+                                    calculatePriority();
+                                  }} 
+                                  value={field.value?.toString() || ""}
                                 >
-                                  <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                                </button>
-                              </PopoverTrigger>
-                              <PopoverContent side="right" className="max-w-xs">
-                                <p className="text-sm">
-                                  Seberapa besar dampak inisiatif ini terhadap bisnis? Pilih skala 1-5 berdasarkan potensi pengaruhnya terhadap tujuan organisasi.
-                                </p>
-                              </PopoverContent>
-                            </Popover>
-                          </FormLabel>
-                          <Select 
-                            onValueChange={(value) => {
-                              form.setValue("businessImpact", Number(value));
-                              calculatePriority();
-                            }} 
-                            value={form.watch("businessImpact")?.toString() || ""}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Pilih dampak bisnis" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="1">1 - Sangat Rendah</SelectItem>
-                              <SelectItem value="2">2 - Rendah</SelectItem>
-                              <SelectItem value="3">3 - Sedang</SelectItem>
-                              <SelectItem value="4">4 - Tinggi</SelectItem>
-                              <SelectItem value="5">5 - Sangat Tinggi</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Pilih dampak bisnis" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="1">1 - Sangat Rendah</SelectItem>
+                                    <SelectItem value="2">2 - Rendah</SelectItem>
+                                    <SelectItem value="3">3 - Sedang</SelectItem>
+                                    <SelectItem value="4">4 - Tinggi</SelectItem>
+                                    <SelectItem value="5">5 - Sangat Tinggi</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
 
                         {/* Difficulty Level */}
-                        <div>
-                          <FormLabel className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                            Tingkat Kesulitan
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <button 
-                                  type="button" 
-                                  className="inline-flex items-center justify-center"
+                        <FormField
+                          control={form.control}
+                          name="difficultyLevel"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                                Tingkat Kesulitan <span className="text-red-500">*</span>
+                                <Popover>
+                                  <PopoverTrigger asChild>
+                                    <button 
+                                      type="button" 
+                                      className="inline-flex items-center justify-center"
+                                    >
+                                      <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                                    </button>
+                                  </PopoverTrigger>
+                                  <PopoverContent side="right" className="max-w-xs">
+                                    <p className="text-sm">
+                                      Seberapa sulit implementasi inisiatif ini? Pertimbangkan kompleksitas, sumber daya yang dibutuhkan, dan kemampuan tim.
+                                    </p>
+                                  </PopoverContent>
+                                </Popover>
+                              </FormLabel>
+                              <FormControl>
+                                <Select 
+                                  onValueChange={(value) => {
+                                    field.onChange(Number(value));
+                                    calculatePriority();
+                                  }} 
+                                  value={field.value?.toString() || ""}
                                 >
-                                  <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                                </button>
-                              </PopoverTrigger>
-                              <PopoverContent side="right" className="max-w-xs">
-                                <p className="text-sm">
-                                  Seberapa sulit implementasi inisiatif ini? Pertimbangkan kompleksitas, sumber daya yang dibutuhkan, dan kemampuan tim.
-                                </p>
-                              </PopoverContent>
-                            </Popover>
-                          </FormLabel>
-                          <Select 
-                            onValueChange={(value) => {
-                              form.setValue("difficultyLevel", Number(value));
-                              calculatePriority();
-                            }} 
-                            value={form.watch("difficultyLevel")?.toString() || ""}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Pilih tingkat kesulitan" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="1">1 - Sangat Mudah</SelectItem>
-                              <SelectItem value="2">2 - Mudah</SelectItem>
-                              <SelectItem value="3">3 - Sedang</SelectItem>
-                              <SelectItem value="4">4 - Sulit</SelectItem>
-                              <SelectItem value="5">5 - Sangat Sulit</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Pilih tingkat kesulitan" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="1">1 - Sangat Mudah</SelectItem>
+                                    <SelectItem value="2">2 - Mudah</SelectItem>
+                                    <SelectItem value="3">3 - Sedang</SelectItem>
+                                    <SelectItem value="4">4 - Sulit</SelectItem>
+                                    <SelectItem value="5">5 - Sangat Sulit</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
 
                         {/* Belief Level */}
-                        <div>
-                          <FormLabel className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                            Tingkat Keyakinan
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <button 
-                                  type="button" 
-                                  className="inline-flex items-center justify-center"
+                        <FormField
+                          control={form.control}
+                          name="beliefLevel"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                                Tingkat Keyakinan <span className="text-red-500">*</span>
+                                <Popover>
+                                  <PopoverTrigger asChild>
+                                    <button 
+                                      type="button" 
+                                      className="inline-flex items-center justify-center"
+                                    >
+                                      <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                                    </button>
+                                  </PopoverTrigger>
+                                  <PopoverContent side="right" className="max-w-xs">
+                                    <p className="text-sm">
+                                      Seberapa yakin tim dapat menyelesaikan inisiatif ini dengan sukses? Pertimbangkan pengalaman, komitmen, dan kondisi saat ini.
+                                    </p>
+                                  </PopoverContent>
+                                </Popover>
+                              </FormLabel>
+                              <FormControl>
+                                <Select 
+                                  onValueChange={(value) => {
+                                    field.onChange(Number(value));
+                                    calculatePriority();
+                                  }} 
+                                  value={field.value?.toString() || ""}
                                 >
-                                  <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                                </button>
-                              </PopoverTrigger>
-                              <PopoverContent side="right" className="max-w-xs">
-                                <p className="text-sm">
-                                  Seberapa yakin tim dapat menyelesaikan inisiatif ini dengan sukses? Pertimbangkan pengalaman, komitmen, dan kondisi saat ini.
-                                </p>
-                              </PopoverContent>
-                            </Popover>
-                          </FormLabel>
-                          <Select 
-                            onValueChange={(value) => {
-                              form.setValue("beliefLevel", Number(value));
-                              calculatePriority();
-                            }} 
-                            value={form.watch("beliefLevel")?.toString() || ""}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Pilih tingkat keyakinan" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="1">1 - Sangat Rendah</SelectItem>
-                              <SelectItem value="2">2 - Rendah</SelectItem>
-                              <SelectItem value="3">3 - Sedang</SelectItem>
-                              <SelectItem value="4">4 - Tinggi</SelectItem>
-                              <SelectItem value="5">5 - Sangat Tinggi</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Pilih tingkat keyakinan" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="1">1 - Sangat Rendah</SelectItem>
+                                    <SelectItem value="2">2 - Rendah</SelectItem>
+                                    <SelectItem value="3">3 - Sedang</SelectItem>
+                                    <SelectItem value="4">4 - Tinggi</SelectItem>
+                                    <SelectItem value="5">5 - Sangat Tinggi</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
                       </div>
 
                       {/* Priority Result */}
@@ -1390,8 +1417,8 @@ Contoh: Wilayah timur memiliki potensi pasar yang besar namun kontribusi penjual
                             </div>
                           </div>
                         ) : (
-                          <p className="text-sm text-gray-600">
-                            Pilih semua kriteria di atas untuk melihat hasil prioritas otomatis
+                          <p className="text-sm text-red-600 font-medium">
+                            Semua kriteria prioritas di atas wajib dipilih untuk melanjutkan
                           </p>
                         )}
                       </div>
