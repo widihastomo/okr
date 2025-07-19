@@ -1187,11 +1187,70 @@ export default function InitiativeDetailPage() {
               </CardHeader>
               <CardContent className="pt-0">
                 <div className="space-y-4">
-                  <div>
-                    <p className="text-gray-600 text-sm leading-relaxed">
-                      {initiativeData.description}
-                    </p>
-                  </div>
+                  {/* Description Section */}
+                  {initiativeData.description && (
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <FileText className="h-4 w-4 text-orange-500" />
+                        <span className="text-sm font-medium text-gray-700">Deskripsi Inisiatif</span>
+                      </div>
+                      <p className="text-gray-600 text-sm leading-relaxed bg-gray-50 p-3 rounded-lg">
+                        {initiativeData.description}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Implementation Plan Section */}
+                  {initiativeData.implementationPlan && (
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <Rocket className="h-4 w-4 text-blue-500" />
+                        <span className="text-sm font-medium text-gray-700">Rencana Pelaksanaan</span>
+                      </div>
+                      <p className="text-gray-600 text-sm leading-relaxed bg-blue-50 p-3 rounded-lg border border-blue-200">
+                        {initiativeData.implementationPlan}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Definition of Done Section */}
+                  {definitionOfDoneItems && definitionOfDoneItems.length > 0 && (
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <CheckSquare className="h-4 w-4 text-green-500" />
+                        <span className="text-sm font-medium text-gray-700">Definition of Done</span>
+                      </div>
+                      <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+                        <div className="space-y-2">
+                          {definitionOfDoneItems.map((item: any, index: number) => (
+                            <div key={item.id || index} className="flex items-center gap-2">
+                              <div className={`w-4 h-4 rounded border-2 flex items-center justify-center ${
+                                item.isCompleted 
+                                  ? 'bg-green-500 border-green-500' 
+                                  : 'border-gray-300'
+                              }`}>
+                                {item.isCompleted && (
+                                  <Check className="w-3 h-3 text-white" />
+                                )}
+                              </div>
+                              <span className={`text-sm ${
+                                item.isCompleted 
+                                  ? 'text-green-700 line-through' 
+                                  : 'text-gray-700'
+                              }`}>
+                                {item.title}
+                              </span>
+                              {item.isCompleted && item.completedAt && (
+                                <span className="text-xs text-green-600 ml-auto">
+                                  ✓ {new Date(item.completedAt).toLocaleDateString('id-ID')}
+                                </span>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-gray-100">
                     <div className="space-y-3">
