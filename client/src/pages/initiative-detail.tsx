@@ -920,6 +920,13 @@ export default function InitiativeDetailPage() {
     return user.email ? user.email[0].toUpperCase() : "U";
   };
 
+  // Helper function to get user profile image URL
+  const getUserProfileImage = (userId: string): string | undefined => {
+    if (!userId || !users) return undefined;
+    const user = users.find((u: any) => u.id === userId);
+    return user?.profileImageUrl || undefined;
+  };
+
   const { data: relatedInitiatives } = useQuery({
     queryKey: ["/api/initiatives"],
     enabled: !!initiative,
@@ -1538,20 +1545,15 @@ export default function InitiativeDetailPage() {
                       <div className="flex items-center gap-2">
                         {pic && (
                           <div className="flex items-center gap-1">
-                            <div className="w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-medium">
-                              {(() => {
-                                const name =
-                                  pic.name || pic.email?.split("@")[0] || "U";
-                                const nameParts = name.split(" ");
-                                if (nameParts.length > 1) {
-                                  return (
-                                    nameParts[0].charAt(0) +
-                                    nameParts[nameParts.length - 1].charAt(0)
-                                  );
-                                }
-                                return name.charAt(0);
-                              })()}
-                            </div>
+                            <Avatar className="w-5 h-5">
+                              <AvatarImage 
+                                src={getUserProfileImage(pic.id)} 
+                                alt={pic.name || pic.email?.split("@")[0] || "Unknown"}
+                              />
+                              <AvatarFallback className="bg-blue-600 text-white text-xs font-medium">
+                                {getUserInitials(pic.id)}
+                              </AvatarFallback>
+                            </Avatar>
                             <span className="text-xs font-medium">
                               {pic.name ||
                                 pic.email?.split("@")[0] ||
@@ -2243,30 +2245,15 @@ export default function InitiativeDetailPage() {
                               <TooltipProvider>
                                 <Tooltip>
                                   <TooltipTrigger asChild>
-                                    <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-medium cursor-pointer">
-                                      {(() => {
-                                        const assignedUser = users.find(
-                                          (u: any) => u.id === task.assignedTo,
-                                        );
-                                        if (assignedUser) {
-                                          const name =
-                                            assignedUser.name ||
-                                            assignedUser.email?.split("@")[0] ||
-                                            "U";
-                                          const nameParts = name.split(" ");
-                                          if (nameParts.length > 1) {
-                                            return (
-                                              nameParts[0].charAt(0) +
-                                              nameParts[
-                                                nameParts.length - 1
-                                              ].charAt(0)
-                                            );
-                                          }
-                                          return name.charAt(0);
-                                        }
-                                        return "U";
-                                      })()}
-                                    </div>
+                                    <Avatar className="w-6 h-6 cursor-pointer">
+                                      <AvatarImage 
+                                        src={getUserProfileImage(task.assignedTo)} 
+                                        alt={getUserName(task.assignedTo)}
+                                      />
+                                      <AvatarFallback className="bg-blue-600 text-white text-xs font-medium">
+                                        {getUserInitials(task.assignedTo)}
+                                      </AvatarFallback>
+                                    </Avatar>
                                   </TooltipTrigger>
                                   <TooltipContent>
                                     <p>
@@ -2736,13 +2723,18 @@ export default function InitiativeDetailPage() {
                   PIC (Person in Charge)
                 </h4>
                 <div className="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                  <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-medium">
-                    {pic.firstName?.charAt(0)}
-                    {pic.lastName?.charAt(0)}
-                  </div>
+                  <Avatar className="w-10 h-10">
+                    <AvatarImage 
+                      src={getUserProfileImage(pic.id)} 
+                      alt={pic.name || pic.email?.split("@")[0] || "PIC"}
+                    />
+                    <AvatarFallback className="bg-blue-600 text-white font-medium">
+                      {getUserInitials(pic.id)}
+                    </AvatarFallback>
+                  </Avatar>
                   <div className="flex-1">
                     <div className="font-medium text-gray-900">
-                      {pic.firstName} {pic.lastName}
+                      {pic.name || pic.email?.split("@")[0] || "Unknown"}
                     </div>
                     <div className="text-sm text-gray-600">{pic.email}</div>
                   </div>
@@ -2770,13 +2762,18 @@ export default function InitiativeDetailPage() {
                         key={member.id}
                         className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg"
                       >
-                        <div className="w-10 h-10 bg-gray-600 rounded-full flex items-center justify-center text-white font-medium">
-                          {member.user?.firstName?.charAt(0)}
-                          {member.user?.lastName?.charAt(0)}
-                        </div>
+                        <Avatar className="w-10 h-10">
+                          <AvatarImage 
+                            src={getUserProfileImage(member.userId)} 
+                            alt={member.user?.name || member.user?.email?.split("@")[0] || "Member"}
+                          />
+                          <AvatarFallback className="bg-gray-600 text-white font-medium">
+                            {getUserInitials(member.userId)}
+                          </AvatarFallback>
+                        </Avatar>
                         <div className="flex-1">
                           <div className="font-medium text-gray-900">
-                            {member.user?.firstName} {member.user?.lastName}
+                            {member.user?.name || member.user?.email?.split("@")[0] || "Unknown"}
                           </div>
                           <div className="text-sm text-gray-600">
                             {member.user?.email}
