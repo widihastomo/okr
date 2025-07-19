@@ -401,16 +401,46 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
           picName = picUser ? getUserName(picUser) : "";
         }
 
+        // Calculate priority if scores are provided
+        let calculatedPriority = data.initiative.priority;
+        let impactScore: number | undefined;
+        let effortScore: number | undefined; 
+        let confidenceScore: number | undefined;
+        
+        if (data.businessImpact && data.difficultyLevel && data.beliefLevel) {
+          impactScore = data.businessImpact;
+          effortScore = data.difficultyLevel;
+          confidenceScore = data.beliefLevel;
+          
+          // Calculate priority score using the same formula
+          const ease = 6 - data.difficultyLevel;
+          const score = (data.businessImpact * 0.4) + (ease * 0.3) + (data.beliefLevel * 0.3);
+          
+          if (score >= 4.5) calculatedPriority = "critical";
+          else if (score >= 3.5) calculatedPriority = "high";
+          else if (score >= 2.5) calculatedPriority = "medium";
+          else calculatedPriority = "low";
+        }
+
         // Prepare the payload
         const payload = {
           ...data.initiative,
           pic: picName,
           organizationId: user?.organizationId, // Add missing organizationId
+          priority: calculatedPriority, // Use calculated priority
+          // Add priority calculation scores
+          impactScore,
+          effortScore, 
+          confidenceScore,
           // Convert definition of done array to JSON string for backend
           definitionOfDone: JSON.stringify(data.initiative.definitionOfDone || []),
           // Format dates for API
           startDate: data.initiative.startDate.toISOString(),
           dueDate: data.initiative.dueDate.toISOString(),
+          // Include success metrics
+          successMetrics: data.successMetrics || [],
+          // Include tasks  
+          tasks: data.tasks || [],
         };
 
         console.log("Initiative form payload:", payload);

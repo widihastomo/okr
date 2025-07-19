@@ -4284,8 +4284,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // Extract success metrics from request body
-      const { successMetrics, ...initiativeBody } = req.body;
+      // Extract success metrics and tasks from request body
+      const { successMetrics, tasks, ...initiativeBody } = req.body;
       
       // Process the initiative data with authentication
       const initiativeData = {
@@ -4331,6 +4331,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
           } catch (metricError) {
             console.error("Error creating success metric:", metricError);
+          }
+        }
+      }
+      
+      // Create tasks if provided
+      if (tasks && Array.isArray(tasks) && tasks.length > 0) {
+        console.log("Creating tasks:", tasks);
+        
+        for (const task of tasks) {
+          try {
+            const taskData = {
+              ...task,
+              initiativeId: initiative.id,
+              createdBy: currentUser.id,
+              organizationId: currentUser.organizationId,
+              assignedTo: task.assignedTo === "none" || !task.assignedTo ? null : task.assignedTo,
+              dueDate: task.dueDate ? new Date(task.dueDate) : null,
+              startDate: task.startDate ? new Date(task.startDate) : null,
+            };
+            
+            const taskResult = insertTaskSchema.safeParse(taskData);
+            if (taskResult.success) {
+              await storage.createTask(taskResult.data);
+              console.log("Task created:", taskResult.data.title);
+            } else {
+              console.error("Task validation error:", taskResult.error.errors);
+            }
+          } catch (taskError) {
+            console.error("Error creating task:", taskError);
           }
         }
       }
