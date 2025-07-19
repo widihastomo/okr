@@ -10,6 +10,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -97,6 +98,9 @@ export default function InitiativeTaskModal({ open, onOpenChange, onTaskAdd }: I
             <FileText className="w-5 h-5 text-green-600" />
             Tambah Task ke Inisiatif
           </DialogTitle>
+          <DialogDescription>
+            Buat task baru yang akan ditambahkan ke daftar inisiatif
+          </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
@@ -187,63 +191,65 @@ export default function InitiativeTaskModal({ open, onOpenChange, onTaskAdd }: I
               />
             </div>
 
-            {/* Assigned To */}
-            <FormField
-              control={form.control}
-              name="assignedTo"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Ditugaskan Kepada</FormLabel>
-                  <FormControl>
-                    <SearchableUserSelect
-                      users={users}
-                      value={field.value || ""}
-                      onValueChange={field.onChange}
-                      currentUser={user || undefined}
-                      placeholder="Pilih pengguna..."
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Due Date */}
-            <FormField
-              control={form.control}
-              name="dueDate"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Tanggal Deadline (Opsional)</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant="outline"
-                          className={cn(
-                            "w-full justify-start text-left font-normal",
-                            !field.value && "text-muted-foreground"
-                          )}
-                        >
-                          <CalendarIcon className="mr-2 h-4 w-4" />
-                          {field.value ? format(field.value, "PPP", { locale: id }) : "Pilih tanggal"}
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <CalendarComponent
-                        mode="single"
-                        selected={field.value}
-                        onSelect={field.onChange}
-                        disabled={(date) => date < new Date("1900-01-01")}
-                        initialFocus
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Assigned To */}
+              <FormField
+                control={form.control}
+                name="assignedTo"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Ditugaskan Kepada</FormLabel>
+                    <FormControl>
+                      <SearchableUserSelect
+                        users={users}
+                        value={field.value || ""}
+                        onValueChange={field.onChange}
+                        currentUser={user || undefined}
+                        placeholder="Pilih pengguna..."
                       />
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Due Date */}
+              <FormField
+                control={form.control}
+                name="dueDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tanggal Deadline (Opsional)</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              "w-full justify-start text-left font-normal",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {field.value ? format(field.value, "PPP", { locale: id }) : "Pilih tanggal"}
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <CalendarComponent
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          disabled={(date) => date < new Date("1900-01-01")}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             {/* Action Buttons */}
             <div className="flex justify-end gap-3 pt-4">
