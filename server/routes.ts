@@ -3472,6 +3472,77 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Edit definition of done item
+  app.patch("/api/definition-of-done/:id", requireAuth, async (req, res) => {
+    try {
+      const itemId = req.params.id;
+      const currentUser = req.user;
+      const { title } = req.body;
+
+      if (!title || typeof title !== 'string' || !title.trim()) {
+        return res.status(400).json({ message: "Title is required" });
+      }
+
+      const updatedItem = await storage.updateDefinitionOfDoneItem(itemId, {
+        title: title.trim()
+      });
+      
+      if (!updatedItem) {
+        return res.status(404).json({ message: "Definition of done item not found" });
+      }
+
+      // Add audit trail entry
+      await storage.createAuditTrail({
+        entityType: 'initiative',
+        entityId: updatedItem.initiativeId,
+        userId: currentUser.id,
+        organizationId: currentUser.organizationId,
+        action: 'edit_deliverable',
+        changeDescription: `Edited deliverable: ${title.trim()}`
+      });
+
+      res.json(updatedItem);
+    } catch (error) {
+      console.error("Error editing definition of done item:", error);
+      res.status(500).json({ message: "Failed to edit definition of done item" });
+    }
+  });
+
+  // Delete definition of done item
+  app.delete("/api/definition-of-done/:id", requireAuth, async (req, res) => {
+    try {
+      const itemId = req.params.id;
+      const currentUser = req.user;
+
+      // Get item details before deletion for audit trail
+      const item = await storage.getDefinitionOfDoneItem(itemId);
+      if (!item) {
+        return res.status(404).json({ message: "Definition of done item not found" });
+      }
+
+      const result = await storage.deleteDefinitionOfDoneItem(itemId);
+      
+      if (!result) {
+        return res.status(404).json({ message: "Definition of done item not found" });
+      }
+
+      // Add audit trail entry
+      await storage.createAuditTrail({
+        entityType: 'initiative',
+        entityId: item.initiativeId,
+        userId: currentUser.id,
+        organizationId: currentUser.organizationId,
+        action: 'delete_deliverable',
+        changeDescription: `Deleted deliverable: ${item.title}`
+      });
+
+      res.json({ message: "Definition of done item deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting definition of done item:", error);
+      res.status(500).json({ message: "Failed to delete definition of done item" });
+    }
+  });
+
   app.post("/api/initiatives/:initiativeId/success-metrics", requireAuth, async (req, res) => {
     try {
       const initiativeId = req.params.initiativeId;

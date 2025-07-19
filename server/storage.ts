@@ -1883,6 +1883,13 @@ export class DatabaseStorage implements IStorage {
     return items;
   }
 
+  async getDefinitionOfDoneItem(id: string): Promise<any | null> {
+    const [item] = await db.select().from(definitionOfDoneItems)
+      .where(eq(definitionOfDoneItems.id, id))
+      .limit(1);
+    return item || null;
+  }
+
   async createDefinitionOfDoneItem(item: InsertDefinitionOfDoneItem): Promise<any> {
     const [newItem] = await db.insert(definitionOfDoneItems).values(item).returning();
     return newItem;

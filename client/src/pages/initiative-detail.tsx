@@ -841,6 +841,8 @@ export default function InitiativeDetailPage() {
   const [cancelReason, setCancelReason] = useState("");
   const [isDeleteMetricModalOpen, setIsDeleteMetricModalOpen] = useState(false);
   const [isAddDeliverableModalOpen, setIsAddDeliverableModalOpen] = useState(false);
+  const [isEditDeliverableModalOpen, setIsEditDeliverableModalOpen] = useState(false);
+  const [editingDeliverable, setEditingDeliverable] = useState<any>(null);
   const [metricToDelete, setMetricToDelete] = useState<any>(null);
   const [isTeamModalOpen, setIsTeamModalOpen] = useState(false);
   const [isCloseInitiativeModalOpen, setIsCloseInitiativeModalOpen] =
@@ -1167,6 +1169,68 @@ export default function InitiativeDetailPage() {
       });
     },
   });
+
+  const editDeliverableMutation = useMutation({
+    mutationFn: async ({
+      itemId,
+      title,
+    }: {
+      itemId: string;
+      title: string;
+    }) => {
+      return await apiRequest("PATCH", `/api/definition-of-done/${itemId}`, {
+        title,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [`/api/initiatives/${id}/definition-of-done`],
+      });
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}`] });
+      toast({
+        title: "Deliverable berhasil diubah",
+        description: "Deliverable telah diperbarui",
+        variant: "success",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Gagal mengubah deliverable",
+        description:
+          error.message || "Terjadi kesalahan saat mengubah deliverable",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const deleteDeliverableMutation = useMutation({
+    mutationFn: async (itemId: string) => {
+      return await apiRequest("DELETE", `/api/definition-of-done/${itemId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [`/api/initiatives/${id}/definition-of-done`],
+      });
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}`] });
+      toast({
+        title: "Deliverable berhasil dihapus",
+        description: "Deliverable telah dihapus dari inisiatif",
+        variant: "success",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Gagal menghapus deliverable",
+        description:
+          error.message || "Terjadi kesalahan saat menghapus deliverable",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleDeleteDeliverable = (itemId: string) => {
+    deleteDeliverableMutation.mutate(itemId);
+  };
 
   const handleCancelInitiative = () => {
     if (cancelReason.trim()) {
@@ -1851,7 +1915,7 @@ export default function InitiativeDetailPage() {
                           (item: any, index: number) => (
                             <div
                               key={item.id || index}
-                              className="flex items-center gap-2"
+                              className="flex items-center gap-2 group"
                             >
                               <button
                                 onClick={() => {
@@ -1885,7 +1949,7 @@ export default function InitiativeDetailPage() {
                                 )}
                               </button>
                               <span
-                                className={`text-sm ${
+                                className={`text-sm flex-1 ${
                                   item.isCompleted
                                     ? "text-green-700 line-through"
                                     : "text-gray-700"
@@ -1894,13 +1958,48 @@ export default function InitiativeDetailPage() {
                                 {item.title}
                               </span>
                               {item.isCompleted && item.completedAt && (
-                                <span className="text-xs text-green-600 ml-auto">
+                                <span className="text-xs text-green-600">
                                   ✓{" "}
                                   {new Date(
                                     item.completedAt,
                                   ).toLocaleDateString("id-ID")}
                                 </span>
                               )}
+                              
+                              {/* Deliverable Actions Dropdown */}
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                                    disabled={
+                                      initiativeData.status === "selesai" ||
+                                      initiativeData.status === "dibatalkan"
+                                    }
+                                  >
+                                    <MoreVertical className="w-3 h-3" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem
+                                    onClick={() => {
+                                      setEditingDeliverable(item);
+                                      setIsEditDeliverableModalOpen(true);
+                                    }}
+                                  >
+                                    <Edit className="w-4 h-4 mr-2" />
+                                    Ubah
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => handleDeleteDeliverable(item.id)}
+                                    className="text-red-600 hover:text-red-700"
+                                  >
+                                    <Trash2 className="w-4 h-4 mr-2" />
+                                    Hapus
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                             </div>
                           ),
                         )}
@@ -2274,6 +2373,74 @@ export default function InitiativeDetailPage() {
                 disabled={addDeliverableMutation.isPending}
               >
                 {addDeliverableMutation.isPending ? "Menambah..." : "Tambah Deliverable"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Deliverable Modal */}
+      <Dialog open={isEditDeliverableModalOpen} onOpenChange={setIsEditDeliverableModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <CheckSquare className="h-5 w-5 text-blue-500" />
+              Ubah Deliverable
+            </DialogTitle>
+            <DialogDescription>
+              Ubah nama deliverable yang sudah ada.
+            </DialogDescription>
+          </DialogHeader>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              const formData = new FormData(e.currentTarget);
+              const title = formData.get('title') as string;
+              
+              if (title.trim() && editingDeliverable) {
+                // Update deliverable via API
+                editDeliverableMutation.mutate({
+                  itemId: editingDeliverable.id,
+                  title: title.trim(),
+                });
+                setIsEditDeliverableModalOpen(false);
+                setEditingDeliverable(null);
+              }
+            }}
+            className="space-y-4"
+          >
+            <div>
+              <Label htmlFor="edit-deliverable-title">Nama Deliverable</Label>
+              <Input
+                id="edit-deliverable-title"
+                name="title"
+                placeholder="Contoh: Laporan analisis pasar lengkap"
+                defaultValue={editingDeliverable?.title || ""}
+                required
+                autoFocus
+                className="mt-1"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Ubah nama output konkret yang akan dihasilkan
+              </p>
+            </div>
+            <DialogFooter className="gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setIsEditDeliverableModalOpen(false);
+                  setEditingDeliverable(null);
+                }}
+              >
+                Batal
+              </Button>
+              <Button 
+                type="submit"
+                className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600"
+                disabled={editDeliverableMutation.isPending}
+              >
+                {editDeliverableMutation.isPending ? "Menyimpan..." : "Simpan Perubahan"}
               </Button>
             </DialogFooter>
           </form>
