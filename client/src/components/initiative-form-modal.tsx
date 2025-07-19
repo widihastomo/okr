@@ -81,7 +81,9 @@ const taskSchema = z.object({
   status: z.enum(["not_started", "in_progress", "completed", "cancelled"]).default("not_started"),
   priority: z.enum(["low", "medium", "high"]).default("medium"),
   assignedTo: z.string().optional(),
-  dueDate: z.date().optional(),
+  dueDate: z.date({
+    required_error: "Tanggal deadline wajib diisi",
+  }),
 });
 
 type TaskFormData = z.infer<typeof taskSchema>;
@@ -94,7 +96,7 @@ const initiativeFormSchema = z.object({
     title: z.string().min(1, "Judul inisiatif wajib diisi"),
     description: z.string().optional(),
     implementationPlan: z.string().optional(),
-    definitionOfDone: z.string().optional(),
+    definitionOfDone: z.array(z.string()).optional().default([]),
     keyResultId: z.string().min(1, "Angka target wajib dipilih"),
     picId: z.string().min(1, "Penanggung jawab wajib dipilih"),
     startDate: z.date({
@@ -164,7 +166,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
         title: "",
         description: "",
         implementationPlan: "",
-        definitionOfDone: "",
+        definitionOfDone: [""],
         keyResultId: keyResultId || "",
         picId: user?.id || "",
         startDate: new Date(),
@@ -187,7 +189,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
             title: initiative.title,
             description: initiative.description || "",
             implementationPlan: initiative.implementationPlan || "",
-            definitionOfDone: initiative.definitionOfDone || "",
+            definitionOfDone: Array.isArray(initiative.definitionOfDone) ? initiative.definitionOfDone : [initiative.definitionOfDone || ""],
             keyResultId: initiative.keyResultId,
             picId: initiative.picId,
             startDate: new Date(initiative.startDate),
@@ -204,7 +206,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
             title: "",
             description: "",
             implementationPlan: "",
-            definitionOfDone: "",
+            definitionOfDone: [""],
             keyResultId: keyResultId || "",
             picId: user?.id || "",
             startDate: new Date(),
@@ -243,6 +245,27 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
     form.setValue("successMetrics", updatedMetrics);
   };
 
+  // Definition of Done management functions
+  const addDefinitionItem = () => {
+    const items = form.watch("initiative.definitionOfDone") || [];
+    form.setValue("initiative.definitionOfDone", [...items, ""]);
+  };
+
+  const updateDefinitionItem = (index: number, value: string) => {
+    const items = form.watch("initiative.definitionOfDone") || [];
+    const updatedItems = [...items];
+    updatedItems[index] = value;
+    form.setValue("initiative.definitionOfDone", updatedItems);
+  };
+
+  const removeDefinitionItem = (index: number) => {
+    const items = form.watch("initiative.definitionOfDone") || [];
+    if (items.length > 1) {
+      const updatedItems = items.filter((_, i) => i !== index);
+      form.setValue("initiative.definitionOfDone", updatedItems);
+    }
+  };
+
   // Task management functions
   const addTask = () => {
     const currentTasks = form.getValues("tasks") || [];
@@ -252,6 +275,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
       status: "not_started" as const,
       priority: "medium" as const,
       assignedTo: user?.id || "",
+      dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
     }]);
   };
 
@@ -721,7 +745,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                     )}
                   />
 
-                  {/* Definition of Done CRUD */}
+                  {/* Definition of Done - Dynamic List */}
                   <div className="space-y-4">
                     <div className="flex items-center gap-2">
                       <FormLabel>Definition of Done</FormLabel>
@@ -736,28 +760,54 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                         </PopoverTrigger>
                         <PopoverContent side="right" className="max-w-xs">
                           <p className="text-sm">
-                            Kriteria yang harus dipenuhi agar inisiatif ini dianggap selesai. Buat kriteria yang spesifik dan terukur.
+                            Kriteria spesifik yang harus dipenuhi untuk menganggap inisiatif ini berhasil dan selesai. Buat daftar yang jelas dan terukur.
                           </p>
                         </PopoverContent>
                       </Popover>
                     </div>
                     
-                    <FormField
-                      control={form.control}
-                      name="initiative.definitionOfDone"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormControl>
-                            <Textarea 
-                              placeholder="Contoh: 1. Chatbot dapat menangani minimal 70% pertanyaan umum, 2. Response time rata-rata di bawah 2 detik, 3. User satisfaction rating minimal 4.5/5, 4. Dokumentasi teknis lengkap tersedia..." 
-                              {...field}
-                              className="min-h-[100px]"
+                    {/* Definition of Done Dynamic List */}
+                    <div>
+                      {/* Desktop/Mobile Unified View */}
+                      <div className="space-y-3">
+                        {(form.watch("initiative.definitionOfDone") || [""]).map((item, index) => (
+                          <div key={index} className="flex items-center gap-2">
+                            <div className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-xs font-medium text-blue-600">
+                              {index + 1}
+                            </div>
+                            <Input
+                              placeholder="Contoh: User dapat login dengan chatbot"
+                              value={item}
+                              onChange={(e) => updateDefinitionItem(index, e.target.value)}
+                              className="flex-1 border border-gray-300 p-2"
                             />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeDefinitionItem(index)}
+                              className="text-red-600 hover:text-red-700 hover:bg-red-50 flex-shrink-0"
+                              disabled={(form.watch("initiative.definitionOfDone") || []).length <= 1}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Add Definition Item Button */}
+                      <div className="mt-3">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={addDefinitionItem}
+                          className="w-full flex items-center justify-center gap-2 border-blue-600 text-blue-600 hover:bg-blue-50"
+                        >
+                          <Plus className="w-4 h-4" />
+                          Tambah Kriteria
+                        </Button>
+                      </div>
+                    </div>
                   </div>
 
                   {/* Tasks CRUD - Dynamic Table Form */}
@@ -792,6 +842,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                               <TableHead className="text-center">Status</TableHead>
                               <TableHead className="text-center">Prioritas</TableHead>
                               <TableHead className="text-center">Assigned To</TableHead>
+                              <TableHead className="text-center">Deadline</TableHead>
                               <TableHead className="text-center">Aksi</TableHead>
                             </TableRow>
                           </TableHeader>
@@ -844,6 +895,27 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                                     onValueChange={(value) => updateTask(index, "assignedTo", value)}
                                     currentUser={user || undefined}
                                   />
+                                </TableCell>
+                                <TableCell className="text-center">
+                                  <Popover>
+                                    <PopoverTrigger asChild>
+                                      <Button
+                                        variant="outline"
+                                        className="w-32 justify-start text-left font-normal h-9"
+                                      >
+                                        <CalendarIcon className="mr-2 h-4 w-4" />
+                                        {task.dueDate ? format(new Date(task.dueDate), "dd/MM/yyyy", { locale: id }) : "Pilih tanggal"}
+                                      </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-auto p-0">
+                                      <Calendar
+                                        mode="single"
+                                        selected={task.dueDate ? new Date(task.dueDate) : undefined}
+                                        onSelect={(date) => updateTask(index, "dueDate", date)}
+                                        initialFocus
+                                      />
+                                    </PopoverContent>
+                                  </Popover>
                                 </TableCell>
                                 <TableCell className="text-center">
                                   <Button
@@ -934,6 +1006,28 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                                   onValueChange={(value) => updateTask(index, "assignedTo", value)}
                                   currentUser={user || undefined}
                                 />
+                              </div>
+                              <div>
+                                <label className="text-xs font-medium text-gray-600">Deadline:</label>
+                                <Popover>
+                                  <PopoverTrigger asChild>
+                                    <Button
+                                      variant="outline"
+                                      className="w-full justify-start text-left font-normal mt-1 h-9"
+                                    >
+                                      <CalendarIcon className="mr-2 h-4 w-4" />
+                                      {task.dueDate ? format(new Date(task.dueDate), "dd/MM/yyyy", { locale: id }) : "Pilih tanggal"}
+                                    </Button>
+                                  </PopoverTrigger>
+                                  <PopoverContent className="w-auto p-0">
+                                    <Calendar
+                                      mode="single"
+                                      selected={task.dueDate ? new Date(task.dueDate) : undefined}
+                                      onSelect={(date) => updateTask(index, "dueDate", date)}
+                                      initialFocus
+                                    />
+                                  </PopoverContent>
+                                </Popover>
                               </div>
                             </div>
                           </div>
