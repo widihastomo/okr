@@ -391,6 +391,9 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
         const payload = {
           ...data.initiative,
           pic: picName,
+          organizationId: user?.organizationId, // Add missing organizationId
+          // Convert definition of done array to JSON string for backend
+          definitionOfDone: JSON.stringify(data.initiative.definitionOfDone || []),
           // Format dates for API
           startDate: data.initiative.startDate.toISOString(),
           dueDate: data.initiative.dueDate.toISOString(),
