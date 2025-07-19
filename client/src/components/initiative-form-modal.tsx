@@ -243,7 +243,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
         keyResultId: keyResultId || "",
         picId: user?.id || "",
         startDate: new Date(),
-        dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
+        dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
         priority: "medium",
         budget: "",
       },
@@ -289,7 +289,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
             keyResultId: keyResultId || "",
             picId: user?.id || "",
             startDate: new Date(),
-            dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
+            dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
             priority: "medium",
             budget: "",
           },
