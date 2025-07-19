@@ -629,6 +629,56 @@ Contoh : Wilayah timur memiliki potensi pasar yang besar namun kontribusi penjua
                     )}
                   />
 
+                  {/* Implementation Plan */}
+                  <FormField
+                    control={form.control}
+                    name="implementationPlan"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center gap-2">
+                          Rencana Pelaksanaan Inisiatif
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <button
+                                type="button"
+                                className="inline-flex items-center justify-center"
+                              >
+                                <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                              </button>
+                            </PopoverTrigger>
+                            <PopoverContent side="right" className="max-w-xs">
+                              <p className="text-sm">
+                                Langkah-langkah konkret yang akan dilakukan untuk
+                                melaksanakan inisiatif ini. Jelaskan tahapan,
+                                aktivitas utama, dan pendekatan yang akan digunakan.
+                                <br />
+                                <br />
+                                <strong>Contoh:</strong> "1. Survey dan analisis
+                                kondisi reseller eksisting, 2. Develop materi
+                                training dan incentive program, 3. Roadshow ke
+                                5 kota prioritas, 4. Onboarding dan aktivasi
+                                reseller baru"
+                              </p>
+                            </PopoverContent>
+                          </Popover>
+                        </FormLabel>
+                        <FormControl>
+                          <Textarea
+                            className="min-h-[120px] resize-y"
+                            placeholder="Bagaimana rencana pelaksanaan inisiatif ini?
+Contoh: 
+1. Survey dan analisis kondisi reseller eksisting di wilayah timur
+2. Develop materi training dan incentive program untuk reseller baru
+3. Roadshow ke 5 kota prioritas untuk rekrutmen reseller
+4. Onboarding dan aktivasi reseller baru dengan target 50 reseller aktif"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
                   {/* Grid for dates */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Start Date */}

@@ -396,6 +396,7 @@ export const initiatives = pgTable("initiatives", {
   organizationId: uuid("organization_id").notNull().references(() => organizations.id), // organization ID for multi-tenant security
   title: text("title").notNull(),
   description: text("description"),
+  implementationPlan: text("implementation_plan"), // Rencana pelaksanaan inisiatif
   status: text("status").notNull().default("draft"), // "draft", "sedang_berjalan", "selesai", "dibatalkan"
   priority: text("priority").notNull().default("medium"), // "low", "medium", "high", "critical"
   picId: uuid("pic_id").references(() => users.id), // Person in Charge
