@@ -694,6 +694,30 @@ export default function InitiativeDetailPage() {
   const [, navigate] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Prevent auto-scroll when page loads
+  useEffect(() => {
+    // Prevent any automatic scrolling by overriding scroll behavior temporarily
+    const preventScroll = (e: Event) => {
+      e.preventDefault();
+      return false;
+    };
+
+    // Add event listener to prevent scroll during initial load
+    window.addEventListener('scroll', preventScroll, { passive: false });
+    
+    // Remove the event listener after component has fully loaded
+    const timer = setTimeout(() => {
+      window.removeEventListener('scroll', preventScroll);
+      // Ensure we're at the top of the page
+      window.scrollTo(0, 0);
+    }, 100);
+    
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('scroll', preventScroll);
+    };
+  }, []);
   
   // All state variables declared at the top level
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
