@@ -544,7 +544,11 @@ export default function InitiativeFormModal({
             <DialogTitle className="text-xl font-semibold">
               {isEditMode ? "Edit Inisiatif" : "Buat Inisiatif Baru"}
             </DialogTitle>
-            
+            <DialogDescription className="text-sm text-gray-600 mt-2">
+              {currentStep === 1 && "Langkah 1: Informasi Dasar - Tentukan judul, angka target terkait, tujuan, dan metrik inisiatif"}
+              {currentStep === 2 && "Langkah 2: Rencana Pelaksanaan - Atur strategi implementasi dan definisi selesai"}
+              {currentStep === 3 && "Langkah 3: Detail Akhir - Tentukan tanggal, penanggung jawab, anggaran, dan prioritas"}
+            </DialogDescription>
             
             {/* Step Indicators */}
             <div className="flex items-center justify-center space-x-4 mt-4">
