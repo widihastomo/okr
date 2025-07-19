@@ -1268,7 +1268,7 @@ export default function KeyResultDetailPage() {
                     className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white w-full md:w-auto"
                   >
                     <Plus className="h-4 w-4 mr-2" />
-                    Tambah Rencana
+                    Tambah Inisiatif
                   </Button>
                 </div>
               </div>
