@@ -121,7 +121,7 @@ import { DailyAchievements } from "@/components/daily-achievements";
 import { DailyUpdateSimple } from "@/components/daily-update-simple";
 import { useAuth } from "@/hooks/useAuth";
 import GoalFormModal from "@/components/goal-form-modal";
-import TaskModal from "@/components/task-modal";
+import SimpleTaskModal from "@/components/simple-task-modal";
 import InitiativeFormModal from "@/components/initiative-form-modal";
 import TourStartButton from "@/components/tour-start-button";
 
@@ -3752,15 +3752,17 @@ export default function DailyFocusPage() {
       <GoalFormModal open={isGoalModalOpen} onOpenChange={setIsGoalModalOpen} />
 
       {/* Task Modal */}
-      <TaskModal
+      <SimpleTaskModal
         open={isTaskModalOpen}
-        onClose={() => {
+        onOpenChange={setIsTaskModalOpen}
+        task={selectedTask}
+        onSuccess={() => {
           setIsTaskModalOpen(false);
           setSelectedTask(null);
+          // Refresh data after task operation
+          queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
+          queryClient.invalidateQueries({ queryKey: ["/api/initiatives"] });
         }}
-        task={selectedTask}
-        initiativeId=""
-        isAdding={!selectedTask}
       />
 
       {/* Initiative Creation Modal */}

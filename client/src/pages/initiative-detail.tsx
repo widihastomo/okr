@@ -73,7 +73,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import TaskModal from "@/components/task-modal";
+import SimpleTaskModal from "@/components/simple-task-modal";
 import { QuickUpdateButton } from "@/components/quick-update-button";
 import InitiativeFormModal from "@/components/initiative-form-modal";
 import { InitiativeHistory } from "@/components/initiative-history";
@@ -1642,19 +1642,27 @@ export default function InitiativeDetailPage() {
         </div>
 
       {/* Modals */}
-      <TaskModal
+      <SimpleTaskModal
         open={isAddTaskModalOpen && initiativeData.status !== 'selesai' && initiativeData.status !== 'dibatalkan'}
-        onClose={() => setIsAddTaskModalOpen(false)}
+        onOpenChange={setIsAddTaskModalOpen}
         initiativeId={id!}
-        isAdding={true}
+        onSuccess={() => {
+          setIsAddTaskModalOpen(false);
+          queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}`] });
+          queryClient.invalidateQueries({ queryKey: ['/api/tasks'] });
+        }}
       />
 
-      <TaskModal
+      <SimpleTaskModal
         open={isEditTaskModalOpen && initiativeData.status !== 'selesai' && initiativeData.status !== 'dibatalkan'}
-        onClose={() => setIsEditTaskModalOpen(false)}
+        onOpenChange={setIsEditTaskModalOpen}
         task={selectedTask}
         initiativeId={id!}
-        isAdding={false}
+        onSuccess={() => {
+          setIsEditTaskModalOpen(false);
+          queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}`] });
+          queryClient.invalidateQueries({ queryKey: ['/api/tasks'] });
+        }}
       />
 
       {initiative && (

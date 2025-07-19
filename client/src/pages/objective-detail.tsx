@@ -121,7 +121,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import TaskModal from "@/components/task-modal";
+import SimpleTaskModal from "@/components/simple-task-modal";
 
 import ObjectiveOverviewCard from "@/components/objective-overview-card";
 import ObjectiveTimeline from "@/components/objective-timeline";
@@ -3109,16 +3109,16 @@ export default function GoalDetail() {
         />
       )}
       {/* Task Modal */}
-      <TaskModal
+      <SimpleTaskModal
         open={showTaskModal}
-        onClose={() => {
+        onOpenChange={setShowTaskModal}
+        task={editingTask}
+        onSuccess={() => {
           setShowTaskModal(false);
           setEditingTask(null);
+          // Refresh data after task operation
+          queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
         }}
-        task={editingTask}
-        initiativeId={undefined}
-        objectiveId={id}
-        isAdding={!editingTask}
       />
 
       {/* Delete Key Result Confirmation Dialog */}

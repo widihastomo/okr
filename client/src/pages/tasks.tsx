@@ -17,7 +17,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { apiRequest } from '@/lib/queryClient';
 import { format as formatDate } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
-import TaskModal from '@/components/task-modal';
+import SimpleTaskModal from '@/components/simple-task-modal';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { Gantt, Task as GanttTask, EventOption, StylingOption, ViewMode, DisplayOption } from 'gantt-task-react';
 import 'gantt-task-react/dist/index.css';
@@ -1391,16 +1391,16 @@ const TasksPage = () => {
       )}
 
       {/* Task Modal */}
-      <TaskModal
+      <SimpleTaskModal
         open={showTaskModal}
-        onClose={() => {
+        onOpenChange={setShowTaskModal}
+        task={editingTask}
+        onSuccess={() => {
           setShowTaskModal(false);
           setEditingTask(null);
           // Refresh tasks after modal closes
           queryClient.invalidateQueries({ queryKey: ['/api/tasks'] });
         }}
-        task={editingTask}
-        isAdding={!editingTask}
       />
     </div>
   );
