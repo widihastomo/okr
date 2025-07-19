@@ -844,6 +844,8 @@ export default function InitiativeDetailPage() {
   const [isEditDeliverableModalOpen, setIsEditDeliverableModalOpen] = useState(false);
   const [editingDeliverable, setEditingDeliverable] = useState<any>(null);
   const [metricToDelete, setMetricToDelete] = useState<any>(null);
+  const [isDeleteDeliverableModalOpen, setIsDeleteDeliverableModalOpen] = useState(false);
+  const [deliverableToDelete, setDeliverableToDelete] = useState<any>(null);
   const [isTeamModalOpen, setIsTeamModalOpen] = useState(false);
   const [isCloseInitiativeModalOpen, setIsCloseInitiativeModalOpen] =
     useState(false);
@@ -1228,8 +1230,17 @@ export default function InitiativeDetailPage() {
     },
   });
 
-  const handleDeleteDeliverable = (itemId: string) => {
-    deleteDeliverableMutation.mutate(itemId);
+  const handleDeleteDeliverable = (item: any) => {
+    setDeliverableToDelete(item);
+    setIsDeleteDeliverableModalOpen(true);
+  };
+
+  const confirmDeleteDeliverable = () => {
+    if (deliverableToDelete) {
+      deleteDeliverableMutation.mutate(deliverableToDelete.id);
+      setIsDeleteDeliverableModalOpen(false);
+      setDeliverableToDelete(null);
+    }
   };
 
   const handleCancelInitiative = () => {
@@ -1992,7 +2003,7 @@ export default function InitiativeDetailPage() {
                                     Ubah
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
-                                    onClick={() => handleDeleteDeliverable(item.id)}
+                                    onClick={() => handleDeleteDeliverable(item)}
                                     className="text-red-600 hover:text-red-700"
                                   >
                                     <Trash2 className="w-4 h-4 mr-2" />
@@ -2444,6 +2455,51 @@ export default function InitiativeDetailPage() {
               </Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Deliverable Confirmation Modal */}
+      <Dialog open={isDeleteDeliverableModalOpen} onOpenChange={setIsDeleteDeliverableModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Trash2 className="h-5 w-5 text-red-500" />
+              Konfirmasi Hapus Deliverable
+            </DialogTitle>
+            <DialogDescription>
+              Apakah Anda yakin ingin menghapus deliverable ini? Tindakan ini tidak dapat dibatalkan.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <div className="p-3 bg-gray-50 rounded-md">
+              <p className="text-sm font-medium text-gray-700">
+                Deliverable yang akan dihapus:
+              </p>
+              <p className="text-sm text-gray-900 mt-1">
+                "{deliverableToDelete?.title}"
+              </p>
+            </div>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setIsDeleteDeliverableModalOpen(false);
+                setDeliverableToDelete(null);
+              }}
+            >
+              Batal
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={confirmDeleteDeliverable}
+              disabled={deleteDeliverableMutation.isPending}
+            >
+              {deleteDeliverableMutation.isPending ? "Menghapus..." : "Hapus Deliverable"}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
