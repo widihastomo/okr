@@ -3402,6 +3402,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Definition of Done endpoints  
+  app.get("/api/initiatives/:initiativeId/definition-of-done", async (req, res) => {
+    try {
+      const initiativeId = req.params.initiativeId;
+      const items = await storage.getDefinitionOfDoneItems(initiativeId);
+      res.json(items);
+    } catch (error) {
+      console.error("Error fetching definition of done items:", error);
+      res.status(500).json({ message: "Failed to fetch definition of done items" });
+    }
+  });
+
   app.post("/api/initiatives/:initiativeId/success-metrics", requireAuth, async (req, res) => {
     try {
       const initiativeId = req.params.initiativeId;
@@ -4284,8 +4296,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // Extract success metrics and tasks from request body
-      const { successMetrics, tasks, ...initiativeBody } = req.body;
+      // Extract success metrics, tasks, and definition of done from request body  
+      const { successMetrics, tasks, definitionOfDone, ...initiativeBody } = req.body;
       
       // Process the initiative data with authentication
       const initiativeData = {
@@ -4360,6 +4372,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
           } catch (taskError) {
             console.error("Error creating task:", taskError);
+          }
+        }
+      }
+      
+      // Create definition of done items if provided
+      if (definitionOfDone && Array.isArray(definitionOfDone) && definitionOfDone.length > 0) {
+        console.log("Creating definition of done items:", definitionOfDone);
+        
+        for (const dodItem of definitionOfDone) {
+          try {
+            if (typeof dodItem === 'string' && dodItem.trim()) {
+              const dodData = {
+                title: dodItem.trim(),
+                initiativeId: initiative.id,
+                createdBy: currentUser.id,
+                organizationId: currentUser.organizationId,
+                isCompleted: false,
+              };
+              
+              await storage.createDefinitionOfDoneItem(dodData);
+              console.log("DoD item created:", dodItem.trim());
+            }
+          } catch (dodError) {
+            console.error("Error creating definition of done item:", dodError);
           }
         }
       }

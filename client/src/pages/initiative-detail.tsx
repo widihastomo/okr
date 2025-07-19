@@ -729,6 +729,12 @@ export default function InitiativeDetailPage() {
     enabled: !!id,
   });
 
+  // Fetch definition of done items for the initiative
+  const { data: definitionOfDoneItems = [] } = useQuery<any[]>({
+    queryKey: [`/api/initiatives/${id}/definition-of-done`],
+    enabled: !!id,
+  });
+
   const { data: users = [] } = useQuery<any[]>({
     queryKey: ['/api/organization/users'],
     staleTime: 5 * 60 * 1000, // 5 minutes

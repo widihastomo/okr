@@ -429,6 +429,21 @@ export const initiatives = pgTable("initiatives", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Definition of Done items for initiatives - stored separately for proper management
+export const definitionOfDoneItems = pgTable("definition_of_done_items", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  initiativeId: uuid("initiative_id").references(() => initiatives.id).notNull(),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id), // organization ID for multi-tenant security
+  title: text("title").notNull(), // DoD item description
+  isCompleted: boolean("is_completed").default(false),
+  completedAt: timestamp("completed_at"),
+  completedBy: uuid("completed_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  createdBy: uuid("created_by").notNull().references(() => users.id),
+  updatedAt: timestamp("updated_at").defaultNow(),
+  lastUpdateBy: uuid("last_update_by").references(() => users.id),
+});
+
 // Simplified initiative collaboration - users can contribute to initiatives
 export const initiativeMembers = pgTable("initiative_members", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -604,6 +619,12 @@ export const insertCheckInSchema = createInsertSchema(checkIns).omit({
 // This will be defined after the table definitions
 
 export const insertInitiativeSchema = createInsertSchema(initiatives).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertDefinitionOfDoneItemSchema = createInsertSchema(definitionOfDoneItems).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
@@ -855,6 +876,7 @@ export type InsertCheckIn = z.infer<typeof insertCheckInSchema>;
 export type InsertTimelineComment = z.infer<typeof insertTimelineCommentSchema>;
 export type InsertTimelineReaction = z.infer<typeof insertTimelineReactionSchema>;
 export type InsertInitiative = z.infer<typeof insertInitiativeSchema>;
+export type InsertDefinitionOfDoneItem = z.infer<typeof insertDefinitionOfDoneItemSchema>;
 export type InsertInitiativeMember = z.infer<typeof insertInitiativeMemberSchema>;
 export type InsertInitiativeDocument = z.infer<typeof insertInitiativeDocumentSchema>;
 export type InsertTask = z.infer<typeof insertTaskSchema>;
@@ -1024,9 +1046,25 @@ export const initiativesRelations = relations(initiatives, ({ one, many }) => ({
   }),
   tasks: many(tasks),
   successMetrics: many(initiativeSuccessMetrics),
+  definitionOfDoneItems: many(definitionOfDoneItems),
   members: many(initiativeMembers),
   documents: many(initiativeDocuments),
   notes: many(initiativeNotes),
+}));
+
+export const definitionOfDoneItemsRelations = relations(definitionOfDoneItems, ({ one }) => ({
+  initiative: one(initiatives, {
+    fields: [definitionOfDoneItems.initiativeId],
+    references: [initiatives.id],
+  }),
+  creator: one(users, {
+    fields: [definitionOfDoneItems.createdBy],
+    references: [users.id],
+  }),
+  completedByUser: one(users, {
+    fields: [definitionOfDoneItems.completedBy],
+    references: [users.id],
+  }),
 }));
 
 export const successMetricsRelations = relations(initiativeSuccessMetrics, ({ one, many }) => ({

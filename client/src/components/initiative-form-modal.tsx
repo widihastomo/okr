@@ -432,8 +432,8 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
           impactScore,
           effortScore, 
           confidenceScore,
-          // Convert definition of done array to JSON string for backend
-          definitionOfDone: JSON.stringify(data.initiative.definitionOfDone || []),
+          // Send definition of done as array to backend
+          definitionOfDone: data.initiative.definitionOfDone || [],
           // Format dates for API
           startDate: data.initiative.startDate.toISOString(),
           dueDate: data.initiative.dueDate.toISOString(),

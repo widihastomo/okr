@@ -2,7 +2,7 @@ import {
   cycles, templates, objectives, keyResults, users, teams, teamMembers, checkIns, initiatives, tasks, taskComments, taskAuditTrail,
   initiativeMembers, initiativeDocuments, initiativeNotes, initiativeComments, initiativeSuccessMetrics, successMetricUpdates,
   notifications, notificationPreferences, userOnboardingProgress, organizations, applicationSettings, auditTrail,
-  subscriptionPlans, billingPeriods, organizationSubscriptions, timelineComments, timelineReactions,
+  subscriptionPlans, billingPeriods, organizationSubscriptions, timelineComments, timelineReactions, definitionOfDoneItems,
   type Cycle, type Template, type Objective, type KeyResult, type User, type Team, type TeamMember,
   type CheckIn, type Initiative, type Task, type TaskComment, type TaskAuditTrail, type KeyResultWithDetails, type InitiativeMember, type InitiativeDocument,
   type InitiativeNote, type InitiativeComment, type InsertCycle, type InsertTemplate, type InsertObjective, type InsertKeyResult, 
@@ -13,7 +13,8 @@ import {
   type Notification, type InsertNotification, type NotificationPreferences, type InsertNotificationPreferences,
   type UserOnboardingProgress, type InsertUserOnboardingProgress, type UpdateOnboardingProgress,
   type ApplicationSetting, type InsertApplicationSetting, type UpdateApplicationSetting,
-  type Organization, type TimelineComment, type TimelineReaction, type InsertTimelineComment, type InsertTimelineReaction
+  type Organization, type TimelineComment, type TimelineReaction, type InsertTimelineComment, type InsertTimelineReaction,
+  type InsertDefinitionOfDoneItem
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, asc, inArray, count } from "drizzle-orm";
@@ -151,6 +152,13 @@ export interface IStorage {
   deleteSuccessMetric(id: string): Promise<boolean>;
   getSuccessMetricUpdates(metricId: string): Promise<SuccessMetricUpdate[]>;
   createSuccessMetricUpdate(update: InsertSuccessMetricUpdate): Promise<SuccessMetricUpdate>;
+  
+  // Definition of Done Items
+  getDefinitionOfDoneItems(initiativeId: string): Promise<any[]>;
+  createDefinitionOfDoneItem(item: InsertDefinitionOfDoneItem): Promise<any>;
+  updateDefinitionOfDoneItem(id: string, item: Partial<InsertDefinitionOfDoneItem>): Promise<any>;
+  toggleDefinitionOfDoneItem(id: string, isCompleted: boolean, completedBy?: string): Promise<any>;
+  deleteDefinitionOfDoneItem(id: string): Promise<boolean>;
   
   // Tasks
   getTasks(): Promise<Task[]>;
@@ -1865,6 +1873,54 @@ export class DatabaseStorage implements IStorage {
   async createSuccessMetricUpdate(update: InsertSuccessMetricUpdate): Promise<SuccessMetricUpdate> {
     const [newUpdate] = await db.insert(successMetricUpdates).values(update).returning();
     return newUpdate;
+  }
+
+  // Definition of Done Items
+  async getDefinitionOfDoneItems(initiativeId: string): Promise<any[]> {
+    const items = await db.select().from(definitionOfDoneItems)
+      .where(eq(definitionOfDoneItems.initiativeId, initiativeId))
+      .orderBy(asc(definitionOfDoneItems.createdAt));
+    return items;
+  }
+
+  async createDefinitionOfDoneItem(item: InsertDefinitionOfDoneItem): Promise<any> {
+    const [newItem] = await db.insert(definitionOfDoneItems).values(item).returning();
+    return newItem;
+  }
+
+  async updateDefinitionOfDoneItem(id: string, item: Partial<InsertDefinitionOfDoneItem>): Promise<any> {
+    const [updatedItem] = await db.update(definitionOfDoneItems)
+      .set(item)
+      .where(eq(definitionOfDoneItems.id, id))
+      .returning();
+    return updatedItem;
+  }
+
+  async toggleDefinitionOfDoneItem(id: string, isCompleted: boolean, completedBy?: string): Promise<any> {
+    const updates: any = { 
+      isCompleted,
+      updatedAt: new Date()
+    };
+    
+    if (isCompleted) {
+      updates.completedAt = new Date();
+      updates.completedBy = completedBy;
+    } else {
+      updates.completedAt = null;
+      updates.completedBy = null;
+    }
+
+    const [updatedItem] = await db.update(definitionOfDoneItems)
+      .set(updates)
+      .where(eq(definitionOfDoneItems.id, id))
+      .returning();
+    return updatedItem;
+  }
+
+  async deleteDefinitionOfDoneItem(id: string): Promise<boolean> {
+    const result = await db.delete(definitionOfDoneItems)
+      .where(eq(definitionOfDoneItems.id, id));
+    return result.rowCount !== undefined && result.rowCount > 0;
   }
 
   // Task Comments
