@@ -3414,6 +3414,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Toggle Definition of Done item completion status
+  app.patch("/api/definition-of-done/:id/toggle", requireAuth, async (req, res) => {
+    try {
+      const itemId = req.params.id;
+      const currentUser = req.user;
+      const { isCompleted } = req.body;
+
+      const result = await storage.toggleDefinitionOfDoneItem(itemId, isCompleted, currentUser.id);
+      
+      if (!result) {
+        return res.status(404).json({ message: "Definition of done item not found" });
+      }
+
+      res.json(result);
+    } catch (error) {
+      console.error("Error toggling definition of done item:", error);
+      res.status(500).json({ message: "Failed to toggle definition of done item" });
+    }
+  });
+
   app.post("/api/initiatives/:initiativeId/success-metrics", requireAuth, async (req, res) => {
     try {
       const initiativeId = req.params.initiativeId;

@@ -860,6 +860,25 @@ export default function InitiativeDetailPage() {
     },
   });
 
+  // Toggle Definition of Done item completion
+  const toggleDoLItemMutation = useMutation({
+    mutationFn: async ({ itemId, isCompleted }: { itemId: string, isCompleted: boolean }) => {
+      return apiRequest("PATCH", `/api/definition-of-done/${itemId}/toggle`, { isCompleted });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}/definition-of-done`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}/history`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}`] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Gagal mengupdate Definition of Done",
+        variant: "destructive",
+      });
+    },
+  });
+
   const cancelInitiativeMutation = useMutation({
     mutationFn: async ({ reason }: { reason: string }) => {
       return await apiRequest("POST", `/api/initiatives/${id}/cancel`, { reason });
@@ -1246,15 +1265,30 @@ export default function InitiativeDetailPage() {
                         <div className="space-y-2">
                           {definitionOfDoneItems.map((item: any, index: number) => (
                             <div key={item.id || index} className="flex items-center gap-2">
-                              <div className={`w-4 h-4 rounded border-2 flex items-center justify-center ${
-                                item.isCompleted 
-                                  ? 'bg-green-500 border-green-500' 
-                                  : 'border-gray-300'
-                              }`}>
+                              <button
+                                onClick={() => {
+                                  if (initiativeData.status !== 'selesai' && initiativeData.status !== 'dibatalkan') {
+                                    toggleDoLItemMutation.mutate({
+                                      itemId: item.id,
+                                      isCompleted: !item.isCompleted
+                                    });
+                                  }
+                                }}
+                                disabled={initiativeData.status === 'selesai' || initiativeData.status === 'dibatalkan'}
+                                className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-colors hover:opacity-80 ${
+                                  item.isCompleted 
+                                    ? 'bg-green-500 border-green-500' 
+                                    : 'border-gray-300 hover:border-green-400'
+                                } ${
+                                  initiativeData.status === 'selesai' || initiativeData.status === 'dibatalkan' 
+                                    ? 'cursor-not-allowed opacity-50' 
+                                    : 'cursor-pointer'
+                                }`}
+                              >
                                 {item.isCompleted && (
                                   <Check className="w-3 h-3 text-white" />
                                 )}
-                              </div>
+                              </button>
                               <span className={`text-sm ${
                                 item.isCompleted 
                                   ? 'text-green-700 line-through' 
