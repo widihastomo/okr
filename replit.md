@@ -344,9 +344,9 @@ The system includes comprehensive database connection troubleshooting tools:
 - July 19, 2025. **INITIATIVE CREATION INTEGRATION & FORM REORGANIZATION** - Successfully integrated initiative creation functionality into Daily Focus page:
   * ADDED: Initiative creation button in "Kelola Inisiatif Aktif" section with responsive design ("Tambah Inisiatif" on desktop, "Tambah" on mobile)
   * INTEGRATED: InitiativeFormModal component with proper state management and query invalidation
-  * REORGANIZED: Success Metrics section moved below Implementation Plan ("Rencana Pelaksanaan") within the same card for better logical flow
-  * ENHANCED: Success Metrics now appear as a subsection with border-top separator instead of separate card
-  * IMPROVED: Form field sequence now follows logical order: title → key result → description → implementation plan → success metrics → priority calculation
+  * REORGANIZED: Success Metrics section moved above date fields ("tanggal") but after Implementation Plan for better logical flow
+  * ENHANCED: Success Metrics now appear as a subsection with border-top separator within the main card
+  * IMPROVED: Form field sequence now follows logical order: title → key result → description → implementation plan → success metrics → dates → PIC/budget → priority calculation
   * RESULT: Complete initiative creation workflow accessible from Daily Focus with improved user experience and logical form structure
 - July 17, 2025. **MOBILE SIDEBAR DUPLICATION FIX** - Successfully fixed duplicate menu items in mobile sidebar:
   * FIXED: Removed redundant mobile rendering that caused each menu item to appear twice
