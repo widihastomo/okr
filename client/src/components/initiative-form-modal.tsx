@@ -273,9 +273,19 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
 
   // Reset form when initiative prop changes or dialog opens
   useEffect(() => {
-    if (open) {
+    if (open && isEditMode && initiative) {
       setCurrentStep(1); // Reset to step 1 when dialog opens
-      if (isEditMode && initiative) {
+      
+      // Only reset when we have the data or when data is not needed
+      const shouldReset = !isEditMode || (existingSuccessMetrics !== undefined && existingTasks !== undefined && existingDoDItems !== undefined);
+      
+      if (shouldReset) {
+        console.log('Resetting form with data:', {
+          existingSuccessMetrics,
+          existingTasks,
+          existingDoDItems: existingDoDItems?.map(item => item.description)
+        });
+        
         form.reset({
           initiative: {
             title: initiative.title,
@@ -295,27 +305,28 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
           successMetrics: existingSuccessMetrics || [{ name: "", target: "" }],
           tasks: existingTasks || [],
         });
-      } else {
-        form.reset({
-          initiative: {
-            title: "",
-            description: "",
-            implementationPlan: "",
-            definitionOfDone: [""],
-            keyResultId: keyResultId || "",
-            picId: user?.id || "",
-            startDate: new Date(),
-            dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
-            priority: "medium",
-            budget: "",
-          },
-          businessImpact: undefined,
-          difficultyLevel: undefined,
-          beliefLevel: undefined,
-          successMetrics: [{ name: "", target: "" }],
-          tasks: [],
-        });
       }
+    } else if (open && !isEditMode) {
+      setCurrentStep(1);
+      form.reset({
+        initiative: {
+          title: "",
+          description: "",
+          implementationPlan: "",
+          definitionOfDone: [""],
+          keyResultId: keyResultId || "",
+          picId: user?.id || "",
+          startDate: new Date(),
+          dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+          priority: "medium",
+          budget: "",
+        },
+        businessImpact: undefined,
+        difficultyLevel: undefined,
+        beliefLevel: undefined,
+        successMetrics: [{ name: "", target: "" }],
+        tasks: [],
+      });
     }
   }, [open, initiative, isEditMode, form, keyResultId, user?.id, existingSuccessMetrics, existingTasks, existingDoDItems]);
 
