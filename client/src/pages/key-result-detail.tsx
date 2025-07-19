@@ -1417,13 +1417,15 @@ export default function KeyResultDetailPage() {
                                   <td className="px-4 py-4 whitespace-nowrap">
                                     {initiative.picId ? (
                                       <div className="flex items-center gap-2">
-                                        <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-medium">
-                                          {getUserName(initiative.picId)
-                                            ?.split(" ")
-                                            .map((n) => n[0])
-                                            .join("")
-                                            .toUpperCase() || "?"}
-                                        </div>
+                                        <Avatar className="w-6 h-6">
+                                          <AvatarImage 
+                                            src={getUserProfileImage(initiative.picId)} 
+                                            alt={getUserName(initiative.picId)}
+                                          />
+                                          <AvatarFallback className="bg-blue-500 text-white text-xs font-medium">
+                                            {getUserInitials(initiative.picId)}
+                                          </AvatarFallback>
+                                        </Avatar>
                                         <span className="text-sm text-gray-900">
                                           {getUserName(initiative.picId)}
                                         </span>
@@ -1594,13 +1596,15 @@ export default function KeyResultDetailPage() {
                                 <div className="flex items-center gap-1">
                                   {initiative.picId ? (
                                     <>
-                                      <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-medium">
-                                        {getUserName(initiative.picId)
-                                          ?.split(" ")
-                                          .map((n) => n[0])
-                                          .join("")
-                                          .toUpperCase() || "?"}
-                                      </div>
+                                      <Avatar className="w-5 h-5">
+                                        <AvatarImage 
+                                          src={getUserProfileImage(initiative.picId)} 
+                                          alt={getUserName(initiative.picId)}
+                                        />
+                                        <AvatarFallback className="bg-blue-500 text-white text-xs font-medium">
+                                          {getUserInitials(initiative.picId)}
+                                        </AvatarFallback>
+                                      </Avatar>
                                       <span className="text-gray-600 truncate">
                                         {getUserName(initiative.picId)}
                                       </span>

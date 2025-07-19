@@ -756,9 +756,15 @@ export default function GoalCard({ goal, onEditProgress, onEditKeyResult, onDele
                   <div className="relative group text-xs text-gray-600 flex items-center gap-2">
                     {kr.assignedTo ? (
                       <>
-                        <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-medium cursor-help">
-                          {getUserName(kr.assignedTo)?.charAt(0).toUpperCase() || '?'}
-                        </div>
+                        <Avatar className="w-5 h-5">
+                          <AvatarImage 
+                            src={getUserProfileImage(kr.assignedTo)} 
+                            alt={getUserName(kr.assignedTo)}
+                          />
+                          <AvatarFallback className="bg-blue-500 text-white text-xs font-medium cursor-help">
+                            {getUserInitials(kr.assignedTo)}
+                          </AvatarFallback>
+                        </Avatar>
                         <span className="font-medium text-gray-800">
                           {getUserName(kr.assignedTo)}
                         </span>

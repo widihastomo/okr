@@ -1785,11 +1785,15 @@ export default function GoalDetail() {
                         <div className="relative group text-xs text-gray-600 flex items-center gap-2">
                           {kr.assignedTo ? (
                             <>
-                              <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-medium cursor-help">
-                                {getUserName(kr.assignedTo)
-                                  .charAt(0)
-                                  .toUpperCase()}
-                              </div>
+                              <Avatar className="w-5 h-5">
+                                <AvatarImage 
+                                  src={getUserProfileImage(kr.assignedTo)} 
+                                  alt={getUserName(kr.assignedTo)}
+                                />
+                                <AvatarFallback className="bg-blue-500 text-white text-xs font-medium cursor-help">
+                                  {getUserInitials(kr.assignedTo)}
+                                </AvatarFallback>
+                              </Avatar>
                               <span className="font-medium text-gray-800">
                                 {getUserName(kr.assignedTo)}
                               </span>
@@ -2279,13 +2283,15 @@ export default function GoalDetail() {
                                   <td className="px-4 py-4">
                                     {initiative.picId ? (
                                       <div className="flex items-center gap-2">
-                                        <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-medium">
-                                          {getUserName(initiative.picId)
-                                            ?.split(" ")
-                                            .map((n) => n[0])
-                                            .join("")
-                                            .toUpperCase() || "?"}
-                                        </div>
+                                        <Avatar className="w-8 h-8">
+                                          <AvatarImage 
+                                            src={getUserProfileImage(initiative.picId)} 
+                                            alt={getUserName(initiative.picId)}
+                                          />
+                                          <AvatarFallback className="bg-blue-500 text-white text-xs font-medium">
+                                            {getUserInitials(initiative.picId)}
+                                          </AvatarFallback>
+                                        </Avatar>
                                         <span className="text-sm text-gray-900 truncate">
                                           {getUserName(initiative.picId)}
                                         </span>
@@ -2478,13 +2484,15 @@ export default function GoalDetail() {
                               <div className="flex items-center gap-1">
                                 {initiative.picId ? (
                                   <>
-                                    <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-medium">
-                                      {getUserName(initiative.picId)
-                                        ?.split(" ")
-                                        .map((n) => n[0])
-                                        .join("")
-                                        .toUpperCase() || "?"}
-                                    </div>
+                                    <Avatar className="w-5 h-5">
+                                      <AvatarImage 
+                                        src={getUserProfileImage(initiative.picId)} 
+                                        alt={getUserName(initiative.picId)}
+                                      />
+                                      <AvatarFallback className="bg-blue-500 text-white text-xs font-medium">
+                                        {getUserInitials(initiative.picId)}
+                                      </AvatarFallback>
+                                    </Avatar>
                                     <span className="text-gray-600 truncate">
                                       {getUserName(initiative.picId)}
                                     </span>

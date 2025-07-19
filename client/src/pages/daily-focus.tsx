@@ -3434,13 +3434,15 @@ export default function DailyFocusPage() {
                                   <div className="flex items-center gap-2">
                                     {initiative.picId ? (
                                       <>
-                                        <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-medium">
-                                          {getUserName(initiative.picId)
-                                            ?.split(" ")
-                                            .map((n) => n[0])
-                                            .join("")
-                                            .toUpperCase() || "?"}
-                                        </div>
+                                        <Avatar className="w-6 h-6">
+                                          <AvatarImage 
+                                            src={getUserProfileImage(initiative.picId)} 
+                                            alt={getUserName(initiative.picId)}
+                                          />
+                                          <AvatarFallback className="bg-blue-500 text-white text-xs font-medium">
+                                            {getUserInitials(initiative.picId)}
+                                          </AvatarFallback>
+                                        </Avatar>
                                         <span className="text-sm text-gray-900 truncate">
                                           {getUserName(initiative.picId)}
                                         </span>
@@ -3652,13 +3654,15 @@ export default function DailyFocusPage() {
                                 <div className="flex items-center gap-2">
                                   {initiative.picId ? (
                                     <>
-                                      <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-medium">
-                                        {getUserName(initiative.picId)
-                                          ?.split(" ")
-                                          .map((n) => n[0])
-                                          .join("")
-                                          .toUpperCase() || "?"}
-                                      </div>
+                                      <Avatar className="w-5 h-5">
+                                        <AvatarImage 
+                                          src={getUserProfileImage(initiative.picId)} 
+                                          alt={getUserName(initiative.picId)}
+                                        />
+                                        <AvatarFallback className="bg-blue-500 text-white text-xs font-medium">
+                                          {getUserInitials(initiative.picId)}
+                                        </AvatarFallback>
+                                      </Avatar>
                                       <span className="text-gray-900 text-sm">
                                         {getUserName(initiative.picId)}
                                       </span>
