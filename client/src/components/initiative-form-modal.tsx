@@ -864,16 +864,10 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                         {(form.watch("tasks") || []).map((task, index) => (
                           <div key={index} className="border rounded-lg p-2 bg-gradient-to-r from-green-50 to-white shadow-sm">
                             <div className="flex items-center justify-between gap-2">
-                              <div className="flex items-center gap-2 flex-1 min-w-0">
+                              <div className="flex items-center gap-3 flex-1 min-w-0">
                                 <h4 className="font-medium text-green-800 text-sm truncate">{task.title || "Task tanpa judul"}</h4>
-                                <span className="px-1.5 py-0.5 bg-blue-100 text-blue-800 rounded text-xs shrink-0">
-                                  {getTaskStatusLabel(task.status)}
-                                </span>
-                                <span className="px-1.5 py-0.5 bg-orange-100 text-orange-800 rounded text-xs shrink-0">
-                                  {getTaskPriorityLabel(task.priority)}
-                                </span>
                                 {task.dueDate && (
-                                  <span className="text-xs text-gray-500 shrink-0">📅 {format(new Date(task.dueDate), "dd MMM", { locale: id })}</span>
+                                  <span className="text-xs text-gray-500 shrink-0">{format(new Date(task.dueDate), "dd MMM yyyy", { locale: id })}</span>
                                 )}
                               </div>
                               <Button
