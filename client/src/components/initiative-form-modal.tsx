@@ -994,12 +994,6 @@ Contoh: Wilayah timur memiliki potensi pasar yang besar namun kontribusi penjual
             {/* Step 3: Timeline & PIC */}
             {(currentStep === 3 || isEditMode) && (
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Target className="w-5 h-5" />
-                    Timeline & Penanggung Jawab
-                  </CardTitle>
-                </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
@@ -1007,7 +1001,17 @@ Contoh: Wilayah timur memiliki potensi pasar yang besar namun kontribusi penjual
                       name="initiative.startDate"
                       render={({ field }) => (
                         <FormItem className="flex flex-col">
-                          <FormLabel>Tanggal Mulai*</FormLabel>
+                          <FormLabel className="flex items-center gap-2">
+                            Tanggal Mulai*
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <span className="text-blue-500 cursor-help text-sm">ⓘ</span>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-64 text-sm">
+                                Pilih tanggal mulai pelaksanaan inisiatif ini. Tanggal ini akan menjadi acuan untuk timeline dan progress tracking.
+                              </PopoverContent>
+                            </Popover>
+                          </FormLabel>
                           <Popover>
                             <PopoverTrigger asChild>
                               <FormControl>
@@ -1049,7 +1053,17 @@ Contoh: Wilayah timur memiliki potensi pasar yang besar namun kontribusi penjual
                       name="initiative.dueDate"
                       render={({ field }) => (
                         <FormItem className="flex flex-col">
-                          <FormLabel>Tanggal Selesai*</FormLabel>
+                          <FormLabel className="flex items-center gap-2">
+                            Tanggal Selesai*
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <span className="text-blue-500 cursor-help text-sm">ⓘ</span>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-64 text-sm">
+                                Tentukan target deadline untuk menyelesaikan inisiatif ini. Pastikan timeline yang realistis sesuai scope pekerjaan.
+                              </PopoverContent>
+                            </Popover>
+                          </FormLabel>
                           <Popover>
                             <PopoverTrigger asChild>
                               <FormControl>
@@ -1087,22 +1101,58 @@ Contoh: Wilayah timur memiliki potensi pasar yang besar namun kontribusi penjual
                     />
                   </div>
 
-                  <FormField
-                    control={form.control}
-                    name="initiative.picId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Penanggung Jawab*</FormLabel>
-                        <SearchableUserSelect
-                          users={users || []}
-                          value={field.value}
-                          onValueChange={field.onChange}
-                          currentUser={user || undefined}
-                        />
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="initiative.picId"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="flex items-center gap-2">
+                            Penanggung Jawab*
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <span className="text-blue-500 cursor-help text-sm">ⓘ</span>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-64 text-sm">
+                                Pilih anggota tim yang bertanggung jawab memimpin dan memastikan keberhasilan inisiatif ini.
+                              </PopoverContent>
+                            </Popover>
+                          </FormLabel>
+                          <SearchableUserSelect
+                            users={users || []}
+                            value={field.value}
+                            onValueChange={field.onChange}
+                            currentUser={user || undefined}
+                          />
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="initiative.budget"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="flex items-center gap-2">
+                            Budget (Opsional)
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <span className="text-blue-500 cursor-help text-sm">ⓘ</span>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-64 text-sm">
+                                Masukkan estimasi budget yang dibutuhkan untuk menjalankan inisiatif ini, jika ada.
+                              </PopoverContent>
+                            </Popover>
+                          </FormLabel>
+                          <FormControl>
+                            <Input placeholder="Contoh: Rp 50.000.000" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Priority Calculation System */}
@@ -1223,33 +1273,7 @@ Contoh: Wilayah timur memiliki potensi pasar yang besar namun kontribusi penjual
                       </div>
                     </div>
 
-                    <FormField
-                      control={form.control}
-                      name="initiative.budget"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Budget (Opsional)</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Contoh: Rp 50.000.000" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
 
-                    <FormField
-                      control={form.control}
-                      name="initiative.budget"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Budget (Opsional)</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Contoh: Rp 50.000.000" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
                   </div>
                 </CardContent>
               </Card>

@@ -350,6 +350,13 @@ The system includes comprehensive database connection troubleshooting tools:
   * CREATED: Helper functions for priority calculation, labeling, and badge styling
   * DISPLAYED: Formula breakdown showing exact calculation: (Dampak×0.4) + (Kemudahan×0.3) + (Keyakinan×0.3)
   * RESULT: Users can now get intelligent priority recommendations based on quantitative business factors instead of manual priority selection
+- July 19, 2025. **INITIATIVE FORM UI IMPROVEMENTS** - Successfully improved Step 3 layout and added helpful popover hints:
+  * REMOVED: Card title "Timeline & Penanggung Jawab" for cleaner interface
+  * REORGANIZED: Penanggung Jawab and Budget fields now in same row for better space utilization
+  * ADDED: Comprehensive popover hints for all fields (start date, due date, PIC, budget) with helpful explanations
+  * ENHANCED: Consistent tooltip design matching other form steps with blue info icons
+  * IMPROVED: Better form layout with proper spacing and logical field grouping
+  * RESULT: More compact and informative form interface with helpful user guidance
 - July 19, 2025. **INITIATIVE TASK CARDS VISUAL ENHANCEMENT** - Successfully enhanced task card display with avatar integration and layout improvements:
   * REPLACED: "PIC:" text with user profile avatar (w-4 h-4) showing user initials in blue theme
   * REORGANIZED: Task card layout - task title on left, avatar + name + date + delete button on right
