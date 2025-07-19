@@ -76,7 +76,7 @@ export function CheckInModal({
   };
 
   const [value, setValue] = useState(currentValue);
-  const [achieved, setAchieved] = useState(parseFloat(currentValue) >= parseFloat(targetValue));
+  const [achieved, setAchieved] = useState(keyResultType === "achieve_or_not" ? parseFloat(currentValue) >= parseFloat(targetValue) : false);
   const [notes, setNotes] = useState("");
 
   const [showNumberWarning, setShowNumberWarning] = useState(false);
@@ -154,7 +154,7 @@ export function CheckInModal({
       
       handleOpenChange(false);
       setValue(currentValue);
-      setAchieved(parseFloat(currentValue) >= parseFloat(targetValue));
+      setAchieved(keyResultType === "achieve_or_not" ? parseFloat(currentValue) >= parseFloat(targetValue) : false);
       setNotes("");
     },
     onError: (error: any) => {
@@ -242,14 +242,14 @@ export function CheckInModal({
         }
         
       case "should_stay_above":
-        if (achieved) {
+        if (current >= target) {
           return "✅ Berhasil mempertahankan nilai di atas ambang batas target";
         } else {
           return "⚠️ Nilai berada di bawah ambang batas - perlu perbaikan segera";
         }
         
       case "should_stay_below":
-        if (achieved) {
+        if (current <= target) {
           return "✅ Berhasil mempertahankan nilai di bawah ambang batas target";
         } else {
           return "⚠️ Nilai melebihi ambang batas - perlu optimasi segera";
@@ -302,7 +302,7 @@ export function CheckInModal({
           </div>
 
           {/* Conditional Input Based on Key Result Type */}
-          {(keyResultType === "increase_to" || keyResultType === "decrease_to") && (
+          {(keyResultType === "increase_to" || keyResultType === "decrease_to" || keyResultType === "should_stay_above" || keyResultType === "should_stay_below") && (
             <div>
               <Label htmlFor="value" className="text-sm font-medium">
                 Nilai Saat Ini {getUnitDisplay(unit)}
@@ -329,7 +329,7 @@ export function CheckInModal({
                 required
               />
               <div className="text-xs text-gray-500 mt-1">
-                Target: {isCurrencyUnit(unit) ? `Rp ${formatNumberWithCommas(targetValue)}` : 
+                Target: {keyResultType === "should_stay_above" ? "Tetap di atas " : keyResultType === "should_stay_below" ? "Tetap di bawah " : ""}{isCurrencyUnit(unit) ? `Rp ${formatNumberWithCommas(targetValue)}` : 
                          isPercentageUnit(unit) ? `${formatNumberWithCommas(targetValue)}%` :
                          `${formatNumberWithCommas(targetValue)} ${getUnitDisplay(unit)}`}
               </div>
@@ -344,28 +344,7 @@ export function CheckInModal({
             </div>
           )}
 
-          {(keyResultType === "should_stay_above" || keyResultType === "should_stay_below") && (
-            <div>
-              <Label className="text-sm font-medium">
-                Status Target
-              </Label>
-              <div className="flex items-center space-x-3 mt-2">
-                <Switch
-                  checked={achieved}
-                  onCheckedChange={setAchieved}
-                />
-                <span className="text-sm">
-                  {achieved ? "✅ Target tercapai" : "❌ Target belum tercapai"}
-                </span>
-              </div>
-              <div className="text-xs text-gray-500 mt-1">
-                Target: {keyResultType === "should_stay_above" ? "Tetap di atas" : "Tetap di bawah"} {" "}
-                {isCurrencyUnit(unit) ? `Rp ${formatNumberWithCommas(targetValue)}` : 
-                 isPercentageUnit(unit) ? `${formatNumberWithCommas(targetValue)}%` :
-                 `${formatNumberWithCommas(targetValue)} ${getUnitDisplay(unit)}`}
-              </div>
-            </div>
-          )}
+
 
           {keyResultType === "achieve_or_not" && (
             <div>
