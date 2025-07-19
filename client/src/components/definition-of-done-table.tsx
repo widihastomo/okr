@@ -1,17 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Trash2, Plus, Edit2, Save, X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import type { DefinitionOfDoneItem, InsertDefinitionOfDoneItem } from '@shared/schema';
 
 interface DefinitionOfDoneTableProps {
-  items: DefinitionOfDoneItem[];
-  onItemsChange: (items: DefinitionOfDoneItem[]) => void;
+  items: LocalDoD[];
+  onItemsChange: (items: LocalDoD[]) => void;
   isLoading?: boolean;
   canEdit?: boolean;
+  mode?: 'form' | 'database'; // 'form' for input mode, 'database' for saved items
 }
 
 interface LocalDoD {
@@ -28,18 +30,18 @@ export function DefinitionOfDoneTable({
   items, 
   onItemsChange, 
   isLoading = false, 
-  canEdit = true 
+  canEdit = true,
+  mode = 'form'
 }: DefinitionOfDoneTableProps) {
-  const [localItems, setLocalItems] = useState<LocalDoD[]>(
-    items.map(item => ({
-      id: item.id,
-      title: item.title,
-      description: item.description || '',
-      isCompleted: item.isCompleted,
-      order: item.order
-    }))
-  );
+  const [localItems, setLocalItems] = useState<LocalDoD[]>(items || []);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editDescription, setEditDescription] = useState('');
+
+  // Update local items when items prop changes
+  useEffect(() => {
+    setLocalItems(items || []);
+  }, [items]);
 
   // Add new item
   const addNewItem = () => {
@@ -75,25 +77,9 @@ export function DefinitionOfDoneTable({
 
     setLocalItems(updatedItems);
     setEditingId(null);
-
-    // Convert back to DefinitionOfDoneItem format for parent component
-    const convertedItems: DefinitionOfDoneItem[] = updatedItems.map((item, index) => ({
-      id: item.id,
-      initiativeId: '', // Will be set by parent
-      organizationId: '', // Will be set by parent
-      title: item.title,
-      description: item.description,
-      isCompleted: item.isCompleted,
-      order: index,
-      createdAt: new Date(),
-      createdBy: '', // Will be set by parent
-      updatedAt: new Date(),
-      lastUpdateBy: null,
-      completedAt: item.isCompleted ? new Date() : null,
-      completedBy: item.isCompleted ? '' : null
-    }));
-
-    onItemsChange(convertedItems);
+    setEditTitle('');
+    setEditDescription('');
+    onItemsChange(updatedItems);
   };
 
   // Cancel edit
@@ -111,62 +97,37 @@ export function DefinitionOfDoneTable({
       ));
     }
     setEditingId(null);
+    setEditTitle('');
+    setEditDescription('');
   };
 
   // Delete item
   const deleteItem = (id: string) => {
     const updatedItems = localItems.filter(item => item.id !== id);
     setLocalItems(updatedItems);
-    
-    const convertedItems: DefinitionOfDoneItem[] = updatedItems.map((item, index) => ({
-      id: item.id,
-      initiativeId: '',
-      organizationId: '',
-      title: item.title,
-      description: item.description,
-      isCompleted: item.isCompleted,
-      order: index,
-      createdAt: new Date(),
-      createdBy: '',
-      updatedAt: new Date(),
-      lastUpdateBy: null,
-      completedAt: item.isCompleted ? new Date() : null,
-      completedBy: item.isCompleted ? '' : null
-    }));
-
-    onItemsChange(convertedItems);
+    onItemsChange(updatedItems);
   };
 
-  // Toggle completion
+  // Toggle completion (only for database mode)
   const toggleCompletion = (id: string) => {
+    if (mode === 'form') return; // No completion toggling in form mode
+    
     const updatedItems = localItems.map(item => 
       item.id === id 
         ? { ...item, isCompleted: !item.isCompleted }
         : item
     );
     setLocalItems(updatedItems);
-
-    const convertedItems: DefinitionOfDoneItem[] = updatedItems.map((item, index) => ({
-      id: item.id,
-      initiativeId: '',
-      organizationId: '',
-      title: item.title,
-      description: item.description,
-      isCompleted: item.isCompleted,
-      order: index,
-      createdAt: new Date(),
-      createdBy: '',
-      updatedAt: new Date(),
-      lastUpdateBy: null,
-      completedAt: item.isCompleted ? new Date() : null,
-      completedBy: item.isCompleted ? '' : null
-    }));
-
-    onItemsChange(convertedItems);
+    onItemsChange(updatedItems);
   };
 
   // Start editing
   const startEdit = (id: string) => {
+    const item = localItems.find(item => item.id === id);
+    if (item) {
+      setEditTitle(item.title);
+      setEditDescription(item.description);
+    }
     setEditingId(id);
     setLocalItems(prev => prev.map(item => 
       item.id === id 
@@ -195,28 +156,129 @@ export function DefinitionOfDoneTable({
         )}
       </div>
 
-      {localItems.length === 0 ? (
-        <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
-          <p className="text-sm">Belum ada Definition of Done yang ditambahkan</p>
-          <p className="text-xs mt-1">Klik "Tambah Item" untuk menambahkan kriteria penyelesaian</p>
-        </div>
+      {mode === 'form' ? (
+        /* Table format for form input mode */
+        localItems.length === 0 ? (
+          <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
+            <p className="text-sm">Belum ada Definition of Done yang ditambahkan</p>
+            <p className="text-xs mt-1">Klik "Tambah Item" untuk menambahkan kriteria penyelesaian</p>
+          </div>
+        ) : (
+          <div className="border rounded-lg overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Kriteria / Item</TableHead>
+                  <TableHead>Deskripsi</TableHead>
+                  <TableHead className="w-20">Aksi</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {localItems.map((item, index) => (
+                  <TableRow key={item.id}>
+                    <TableCell>
+                      {item.isEditing ? (
+                        <Input
+                          value={editTitle}
+                          onChange={(e) => setEditTitle(e.target.value)}
+                          placeholder="Kriteria penyelesaian..."
+                          autoFocus
+                          className="text-sm"
+                        />
+                      ) : (
+                        <span className="text-sm font-medium">{item.title}</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {item.isEditing ? (
+                        <Textarea
+                          value={editDescription}
+                          onChange={(e) => setEditDescription(e.target.value)}
+                          placeholder="Deskripsi detail (opsional)..."
+                          rows={2}
+                          className="text-sm"
+                        />
+                      ) : (
+                        <span className="text-sm text-gray-600">{item.description || '-'}</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {item.isEditing ? (
+                        <div className="flex gap-1">
+                          <Button
+                            type="button"
+                            onClick={() => saveItem(item.id, editTitle, editDescription)}
+                            size="sm"
+                            variant="ghost"
+                            className="h-6 w-6 p-0 hover:bg-green-100"
+                            disabled={!editTitle.trim()}
+                          >
+                            <Save className="w-3 h-3 text-green-600" />
+                          </Button>
+                          <Button
+                            type="button"
+                            onClick={() => cancelEdit(item.id)}
+                            size="sm"
+                            variant="ghost"
+                            className="h-6 w-6 p-0 hover:bg-red-100"
+                          >
+                            <X className="w-3 h-3 text-red-600" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="flex gap-1">
+                          <Button
+                            type="button"
+                            onClick={() => startEdit(item.id)}
+                            size="sm"
+                            variant="ghost"
+                            className="h-6 w-6 p-0 hover:bg-blue-100"
+                          >
+                            <Edit2 className="w-3 h-3 text-blue-600" />
+                          </Button>
+                          <Button
+                            type="button"
+                            onClick={() => deleteItem(item.id)}
+                            size="sm"
+                            variant="ghost"
+                            className="h-6 w-6 p-0 hover:bg-red-100"
+                          >
+                            <Trash2 className="w-3 h-3 text-red-600" />
+                          </Button>
+                        </div>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        )
       ) : (
-        <div className="space-y-2">
-          {localItems.map((item, index) => (
-            <DoD_Item
-              key={item.id}
-              item={item}
-              index={index}
-              isEditing={item.isEditing || false}
-              canEdit={canEdit}
-              onSave={(title, description) => saveItem(item.id, title, description)}
-              onCancel={() => cancelEdit(item.id)}
-              onEdit={() => startEdit(item.id)}
-              onDelete={() => deleteItem(item.id)}
-              onToggle={() => toggleCompletion(item.id)}
-            />
-          ))}
-        </div>
+        /* Card format for database mode */
+        localItems.length === 0 ? (
+          <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
+            <p className="text-sm">Belum ada Definition of Done yang ditambahkan</p>
+            <p className="text-xs mt-1">Klik "Tambah Item" untuk menambahkan kriteria penyelesaian</p>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {localItems.map((item, index) => (
+              <DoD_Item
+                key={item.id}
+                item={item}
+                index={index}
+                isEditing={item.isEditing || false}
+                canEdit={canEdit}
+                onSave={(title, description) => saveItem(item.id, title, description)}
+                onCancel={() => cancelEdit(item.id)}
+                onEdit={() => startEdit(item.id)}
+                onDelete={() => deleteItem(item.id)}
+                onToggle={() => toggleCompletion(item.id)}
+              />
+            ))}
+          </div>
+        )
       )}
     </div>
   );

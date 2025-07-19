@@ -891,6 +891,7 @@ Contoh: Wilayah timur memiliki potensi pasar yang besar namun kontribusi penjual
                       items={definitionOfDoneItems}
                       onItemsChange={setDefinitionOfDoneItems}
                       canEdit={true}
+                      mode="form"
                     />
                   </div>
 
