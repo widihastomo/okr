@@ -873,7 +873,6 @@ Tim akan mulai dengan mengumpulkan database reseller wilayah timur, mengirim sta
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead className="w-16">#</TableHead>
                           <TableHead>Nama Metrik *</TableHead>
                           <TableHead>Target *</TableHead>
                           <TableHead className="w-16">Aksi</TableHead>
@@ -882,11 +881,6 @@ Tim akan mulai dengan mengumpulkan database reseller wilayah timur, mengirim sta
                       <TableBody>
                         {(successMetrics.length === 0 ? [{ name: "", target: "" }] : successMetrics).map((metric, index) => (
                           <TableRow key={index}>
-                            <TableCell className="text-center">
-                              <div className="flex items-center justify-center">
-                                <Target className="w-4 h-4 text-green-600" />
-                              </div>
-                            </TableCell>
                             <TableCell>
                               <Input
                                 value={metric.name}
