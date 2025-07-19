@@ -179,7 +179,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
         priority: initiative.priority,
         budget: initiative.budget || "",
       },
-      successMetrics: [{ name: "", target: "" }],
+      successMetrics: [],
       tasks: [],
     } : {
       initiative: {
@@ -194,7 +194,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
         priority: "medium",
         budget: "",
       },
-      successMetrics: [{ name: "", target: "" }],
+      successMetrics: [],
       tasks: [],
     },
   });
@@ -217,7 +217,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
             priority: initiative.priority,
             budget: initiative.budget || "",
           },
-          successMetrics: [{ name: "", target: "" }],
+          successMetrics: [],
           tasks: [],
         });
       } else {
@@ -234,7 +234,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
             priority: "medium",
             budget: "",
           },
-          successMetrics: [{ name: "", target: "" }],
+          successMetrics: [],
           tasks: [],
         });
       }
@@ -252,10 +252,8 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
 
   const removeSuccessMetric = (index: number) => {
     const currentMetrics = form.getValues("successMetrics") || [];
-    if (currentMetrics.length > 1) {
-      const updatedMetrics = currentMetrics.filter((_, i) => i !== index);
-      form.setValue("successMetrics", updatedMetrics);
-    }
+    const updatedMetrics = currentMetrics.filter((_, i) => i !== index);
+    form.setValue("successMetrics", updatedMetrics);
   };
 
   const updateSuccessMetric = (index: number, field: keyof SuccessMetricFormData, value: string) => {
@@ -621,18 +619,26 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                     
                     {/* Success Metrics Dynamic Table */}
                     <div>
-                      {/* Desktop Table View */}
-                      <div className="hidden md:block border rounded-lg">
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead>Nama Metrik</TableHead>
-                              <TableHead className="text-center">Target</TableHead>
-                              <TableHead className="text-center">Aksi</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {(form.watch("successMetrics") || []).map((metric, index) => (
+                      {(form.watch("successMetrics") || []).length === 0 ? (
+                        <div className="text-center py-8 text-gray-500">
+                          <TrendingUp className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                          <p>Belum ada Metrik Keberhasilan</p>
+                          <p className="text-sm">Klik tombol di bawah untuk menambahkan (opsional)</p>
+                        </div>
+                      ) : (
+                        <>
+                          {/* Desktop Table View */}
+                          <div className="hidden md:block border rounded-lg">
+                            <Table>
+                              <TableHeader>
+                                <TableRow>
+                                  <TableHead>Nama Metrik</TableHead>
+                                  <TableHead className="text-center">Target</TableHead>
+                                  <TableHead className="text-center">Aksi</TableHead>
+                                </TableRow>
+                              </TableHeader>
+                              <TableBody>
+                                {(form.watch("successMetrics") || []).map((metric, index) => (
                               <TableRow key={index}>
                                 <TableCell>
                                   <Input
@@ -657,20 +663,20 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                                     size="sm"
                                     onClick={() => removeSuccessMetric(index)}
                                     className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                                    disabled={(form.watch("successMetrics") || []).length <= 1}
+                                    disabled={false}
                                   >
                                     <Trash2 className="w-4 h-4" />
                                   </Button>
                                 </TableCell>
                               </TableRow>
                             ))}
-                          </TableBody>
-                        </Table>
-                      </div>
+                              </TableBody>
+                            </Table>
+                          </div>
 
-                      {/* Mobile Card View */}
-                      <div className="md:hidden space-y-4">
-                        {(form.watch("successMetrics") || []).map((metric, index) => (
+                          {/* Mobile Card View */}
+                          <div className="md:hidden space-y-4">
+                            {(form.watch("successMetrics") || []).map((metric, index) => (
                           <div key={index} className="border rounded-lg p-3 bg-gradient-to-r from-blue-50 to-white shadow-sm">
                             <div className="flex items-center justify-between mb-3">
                               <div className="flex items-center gap-2">
@@ -683,7 +689,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                                 size="sm"
                                 onClick={() => removeSuccessMetric(index)}
                                 className="text-red-600 hover:text-red-700 hover:bg-red-100 h-6 w-6 p-0"
-                                disabled={(form.watch("successMetrics") || []).length <= 1}
+                                disabled={false}
                               >
                                 <Trash2 className="w-3 h-3" />
                               </Button>
@@ -708,9 +714,11 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                                 />
                               </div>
                             </div>
+                            </div>
+                          ))}
                           </div>
-                        ))}
-                      </div>
+                        </>
+                      )}
 
                       {/* Add Button Below Table */}
                       <div className="mt-3">
