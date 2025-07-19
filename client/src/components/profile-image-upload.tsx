@@ -68,11 +68,18 @@ export function ProfileImageUpload({ currentImageUrl, onImageUpdate }: ProfileIm
       const formData = new FormData();
       formData.append('profileImage', file);
 
-      return await apiRequest('/api/profile/image', {
+      const response = await fetch('/api/profile/image', {
         method: 'POST',
         body: formData,
         // Don't set Content-Type header, let browser set it with boundary for FormData
       });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Upload failed');
+      }
+
+      return await response.json();
     },
     onSuccess: (data) => {
       toast({
@@ -106,9 +113,19 @@ export function ProfileImageUpload({ currentImageUrl, onImageUpdate }: ProfileIm
   // Delete profile image mutation
   const deleteMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest('/api/profile/image', {
-        method: 'DELETE'
+      const response = await fetch('/api/profile/image', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Delete failed');
+      }
+
+      return await response.json();
     },
     onSuccess: () => {
       toast({
