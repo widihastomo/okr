@@ -672,10 +672,12 @@ export default function InitiativeFormModal({
                           <FormLabel>Angka Target Terkait*</FormLabel>
                           <FormControl>
                             <SearchableKeyResultSelect
-                              value={field.value}
-                              onChange={field.onChange}
+                              keyResults={keyResults || []}
+                              value={field.value || ""}
+                              onValueChange={field.onChange}
                               placeholder="Pilih angka target..."
                               objectiveId={objectiveId}
+                              disabled={!!keyResultId}
                             />
                           </FormControl>
                           <FormMessage />
