@@ -866,24 +866,24 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                           return (
                             <div key={index} className="border rounded-lg p-2 bg-gradient-to-r from-green-50 to-white shadow-sm">
                               <div className="flex items-center justify-between gap-2">
-                                <div className="flex items-center gap-3 flex-1 min-w-0">
-                                  <h4 className="font-medium text-green-800 text-sm truncate">{task.title || "Task tanpa judul"}</h4>
+                                <h4 className="font-medium text-green-800 text-sm truncate flex-1 min-w-0">{task.title || "Task tanpa judul"}</h4>
+                                <div className="flex items-center gap-2 shrink-0">
                                   {assignedUser && (
-                                    <span className="text-xs text-blue-600 shrink-0">PIC: {getUserName(assignedUser)}</span>
+                                    <span className="text-xs text-blue-600">PIC: {getUserName(assignedUser)}</span>
                                   )}
                                   {task.dueDate && (
-                                    <span className="text-xs text-gray-500 shrink-0">{format(new Date(task.dueDate), "dd MMM yyyy", { locale: id })}</span>
+                                    <span className="text-xs text-gray-500">{format(new Date(task.dueDate), "dd MMM yyyy", { locale: id })}</span>
                                   )}
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => removeTask(index)}
+                                    className="text-red-600 hover:text-red-800 hover:bg-red-100 h-6 w-6 p-0"
+                                  >
+                                    <Trash2 className="w-3 h-3" />
+                                  </Button>
                                 </div>
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => removeTask(index)}
-                                  className="text-red-600 hover:text-red-800 hover:bg-red-100 h-6 w-6 p-0 shrink-0"
-                                >
-                                  <Trash2 className="w-3 h-3" />
-                                </Button>
                               </div>
                             </div>
                           );
