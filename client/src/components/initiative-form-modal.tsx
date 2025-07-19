@@ -333,7 +333,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Target className="w-5 h-5" />
-                    Informasi Dasar
+                    Informasi Dasar & Metrik Keberhasilan
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -400,6 +400,40 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                           value={field.value}
                           onValueChange={field.onChange}
                         />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="initiative.definitionOfDone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center gap-2">
+                          Metrik Keberhasilan
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <button 
+                                type="button" 
+                                className="inline-flex items-center justify-center"
+                              >
+                                <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                              </button>
+                            </PopoverTrigger>
+                            <PopoverContent side="right" className="max-w-xs">
+                              <p className="text-sm">
+                                Kriteria yang harus dipenuhi agar inisiatif ini dianggap berhasil. Buat kriteria yang spesifik dan terukur.
+                              </p>
+                            </PopoverContent>
+                          </Popover>
+                        </FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            placeholder="Contoh: 1. Chatbot dapat menjawab minimal 70% pertanyaan FAQ, 2. Response time rata-rata <30 detik, 3. User satisfaction score >4.0, 4. Dokumentasi lengkap tersedia..." 
+                            {...field} 
+                          />
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
