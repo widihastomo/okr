@@ -82,11 +82,11 @@ const getTaskPriorityLabel = (priority: string): string => {
 
 
 
-// Success Metrics Schema
+// Success Metrics Schema - fields are optional to allow empty metrics
 const successMetricSchema = z.object({
   id: z.string().optional(), // untuk edit mode
-  name: z.string().min(1, "Nama metrik wajib diisi"),
-  target: z.string().min(1, "Target wajib diisi"),
+  name: z.string().optional(),
+  target: z.string().optional(),
 });
 
 type SuccessMetricFormData = z.infer<typeof successMetricSchema>;
@@ -179,7 +179,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
         priority: initiative.priority,
         budget: initiative.budget || "",
       },
-      successMetrics: [],
+      successMetrics: [{ name: "", target: "" }],
       tasks: [],
     } : {
       initiative: {
@@ -194,7 +194,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
         priority: "medium",
         budget: "",
       },
-      successMetrics: [],
+      successMetrics: [{ name: "", target: "" }],
       tasks: [],
     },
   });
@@ -217,7 +217,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
             priority: initiative.priority,
             budget: initiative.budget || "",
           },
-          successMetrics: [],
+          successMetrics: [{ name: "", target: "" }],
           tasks: [],
         });
       } else {
@@ -234,7 +234,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
             priority: "medium",
             budget: "",
           },
-          successMetrics: [],
+          successMetrics: [{ name: "", target: "" }],
           tasks: [],
         });
       }
@@ -252,8 +252,10 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
 
   const removeSuccessMetric = (index: number) => {
     const currentMetrics = form.getValues("successMetrics") || [];
-    const updatedMetrics = currentMetrics.filter((_, i) => i !== index);
-    form.setValue("successMetrics", updatedMetrics);
+    if (currentMetrics.length > 1) {
+      const updatedMetrics = currentMetrics.filter((_, i) => i !== index);
+      form.setValue("successMetrics", updatedMetrics);
+    }
   };
 
   const updateSuccessMetric = (index: number, field: keyof SuccessMetricFormData, value: string) => {
@@ -663,7 +665,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                                     size="sm"
                                     onClick={() => removeSuccessMetric(index)}
                                     className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                                    disabled={false}
+                                    disabled={(form.watch("successMetrics") || []).length <= 1}
                                   >
                                     <Trash2 className="w-4 h-4" />
                                   </Button>
@@ -689,7 +691,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                                 size="sm"
                                 onClick={() => removeSuccessMetric(index)}
                                 className="text-red-600 hover:text-red-700 hover:bg-red-100 h-6 w-6 p-0"
-                                disabled={false}
+                                disabled={(form.watch("successMetrics") || []).length <= 1}
                               >
                                 <Trash2 className="w-3 h-3" />
                               </Button>
