@@ -613,6 +613,11 @@ Contoh : Wilayah timur memiliki potensi pasar yang besar namun kontribusi penjua
                             </PopoverContent>
                           </Popover>
                         </FormLabel>
+                        <FormDescription>
+                          {keyResultId
+                            ? "Angka target sudah dipilih sesuai dengan konteks halaman"
+                            : "Pilih angka target yang akan didukung oleh inisiatif ini"}
+                        </FormDescription>
                         <FormControl>
                           <SearchableKeyResultSelect
                             keyResults={keyResults}
@@ -623,11 +628,6 @@ Contoh : Wilayah timur memiliki potensi pasar yang besar namun kontribusi penjua
                             disabled={!!keyResultId}
                           />
                         </FormControl>
-                        <FormDescription>
-                          {keyResultId
-                            ? "Angka target sudah dipilih sesuai dengan konteks halaman"
-                            : "Pilih angka target yang akan didukung oleh inisiatif ini"}
-                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
