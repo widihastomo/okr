@@ -531,7 +531,7 @@ export default function GoalFormModal({ goal, open, onOpenChange }: ObjectiveFor
                                 className="inline-flex items-center justify-center"
                                 
                               >
-                                <HelpCircle className="w-4 h-4 text-orange-500 hover:text-orange-600 cursor-pointer" />
+                                <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
                               </button>
                             </PopoverTrigger>
                             <PopoverContent side="right" className="max-w-xs">
@@ -567,7 +567,7 @@ export default function GoalFormModal({ goal, open, onOpenChange }: ObjectiveFor
                                 className="inline-flex items-center justify-center"
                                 
                               >
-                                <HelpCircle className="w-4 h-4 text-orange-500 hover:text-orange-600 cursor-pointer" />
+                                <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
                               </button>
                             </PopoverTrigger>
                             <PopoverContent side="right" className="max-w-xs">
@@ -606,7 +606,7 @@ export default function GoalFormModal({ goal, open, onOpenChange }: ObjectiveFor
                                 className="inline-flex items-center justify-center"
                                 
                               >
-                                <HelpCircle className="w-4 h-4 text-orange-500 hover:text-orange-600 cursor-pointer" />
+                                <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
                               </button>
                             </PopoverTrigger>
                             <PopoverContent side="right" className="max-w-xs">
@@ -650,7 +650,7 @@ export default function GoalFormModal({ goal, open, onOpenChange }: ObjectiveFor
                           
                             <Popover>
                               <PopoverTrigger asChild>
-                                <HelpCircle className="w-4 h-4 text-orange-500 hover:text-orange-600 cursor-pointer" />
+                                <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
                               </PopoverTrigger>
                               <PopoverContent side="right" className="max-w-xs">
                                 <p className="text-sm">
@@ -690,7 +690,7 @@ export default function GoalFormModal({ goal, open, onOpenChange }: ObjectiveFor
                           
                             <Popover>
                               <PopoverTrigger asChild>
-                                <HelpCircle className="w-4 h-4 text-orange-500 hover:text-orange-600 cursor-pointer" />
+                                <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
                               </PopoverTrigger>
                               <PopoverContent side="right" className="max-w-xs">
                                 <p className="text-sm">
@@ -751,7 +751,7 @@ export default function GoalFormModal({ goal, open, onOpenChange }: ObjectiveFor
                                 className="inline-flex items-center justify-center"
                                 
                               >
-                                <HelpCircle className="w-4 h-4 text-orange-500 hover:text-orange-600 cursor-pointer" />
+                                <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
                               </button>
                             </PopoverTrigger>
                             <PopoverContent side="right" className="max-w-xs">
