@@ -353,6 +353,12 @@ The system includes comprehensive database connection troubleshooting tools:
   * ENHANCED: Default values and useEffect properly populate form with fetched success metrics and tasks
   * UPDATED: Dependency array to include fetched data for proper form updates
   * RESULT: Edit mode now correctly displays all existing data including metrics, DoD, tasks, and priority sections
+- July 19, 2025. **DEFINITION OF DONE EDIT MODE FIX** - Successfully fixed DoD items not displaying in edit form:
+  * ADDED: Query to fetch DoD items from separate definition_of_done_items table for edit mode
+  * FIXED: Form initialization now uses fetched DoD items instead of parsing JSON from initiative field
+  * UPDATED: Both default values and useEffect to properly load DoD descriptions from database
+  * ENHANCED: Dependency array includes existingDoDItems for proper form updates
+  * RESULT: Definition of Done section now correctly displays existing items in edit mode
 - July 19, 2025. **COMPREHENSIVE INITIATIVE DETAIL DISPLAY** - Successfully added comprehensive information display for initiative description, implementation plan, and definition of done:
   * ADDED: Dedicated description section with FileText icon and gray-themed background styling
   * ADDED: Implementation plan section with Rocket icon and blue-themed background for clear visual distinction

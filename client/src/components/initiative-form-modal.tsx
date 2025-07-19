@@ -167,7 +167,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
   const { data: keyResults } = useQuery<KeyResult[]>({ queryKey: ["/api/key-results"] });
   const { data: users } = useQuery<User[]>({ queryKey: ["/api/users"] });
   
-  // Fetch existing success metrics and tasks for edit mode
+  // Fetch existing success metrics, tasks, and DoD items for edit mode
   const { data: existingSuccessMetrics } = useQuery({
     queryKey: [`/api/initiatives/${initiative?.id}/success-metrics`],
     enabled: !!(isEditMode && initiative?.id),
@@ -175,6 +175,11 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
 
   const { data: existingTasks } = useQuery({
     queryKey: [`/api/initiatives/${initiative?.id}/tasks`],
+    enabled: !!(isEditMode && initiative?.id),
+  });
+
+  const { data: existingDoDItems } = useQuery({
+    queryKey: [`/api/initiatives/${initiative?.id}/definition-of-done`],
     enabled: !!(isEditMode && initiative?.id),
   });
 
@@ -232,14 +237,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
         title: initiative.title,
         description: initiative.description || "",
         implementationPlan: initiative.implementationPlan || "",
-        definitionOfDone: (() => {
-          try {
-            const parsed = initiative.definitionOfDone ? JSON.parse(initiative.definitionOfDone) : [];
-            return Array.isArray(parsed) ? parsed : [parsed || ""];
-          } catch {
-            return [initiative.definitionOfDone || ""];
-          }
-        })(),
+        definitionOfDone: existingDoDItems?.map(item => item.description) || [""],
         keyResultId: initiative.keyResultId,
         picId: initiative.picId,
         startDate: new Date(initiative.startDate),
@@ -283,14 +281,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
             title: initiative.title,
             description: initiative.description || "",
             implementationPlan: initiative.implementationPlan || "",
-            definitionOfDone: (() => {
-              try {
-                const parsed = initiative.definitionOfDone ? JSON.parse(initiative.definitionOfDone) : [];
-                return Array.isArray(parsed) ? parsed : [parsed || ""];
-              } catch {
-                return [initiative.definitionOfDone || ""];
-              }
-            })(),
+            definitionOfDone: existingDoDItems?.map(item => item.description) || [""],
             keyResultId: initiative.keyResultId,
             picId: initiative.picId,
             startDate: new Date(initiative.startDate),
@@ -326,7 +317,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
         });
       }
     }
-  }, [open, initiative, isEditMode, form, keyResultId, user?.id, existingSuccessMetrics, existingTasks]);
+  }, [open, initiative, isEditMode, form, keyResultId, user?.id, existingSuccessMetrics, existingTasks, existingDoDItems]);
 
   // Success Metrics management functions
   const addSuccessMetric = () => {
