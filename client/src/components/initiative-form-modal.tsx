@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
@@ -869,7 +870,14 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                                 <h4 className="font-medium text-green-800 text-sm truncate flex-1 min-w-0">{task.title || "Task tanpa judul"}</h4>
                                 <div className="flex items-center gap-2 shrink-0">
                                   {assignedUser && (
-                                    <span className="text-xs text-blue-600">PIC: {getUserName(assignedUser)}</span>
+                                    <div className="flex items-center gap-1">
+                                      <Avatar className="w-4 h-4">
+                                        <AvatarFallback className="text-xs bg-blue-100 text-blue-700">
+                                          {getUserInitials(assignedUser)}
+                                        </AvatarFallback>
+                                      </Avatar>
+                                      <span className="text-xs text-blue-600">{getUserName(assignedUser)}</span>
+                                    </div>
                                   )}
                                   {task.dueDate && (
                                     <span className="text-xs text-gray-500">{format(new Date(task.dueDate), "dd MMM yyyy", { locale: id })}</span>
