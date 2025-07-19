@@ -341,6 +341,12 @@ The system includes comprehensive database connection troubleshooting tools:
 
 ## Changelog
 ```
+- July 19, 2025. **TASK MODAL SIZE OPTIMIZATION** - Successfully reduced task modal dimensions for better UI experience:
+  * REDUCED: Modal width from max-w-4xl to max-w-2xl on desktop for more compact display
+  * OPTIMIZED: Mobile width from 95vw to 90vw for better screen utilization
+  * DECREASED: Maximum height from 90vh to 80vh to reduce screen dominance
+  * IMPROVED: Padding reduced from sm:p-6 to sm:p-4 for tighter spacing
+  * RESULT: More compact task creation/editing modal with better proportions and less overwhelming interface
 - July 19, 2025. **INITIATIVE CREATION INTEGRATION & FORM REORGANIZATION** - Successfully integrated initiative creation functionality into Daily Focus page:
   * ADDED: Initiative creation button in "Kelola Inisiatif Aktif" section with responsive design ("Tambah Inisiatif" on desktop, "Tambah" on mobile)
   * INTEGRATED: InitiativeFormModal component with proper state management and query invalidation
