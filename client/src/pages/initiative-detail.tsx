@@ -78,6 +78,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import TaskModal from "@/components/task-modal";
 import { QuickUpdateButton } from "@/components/quick-update-button";
@@ -839,6 +840,7 @@ export default function InitiativeDetailPage() {
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
   const [isDeleteMetricModalOpen, setIsDeleteMetricModalOpen] = useState(false);
+  const [isAddDeliverableModalOpen, setIsAddDeliverableModalOpen] = useState(false);
   const [metricToDelete, setMetricToDelete] = useState<any>(null);
   const [isTeamModalOpen, setIsTeamModalOpen] = useState(false);
   const [isCloseInitiativeModalOpen, setIsCloseInitiativeModalOpen] =
@@ -1128,6 +1130,39 @@ export default function InitiativeDetailPage() {
         title: "Gagal membuka kembali inisiatif",
         description:
           error.message || "Terjadi kesalahan saat membuka kembali inisiatif",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const addDeliverableMutation = useMutation({
+    mutationFn: async ({
+      initiativeId,
+      title,
+    }: {
+      initiativeId: string;
+      title: string;
+    }) => {
+      return await apiRequest("POST", `/api/initiatives/${initiativeId}/definition-of-done`, {
+        title,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [`/api/initiatives/${id}/definition-of-done`],
+      });
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}`] });
+      toast({
+        title: "Deliverable berhasil ditambahkan",
+        description: "Deliverable baru telah ditambahkan ke inisiatif",
+        variant: "success",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Gagal menambahkan deliverable",
+        description:
+          error.message || "Terjadi kesalahan saat menambahkan deliverable",
         variant: "destructive",
       });
     },
@@ -1753,13 +1788,12 @@ export default function InitiativeDetailPage() {
                 )}
 
                 {/* Definition of Done Section */}
-                {definitionOfDoneItems && definitionOfDoneItems.length > 0 && (
-                  <div>
-                    <div className="flex items-center gap-2 mb-2">
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
                       <CheckSquare className="h-4 w-4 text-green-500" />
                       <span className="text-sm font-medium text-gray-700">
-                        Deliverables (Output Inisiatif) - Centang Jika Sudah
-                        Selesai
+                        Deliverables (Output Inisiatif)
                       </span>
                       <Popover>
                         <PopoverTrigger asChild>
@@ -1796,6 +1830,21 @@ export default function InitiativeDetailPage() {
                         </PopoverContent>
                       </Popover>
                     </div>
+                    <Button
+                      onClick={() => setIsAddDeliverableModalOpen(true)}
+                      size="sm"
+                      className="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white"
+                      disabled={
+                        initiativeData.status === "selesai" ||
+                        initiativeData.status === "dibatalkan"
+                      }
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      <span className="hidden sm:inline">Tambah Deliverable</span>
+                      <span className="sm:hidden">Tambah</span>
+                    </Button>
+                  </div>
+                  {definitionOfDoneItems && definitionOfDoneItems.length > 0 ? (
                     <div className="bg-green-50 p-3 rounded-lg border border-green-200">
                       <div className="space-y-2">
                         {definitionOfDoneItems.map(
@@ -1857,8 +1906,12 @@ export default function InitiativeDetailPage() {
                         )}
                       </div>
                     </div>
-                  </div>
-                )}
+                  ) : (
+                    <p className="text-sm text-gray-500 text-center py-2">
+                      Belum ada deliverable. Tambahkan deliverable pertama untuk memulai.
+                    </p>
+                  )}
+                </div>
 
                 {/* Task Management Section */}
                 <div>
@@ -2162,6 +2215,70 @@ export default function InitiativeDetailPage() {
           <InitiativeHistory initiativeId={id!} />
         </div>
       </div>
+
+      {/* Add Deliverable Modal */}
+      <Dialog open={isAddDeliverableModalOpen} onOpenChange={setIsAddDeliverableModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <CheckSquare className="h-5 w-5 text-green-500" />
+              Tambah Deliverable Baru
+            </DialogTitle>
+            <DialogDescription>
+              Tambahkan output konkret yang harus dicapai dari inisiatif ini.
+            </DialogDescription>
+          </DialogHeader>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              const formData = new FormData(e.currentTarget);
+              const title = formData.get('title') as string;
+              
+              if (title.trim()) {
+                // Create deliverable via API
+                addDeliverableMutation.mutate({
+                  initiativeId: id!,
+                  title: title.trim(),
+                });
+                setIsAddDeliverableModalOpen(false);
+                (e.target as HTMLFormElement).reset();
+              }
+            }}
+            className="space-y-4"
+          >
+            <div>
+              <Label htmlFor="deliverable-title">Nama Deliverable</Label>
+              <Input
+                id="deliverable-title"
+                name="title"
+                placeholder="Contoh: Laporan analisis pasar lengkap"
+                required
+                autoFocus
+                className="mt-1"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Tuliskan nama output konkret yang akan dihasilkan
+              </p>
+            </div>
+            <DialogFooter className="gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsAddDeliverableModalOpen(false)}
+              >
+                Batal
+              </Button>
+              <Button 
+                type="submit"
+                className="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600"
+                disabled={addDeliverableMutation.isPending}
+              >
+                {addDeliverableMutation.isPending ? "Menambah..." : "Tambah Deliverable"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       {/* Modals */}
       <TaskModal

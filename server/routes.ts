@@ -3414,6 +3414,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Create new definition of done item
+  app.post("/api/initiatives/:initiativeId/definition-of-done", requireAuth, async (req, res) => {
+    try {
+      const initiativeId = req.params.initiativeId;
+      const currentUser = req.user;
+      const { title } = req.body;
+
+      if (!title || typeof title !== 'string' || !title.trim()) {
+        return res.status(400).json({ message: "Title is required" });
+      }
+
+      const dodData = {
+        title: title.trim(),
+        initiativeId,
+        createdBy: currentUser.id,
+        organizationId: currentUser.organizationId,
+        isCompleted: false,
+      };
+
+      const newItem = await storage.createDefinitionOfDoneItem(dodData);
+      
+      // Add audit trail entry
+      await storage.addAuditTrailEntry({
+        initiativeId,
+        userId: currentUser.id,
+        action: 'add_deliverable',
+        changes: { deliverable: title.trim() }
+      });
+
+      res.json(newItem);
+    } catch (error) {
+      console.error("Error creating definition of done item:", error);
+      res.status(500).json({ message: "Failed to create definition of done item" });
+    }
+  });
+
   // Toggle Definition of Done item completion status
   app.patch("/api/definition-of-done/:id/toggle", requireAuth, async (req, res) => {
     try {
