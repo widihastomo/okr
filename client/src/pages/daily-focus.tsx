@@ -2994,6 +2994,7 @@ export default function DailyFocusPage() {
                               dueDate={null}
                               startDate="2025-07-01"
                               compact={true}
+                              keyResultType={kr.type}
                             />
                           </div>
                           <div className="hidden sm:block">
@@ -3006,6 +3007,7 @@ export default function DailyFocusPage() {
                               dueDate={null}
                               startDate="2025-07-01"
                               compact={false}
+                              keyResultType={kr.type}
                             />
                           </div>
                         </div>

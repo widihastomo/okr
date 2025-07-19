@@ -150,6 +150,7 @@ interface SimpleProgressStatusProps {
   compact?: boolean;
   dueDate?: string | null;
   startDate?: string;
+  keyResultType?: string;
 }
 
 // Calculate ideal progress based on current date and timeline
@@ -175,7 +176,8 @@ export function SimpleProgressStatus({
   timeProgressPercentage = 0,
   compact = false,
   dueDate,
-  startDate = "2025-07-01" // Q3 2025 start date
+  startDate = "2025-07-01", // Q3 2025 start date
+  keyResultType = "increase_to"
 }: SimpleProgressStatusProps) {
   const config = getStatusConfig(status);
   const StatusIcon = config.icon;
@@ -187,17 +189,38 @@ export function SimpleProgressStatus({
   
   let idealProgress = timeProgressPercentage;
   
-  // If current date is past the cycle end date, show target achievement (100%)
-  if (now > cycleEnd) {
-    idealProgress = 100;
-  }
-  // If timeProgressPercentage is negative (before cycle start), show 0%
-  else if (Number(timeProgressPercentage) < 0) {
-    idealProgress = 0;
-  }
-  // Otherwise use the server-calculated timeProgressPercentage
-  else {
-    idealProgress = Number(timeProgressPercentage) || 0;
+  // Adjust ideal progress calculation based on key result type
+  switch (keyResultType) {
+    case "achieve_or_not":
+      // For binary achievements, ideal progress should be 100% only at the end
+      if (now > cycleEnd) {
+        idealProgress = 100;
+      } else {
+        idealProgress = 0; // No gradual progress for binary achievements
+      }
+      break;
+      
+    case "should_stay_above":
+    case "should_stay_below":
+      // For threshold types, target is to maintain the level throughout
+      // Ideal progress should always be 100% if we're maintaining the threshold
+      idealProgress = 100;
+      break;
+      
+    case "increase_to":
+    case "decrease_to":
+    default:
+      // For gradual improvement types, use time-based ideal progress
+      if (now > cycleEnd) {
+        idealProgress = 100;
+      }
+      else if (Number(timeProgressPercentage) < 0) {
+        idealProgress = 0;
+      }
+      else {
+        idealProgress = Number(timeProgressPercentage) || 0;
+      }
+      break;
   }
 
   if (compact) {
@@ -247,7 +270,20 @@ export function SimpleProgressStatus({
         </Badge>
         <div 
           className="flex-1 min-w-0 relative group cursor-pointer"
-          title={`Progress: ${(progressPercentage || 0).toFixed(1)}% | Target ideal: ${Number(idealProgress).toFixed(1)}%`}
+          title={`Progress: ${(progressPercentage || 0).toFixed(1)}% | ${(() => {
+            switch (keyResultType) {
+              case "achieve_or_not":
+                return now > cycleEnd 
+                  ? "Target capaian: 100%"
+                  : "Target ideal: 0% (capai di akhir periode)";
+              case "should_stay_above":
+                return "Target ideal: 100% (pertahankan di atas ambang)";
+              case "should_stay_below":
+                return "Target ideal: 100% (pertahankan di bawah ambang)";
+              default:
+                return `Target ideal: ${Number(idealProgress).toFixed(1)}%`;
+            }
+          })()}`}
         >
           <div className="w-full bg-gray-200 rounded-full h-3 relative">
             <div 
@@ -273,7 +309,20 @@ export function SimpleProgressStatus({
           </div>
           {/* Enhanced tooltip on hover */}
           <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
-            Progress: {(progressPercentage || 0).toFixed(1)}% | Target ideal: {Number(idealProgress).toFixed(1)}%
+            Progress: {(progressPercentage || 0).toFixed(1)}% | {(() => {
+              switch (keyResultType) {
+                case "achieve_or_not":
+                  return now > cycleEnd 
+                    ? "Target capaian: 100%"
+                    : "Target ideal: 0% (capai di akhir periode)";
+                case "should_stay_above":
+                  return "Target ideal: 100% (pertahankan di atas ambang)";
+                case "should_stay_below":
+                  return "Target ideal: 100% (pertahankan di bawah ambang)";
+                default:
+                  return `Target ideal: ${Number(idealProgress).toFixed(1)}%`;
+              }
+            })()}
             <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-black"></div>
           </div>
         </div>
@@ -297,12 +346,27 @@ export function SimpleProgressStatus({
         <div className="flex items-center gap-1">
           <div className="w-0.5 h-3 bg-gray-400 opacity-70"></div>
           <span className="text-xs">
-            {now > cycleEnd 
-              ? `Target capaian (100%)` 
-              : Number(timeProgressPercentage) < 0 
-                ? `Target ideal (0% - belum dimulai)`
-                : `Target ideal (${Number(idealProgress).toFixed(1)}%)`
-            }
+            {(() => {
+              switch (keyResultType) {
+                case "achieve_or_not":
+                  return now > cycleEnd 
+                    ? "Target capaian (100%)"
+                    : "Target ideal (0% - capai di akhir periode)";
+                    
+                case "should_stay_above":
+                  return "Target ideal (100% - pertahankan di atas ambang)";
+                  
+                case "should_stay_below":
+                  return "Target ideal (100% - pertahankan di bawah ambang)";
+                  
+                default:
+                  return now > cycleEnd 
+                    ? "Target capaian (100%)" 
+                    : Number(timeProgressPercentage) < 0 
+                      ? "Target ideal (0% - belum dimulai)"
+                      : `Target ideal (${Number(idealProgress).toFixed(1)}%)`;
+              }
+            })()}
           </span>
         </div>
       </div>

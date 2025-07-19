@@ -1722,6 +1722,7 @@ export default function GoalDetail() {
                               dueDate={null}
                               startDate={cycle?.startDate}
                               compact={true}
+                              keyResultType={kr.type}
                             />
                           </div>
                           <div className="hidden sm:block">
@@ -1734,6 +1735,7 @@ export default function GoalDetail() {
                               dueDate={null}
                               startDate={cycle?.startDate}
                               compact={false}
+                              keyResultType={kr.type}
                             />
                           </div>
                         </div>
