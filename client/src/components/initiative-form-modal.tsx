@@ -181,6 +181,12 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
   const { data: existingDoDItems } = useQuery({
     queryKey: [`/api/initiatives/${initiative?.id}/definition-of-done`],
     enabled: !!(isEditMode && initiative?.id),
+    onSuccess: (data) => {
+      console.log('DoD API response:', data);
+    },
+    onError: (error) => {
+      console.error('DoD API error:', error);
+    }
   });
 
   // Priority calculation functions
@@ -283,7 +289,10 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
         console.log('Resetting form with data:', {
           existingSuccessMetrics,
           existingTasks,
-          existingDoDItems: existingDoDItems?.map(item => item.description)
+          existingDoDItems,
+          mappedDoDItems: existingDoDItems?.map(item => item.description),
+          isDoDArray: Array.isArray(existingDoDItems),
+          doDLength: existingDoDItems?.length
         });
         
         form.reset({
