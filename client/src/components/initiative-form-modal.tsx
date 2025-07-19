@@ -860,24 +860,24 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                         <p className="text-sm">Klik tombol di bawah untuk menambahkan</p>
                       </div>
                     ) : (
-                      <div className="space-y-3">
+                      <div className="space-y-2">
                         {(form.watch("tasks") || []).map((task, index) => (
-                          <div key={index} className="border rounded-lg p-4 bg-gradient-to-r from-green-50 to-white shadow-sm">
+                          <div key={index} className="border rounded-lg p-3 bg-gradient-to-r from-green-50 to-white shadow-sm">
                             <div className="flex items-start justify-between">
                               <div className="flex-1">
-                                <h4 className="font-medium text-green-800">{task.title || "Task tanpa judul"}</h4>
+                                <h4 className="font-medium text-green-800 text-sm">{task.title || "Task tanpa judul"}</h4>
                                 {task.description && (
-                                  <p className="text-sm text-gray-600 mt-1">{task.description}</p>
+                                  <p className="text-xs text-gray-600 mt-1 line-clamp-1">{task.description}</p>
                                 )}
-                                <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
-                                  <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded">
+                                <div className="flex items-center gap-3 mt-1.5 text-xs text-gray-500">
+                                  <span className="px-1.5 py-0.5 bg-blue-100 text-blue-800 rounded text-xs">
                                     {getTaskStatusLabel(task.status)}
                                   </span>
-                                  <span className="px-2 py-1 bg-orange-100 text-orange-800 rounded">
+                                  <span className="px-1.5 py-0.5 bg-orange-100 text-orange-800 rounded text-xs">
                                     {getTaskPriorityLabel(task.priority)}
                                   </span>
                                   {task.dueDate && (
-                                    <span>📅 {format(new Date(task.dueDate), "dd MMM yyyy", { locale: id })}</span>
+                                    <span className="text-xs">📅 {format(new Date(task.dueDate), "dd MMM yyyy", { locale: id })}</span>
                                   )}
                                 </div>
                               </div>
@@ -886,9 +886,9 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => removeTask(index)}
-                                className="text-red-600 hover:text-red-800 hover:bg-red-100"
+                                className="text-red-600 hover:text-red-800 hover:bg-red-100 h-6 w-6 p-0"
                               >
-                                <Trash2 className="w-4 h-4" />
+                                <Trash2 className="w-3 h-3" />
                               </Button>
                             </div>
                           </div>
@@ -897,11 +897,12 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                     )}
                     
                     {/* Tombol Tambah Task */}
-                    <div className="pt-4 border-t">
+                    <div className="pt-3 border-t">
                       <Button 
                         type="button" 
                         onClick={addTask} 
                         variant="outline" 
+                        size="sm"
                         className="w-full border-green-600 text-green-600 hover:bg-green-50"
                       >
                         <Plus className="w-4 h-4 mr-2" />

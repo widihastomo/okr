@@ -95,7 +95,6 @@ export default function InitiativeTaskModal({ open, onOpenChange, onTaskAdd }: I
       <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <FileText className="w-5 h-5 text-green-600" />
             Tambah Task ke Inisiatif
           </DialogTitle>
           <DialogDescription>
