@@ -14,12 +14,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { HelpCircle, Plus, ChevronRight, ChevronLeft, Target, Trash2, CalendarIcon } from "lucide-react";
+import { HelpCircle, Plus, ChevronRight, ChevronLeft, Target, Trash2, CalendarIcon, Edit, TrendingUp } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { cn } from "@/lib/utils";
 import { SearchableUserSelect } from "@/components/ui/searchable-user-select";
 import { SearchableKeyResultSelect } from "@/components/ui/searchable-key-result-select";
+import SuccessMetricsModal from "@/components/success-metrics-modal-simple";
 import { useAuth } from "@/hooks/useAuth";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
@@ -33,6 +34,96 @@ const getUserName = (user: User): string => {
   // Fallback to email username
   return user.email?.split('@')[0] || 'Unknown';
 };
+
+// Success Metrics List Component
+interface SuccessMetricsListProps {
+  initiativeId: string;
+  onEditMetric: (metric: any) => void;
+}
+
+function SuccessMetricsList({ initiativeId, onEditMetric }: SuccessMetricsListProps) {
+  const { data: metrics = [] } = useQuery<any[]>({ 
+    queryKey: [`/api/initiatives/${initiativeId}/success-metrics`],
+    enabled: initiativeId !== "temp-initiative-id"
+  });
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  const deleteMutation = useMutation({
+    mutationFn: async (metricId: string) => {
+      return apiRequest("DELETE", `/api/success-metrics/${metricId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}/success-metrics`] });
+      toast({
+        title: "Berhasil",
+        description: "Metrik keberhasilan berhasil dihapus",
+        className: "border-green-200 bg-green-50 text-green-800",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Gagal menghapus metrik keberhasilan",
+        variant: "destructive",
+      });
+    },
+  });
+
+  if (metrics.length === 0) {
+    return (
+      <div className="border-2 border-dashed border-gray-200 rounded-lg p-6 text-center text-gray-500">
+        <TrendingUp className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+        <p className="text-sm mb-2">Belum ada metrik keberhasilan</p>
+        <p className="text-xs text-gray-400">Tambahkan metrik untuk mengukur keberhasilan inisiatif</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      {metrics.map((metric) => (
+        <div key={metric.id} className="border border-gray-200 rounded-lg p-4">
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <h4 className="font-medium text-gray-900">{metric.name}</h4>
+              <div className="mt-2 grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span className="text-gray-600">Target: </span>
+                  <span className="font-medium">{metric.target}</span>
+                </div>
+                <div>
+                  <span className="text-gray-600">Capaian: </span>
+                  <span className="font-medium text-blue-600">{metric.achievement}</span>
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 ml-4">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => onEditMetric(metric)}
+                className="h-8 w-8 p-0"
+              >
+                <Edit className="w-4 h-4" />
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => deleteMutation.mutate(metric.id)}
+                className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 // Form schema for initiative
 const initiativeFormSchema = z.object({
@@ -76,8 +167,13 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [currentStep, setCurrentStep] = useState(1);
+  const [isSuccessMetricsModalOpen, setIsSuccessMetricsModalOpen] = useState(false);
+  const [editingMetric, setEditingMetric] = useState(null);
   const { user } = useAuth();
   const isEditMode = !!initiative;
+  
+  // For creating initiative, we need a temporary ID
+  const initiativeId = initiative?.id || "temp-initiative-id";
 
   // Fetch data yang diperlukan
   const { data: keyResults } = useQuery<KeyResult[]>({ queryKey: ["/api/key-results"] });
@@ -405,39 +501,60 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                     )}
                   />
 
-                  <FormField
-                    control={form.control}
-                    name="initiative.definitionOfDone"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="flex items-center gap-2">
+                  {/* Success Metrics Management */}
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <FormLabel>
                           Metrik Keberhasilan
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <button 
-                                type="button" 
-                                className="inline-flex items-center justify-center"
-                              >
-                                <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                              </button>
-                            </PopoverTrigger>
-                            <PopoverContent side="right" className="max-w-xs">
-                              <p className="text-sm">
-                                Kriteria yang harus dipenuhi agar inisiatif ini dianggap berhasil. Buat kriteria yang spesifik dan terukur.
-                              </p>
-                            </PopoverContent>
-                          </Popover>
                         </FormLabel>
-                        <FormControl>
-                          <Textarea 
-                            placeholder="Contoh: 1. Chatbot dapat menjawab minimal 70% pertanyaan FAQ, 2. Response time rata-rata <30 detik, 3. User satisfaction score >4.0, 4. Dokumentasi lengkap tersedia..." 
-                            {...field} 
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <button 
+                              type="button" 
+                              className="inline-flex items-center justify-center"
+                            >
+                              <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                            </button>
+                          </PopoverTrigger>
+                          <PopoverContent side="right" className="max-w-xs">
+                            <p className="text-sm">
+                              Metrik yang akan digunakan untuk mengukur keberhasilan inisiatif ini. Buat metrik yang spesifik dan terukur.
+                            </p>
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setIsSuccessMetricsModalOpen(true)}
+                        className="flex items-center gap-2"
+                      >
+                        <Plus className="w-4 h-4" />
+                        Tambah Metrik
+                      </Button>
+                    </div>
+                    
+                    {/* Success Metrics List */}
+                    {isEditMode && (
+                      <SuccessMetricsList 
+                        initiativeId={initiativeId} 
+                        onEditMetric={(metric) => {
+                          setEditingMetric(metric);
+                          setIsSuccessMetricsModalOpen(true);
+                        }}
+                      />
                     )}
-                  />
+                    
+                    {!isEditMode && (
+                      <div className="border-2 border-dashed border-gray-200 rounded-lg p-6 text-center text-gray-500">
+                        <TrendingUp className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+                        <p className="text-sm mb-2">Metrik akan dapat ditambahkan setelah inisiatif dibuat</p>
+                        <p className="text-xs text-gray-400">Buat inisiatif terlebih dahulu, lalu kelola metrik keberhasilan</p>
+                      </div>
+                    )}
+                  </div>
 
                   <FormField
                     control={form.control}
@@ -713,6 +830,21 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
           </form>
         </Form>
       </DialogContent>
+      
+      {/* Success Metrics Modal */}
+      {isEditMode && (
+        <SuccessMetricsModal
+          open={isSuccessMetricsModalOpen}
+          onOpenChange={(open) => {
+            setIsSuccessMetricsModalOpen(open);
+            if (!open) {
+              setEditingMetric(null);
+            }
+          }}
+          initiativeId={initiativeId}
+          metric={editingMetric}
+        />
+      )}
     </Dialog>
   );
 }
