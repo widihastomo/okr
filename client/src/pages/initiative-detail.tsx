@@ -1921,6 +1921,26 @@ export default function InitiativeDetailPage() {
                   </div>
                   {definitionOfDoneItems && definitionOfDoneItems.length > 0 ? (
                     <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+                      {/* Progress Summary */}
+                      <div className="mb-3 pb-2 border-b border-green-200">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="font-medium text-green-700">
+                            Progress Deliverable
+                          </span>
+                          <span className="text-green-600 font-semibold">
+                            {Math.round((definitionOfDoneItems.filter((item: any) => item.isCompleted).length / definitionOfDoneItems.length) * 100)}% 
+                            ({definitionOfDoneItems.filter((item: any) => item.isCompleted).length}/{definitionOfDoneItems.length})
+                          </span>
+                        </div>
+                        <div className="mt-2 w-full bg-green-100 rounded-full h-2">
+                          <div 
+                            className="bg-green-500 h-2 rounded-full transition-all duration-300" 
+                            style={{ 
+                              width: `${(definitionOfDoneItems.filter((item: any) => item.isCompleted).length / definitionOfDoneItems.length) * 100}%` 
+                            }}
+                          ></div>
+                        </div>
+                      </div>
                       <div className="space-y-2">
                         {definitionOfDoneItems.map(
                           (item: any, index: number) => (
