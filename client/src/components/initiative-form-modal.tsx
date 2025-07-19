@@ -520,7 +520,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                                     placeholder="Contoh: Tingkat Kepuasan Customer"
                                     value={metric.name}
                                     onChange={(e) => updateSuccessMetric(index, "name", e.target.value)}
-                                    className="border-0 shadow-none p-0"
+                                    className="border border-gray-300 p-2"
                                   />
                                 </TableCell>
                                 <TableCell className="text-center">
@@ -528,7 +528,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                                     placeholder="Contoh: 90%"
                                     value={metric.target}
                                     onChange={(e) => updateSuccessMetric(index, "target", e.target.value)}
-                                    className="border-0 shadow-none p-0 text-center"
+                                    className="border border-gray-300 p-2 text-center"
                                   />
                                 </TableCell>
                                 <TableCell className="text-center">
@@ -599,7 +599,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
                           type="button"
                           variant="outline"
                           onClick={addSuccessMetric}
-                          className="w-full flex items-center justify-center gap-2"
+                          className="w-full flex items-center justify-center gap-2 border-blue-600 text-blue-600 hover:bg-blue-50"
                         >
                           <Plus className="w-4 h-4" />
                           Tambah Metrik
