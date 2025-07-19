@@ -397,6 +397,7 @@ export const initiatives = pgTable("initiatives", {
   title: text("title").notNull(),
   description: text("description"),
   implementationPlan: text("implementation_plan"), // Rencana pelaksanaan inisiatif
+  definitionOfDone: text("definition_of_done"), // Definition of Done for the initiative
   status: text("status").notNull().default("draft"), // "draft", "sedang_berjalan", "selesai", "dibatalkan"
   priority: text("priority").notNull().default("medium"), // "low", "medium", "high", "critical"
   picId: uuid("pic_id").references(() => users.id), // Person in Charge

@@ -34,6 +34,11 @@ import {
   Trash2,
   BarChart3,
   Edit,
+  ChevronRight,
+  ChevronLeft,
+  Lightbulb,
+  Settings,
+  User as UserIcon,
 } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -76,6 +81,7 @@ const initiativeFormSchema = z
     title: z.string().min(1, "Judul inisiatif wajib diisi"),
     description: z.string().optional(),
     implementationPlan: z.string().optional(),
+    definitionOfDone: z.string().optional(),
     keyResultId: z.string().min(1, "Angka target wajib dipilih"),
     picId: z.string().min(1, "Penanggung jawab wajib dipilih"),
     startDate: z.date({
@@ -128,6 +134,7 @@ export default function InitiativeFormModal({
   const { user } = useAuth();
 
   const isEditMode = !!initiative;
+  const [currentStep, setCurrentStep] = useState(1);
   const [successMetrics, setSuccessMetrics] = useState<
     Array<{ name: string; target: string }>
   >([]);
@@ -135,6 +142,41 @@ export default function InitiativeFormModal({
   // Get current user ID for default assignment
   const currentUserId =
     user && typeof user === "object" && "id" in user ? (user as any).id : null;
+
+  // Wizard navigation functions
+  const nextStep = async () => {
+    const isValid = await validateCurrentStep();
+    if (isValid) {
+      setCurrentStep((prev) => Math.min(prev + 1, 3));
+    }
+  };
+
+  const prevStep = () => {
+    setCurrentStep((prev) => Math.max(prev - 1, 1));
+  };
+
+  const validateCurrentStep = async (): Promise<boolean> => {
+    const values = form.getValues();
+    
+    switch (currentStep) {
+      case 1:
+        // Step 1 validation: title, keyResultId required
+        const titleValid = await form.trigger("title");
+        const keyResultValid = await form.trigger("keyResultId");
+        return titleValid && keyResultValid;
+      case 2:
+        // Step 2 validation: implementation plan should be provided
+        return true; // Optional fields, no strict validation
+      case 3:
+        // Step 3 validation: dates and PIC required
+        const startDateValid = await form.trigger("startDate");
+        const dueDateValid = await form.trigger("dueDate");
+        const picValid = await form.trigger("picId");
+        return startDateValid && dueDateValid && picValid;
+      default:
+        return true;
+    }
+  };
 
   // Success metrics handlers
   const addMetric = () => {
@@ -290,6 +332,7 @@ export default function InitiativeFormModal({
       title: "",
       description: "",
       implementationPlan: "",
+      definitionOfDone: "",
       keyResultId: keyResultId || "",
       picId: currentUserId || "",
       startDate: new Date(),
@@ -302,6 +345,13 @@ export default function InitiativeFormModal({
     },
   });
 
+  // Reset currentStep when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setCurrentStep(1);
+    }
+  }, [isOpen]);
+
   // Reset form with initiative data when editing
   useEffect(() => {
     if (isEditMode && initiative) {
@@ -309,6 +359,7 @@ export default function InitiativeFormModal({
         title: initiative.title || "",
         description: initiative.description || "",
         implementationPlan: (initiative as any)?.implementationPlan || "",
+        definitionOfDone: (initiative as any)?.definitionOfDone || "",
         keyResultId: initiative.keyResultId || keyResultId || "",
         picId: initiative.picId || "",
         startDate: initiative.startDate
@@ -330,6 +381,8 @@ export default function InitiativeFormModal({
       form.reset({
         title: "",
         description: "",
+        implementationPlan: "",
+        definitionOfDone: "",
         keyResultId: keyResultId || "",
         picId: currentUserId || "",
         startDate: new Date(),
@@ -486,11 +539,69 @@ export default function InitiativeFormModal({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={handleClose}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden">
+          <DialogHeader className="pb-4 border-b">
+            <DialogTitle className="text-xl font-semibold">
               {isEditMode ? "Edit Inisiatif" : "Buat Inisiatif Baru"}
             </DialogTitle>
+            <DialogDescription className="text-sm text-gray-600 mt-2">
+              {currentStep === 1 && "Langkah 1: Informasi Dasar - Tentukan judul, angka target terkait, tujuan, dan metrik inisiatif"}
+              {currentStep === 2 && "Langkah 2: Rencana Pelaksanaan - Atur strategi implementasi dan definisi selesai"}
+              {currentStep === 3 && "Langkah 3: Detail Akhir - Tentukan tanggal, penanggung jawab, anggaran, dan prioritas"}
+            </DialogDescription>
+            
+            {/* Step Indicators */}
+            <div className="flex items-center space-x-4 mt-4">
+              {[1, 2, 3].map((step) => (
+                <div key={step} className="flex items-center">
+                  <div
+                    className={cn(
+                      "flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium",
+                      currentStep === step
+                        ? "bg-orange-600 text-white"
+                        : currentStep > step
+                          ? "bg-green-600 text-white"
+                          : "bg-gray-200 text-gray-600",
+                    )}
+                  >
+                    {currentStep > step ? (
+                      <span className="text-xs">✓</span>
+                    ) : (
+                      step
+                    )}
+                  </div>
+                  <div className="ml-2 text-sm">
+                    {step === 1 && (
+                      <div className="flex items-center">
+                        <Target className="w-4 h-4 mr-1" />
+                        <span className={currentStep === 1 ? "font-medium text-orange-600" : currentStep > 1 ? "text-green-600" : "text-gray-500"}>
+                          Info Dasar
+                        </span>
+                      </div>
+                    )}
+                    {step === 2 && (
+                      <div className="flex items-center">
+                        <Lightbulb className="w-4 h-4 mr-1" />
+                        <span className={currentStep === 2 ? "font-medium text-orange-600" : currentStep > 2 ? "text-green-600" : "text-gray-500"}>
+                          Rencana
+                        </span>
+                      </div>
+                    )}
+                    {step === 3 && (
+                      <div className="flex items-center">
+                        <Settings className="w-4 h-4 mr-1" />
+                        <span className={currentStep === 3 ? "font-medium text-orange-600" : "text-gray-500"}>
+                          Detail Akhir
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  {step < 3 && (
+                    <ChevronRight className="w-4 h-4 text-gray-400 ml-4" />
+                  )}
+                </div>
+              ))}
+            </div>
             <DialogDescription>
               {isEditMode
                 ? "Update informasi inisiatif ini."
@@ -499,356 +610,26 @@ export default function InitiativeFormModal({
           </DialogHeader>
 
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <Card>
-                <CardContent className="space-y-6 pt-6">
-                  {/* Title */}
-                  <FormField
-                    control={form.control}
-                    name="title"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="flex items-center gap-2">
-                          Judul Inisiatif*
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <button
-                                type="button"
-                                className="inline-flex items-center justify-center"
-                              >
-                                <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                              </button>
-                            </PopoverTrigger>
-                            <PopoverContent side="right" className="max-w-xs">
-                              <p className="text-sm">
-                                Nama inisiatif yang akan dijalankan untuk
-                                mencapai angka target.
-                                <br />
-                                <br />
-                                <strong>Contoh:</strong> "Kampanye Digital
-                                Marketing", "Pelatihan Tim Sales", "Optimisasi
-                                Website"
-                              </p>
-                            </PopoverContent>
-                          </Popover>
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Contoh: Aktivasi Reseller Baru Wilayah Timur"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* Key Result Selection */}
-                  <FormField
-                    control={form.control}
-                    name="keyResultId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="flex items-center gap-2">
-                          Angka Target Terkait*
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <button
-                                type="button"
-                                className="inline-flex items-center justify-center"
-                              >
-                                <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                              </button>
-                            </PopoverTrigger>
-                            <PopoverContent side="right" className="max-w-xs">
-                              <p className="text-sm">
-                                Pilih angka target yang akan didukung oleh
-                                inisiatif ini.
-                              </p>
-                            </PopoverContent>
-                          </Popover>
-                        </FormLabel>
-                        <FormControl>
-                          <SearchableKeyResultSelect
-                            keyResults={keyResults}
-                            value={field.value || ""}
-                            onValueChange={field.onChange}
-                            placeholder="Pilih angka target"
-                            objectiveId={objectiveId}
-                            disabled={!!keyResultId}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* Description */}
-                  <FormField
-                    control={form.control}
-                    name="description"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="flex items-center gap-2">
-                          Tujuan Inisiatif?
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <button
-                                type="button"
-                                className="inline-flex items-center justify-center"
-                              >
-                                <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                              </button>
-                            </PopoverTrigger>
-                            <PopoverContent side="right" className="max-w-xs">
-                              <p className="text-sm">
-                                Penjelasan detail tentang inisiatif yang akan
-                                dilakukan, alasan kenapa inisiatif perlu
-                                dilakukan.
-                              </p>
-                            </PopoverContent>
-                          </Popover>
-                        </FormLabel>
-                        <FormControl>
-                          <Textarea
-                            className="min-h-[120px] resize-y"
-                            placeholder="Kenapa Inisiatif perlu dilakuan?
-Contoh : Wilayah timur memiliki potensi pasar yang besar namun kontribusi penjualannya masih rendah. Maka dari itu, mengakselerasi akuisisi reseller aktif di wilayah tersebut dengan pendekatan sistematis berpotensi untuk meningkatakan omset."
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* Implementation Plan */}
-                  <FormField
-                    control={form.control}
-                    name="implementationPlan"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="flex items-center gap-2">
-                          Rencana Pelaksanaan Inisiatif
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <button
-                                type="button"
-                                className="inline-flex items-center justify-center"
-                              >
-                                <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                              </button>
-                            </PopoverTrigger>
-                            <PopoverContent side="right" className="max-w-xs">
-                              <p className="text-sm">
-                                Langkah-langkah konkret yang akan dilakukan untuk
-                                melaksanakan inisiatif ini. Jelaskan tahapan,
-                                aktivitas utama, dan pendekatan yang akan digunakan.
-                              </p>
-                            </PopoverContent>
-                          </Popover>
-                        </FormLabel>
-                        <FormControl>
-                          <Textarea
-                            className="min-h-[120px] resize-y"
-                            placeholder="Bagaimana rencana pelaksanaan inisiatif ini?
-Contoh: 
-Tim akan mulai dengan mengumpulkan database reseller wilayah timur, mengirim starter kit ke 10 reseller terpilih, dan menjadwalkan onboarding melalui Zoom supaya efisien."
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* Success Metrics Section */}
-                  <div className="pt-6 border-t">
-                    <div className="mb-4">
-                      <p className="text-sm text-muted-foreground">
-                        Apa tanda konkret bahwa inisiatif ini berhasil? Buat metrik
-                        yang bisa mengukurnya secara obyektif.
-                      </p>
-                    </div>
-                    
-                    {/* Dynamic Table */}
-                    <div className="border rounded-lg mb-4">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Nama Metrik *</TableHead>
-                            <TableHead>Target *</TableHead>
-                            <TableHead className="w-16">Aksi</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {(successMetrics.length === 0 ? [{ name: "", target: "" }] : successMetrics).map((metric, index) => (
-                            <TableRow key={index}>
-                              <TableCell>
-                                <Input
-                                  value={metric.name}
-                                  onChange={(e) => updateMetric(index, "name", e.target.value)}
-                                  placeholder="Contoh: Tingkat konversi leads"
-                                  className="w-full border-0 focus:ring-1 focus:ring-green-500"
-                                />
-                              </TableCell>
-                              <TableCell>
-                                <Input
-                                  value={metric.target}
-                                  onChange={(e) => updateMetric(index, "target", e.target.value)}
-                                  placeholder="Contoh: 15% atau 100 leads"
-                                  className="w-full border-0 focus:ring-1 focus:ring-green-500"
-                                />
-                              </TableCell>
-                              <TableCell className="text-center">
-                                {successMetrics.length > 1 && (
-                                  <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => removeMetric(index)}
-                                    className="text-red-600 hover:text-red-700 hover:bg-red-100 h-8 w-8 p-0"
-                                  >
-                                    <Trash2 className="w-4 h-4" />
-                                  </Button>
-                                )}
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </div>
-
-                    {/* Tombol Tambah Metrik */}
-                    <Button
-                      type="button"
-                      onClick={addMetric}
-                      variant="outline"
-                      className="w-full border-green-600 text-green-600 hover:bg-green-50"
-                    >
-                      <Plus className="w-4 h-4 mr-2" />
-                      <span className="hidden sm:inline">
-                        Tambah Metrik Keberhasilan
-                      </span>
-                      <span className="sm:hidden">Tambah Metrik</span>
-                    </Button>
-                  </div>
-
-                  {/* Grid for dates */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* Start Date */}
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 overflow-y-auto max-h-[60vh]">
+              
+              {/* Step 1: Info Dasar - judul inisiatif, angka target terkait, tujuan inisiatif, Metrik */}
+              {currentStep === 1 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Target className="w-5 h-5 text-orange-600" />
+                      Informasi Dasar
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    {/* Title */}
                     <FormField
                       control={form.control}
-                      name="startDate"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Tanggal Mulai*</FormLabel>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <FormControl>
-                                <Button
-                                  variant={"outline"}
-                                  className={cn(
-                                    "w-full pl-3 text-left font-normal",
-                                    !field.value && "text-muted-foreground",
-                                  )}
-                                >
-                                  {field.value ? (
-                                    format(field.value, "dd/MM/yyyy", {
-                                      locale: id,
-                                    })
-                                  ) : (
-                                    <span>Pilih tanggal mulai inisiatif</span>
-                                  )}
-                                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                </Button>
-                              </FormControl>
-                            </PopoverTrigger>
-                            <PopoverContent
-                              className="w-auto p-0"
-                              align="start"
-                            >
-                              <Calendar
-                                mode="single"
-                                selected={field.value}
-                                onSelect={field.onChange}
-                                disabled={(date) => {
-                                  // Allow back dating for start date, only prevent very old dates
-                                  return date < new Date("1900-01-01");
-                                }}
-                                initialFocus
-                              />
-                            </PopoverContent>
-                          </Popover>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    {/* Due Date */}
-                    <FormField
-                      control={form.control}
-                      name="dueDate"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Tanggal Selesai*</FormLabel>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <FormControl>
-                                <Button
-                                  variant={"outline"}
-                                  className={cn(
-                                    "w-full pl-3 text-left font-normal",
-                                    !field.value && "text-muted-foreground",
-                                  )}
-                                >
-                                  {field.value ? (
-                                    format(field.value, "dd/MM/yyyy", {
-                                      locale: id,
-                                    })
-                                  ) : (
-                                    <span>Pilih tanggal selesai inisiatif</span>
-                                  )}
-                                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                </Button>
-                              </FormControl>
-                            </PopoverTrigger>
-                            <PopoverContent
-                              className="w-auto p-0"
-                              align="start"
-                            >
-                              <Calendar
-                                mode="single"
-                                selected={field.value}
-                                onSelect={field.onChange}
-                                disabled={(date) => {
-                                  const today = new Date();
-                                  today.setHours(0, 0, 0, 0); // Reset time to start of day
-                                  return (
-                                    date < today ||
-                                    date < new Date("1900-01-01")
-                                  );
-                                }}
-                                initialFocus
-                              />
-                            </PopoverContent>
-                          </Popover>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  {/* Grid for PIC and Budget */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* PIC Selection */}
-                    <FormField
-                      control={form.control}
-                      name="picId"
+                      name="title"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="flex items-center gap-2">
-                            Penanggung Jawab*
+                            Judul Inisiatif*
                             <Popover>
                               <PopoverTrigger asChild>
                                 <button
@@ -860,22 +641,346 @@ Tim akan mulai dengan mengumpulkan database reseller wilayah timur, mengirim sta
                               </PopoverTrigger>
                               <PopoverContent side="right" className="max-w-xs">
                                 <p className="text-sm">
-                                  Pilih orang yang bertanggung jawab untuk
-                                  memimpin dan mengeksekusi inisiatif ini.
+                                  Nama inisiatif yang akan dijalankan untuk
+                                  mencapai angka target.
+                                  <br />
+                                  <br />
+                                  <strong>Contoh:</strong> "Kampanye Digital
+                                  Marketing", "Pelatihan Tim Sales", "Optimisasi
+                                  Website"
                                 </p>
                               </PopoverContent>
                             </Popover>
                           </FormLabel>
                           <FormControl>
+                            <Input
+                              placeholder="Masukkan judul inisiatif..."
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Key Result Selection */}
+                    <FormField
+                      control={form.control}
+                      name="keyResultId"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Angka Target Terkait*</FormLabel>
+                          <FormControl>
+                            <SearchableKeyResultSelect
+                              value={field.value}
+                              onChange={field.onChange}
+                              placeholder="Pilih angka target..."
+                              objectiveId={objectiveId}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Description (Tujuan Inisiatif) */}
+                    <FormField
+                      control={form.control}
+                      name="description"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="flex items-center gap-2">
+                            Tujuan Inisiatif
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <button
+                                  type="button"
+                                  className="inline-flex items-center justify-center"
+                                >
+                                  <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                                </button>
+                              </PopoverTrigger>
+                              <PopoverContent side="right" className="max-w-xs">
+                                <p className="text-sm">
+                                  Jelaskan tujuan dan alasan mengapa inisiatif ini penting
+                                  untuk mencapai angka target.
+                                </p>
+                              </PopoverContent>
+                            </Popover>
+                          </FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="Jelaskan tujuan dan manfaat inisiatif ini..."
+                              rows={3}
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Success Metrics */}
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <BarChart3 className="w-5 h-5 text-orange-600" />
+                          <span className="font-medium">Metrik Kesuksesan</span>
+                        </div>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={addMetric}
+                          className="flex items-center gap-1"
+                        >
+                          <Plus className="w-4 h-4" />
+                          Tambah Metrik
+                        </Button>
+                      </div>
+                      
+                      {successMetrics.length > 0 && (
+                        <div className="space-y-3">
+                          {successMetrics.map((metric, index) => (
+                            <div key={index} className="flex gap-2 items-start">
+                              <div className="flex-1">
+                                <Input
+                                  placeholder="Nama metrik (contoh: Jumlah lead baru)"
+                                  value={metric.name}
+                                  onChange={(e) => updateMetric(index, "name", e.target.value)}
+                                  className="mb-2"
+                                />
+                                <Input
+                                  placeholder="Target (contoh: 100 lead per bulan)"
+                                  value={metric.target}
+                                  onChange={(e) => updateMetric(index, "target", e.target.value)}
+                                />
+                              </div>
+                              {successMetrics.length > 1 && (
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => removeMetric(index)}
+                                  className="text-red-600 hover:text-red-700 mt-1"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Step 2: Rencana Pelaksanaan - Rencana pelaksanaan, definition of done, input task */}
+              {currentStep === 2 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Lightbulb className="w-5 h-5 text-orange-600" />
+                      Rencana Pelaksanaan
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    {/* Implementation Plan */}
+                    <FormField
+                      control={form.control}
+                      name="implementationPlan"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="flex items-center gap-2">
+                            Rencana Pelaksanaan
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <button
+                                  type="button"
+                                  className="inline-flex items-center justify-center"
+                                >
+                                  <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                                </button>
+                              </PopoverTrigger>
+                              <PopoverContent side="right" className="max-w-xs">
+                                <p className="text-sm">
+                                  Langkah-langkah detail yang akan dilakukan untuk 
+                                  menjalankan inisiatif ini.
+                                </p>
+                              </PopoverContent>
+                            </Popover>
+                          </FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="Jelaskan langkah-langkah pelaksanaan inisiatif..."
+                              rows={4}
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Definition of Done */}
+                    <FormField
+                      control={form.control}
+                      name="definitionOfDone"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="flex items-center gap-2">
+                            Definition of Done
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <button
+                                  type="button"
+                                  className="inline-flex items-center justify-center"
+                                >
+                                  <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                                </button>
+                              </PopoverTrigger>
+                              <PopoverContent side="right" className="max-w-xs">
+                                <p className="text-sm">
+                                  Kriteria spesifik yang harus dipenuhi untuk menganggap
+                                  inisiatif ini selesai.
+                                </p>
+                              </PopoverContent>
+                            </Popover>
+                          </FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="Tentukan kriteria selesai yang jelas dan terukur..."
+                              rows={3}
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Task Input Placeholder */}
+                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Settings className="w-4 h-4 text-gray-600" />
+                        <span className="font-medium text-gray-700">Input Task</span>
+                      </div>
+                      <p className="text-sm text-gray-600">
+                        Fitur untuk menambahkan task akan tersedia setelah inisiatif dibuat.
+                        Anda dapat menambahkan dan mengelola task dari halaman detail inisiatif.
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Step 3: Detail Akhir - tanggal mulai, tanggal selesai, penanggung jawab, anggaran, prioritas */}
+              {currentStep === 3 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <UserIcon className="w-5 h-5 text-orange-600" />
+                      Detail Akhir
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    {/* Dates */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="startDate"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Tanggal Mulai*</FormLabel>
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <FormControl>
+                                  <Button
+                                    variant="outline"
+                                    className={cn(
+                                      "w-full pl-3 text-left font-normal",
+                                      !field.value && "text-muted-foreground",
+                                    )}
+                                  >
+                                    {field.value ? (
+                                      format(field.value, "PPP", { locale: id })
+                                    ) : (
+                                      <span>Pilih tanggal mulai</span>
+                                    )}
+                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                  </Button>
+                                </FormControl>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-auto p-0" align="start">
+                                <Calendar
+                                  mode="single"
+                                  selected={field.value}
+                                  onSelect={field.onChange}
+                                  disabled={(date) => date < new Date()}
+                                  initialFocus
+                                />
+                              </PopoverContent>
+                            </Popover>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="dueDate"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Tanggal Selesai*</FormLabel>
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <FormControl>
+                                  <Button
+                                    variant="outline"
+                                    className={cn(
+                                      "w-full pl-3 text-left font-normal",
+                                      !field.value && "text-muted-foreground",
+                                    )}
+                                  >
+                                    {field.value ? (
+                                      format(field.value, "PPP", { locale: id })
+                                    ) : (
+                                      <span>Pilih tanggal selesai</span>
+                                    )}
+                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                  </Button>
+                                </FormControl>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-auto p-0" align="start">
+                                <Calendar
+                                  mode="single"
+                                  selected={field.value}
+                                  onSelect={field.onChange}
+                                  disabled={(date) => date < new Date()}
+                                  initialFocus
+                                />
+                              </PopoverContent>
+                            </Popover>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    {/* PIC */}
+                    <FormField
+                      control={form.control}
+                      name="picId"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Penanggung Jawab*</FormLabel>
+                          <FormControl>
                             <SearchableUserSelect
-                              users={
-                                users?.filter(
-                                  (user) => user.isActive === true,
-                                ) || []
-                              }
-                              value={field.value || ""}
-                              onValueChange={field.onChange}
-                              placeholder="Pilih penanggung jawab"
+                              value={field.value}
+                              onChange={field.onChange}
+                              placeholder="Pilih penanggung jawab..."
+                              currentUser={user}
                             />
                           </FormControl>
                           <FormMessage />
@@ -890,7 +995,7 @@ Tim akan mulai dengan mengumpulkan database reseller wilayah timur, mengirim sta
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="flex items-center gap-2">
-                            Anggaran
+                            Anggaran (Rp)
                             <Popover>
                               <PopoverTrigger asChild>
                                 <button
@@ -927,241 +1032,241 @@ Tim akan mulai dengan mengumpulkan database reseller wilayah timur, mengirim sta
                         </FormItem>
                       )}
                     />
-                  </div>
-                </CardContent>
-              </Card>
 
-              {/* Priority Calculation Card */}
-              <Card>
-                <CardHeader>
-                  <p className="text-sm text-muted-foreground">
-                    Prioritas akan dihitung otomatis berdasarkan dampak, tingkat
-                    kesulitan, dan keyakinan (skala 1-5)
-                  </p>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {/* Impact Score */}
-                    <FormField
-                      control={form.control}
-                      name="impactScore"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="flex items-center gap-2">
-                            Dampak Bisnis
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <button
-                                  type="button"
-                                  className="inline-flex items-center justify-center"
+                    {/* Priority Calculation */}
+                    <Card className="border-2 border-orange-100">
+                      <CardHeader>
+                        <CardTitle className="text-lg flex items-center gap-2">
+                          <Target className="w-5 h-5 text-orange-600" />
+                          Perhitungan Prioritas
+                        </CardTitle>
+                        <p className="text-sm text-muted-foreground">
+                          Prioritas akan dihitung otomatis berdasarkan dampak, tingkat
+                          kesulitan, dan keyakinan (skala 1-5)
+                        </p>
+                      </CardHeader>
+                      <CardContent className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          {/* Impact Score */}
+                          <FormField
+                            control={form.control}
+                            name="impactScore"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="flex items-center gap-2">
+                                  Dampak Bisnis
+                                  <Popover>
+                                    <PopoverTrigger asChild>
+                                      <button
+                                        type="button"
+                                        className="inline-flex items-center justify-center"
+                                      >
+                                        <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                                      </button>
+                                    </PopoverTrigger>
+                                    <PopoverContent side="right" className="max-w-xs">
+                                      <p className="text-sm">
+                                        Seberapa besar dampak inisiatif ini terhadap
+                                        pencapaian angka target dan tujuan bisnis.
+                                        <br />
+                                        <br />
+                                        1 = Sangat Rendah, 5 = Sangat Tinggi
+                                      </p>
+                                    </PopoverContent>
+                                  </Popover>
+                                </FormLabel>
+                                <Select
+                                  onValueChange={(value) => field.onChange(parseInt(value))}
+                                  defaultValue={field.value?.toString()}
                                 >
-                                  <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                                </button>
-                              </PopoverTrigger>
-                              <PopoverContent side="right" className="max-w-xs">
-                                <p className="text-sm">
-                                  Seberapa besar dampak inisiatif ini terhadap
-                                  pencapaian angka target dan tujuan bisnis.
-                                  <br />
-                                  <br />
-                                  <strong>1:</strong> Dampak sangat rendah
-                                  <br />
-                                  <strong>2:</strong> Dampak rendah
-                                  <br />
-                                  <strong>3:</strong> Dampak sedang
-                                  <br />
-                                  <strong>4:</strong> Dampak tinggi
-                                  <br />
-                                  <strong>5:</strong> Dampak sangat tinggi
-                                </p>
-                              </PopoverContent>
-                            </Popover>
-                          </FormLabel>
-                          <Select
-                            onValueChange={(value) =>
-                              field.onChange(parseInt(value))
-                            }
-                            value={field.value?.toString()}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Pilih dampak" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {[1, 2, 3, 4, 5].map((num) => (
-                                <SelectItem key={num} value={num.toString()}>
-                                  {num} - {getScoreLabel(num, "impact")}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Pilih dampak..." />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    {[1, 2, 3, 4, 5].map((score) => (
+                                      <SelectItem key={score} value={score.toString()}>
+                                        {score} - {getScoreLabel(score, "impact")}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
 
-                    {/* Effort Score */}
-                    <FormField
-                      control={form.control}
-                      name="effortScore"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="flex items-center gap-2">
-                            Tingkat Kesulitan
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <button
-                                  type="button"
-                                  className="inline-flex items-center justify-center"
+                          {/* Effort Score */}
+                          <FormField
+                            control={form.control}
+                            name="effortScore"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="flex items-center gap-2">
+                                  Tingkat Kesulitan
+                                  <Popover>
+                                    <PopoverTrigger asChild>
+                                      <button
+                                        type="button"
+                                        className="inline-flex items-center justify-center"
+                                      >
+                                        <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                                      </button>
+                                    </PopoverTrigger>
+                                    <PopoverContent side="right" className="max-w-xs">
+                                      <p className="text-sm">
+                                        Seberapa sulit implementasi inisiatif ini dalam hal
+                                        resource, waktu, dan kompleksitas.
+                                        <br />
+                                        <br />
+                                        1 = Sangat Mudah, 5 = Sangat Sulit
+                                      </p>
+                                    </PopoverContent>
+                                  </Popover>
+                                </FormLabel>
+                                <Select
+                                  onValueChange={(value) => field.onChange(parseInt(value))}
+                                  defaultValue={field.value?.toString()}
                                 >
-                                  <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                                </button>
-                              </PopoverTrigger>
-                              <PopoverContent side="right" className="max-w-xs">
-                                <p className="text-sm">
-                                  Seberapa sulit implementasi inisiatif ini dari
-                                  segi waktu, sumber daya, dan kompleksitas.
-                                  <br />
-                                  <br />
-                                  <strong>1:</strong> Sangat mudah
-                                  <br />
-                                  <strong>2:</strong> Mudah
-                                  <br />
-                                  <strong>3:</strong> Sedang
-                                  <br />
-                                  <strong>4:</strong> Sulit
-                                  <br />
-                                  <strong>5:</strong> Sangat sulit
-                                </p>
-                              </PopoverContent>
-                            </Popover>
-                          </FormLabel>
-                          <Select
-                            onValueChange={(value) =>
-                              field.onChange(parseInt(value))
-                            }
-                            value={field.value?.toString()}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Pilih kesulitan" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {[1, 2, 3, 4, 5].map((num) => (
-                                <SelectItem key={num} value={num.toString()}>
-                                  {num} - {getScoreLabel(num, "effort")}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Pilih kesulitan..." />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    {[1, 2, 3, 4, 5].map((score) => (
+                                      <SelectItem key={score} value={score.toString()}>
+                                        {score} - {getScoreLabel(score, "effort")}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
 
-                    {/* Confidence Score */}
-                    <FormField
-                      control={form.control}
-                      name="confidenceScore"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="flex items-center gap-2">
-                            Tingkat Keyakinan
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <button
-                                  type="button"
-                                  className="inline-flex items-center justify-center"
+                          {/* Confidence Score */}
+                          <FormField
+                            control={form.control}
+                            name="confidenceScore"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="flex items-center gap-2">
+                                  Tingkat Keyakinan
+                                  <Popover>
+                                    <PopoverTrigger asChild>
+                                      <button
+                                        type="button"
+                                        className="inline-flex items-center justify-center"
+                                      >
+                                        <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                                      </button>
+                                    </PopoverTrigger>
+                                    <PopoverContent side="right" className="max-w-xs">
+                                      <p className="text-sm">
+                                        Seberapa yakin Anda bahwa inisiatif ini akan berhasil
+                                        mencapai target yang ditetapkan.
+                                        <br />
+                                        <br />
+                                        1 = Sangat Rendah, 5 = Sangat Tinggi
+                                      </p>
+                                    </PopoverContent>
+                                  </Popover>
+                                </FormLabel>
+                                <Select
+                                  onValueChange={(value) => field.onChange(parseInt(value))}
+                                  defaultValue={field.value?.toString()}
                                 >
-                                  <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                                </button>
-                              </PopoverTrigger>
-                              <PopoverContent side="right" className="max-w-xs">
-                                <p className="text-sm">
-                                  Seberapa yakin Anda bahwa inisiatif ini akan
-                                  berhasil mencapai tujuannya.
-                                  <br />
-                                  <br />
-                                  <strong>1:</strong> Keyakinan sangat rendah
-                                  <br />
-                                  <strong>2:</strong> Keyakinan rendah
-                                  <br />
-                                  <strong>3:</strong> Keyakinan sedang
-                                  <br />
-                                  <strong>4:</strong> Keyakinan tinggi
-                                  <br />
-                                  <strong>5:</strong> Keyakinan sangat tinggi
-                                </p>
-                              </PopoverContent>
-                            </Popover>
-                          </FormLabel>
-                          <Select
-                            onValueChange={(value) =>
-                              field.onChange(parseInt(value))
-                            }
-                            value={field.value?.toString()}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Pilih keyakinan" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {[1, 2, 3, 4, 5].map((num) => (
-                                <SelectItem key={num} value={num.toString()}>
-                                  {num} - {getScoreLabel(num, "confidence")}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Pilih keyakinan..." />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    {[1, 2, 3, 4, 5].map((score) => (
+                                      <SelectItem key={score} value={score.toString()}>
+                                        {score} - {getScoreLabel(score, "confidence")}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
 
-                  {/* Calculated Priority Display */}
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Target className="w-4 h-4 text-blue-600" />
-                      <span className="font-medium text-blue-900">
-                        Prioritas Otomatis
-                      </span>
-                    </div>
-                    <CalculatedPriorityDisplay
-                      impactScore={form.watch("impactScore")}
-                      effortScore={form.watch("effortScore")}
-                      confidenceScore={form.watch("confidenceScore")}
-                    />
-                  </div>
-                </CardContent>
-              </Card>
+                        {/* Calculated Priority Display */}
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Target className="w-4 h-4 text-blue-600" />
+                            <span className="font-medium text-blue-900">
+                              Prioritas Otomatis
+                            </span>
+                          </div>
+                          <CalculatedPriorityDisplay
+                            impactScore={form.watch("impactScore")}
+                            effortScore={form.watch("effortScore")}
+                            confidenceScore={form.watch("confidenceScore")}
+                          />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </CardContent>
+                </Card>
+              )}
 
-              {/* Submit Button */}
-              <div className="flex justify-end gap-2">
-                <Button type="button" variant="outline" onClick={handleClose}>
-                  Batal
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={createInitiativeMutation.isPending}
-                  className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
-                >
-                  {createInitiativeMutation.isPending
-                    ? "Menyimpan..."
-                    : isEditMode
-                      ? "Update Inisiatif"
-                      : "Buat Inisiatif"}
-                </Button>
+              {/* Navigation Buttons */}
+              <div className="flex justify-between items-center border-t pt-4">
+                <div>
+                  {currentStep > 1 && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={prevStep}
+                      className="flex items-center gap-2"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                      Sebelumnya
+                    </Button>
+                  )}
+                </div>
+                
+                <div className="flex gap-2">
+                  <Button type="button" variant="outline" onClick={handleClose}>
+                    Batal
+                  </Button>
+                  
+                  {currentStep < 3 ? (
+                    <Button
+                      type="button"
+                      onClick={nextStep}
+                      className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 flex items-center gap-2"
+                    >
+                      Selanjutnya
+                      <ChevronRight className="w-4 h-4" />
+                    </Button>
+                  ) : (
+                    <Button
+                      type="submit"
+                      disabled={createInitiativeMutation.isPending}
+                      className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
+                    >
+                      {createInitiativeMutation.isPending
+                        ? "Menyimpan..."
+                        : isEditMode
+                          ? "Update Inisiatif"
+                          : "Buat Inisiatif"}
+                    </Button>
+                  )}
+                </div>
               </div>
             </form>
           </Form>
         </DialogContent>
       </Dialog>
-
-
     </>
   );
 }
