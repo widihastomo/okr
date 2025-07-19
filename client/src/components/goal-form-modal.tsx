@@ -453,12 +453,12 @@ export default function GoalFormModal({ goal, open, onOpenChange }: ObjectiveFor
           {/* Step 1 */}
           <div className="flex items-center">
             <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-              currentStep >= 1 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'
+              currentStep >= 1 ? 'bg-orange-600 text-white' : 'bg-gray-200 text-gray-600'
             }`}>
               1
             </div>
             <span className={`ml-2 text-sm font-medium ${
-              currentStep >= 1 ? 'text-blue-600' : 'text-gray-500'
+              currentStep >= 1 ? 'text-orange-600' : 'text-gray-500'
             }`}>
               Informasi Goal
             </span>
@@ -470,12 +470,12 @@ export default function GoalFormModal({ goal, open, onOpenChange }: ObjectiveFor
           {/* Step 2 */}
           <div className="flex items-center">
             <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-              currentStep >= 2 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'
+              currentStep >= 2 ? 'bg-orange-600 text-white' : 'bg-gray-200 text-gray-600'
             }`}>
               2
             </div>
             <span className={`ml-2 text-sm font-medium ${
-              currentStep >= 2 ? 'text-blue-600' : 'text-gray-500'
+              currentStep >= 2 ? 'text-orange-600' : 'text-gray-500'
             }`}>
               Angka Target
             </span>
@@ -531,7 +531,7 @@ export default function GoalFormModal({ goal, open, onOpenChange }: ObjectiveFor
                                 className="inline-flex items-center justify-center"
                                 
                               >
-                                <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                                <HelpCircle className="w-4 h-4 text-orange-500 hover:text-orange-600 cursor-pointer" />
                               </button>
                             </PopoverTrigger>
                             <PopoverContent side="right" className="max-w-xs">
@@ -567,7 +567,7 @@ export default function GoalFormModal({ goal, open, onOpenChange }: ObjectiveFor
                                 className="inline-flex items-center justify-center"
                                 
                               >
-                                <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                                <HelpCircle className="w-4 h-4 text-orange-500 hover:text-orange-600 cursor-pointer" />
                               </button>
                             </PopoverTrigger>
                             <PopoverContent side="right" className="max-w-xs">
@@ -606,7 +606,7 @@ export default function GoalFormModal({ goal, open, onOpenChange }: ObjectiveFor
                                 className="inline-flex items-center justify-center"
                                 
                               >
-                                <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                                <HelpCircle className="w-4 h-4 text-orange-500 hover:text-orange-600 cursor-pointer" />
                               </button>
                             </PopoverTrigger>
                             <PopoverContent side="right" className="max-w-xs">
@@ -650,7 +650,7 @@ export default function GoalFormModal({ goal, open, onOpenChange }: ObjectiveFor
                           
                             <Popover>
                               <PopoverTrigger asChild>
-                                <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                                <HelpCircle className="w-4 h-4 text-orange-500 hover:text-orange-600 cursor-pointer" />
                               </PopoverTrigger>
                               <PopoverContent side="right" className="max-w-xs">
                                 <p className="text-sm">
@@ -690,7 +690,7 @@ export default function GoalFormModal({ goal, open, onOpenChange }: ObjectiveFor
                           
                             <Popover>
                               <PopoverTrigger asChild>
-                                <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                                <HelpCircle className="w-4 h-4 text-orange-500 hover:text-orange-600 cursor-pointer" />
                               </PopoverTrigger>
                               <PopoverContent side="right" className="max-w-xs">
                                 <p className="text-sm">
@@ -751,7 +751,7 @@ export default function GoalFormModal({ goal, open, onOpenChange }: ObjectiveFor
                                 className="inline-flex items-center justify-center"
                                 
                               >
-                                <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                                <HelpCircle className="w-4 h-4 text-orange-500 hover:text-orange-600 cursor-pointer" />
                               </button>
                             </PopoverTrigger>
                             <PopoverContent side="right" className="max-w-xs">
@@ -828,7 +828,7 @@ export default function GoalFormModal({ goal, open, onOpenChange }: ObjectiveFor
                               <TableRow key={index}>
                                 <TableCell>
                                   <div className="flex items-center gap-2">
-                                    <Target className="w-4 h-4 text-blue-600" />
+                                    <Target className="w-4 h-4 text-orange-600" />
                                     <div>
                                       <p className="font-medium">
                                         {keyResult.title || `Angka Target ${index + 1}`}
@@ -902,8 +902,8 @@ export default function GoalFormModal({ goal, open, onOpenChange }: ObjectiveFor
                                 <TableCell className="text-center">
                                   {keyResult.assignedTo ? (
                                     <div className="flex items-center justify-center gap-2">
-                                      <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center">
-                                        <span className="text-xs font-medium text-blue-600">
+                                      <div className="w-6 h-6 rounded-full bg-orange-100 flex items-center justify-center">
+                                        <span className="text-xs font-medium text-orange-600">
                                           {users?.find(u => u.id === keyResult.assignedTo) ? getUserInitials(users.find(u => u.id === keyResult.assignedTo)!) : '?'}
                                         </span>
                                       </div>
@@ -922,7 +922,7 @@ export default function GoalFormModal({ goal, open, onOpenChange }: ObjectiveFor
                                       variant="ghost"
                                       size="sm"
                                       onClick={() => editKeyResult(index)}
-                                      className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                                      className="text-orange-600 hover:text-orange-700 hover:bg-orange-50"
                                     >
                                       <Edit className="w-4 h-4" />
                                     </Button>
