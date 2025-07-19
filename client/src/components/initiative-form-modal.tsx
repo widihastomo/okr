@@ -877,7 +877,7 @@ export default function InitiativeFormModal({
                           <Textarea
                             placeholder="Kenapa inisiatif ini diperlukan?
 Contoh: Wilayah timur memiliki potensi pasar yang besar namun kontribusi penjualannya masih rendah dan masih berpotensi untuk diakselerasi"
-                            className="min-h-[120px] md:min-h-[100px] resize-y"
+                            className="min-h-[140px] resize-y"
                             {...field}
                           />
                         </FormControl>
