@@ -963,9 +963,9 @@ export default function DailyFocusPage() {
   });
 
   const activeKeyResults = filteredKeyResults.filter((kr: any) => {
-    // Include key results that are not completed or cancelled
-    // This allows showing all active key results regardless of progress percentage
-    return kr.status !== "completed" && kr.status !== "cancelled";
+    // Include key results that are not cancelled
+    // This allows showing all active key results including 100% completed ones
+    return kr.status !== "cancelled";
   });
 
   const activeInitiatives = filteredInitiatives.filter((init: any) => {
@@ -1245,7 +1245,7 @@ export default function DailyFocusPage() {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
-                  Angka Target Aktif
+                  Total Angka Target
                 </CardTitle>
                 <Target className="h-4 w-4 text-green-500" />
               </CardHeader>
@@ -1254,7 +1254,7 @@ export default function DailyFocusPage() {
                   {activeKeyResults.length}
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Belum mencapai target
+                  Termasuk yang sudah 100%
                 </p>
               </CardContent>
             </Card>
@@ -1329,7 +1329,7 @@ export default function DailyFocusPage() {
                 <div className="text-lg font-semibold text-blue-700">
                   {activeKeyResults.length}
                 </div>
-                <div className="text-xs text-blue-600">Target Aktif</div>
+                <div className="text-xs text-blue-600">Total Target</div>
               </div>
 
               {/* Streak */}
@@ -1370,7 +1370,7 @@ export default function DailyFocusPage() {
                   <div className="flex items-center gap-1">
                     <Target className="h-4 w-4 text-blue-500" />
                     <span className="text-blue-700">
-                      {activeKeyResults.length} target aktif
+                      {activeKeyResults.length} total target
                     </span>
                   </div>
                 </div>
@@ -2825,7 +2825,7 @@ export default function DailyFocusPage() {
             <CardHeader>
               <CardTitle>Update Progress Angka Target</CardTitle>
               <CardDescription>
-                Lakukan check-in pada angka target yang aktif
+                Lakukan check-in pada angka target (termasuk yang sudah 100%)
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -2865,7 +2865,7 @@ export default function DailyFocusPage() {
               ) : activeKeyResults.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
                   <Target className="h-12 w-12 mx-auto mb-3 text-gray-300" />
-                  <p>Semua angka target sudah tercapai</p>
+                  <p>Tidak ada angka target yang tersedia</p>
                 </div>
               ) : (
                 activeKeyResults.map((kr: any) => {
