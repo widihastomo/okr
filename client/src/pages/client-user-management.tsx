@@ -42,8 +42,10 @@ import { useOrganization } from "@/hooks/useOrganization";
 interface User {
   id: string;
   email: string;
+  name: string;
   firstName: string | null;
   lastName: string | null;
+  profileImageUrl: string | null;
   role: string;
   isActive: boolean;
   organizationId: string | null;
@@ -116,17 +118,27 @@ export default function ClientUserManagement() {
 
   // Helper function to get user display name
   const getUserDisplayName = (user: User) => {
-    if (user.firstName && user.lastName) {
-      return `${user.firstName} ${user.lastName}`;
-    } else if (user.firstName) {
-      return user.firstName;
-    } else if (user.lastName) {
-      return user.lastName;
-    } else {
-      // Extract name from email if available
-      const emailName = user.email.split('@')[0];
-      return emailName || user.email;
+    if (user.name && user.name.trim() !== '') {
+      return user.name.trim();
     }
+    return user.email?.split('@')[0] || 'Unknown';
+  };
+
+  // Helper function to get user profile image URL
+  const getUserProfileImage = (user: User): string | undefined => {
+    if (!user) return undefined;
+    return user?.profileImageUrl || undefined;
+  };
+
+  // Helper function to get user initials
+  const getUserInitials = (user: User): string => {
+    if (!user) return "U";
+    const name = getUserDisplayName(user);
+    const nameParts = name.split(" ");
+    if (nameParts.length >= 2) {
+      return `${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}`.toUpperCase();
+    }
+    return nameParts[0][0].toUpperCase();
   };
 
   // Reset team form
@@ -682,8 +694,12 @@ export default function ClientUserManagement() {
                       <TableCell>
                         <div className="flex items-center space-x-3">
                           <Avatar className="h-8 w-8">
+                            <AvatarImage 
+                              src={getUserProfileImage(user)} 
+                              alt={getUserDisplayName(user)}
+                            />
                             <AvatarFallback className="bg-blue-100 text-blue-700">
-                              {user.name?.charAt(0) || user.email.charAt(0).toUpperCase()}
+                              {getUserInitials(user)}
                             </AvatarFallback>
                           </Avatar>
                           <div>
@@ -844,8 +860,12 @@ export default function ClientUserManagement() {
                                 {selectedOwnerId ? (
                                   <div className="flex items-center gap-2">
                                     <Avatar className="h-5 w-5">
+                                      <AvatarImage 
+                                        src={getUserProfileImage(activeUsers.find(u => u.id === selectedOwnerId)!)} 
+                                        alt={getUserDisplayName(activeUsers.find(u => u.id === selectedOwnerId)!)}
+                                      />
                                       <AvatarFallback className="text-xs">
-                                        {getUserDisplayName(activeUsers.find(u => u.id === selectedOwnerId)!).charAt(0).toUpperCase()}
+                                        {getUserInitials(activeUsers.find(u => u.id === selectedOwnerId)!)}
                                       </AvatarFallback>
                                     </Avatar>
                                     <span>{getUserDisplayName(activeUsers.find(u => u.id === selectedOwnerId)!)}</span>
@@ -887,8 +907,12 @@ export default function ClientUserManagement() {
                                             className="flex items-center gap-2 cursor-pointer"
                                           >
                                             <Avatar className="h-6 w-6">
+                                              <AvatarImage 
+                                                src={getUserProfileImage(user)} 
+                                                alt={displayName}
+                                              />
                                               <AvatarFallback className="text-xs">
-                                                {displayName.charAt(0).toUpperCase()}
+                                                {getUserInitials(user)}
                                               </AvatarFallback>
                                             </Avatar>
                                             <div>
@@ -963,8 +987,12 @@ export default function ClientUserManagement() {
                                             >
                                               <div className="flex items-center gap-2 flex-1">
                                                 <Avatar className="h-6 w-6">
+                                                  <AvatarImage 
+                                                    src={getUserProfileImage(user)} 
+                                                    alt={displayName}
+                                                  />
                                                   <AvatarFallback className="text-xs">
-                                                    {displayName.charAt(0).toUpperCase()}
+                                                    {getUserInitials(user)}
                                                   </AvatarFallback>
                                                 </Avatar>
                                                 <div>
@@ -999,8 +1027,12 @@ export default function ClientUserManagement() {
                                     return (
                                       <Badge key={memberId} variant="secondary" className="bg-orange-100 text-orange-800 border-orange-300 flex items-center gap-1">
                                         <Avatar className="h-4 w-4">
+                                          <AvatarImage 
+                                            src={getUserProfileImage(member)} 
+                                            alt={displayName}
+                                          />
                                           <AvatarFallback className="text-xs">
-                                            {displayName.charAt(0).toUpperCase()}
+                                            {getUserInitials(member)}
                                           </AvatarFallback>
                                         </Avatar>
                                         {displayName}
@@ -1138,8 +1170,12 @@ export default function ClientUserManagement() {
                               </Badge>
                               <div className="flex items-center space-x-2">
                                 <Avatar className="h-7 w-7">
+                                  <AvatarImage 
+                                    src={owner ? getUserProfileImage(owner) : undefined} 
+                                    alt={owner ? getUserDisplayName(owner) : 'Owner'}
+                                  />
                                   <AvatarFallback className="text-xs bg-blue-100 text-blue-700">
-                                    {owner ? getUserDisplayName(owner).charAt(0).toUpperCase() : '?'}
+                                    {owner ? getUserInitials(owner) : '?'}
                                   </AvatarFallback>
                                 </Avatar>
                                 <span className="text-sm font-medium text-gray-900">
@@ -1160,8 +1196,12 @@ export default function ClientUserManagement() {
                                   {teamMembersForTeam.slice(0, 3).map((member) => (
                                     <div key={member.id} className="flex items-center space-x-2">
                                       <Avatar className="h-6 w-6">
+                                        <AvatarImage 
+                                          src={getUserProfileImage(member.user)} 
+                                          alt={getUserDisplayName(member.user)}
+                                        />
                                         <AvatarFallback className="text-xs bg-gray-100 text-gray-700">
-                                          {getUserDisplayName(member.user).charAt(0).toUpperCase()}
+                                          {getUserInitials(member.user)}
                                         </AvatarFallback>
                                       </Avatar>
                                       <span className="text-sm text-gray-700">
