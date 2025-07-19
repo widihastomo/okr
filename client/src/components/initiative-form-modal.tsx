@@ -590,7 +590,7 @@ export default function InitiativeFormModal({
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="flex items-center gap-2">
-                          Kenapa Inisiatif Ini Dibuat?
+                          Tujuan Inisiatif?
                           <Popover>
                             <PopoverTrigger asChild>
                               <button
