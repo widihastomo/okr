@@ -1724,171 +1724,179 @@ export default function InitiativeDetailPage() {
             </CardContent>
           </Card>
 
-          {/* Implementation Plan Card */}
-          {initiativeData.implementationPlan && (
-            <Card className="border-gray-200 shadow-sm lg:col-span-2">
-              <CardHeader className="pb-3">
-                <div className="flex items-center gap-2">
-                  <Rocket className="h-4 w-4 text-blue-500" />
-                  <span className="text-sm font-medium text-gray-700">Rencana Pelaksanaan</span>
-                </div>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <p className="text-gray-600 text-sm leading-relaxed bg-blue-50 p-3 rounded-lg border border-blue-200">
-                  {initiativeData.implementationPlan}
-                </p>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Definition of Done Card */}
-          {definitionOfDoneItems && definitionOfDoneItems.length > 0 && (
-            <Card className="border-gray-200 shadow-sm lg:col-span-2">
-              <CardHeader className="pb-3">
-                <div className="flex items-center gap-2">
-                  <CheckSquare className="h-4 w-4 text-green-500" />
-                  <span className="text-sm font-medium text-gray-700">Definition of Done</span>
-                </div>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <div className="bg-green-50 p-3 rounded-lg border border-green-200">
-                  <div className="space-y-2">
-                    {definitionOfDoneItems.map(
-                      (item: any, index: number) => (
-                        <div
-                          key={item.id || index}
-                          className="flex items-center gap-2"
-                        >
-                          <button
-                            onClick={() => {
-                              if (
-                                initiativeData.status !== "selesai" &&
-                                initiativeData.status !== "dibatalkan"
-                              ) {
-                                toggleDoLItemMutation.mutate({
-                                  itemId: item.id,
-                                  isCompleted: !item.isCompleted,
-                                });
-                              }
-                            }}
-                            disabled={
-                              initiativeData.status === "selesai" ||
-                              initiativeData.status === "dibatalkan"
-                            }
-                            className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-colors hover:opacity-80 ${
-                              item.isCompleted
-                                ? "bg-green-500 border-green-500"
-                                : "border-gray-300 hover:border-green-400"
-                            } ${
-                              initiativeData.status === "selesai" ||
-                              initiativeData.status === "dibatalkan"
-                                ? "cursor-not-allowed opacity-50"
-                                : "cursor-pointer"
-                            }`}
-                          >
-                            {item.isCompleted && (
-                              <Check className="w-3 h-3 text-white" />
-                            )}
-                          </button>
-                          <span
-                            className={`text-sm ${
-                              item.isCompleted
-                                ? "text-green-700 line-through"
-                                : "text-gray-700"
-                            }`}
-                          >
-                            {item.title}
-                          </span>
-                          {item.isCompleted && item.completedAt && (
-                            <span className="text-xs text-green-600 ml-auto">
-                              ✓{" "}
-                              {new Date(
-                                item.completedAt,
-                              ).toLocaleDateString("id-ID")}
-                            </span>
-                          )}
-                        </div>
-                      ),
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Task Management Card */}
+          {/* Implementation & Task Management Card */}
           <Card className="border-gray-200 shadow-sm lg:col-span-2">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <FileText className="h-4 w-4 text-orange-500" />
-                  <span className="text-sm font-medium text-gray-700">Manajemen Task</span>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <button
-                        type="button"
-                        className="inline-flex items-center justify-center ml-1"
-                      >
-                        <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                      </button>
-                    </PopoverTrigger>
-                    <PopoverContent side="right" className="max-w-sm">
-                      <div className="space-y-2">
-                        <h4 className="font-medium text-sm">
-                          Manajemen Task
-                        </h4>
-                        <p className="text-sm text-gray-600">
-                          Task adalah aktivitas spesifik yang harus
-                          diselesaikan untuk mencapai tujuan inisiatif.
-                          Sistem task management membantu Anda:
-                        </p>
-                        <ul className="text-sm text-gray-600 space-y-1 list-disc pl-4">
-                          <li>
-                            Memecah inisiatif besar menjadi langkah-langkah
-                            yang dapat dilakukan
-                          </li>
-                          <li>
-                            Menetapkan prioritas dan tenggat waktu untuk
-                            setiap aktivitas
-                          </li>
-                          <li>
-                            Melacak progress dan status penyelesaian task
-                          </li>
-                          <li>
-                            Mengassign tanggung jawab kepada anggota tim
-                          </li>
-                          <li>
-                            Mengidentifikasi bottleneck dan hambatan dalam
-                            eksekusi
-                          </li>
-                        </ul>
-                        <p className="text-sm text-gray-600 mt-2">
-                          <strong>Status Task:</strong> Belum (Not Started),
-                          Jalan (In Progress), Selesai (Completed), Batal
-                          (Cancelled)
-                        </p>
-                      </div>
-                    </PopoverContent>
-                  </Popover>
+                  <Rocket className="h-4 w-4 text-blue-500" />
+                  <span className="text-sm font-medium text-gray-700">Rencana Pelaksanaan & Task</span>
                 </div>
-                <Button
-                  onClick={() => setIsAddTaskModalOpen(true)}
-                  size="sm"
-                  className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
-                  disabled={
-                    initiativeData.status === "selesai" ||
-                    initiativeData.status === "dibatalkan"
-                  }
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  <span className="hidden sm:inline">Tambah Task</span>
-                  <span className="sm:hidden">Tambah</span>
-                </Button>
               </div>
             </CardHeader>
             <CardContent className="pt-0">
-              {/* Task List */}
-              <div className="space-y-2">
+              <div className="space-y-6">
+                {/* Implementation Plan Section */}
+                {initiativeData.implementationPlan && (
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <Rocket className="h-4 w-4 text-blue-500" />
+                      <span className="text-sm font-medium text-gray-700">
+                        Rencana Pelaksanaan
+                      </span>
+                    </div>
+                    <p className="text-gray-600 text-sm leading-relaxed bg-blue-50 p-3 rounded-lg border border-blue-200">
+                      {initiativeData.implementationPlan}
+                    </p>
+                  </div>
+                )}
+
+                {/* Definition of Done Section */}
+                {definitionOfDoneItems && definitionOfDoneItems.length > 0 && (
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <CheckSquare className="h-4 w-4 text-green-500" />
+                      <span className="text-sm font-medium text-gray-700">
+                        Definition of Done
+                      </span>
+                    </div>
+                    <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+                      <div className="space-y-2">
+                        {definitionOfDoneItems.map(
+                          (item: any, index: number) => (
+                            <div
+                              key={item.id || index}
+                              className="flex items-center gap-2"
+                            >
+                              <button
+                                onClick={() => {
+                                  if (
+                                    initiativeData.status !== "selesai" &&
+                                    initiativeData.status !== "dibatalkan"
+                                  ) {
+                                    toggleDoLItemMutation.mutate({
+                                      itemId: item.id,
+                                      isCompleted: !item.isCompleted,
+                                    });
+                                  }
+                                }}
+                                disabled={
+                                  initiativeData.status === "selesai" ||
+                                  initiativeData.status === "dibatalkan"
+                                }
+                                className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-colors hover:opacity-80 ${
+                                  item.isCompleted
+                                    ? "bg-green-500 border-green-500"
+                                    : "border-gray-300 hover:border-green-400"
+                                } ${
+                                  initiativeData.status === "selesai" ||
+                                  initiativeData.status === "dibatalkan"
+                                    ? "cursor-not-allowed opacity-50"
+                                    : "cursor-pointer"
+                                }`}
+                              >
+                                {item.isCompleted && (
+                                  <Check className="w-3 h-3 text-white" />
+                                )}
+                              </button>
+                              <span
+                                className={`text-sm ${
+                                  item.isCompleted
+                                    ? "text-green-700 line-through"
+                                    : "text-gray-700"
+                                }`}
+                              >
+                                {item.title}
+                              </span>
+                              {item.isCompleted && item.completedAt && (
+                                <span className="text-xs text-green-600 ml-auto">
+                                  ✓{" "}
+                                  {new Date(
+                                    item.completedAt,
+                                  ).toLocaleDateString("id-ID")}
+                                </span>
+                              )}
+                            </div>
+                          ),
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Task Management Section */}
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <FileText className="h-4 w-4 text-orange-500" />
+                      <span className="text-sm font-medium text-gray-700">
+                        Manajemen Task
+                      </span>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <button
+                            type="button"
+                            className="inline-flex items-center justify-center ml-1"
+                          >
+                            <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                          </button>
+                        </PopoverTrigger>
+                        <PopoverContent side="right" className="max-w-sm">
+                          <div className="space-y-2">
+                            <h4 className="font-medium text-sm">
+                              Manajemen Task
+                            </h4>
+                            <p className="text-sm text-gray-600">
+                              Task adalah aktivitas spesifik yang harus
+                              diselesaikan untuk mencapai tujuan inisiatif.
+                              Sistem task management membantu Anda:
+                            </p>
+                            <ul className="text-sm text-gray-600 space-y-1 list-disc pl-4">
+                              <li>
+                                Memecah inisiatif besar menjadi langkah-langkah
+                                yang dapat dilakukan
+                              </li>
+                              <li>
+                                Menetapkan prioritas dan tenggat waktu untuk
+                                setiap aktivitas
+                              </li>
+                              <li>
+                                Melacak progress dan status penyelesaian task
+                              </li>
+                              <li>
+                                Mengassign tanggung jawab kepada anggota tim
+                              </li>
+                              <li>
+                                Mengidentifikasi bottleneck dan hambatan dalam
+                                eksekusi
+                              </li>
+                            </ul>
+                            <p className="text-sm text-gray-600 mt-2">
+                              <strong>Status Task:</strong> Belum (Not Started),
+                              Jalan (In Progress), Selesai (Completed), Batal
+                              (Cancelled)
+                            </p>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                    <Button
+                      onClick={() => setIsAddTaskModalOpen(true)}
+                      size="sm"
+                      className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
+                      disabled={
+                        initiativeData.status === "selesai" ||
+                        initiativeData.status === "dibatalkan"
+                      }
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      <span className="hidden sm:inline">Tambah Task</span>
+                      <span className="sm:hidden">Tambah</span>
+                    </Button>
+                  </div>
+
+                  {/* Task List */}
+                  <div className="space-y-2">
                     {tasks.length === 0 ? (
                       <p className="text-sm text-gray-500 text-center py-2">
                         Belum ada task. Tambahkan task pertama untuk memulai.
@@ -2097,6 +2105,8 @@ export default function InitiativeDetailPage() {
                       ))
                     )}
                   </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
