@@ -347,6 +347,12 @@ The system includes comprehensive database connection troubleshooting tools:
   * ENHANCED: Proper onOpenChange callback handling with conditional close logic
   * REMOVED: Debug console logs after successful fix verification
   * RESULT: Edit Initiative dropdown menu item now properly opens the initiative form modal for editing
+- July 19, 2025. **INITIATIVE EDIT FORM DATA LOADING FIX** - Successfully implemented proper data loading for edit initiative functionality:
+  * ADDED: Queries to fetch existing success metrics and tasks data for edit mode
+  * FIXED: Form initialization now loads existing priority calculation values (impactScore, effortScore, confidenceScore)
+  * ENHANCED: Default values and useEffect properly populate form with fetched success metrics and tasks
+  * UPDATED: Dependency array to include fetched data for proper form updates
+  * RESULT: Edit mode now correctly displays all existing data including metrics, DoD, tasks, and priority sections
 - July 19, 2025. **COMPREHENSIVE INITIATIVE DETAIL DISPLAY** - Successfully added comprehensive information display for initiative description, implementation plan, and definition of done:
   * ADDED: Dedicated description section with FileText icon and gray-themed background styling
   * ADDED: Implementation plan section with Rocket icon and blue-themed background for clear visual distinction

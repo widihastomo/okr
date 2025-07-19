@@ -166,6 +166,17 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
   // Fetch data yang diperlukan
   const { data: keyResults } = useQuery<KeyResult[]>({ queryKey: ["/api/key-results"] });
   const { data: users } = useQuery<User[]>({ queryKey: ["/api/users"] });
+  
+  // Fetch existing success metrics and tasks for edit mode
+  const { data: existingSuccessMetrics } = useQuery({
+    queryKey: [`/api/initiatives/${initiative?.id}/success-metrics`],
+    enabled: !!(isEditMode && initiative?.id),
+  });
+
+  const { data: existingTasks } = useQuery({
+    queryKey: [`/api/initiatives/${initiative?.id}/tasks`],
+    enabled: !!(isEditMode && initiative?.id),
+  });
 
   // Priority calculation functions
   const calculatePriorityScore = (): number => {
@@ -236,11 +247,11 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
         priority: initiative.priority,
         budget: initiative.budget || "",
       },
-      businessImpact: undefined,
-      difficultyLevel: undefined,
-      beliefLevel: undefined,
-      successMetrics: [{ name: "", target: "" }],
-      tasks: [],
+      businessImpact: initiative.impactScore,
+      difficultyLevel: initiative.effortScore,
+      beliefLevel: initiative.confidenceScore,
+      successMetrics: existingSuccessMetrics || [{ name: "", target: "" }],
+      tasks: existingTasks || [],
     } : {
       initiative: {
         title: "",
@@ -287,11 +298,11 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
             priority: initiative.priority,
             budget: initiative.budget || "",
           },
-          businessImpact: undefined,
-          difficultyLevel: undefined,
-          beliefLevel: undefined,
-          successMetrics: [{ name: "", target: "" }],
-          tasks: [],
+          businessImpact: initiative.impactScore,
+          difficultyLevel: initiative.effortScore,
+          beliefLevel: initiative.confidenceScore,
+          successMetrics: existingSuccessMetrics || [{ name: "", target: "" }],
+          tasks: existingTasks || [],
         });
       } else {
         form.reset({
@@ -315,7 +326,7 @@ export default function InitiativeFormModal({ initiative, open, onOpenChange, ke
         });
       }
     }
-  }, [open, initiative, isEditMode, form, keyResultId, user?.id]);
+  }, [open, initiative, isEditMode, form, keyResultId, user?.id, existingSuccessMetrics, existingTasks]);
 
   // Success Metrics management functions
   const addSuccessMetric = () => {
