@@ -429,6 +429,23 @@ export const initiatives = pgTable("initiatives", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Definition of Done items for initiatives
+export const definitionOfDoneItems = pgTable("definition_of_done_items", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  initiativeId: uuid("initiative_id").references(() => initiatives.id, { onDelete: "cascade" }).notNull(),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id), // organization ID for multi-tenant security
+  title: text("title").notNull(), // DoD item description
+  description: text("description"), // Optional detailed description
+  isCompleted: boolean("is_completed").notNull().default(false), // Completion status
+  completedAt: timestamp("completed_at"), // When it was completed
+  completedBy: uuid("completed_by").references(() => users.id), // Who completed it
+  order: integer("order").notNull().default(0), // Display order within initiative
+  createdAt: timestamp("created_at").defaultNow(),
+  createdBy: uuid("created_by").notNull().references(() => users.id), // user ID who created the DoD item
+  updatedAt: timestamp("updated_at").defaultNow(),
+  lastUpdateBy: uuid("last_update_by").references(() => users.id), // user ID who last updated the DoD item
+});
+
 // Simplified initiative collaboration - users can contribute to initiatives
 export const initiativeMembers = pgTable("initiative_members", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -612,6 +629,13 @@ export const insertInitiativeSchema = createInsertSchema(initiatives).omit({
 export const insertInitiativeMemberSchema = createInsertSchema(initiativeMembers).omit({
   id: true,
   joinedAt: true,
+});
+
+export const insertDefinitionOfDoneItemSchema = createInsertSchema(definitionOfDoneItems).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  completedAt: true,
 });
 
 export const insertTaskSchema = createInsertSchema(tasks).omit({
@@ -856,6 +880,7 @@ export type InsertTimelineComment = z.infer<typeof insertTimelineCommentSchema>;
 export type InsertTimelineReaction = z.infer<typeof insertTimelineReactionSchema>;
 export type InsertInitiative = z.infer<typeof insertInitiativeSchema>;
 export type InsertInitiativeMember = z.infer<typeof insertInitiativeMemberSchema>;
+export type InsertDefinitionOfDoneItem = z.infer<typeof insertDefinitionOfDoneItemSchema>;
 export type InsertInitiativeDocument = z.infer<typeof insertInitiativeDocumentSchema>;
 export type InsertTask = z.infer<typeof insertTaskSchema>;
 export type InsertTaskComment = z.infer<typeof insertTaskCommentSchema>;
@@ -879,6 +904,7 @@ export type KeyResult = typeof keyResults.$inferSelect;
 export type CheckIn = typeof checkIns.$inferSelect;
 export type Initiative = typeof initiatives.$inferSelect;
 export type InitiativeMember = typeof initiativeMembers.$inferSelect;
+export type DefinitionOfDoneItem = typeof definitionOfDoneItems.$inferSelect;
 export type InitiativeDocument = typeof initiativeDocuments.$inferSelect;
 export type InitiativeNote = typeof initiativeNotes.$inferSelect;
 export type InitiativeComment = typeof initiativeComments.$inferSelect;

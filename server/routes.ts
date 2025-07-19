@@ -9,7 +9,7 @@ import {
   subscriptionPlans, organizations, organizationSubscriptions, users, dailyReflections, companyOnboardingDataSchema,
   trialAchievements, userTrialAchievements, billingPeriods,
   applicationSettings, insertApplicationSettingSchema, updateApplicationSettingSchema,
-  insertTimelineCommentSchema, insertTimelineReactionSchema,
+  insertTimelineCommentSchema, insertTimelineReactionSchema, insertDefinitionOfDoneItemSchema,
   type User, type SubscriptionPlan, type Organization, type OrganizationSubscription, type UserOnboardingProgress, type UpdateOnboardingProgress, type CompanyOnboardingData,
   type InsertUser, type ApplicationSetting, type InsertApplicationSetting, type UpdateApplicationSetting,
   type TaskAuditTrail, type InsertTaskAuditTrail
@@ -5816,6 +5816,222 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error reopening initiative:", error);
       res.status(500).json({ message: "Failed to reopen initiative" });
+    }
+  });
+
+  // Definition of Done Items routes
+  app.get("/api/initiatives/:initiativeId/definition-of-done", requireAuth, async (req, res) => {
+    try {
+      const { initiativeId } = req.params;
+      const currentUser = req.user as User;
+      
+      // Verify user has access to this initiative
+      const initiative = await storage.getInitiativeWithDetails(initiativeId);
+      if (!initiative) {
+        return res.status(404).json({ message: "Initiative not found" });
+      }
+      
+      if (!currentUser.isSystemOwner && initiative.organizationId !== currentUser.organizationId) {
+        return res.status(403).json({ message: "Access denied to this initiative" });
+      }
+      
+      const items = await storage.getDefinitionOfDoneItems(initiativeId);
+      res.json(items);
+    } catch (error) {
+      console.error("Error fetching definition of done items:", error);
+      res.status(500).json({ message: "Failed to fetch definition of done items" });
+    }
+  });
+
+  app.post("/api/initiatives/:initiativeId/definition-of-done", requireAuth, async (req, res) => {
+    try {
+      const { initiativeId } = req.params;
+      const currentUser = req.user as User;
+      
+      // Verify user has access to this initiative
+      const initiative = await storage.getInitiativeWithDetails(initiativeId);
+      if (!initiative) {
+        return res.status(404).json({ message: "Initiative not found" });
+      }
+      
+      if (!currentUser.isSystemOwner && initiative.organizationId !== currentUser.organizationId) {
+        return res.status(403).json({ message: "Access denied to this initiative" });
+      }
+      
+      const itemData = insertDefinitionOfDoneItemSchema.parse({
+        ...req.body,
+        initiativeId,
+        organizationId: currentUser.organizationId,
+        createdBy: currentUser.id
+      });
+      
+      const newItem = await storage.createDefinitionOfDoneItem(itemData);
+      
+      // Create audit trail for DoD item creation
+      try {
+        await storage.createAuditTrail({
+          entityType: 'initiative',
+          entityId: initiativeId,
+          action: 'dod_item_created',
+          changeDescription: `Definition of Done item ditambahkan: ${newItem.title}`,
+          userId: currentUser.id,
+          organizationId: currentUser.organizationId
+        });
+      } catch (auditError) {
+        console.error('Error creating audit trail for DoD item creation:', auditError);
+      }
+      
+      res.status(201).json(newItem);
+    } catch (error) {
+      console.error("Error creating definition of done item:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create definition of done item" });
+    }
+  });
+
+  app.patch("/api/initiatives/:initiativeId/definition-of-done/:itemId", requireAuth, async (req, res) => {
+    try {
+      const { initiativeId, itemId } = req.params;
+      const currentUser = req.user as User;
+      
+      // Verify user has access to this initiative
+      const initiative = await storage.getInitiativeWithDetails(initiativeId);
+      if (!initiative) {
+        return res.status(404).json({ message: "Initiative not found" });
+      }
+      
+      if (!currentUser.isSystemOwner && initiative.organizationId !== currentUser.organizationId) {
+        return res.status(403).json({ message: "Access denied to this initiative" });
+      }
+      
+      const updateData = insertDefinitionOfDoneItemSchema.partial().parse({
+        ...req.body,
+        lastUpdateBy: currentUser.id
+      });
+      
+      const updatedItem = await storage.updateDefinitionOfDoneItem(itemId, updateData);
+      
+      if (!updatedItem) {
+        return res.status(404).json({ message: "Definition of done item not found" });
+      }
+      
+      // Create audit trail for DoD item update
+      try {
+        await storage.createAuditTrail({
+          entityType: 'initiative',
+          entityId: initiativeId,
+          action: 'dod_item_updated',
+          changeDescription: `Definition of Done item diperbarui: ${updatedItem.title}`,
+          userId: currentUser.id,
+          organizationId: currentUser.organizationId
+        });
+      } catch (auditError) {
+        console.error('Error creating audit trail for DoD item update:', auditError);
+      }
+      
+      res.json(updatedItem);
+    } catch (error) {
+      console.error("Error updating definition of done item:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update definition of done item" });
+    }
+  });
+
+  app.post("/api/initiatives/:initiativeId/definition-of-done/:itemId/toggle", requireAuth, async (req, res) => {
+    try {
+      const { initiativeId, itemId } = req.params;
+      const { isCompleted } = req.body;
+      const currentUser = req.user as User;
+      
+      // Verify user has access to this initiative
+      const initiative = await storage.getInitiativeWithDetails(initiativeId);
+      if (!initiative) {
+        return res.status(404).json({ message: "Initiative not found" });
+      }
+      
+      if (!currentUser.isSystemOwner && initiative.organizationId !== currentUser.organizationId) {
+        return res.status(403).json({ message: "Access denied to this initiative" });
+      }
+      
+      const updatedItem = await storage.toggleDefinitionOfDoneItem(itemId, isCompleted, currentUser.id);
+      
+      if (!updatedItem) {
+        return res.status(404).json({ message: "Definition of done item not found" });
+      }
+      
+      // Create audit trail for DoD item completion toggle
+      try {
+        const action = isCompleted ? 'dod_item_completed' : 'dod_item_uncompleted';
+        const description = isCompleted 
+          ? `Definition of Done item diselesaikan: ${updatedItem.title}`
+          : `Definition of Done item dibatalkan: ${updatedItem.title}`;
+          
+        await storage.createAuditTrail({
+          entityType: 'initiative',
+          entityId: initiativeId,
+          action,
+          changeDescription: description,
+          userId: currentUser.id,
+          organizationId: currentUser.organizationId
+        });
+      } catch (auditError) {
+        console.error('Error creating audit trail for DoD item toggle:', auditError);
+      }
+      
+      res.json(updatedItem);
+    } catch (error) {
+      console.error("Error toggling definition of done item:", error);
+      res.status(500).json({ message: "Failed to toggle definition of done item" });
+    }
+  });
+
+  app.delete("/api/initiatives/:initiativeId/definition-of-done/:itemId", requireAuth, async (req, res) => {
+    try {
+      const { initiativeId, itemId } = req.params;
+      const currentUser = req.user as User;
+      
+      // Verify user has access to this initiative
+      const initiative = await storage.getInitiativeWithDetails(initiativeId);
+      if (!initiative) {
+        return res.status(404).json({ message: "Initiative not found" });
+      }
+      
+      if (!currentUser.isSystemOwner && initiative.organizationId !== currentUser.organizationId) {
+        return res.status(403).json({ message: "Access denied to this initiative" });
+      }
+      
+      // Get item details before deletion for audit trail
+      const items = await storage.getDefinitionOfDoneItems(initiativeId);
+      const itemToDelete = items.find(item => item.id === itemId);
+      
+      const success = await storage.deleteDefinitionOfDoneItem(itemId);
+      
+      if (!success) {
+        return res.status(404).json({ message: "Definition of done item not found" });
+      }
+      
+      // Create audit trail for DoD item deletion
+      try {
+        await storage.createAuditTrail({
+          entityType: 'initiative',
+          entityId: initiativeId,
+          action: 'dod_item_deleted',
+          changeDescription: `Definition of Done item dihapus: ${itemToDelete?.title || 'Unknown item'}`,
+          userId: currentUser.id,
+          organizationId: currentUser.organizationId
+        });
+      } catch (auditError) {
+        console.error('Error creating audit trail for DoD item deletion:', auditError);
+      }
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting definition of done item:", error);
+      res.status(500).json({ message: "Failed to delete definition of done item" });
     }
   });
 
