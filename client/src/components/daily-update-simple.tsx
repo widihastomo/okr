@@ -357,7 +357,7 @@ export function DailyUpdateSimple() {
           Update Harian Instan
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-5xl w-[95vw] max-h-[90vh] overflow-y-auto sm:w-full">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Zap className="h-5 w-5 text-orange-600" />
@@ -369,37 +369,45 @@ export function DailyUpdateSimple() {
         </DialogHeader>
         
         <Tabs defaultValue="tasks" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="tasks" className="flex items-center gap-2">
-              <ListTodo className="h-4 w-4" />
-              Tasks
+          <TabsList className="grid w-full grid-cols-4 h-auto">
+            <TabsTrigger value="tasks" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 p-2 sm:p-3">
+              <div className="flex items-center gap-1">
+                <ListTodo className="h-4 w-4" />
+                <span className="hidden sm:inline">Tasks</span>
+              </div>
               {relevantTasks.length > 0 && (
-                <Badge variant="secondary" className="ml-1">
+                <Badge variant="secondary" className="text-xs">
                   {relevantTasks.length}
                 </Badge>
               )}
             </TabsTrigger>
-            <TabsTrigger value="targets" className="flex items-center gap-2">
-              <Target className="h-4 w-4" />
-              Angka Target
+            <TabsTrigger value="targets" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 p-2 sm:p-3">
+              <div className="flex items-center gap-1">
+                <Target className="h-4 w-4" />
+                <span className="hidden sm:inline">Target</span>
+              </div>
               {updateData.keyResults.length > 0 && (
-                <Badge variant="secondary" className="ml-1">
+                <Badge variant="secondary" className="text-xs">
                   {updateData.keyResults.length}
                 </Badge>
               )}
             </TabsTrigger>
-            <TabsTrigger value="metrics" className="flex items-center gap-2">
-              <TrendingUp className="h-4 w-4" />
-              Metrik & Output
+            <TabsTrigger value="metrics" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 p-2 sm:p-3">
+              <div className="flex items-center gap-1">
+                <TrendingUp className="h-4 w-4" />
+                <span className="hidden sm:inline">Metrik</span>
+              </div>
               {updateData.successMetrics.length > 0 && (
-                <Badge variant="secondary" className="ml-1">
+                <Badge variant="secondary" className="text-xs">
                   {updateData.successMetrics.length}
                 </Badge>
               )}
             </TabsTrigger>
-            <TabsTrigger value="reflection" className="flex items-center gap-2">
-              <Calendar className="h-4 w-4" />
-              Refleksi
+            <TabsTrigger value="reflection" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 p-2 sm:p-3">
+              <div className="flex items-center gap-1">
+                <Calendar className="h-4 w-4" />
+                <span className="hidden sm:inline">Refleksi</span>
+              </div>
             </TabsTrigger>
           </TabsList>
 
@@ -407,22 +415,24 @@ export function DailyUpdateSimple() {
           <TabsContent value="tasks" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center justify-between">
+                <CardTitle className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                   <div className="flex items-center gap-2">
                     <Clock className="h-5 w-5 text-orange-600" />
-                    Bulk Update Tasks
+                    <span className="text-sm sm:text-base">Bulk Update Tasks</span>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     {overdueTasks.length > 0 && (
-                      <Badge variant="destructive" className="flex items-center gap-1">
+                      <Badge variant="destructive" className="flex items-center gap-1 text-xs">
                         <AlertTriangle className="h-3 w-3" />
-                        {overdueTasks.length} Terlambat
+                        <span className="hidden sm:inline">{overdueTasks.length} Terlambat</span>
+                        <span className="sm:hidden">{overdueTasks.length}</span>
                       </Badge>
                     )}
                     {todayTasks.length > 0 && (
-                      <Badge variant="default" className="flex items-center gap-1">
+                      <Badge variant="default" className="flex items-center gap-1 text-xs">
                         <Calendar className="h-3 w-3" />
-                        {todayTasks.length} Hari Ini
+                        <span className="hidden sm:inline">{todayTasks.length} Hari Ini</span>
+                        <span className="sm:hidden">{todayTasks.length}</span>
                       </Badge>
                     )}
                   </div>
@@ -446,35 +456,40 @@ export function DailyUpdateSimple() {
                       return (
                         <div 
                           key={task.id} 
-                          className={`border rounded-lg p-4 transition-colors ${
+                          className={`border rounded-lg p-3 sm:p-4 transition-colors ${
                             isOverdue ? 'bg-red-50 border-red-200' : 
                             isToday ? 'bg-blue-50 border-blue-200' : 
                             'bg-white border-gray-200'
                           }`}
                         >
-                          <div className="flex items-center justify-between">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-2">
-                                <h4 className="font-medium text-gray-900">
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
+                                <h4 className="font-medium text-gray-900 text-sm sm:text-base truncate">
                                   {task.title}
                                 </h4>
-                                {isOverdue && (
-                                  <Badge variant="destructive" className="text-xs">
-                                    <AlertTriangle className="h-3 w-3 mr-1" />
-                                    Terlambat
-                                  </Badge>
-                                )}
-                                {isToday && (
-                                  <Badge variant="default" className="text-xs">
-                                    <Calendar className="h-3 w-3 mr-1" />
-                                    Hari Ini
-                                  </Badge>
-                                )}
+                                <div className="flex gap-2">
+                                  {isOverdue && (
+                                    <Badge variant="destructive" className="text-xs">
+                                      <AlertTriangle className="h-3 w-3 mr-1" />
+                                      <span className="hidden sm:inline">Terlambat</span>
+                                    </Badge>
+                                  )}
+                                  {isToday && (
+                                    <Badge variant="default" className="text-xs">
+                                      <Calendar className="h-3 w-3 mr-1" />
+                                      <span className="hidden sm:inline">Hari Ini</span>
+                                    </Badge>
+                                  )}
+                                </div>
                               </div>
-                              <div className="text-sm text-gray-500">
-                                {task.dueDate && `Due: ${new Date(task.dueDate).toLocaleDateString('id-ID')}`}
-                                <span className="ml-3">
-                                  Status Saat Ini: <span className={`font-medium ${
+                              <div className="text-xs sm:text-sm text-gray-500 space-y-1 sm:space-y-0">
+                                <div>
+                                  {task.dueDate && `Due: ${new Date(task.dueDate).toLocaleDateString('id-ID')}`}
+                                </div>
+                                <div className="sm:ml-3 sm:inline">
+                                  <span className="hidden sm:inline">Status Saat Ini: </span>
+                                  <span className={`font-medium ${
                                     task.status === 'selesai' ? 'text-green-600' :
                                     task.status === 'sedang_berjalan' ? 'text-blue-600' :
                                     task.status === 'dibatalkan' ? 'text-red-600' :
@@ -485,10 +500,10 @@ export function DailyUpdateSimple() {
                                      task.status === 'dibatalkan' ? 'Dibatalkan' :
                                      'Belum Mulai'}
                                   </span>
-                                </span>
+                                </div>
                               </div>
                             </div>
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-3 flex-shrink-0">
                               <Select
                                 value={(() => {
                                   const existingTask = updateData.tasks.find(t => t.id === task.id);
@@ -528,7 +543,7 @@ export function DailyUpdateSimple() {
                                   setUpdateData({ ...updateData, tasks: newTasks });
                                 }}
                               >
-                                <SelectTrigger className="w-40">
+                                <SelectTrigger className="w-full sm:w-40 text-xs sm:text-sm">
                                   <SelectValue placeholder="Pilih status" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -582,8 +597,8 @@ export function DailyUpdateSimple() {
                 ) : (
                   <div className="space-y-4">
                     {updateData.keyResults.map((kr, index) => (
-                      <div key={kr.id} className="border rounded-lg p-4 bg-white">
-                        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+                      <div key={kr.id} className="border rounded-lg p-3 sm:p-4 bg-white">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                           <div className="lg:col-span-1">
                             <h4 className="font-medium text-gray-900 mb-1">{kr.title}</h4>
                             <div className="text-sm text-gray-500">
@@ -615,7 +630,7 @@ export function DailyUpdateSimple() {
                                     keyResults: newKeyResults
                                   }));
                                 }}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 placeholder="Masukkan nilai baru"
                               />
                               <span className="ml-2 text-gray-600 text-sm">
@@ -670,8 +685,8 @@ export function DailyUpdateSimple() {
                 ) : (
                   <div className="space-y-4">
                     {updateData.successMetrics.map((sm, index) => (
-                      <div key={sm.id} className="border rounded-lg p-4 bg-white">
-                        <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+                      <div key={sm.id} className="border rounded-lg p-3 sm:p-4 bg-white">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
                           <div className="lg:col-span-1">
                             <h4 className="font-medium text-gray-900 mb-1">{sm.name}</h4>
                             <div className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
@@ -755,8 +770,8 @@ export function DailyUpdateSimple() {
                 ) : (
                   <div className="space-y-4">
                     {updateData.deliverables.map((deliverable, index) => (
-                      <div key={deliverable.id} className="border rounded-lg p-4 bg-white">
-                        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+                      <div key={deliverable.id} className="border rounded-lg p-3 sm:p-4 bg-white">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                           <div className="lg:col-span-1">
                             <h4 className="font-medium text-gray-900 mb-1">{deliverable.title}</h4>
                             <div className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
@@ -842,7 +857,7 @@ export function DailyUpdateSimple() {
                       reflection: { ...updateData.reflection, whatWorkedWell: e.target.value }
                     })}
                     placeholder="Ceritakan pencapaian, kesuksesan, atau hal positif yang terjadi hari ini..."
-                    className="min-h-[120px] resize-y"
+                    className="min-h-[80px] sm:min-h-[120px] resize-y text-xs sm:text-sm"
                   />
                 </div>
                 <div>
@@ -856,7 +871,7 @@ export function DailyUpdateSimple() {
                       reflection: { ...updateData.reflection, challenges: e.target.value }
                     })}
                     placeholder="Hambatan, kesulitan, atau masalah yang perlu diatasi besok..."
-                    className="min-h-[120px] resize-y"
+                    className="min-h-[80px] sm:min-h-[120px] resize-y text-xs sm:text-sm"
                   />
                 </div>
               </CardContent>
@@ -865,20 +880,21 @@ export function DailyUpdateSimple() {
         </Tabs>
 
         {/* Footer */}
-        <div className="flex justify-end gap-3 pt-6 border-t border-gray-200">
+        <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 pt-4 sm:pt-6 border-t border-gray-200">
           <Button
             variant="outline"
             onClick={() => setIsOpen(false)}
             disabled={submitMutation.isPending}
+            className="w-full sm:w-auto text-sm"
           >
             Batal
           </Button>
           <Button
             onClick={handleSubmit}
             disabled={submitMutation.isPending}
-            className="bg-orange-600 hover:bg-orange-700 text-white"
+            className="w-full sm:w-auto bg-orange-600 hover:bg-orange-700 text-white text-sm"
           >
-            {submitMutation.isPending ? 'Menyimpan...' : 'Simpan Update Harian'}
+            {submitMutation.isPending ? 'Menyimpan...' : 'Simpan Update'}
           </Button>
         </div>
       </DialogContent>
