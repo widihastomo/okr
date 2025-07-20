@@ -21,6 +21,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import { apiRequest } from "@/lib/queryClient";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -50,6 +51,7 @@ export default function MetricsUpdateModal({
 }: MetricsUpdateModalProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const [metricUpdates, setMetricUpdates] = useState<Record<string, string>>({});
   const [deliverableUpdates, setDeliverableUpdates] = useState<Record<string, boolean>>({});
 
@@ -94,7 +96,8 @@ export default function MetricsUpdateModal({
           apiRequest("POST", `/api/success-metrics/${metricId}/updates`, {
             achievement: newValue,
             notes: `Updated via Daily Focus on ${new Date().toLocaleDateString('id-ID')}`,
-            createdBy: "550e8400-e29b-41d4-a716-446655440001", // Current user ID - should be dynamic
+            organizationId: user?.organizationId,
+            createdBy: user?.id,
           })
         );
       });
