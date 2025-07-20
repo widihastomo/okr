@@ -501,7 +501,7 @@ export default function TimelinePage() {
 
                         {/* Detailed Update Information - Always show for check_in, expandable for others */}
                         {(item.type === 'check_in' || expandedDetails[item.id]) && (
-                          <div className="space-y-2 border-t pt-3">
+                          <div className="space-y-2">
                             {/* Tasks Details */}
                           {item.tasksSummary && (
                             <div className="bg-blue-50 rounded-lg p-2">
