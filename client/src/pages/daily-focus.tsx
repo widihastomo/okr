@@ -939,34 +939,56 @@ export default function DailyFocusPage() {
 
   // Filter data for today's focus
   const todayTasks = filteredTasks.filter((task: any) => {
-    // Include tasks due today or in progress tasks
-    return categorizeTaskByDate(task) === 'today' || task.status === "in_progress";
+    // For today's tasks, use startDate if available, otherwise fallback to dueDate
+    // Also include in-progress tasks regardless of date
+    if (task.status === "in_progress") return true;
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    // Check startDate first for today's tasks
+    if (task.startDate) {
+      const startDate = new Date(task.startDate);
+      startDate.setHours(0, 0, 0, 0);
+      if (startDate.getTime() === today.getTime()) return true;
+    }
+    
+    // Fallback to dueDate logic for backward compatibility
+    return categorizeTaskByDate(task) === 'today';
   });
 
   const overdueTasks = filteredTasks.filter((task: any) => {
-    // Only consider tasks overdue if they were due BEFORE today (not including today)
+    // Overdue tasks use dueDate (tasks that were due before today)
     return categorizeTaskByDate(task) === 'overdue';
   });
 
-  // Tomorrow's tasks - tasks due tomorrow
+  // Tomorrow's tasks - use startDate if available, otherwise fallback to dueDate
   const tomorrowTasks = filteredTasks.filter((task: any) => {
-    if (!task.dueDate) return false;
+    if (task.status === "completed" || task.status === "cancelled") return false;
     
     const today = new Date();
-    const dueDate = new Date(task.dueDate);
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
     
     // Reset time to compare only dates
     today.setHours(0, 0, 0, 0);
-    dueDate.setHours(0, 0, 0, 0);
     tomorrow.setHours(0, 0, 0, 0);
     
-    return (
-      dueDate.getTime() === tomorrow.getTime() &&
-      task.status !== "completed" &&
-      task.status !== "cancelled"
-    );
+    // Check startDate first for tomorrow's tasks
+    if (task.startDate) {
+      const startDate = new Date(task.startDate);
+      startDate.setHours(0, 0, 0, 0);
+      return startDate.getTime() === tomorrow.getTime();
+    }
+    
+    // Fallback to dueDate logic for backward compatibility
+    if (task.dueDate) {
+      const dueDate = new Date(task.dueDate);
+      dueDate.setHours(0, 0, 0, 0);
+      return dueDate.getTime() === tomorrow.getTime();
+    }
+    
+    return false;
   });
 
   const activeKeyResults = filteredKeyResults.filter((kr: any) => {

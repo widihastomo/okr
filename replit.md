@@ -341,6 +341,14 @@ The system includes comprehensive database connection troubleshooting tools:
 
 ## Changelog
 ```
+- July 20, 2025. **TASK FILTERING LOGIC ENHANCED** - Successfully improved Daily Focus task categorization logic based on user requirements:
+  * CHANGED: Task terlambat (overdue) continues to use dueDate < today (no change needed)
+  * ENHANCED: Task hari ini (today) now uses startDate = today if available, otherwise fallbacks to dueDate
+  * ENHANCED: Task besok (tomorrow) now uses startDate = tomorrow if available, otherwise fallbacks to dueDate
+  * MAINTAINED: In-progress tasks always appear in today's section regardless of dates
+  * IMPLEMENTED: Backward compatibility with existing tasks that may not have startDate
+  * RESULT: More accurate task scheduling based on when work should start rather than when it's due
+- July 20, 2025. **TASK CREATION ERROR FIXED** - Successfully resolved 400 error when creating tasks by adding missing startDate field handling to API endpoint
 - July 20, 2025. **INITIATIVE STATUS CALCULATION ENHANCEMENT** - Successfully implemented comprehensive initiative status recalculation logic:
   * ADDED: Task deletion now triggers initiative status recalculation 
   * ENHANCED: When tasks are deleted, initiative automatically changes back to "draft" if no tasks remain or all remaining tasks are "not_started"
