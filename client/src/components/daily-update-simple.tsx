@@ -528,7 +528,6 @@ export function DailyUpdateSimple() {
                                   {task.dueDate && `Due: ${new Date(task.dueDate).toLocaleDateString('id-ID')}`}
                                 </div>
                                 <div className="sm:ml-3 sm:inline">
-                                  <span className="hidden sm:inline">Status Saat Ini: </span>
                                   <span className={`font-medium ${
                                     task.status === 'selesai' ? 'text-green-600' :
                                     task.status === 'sedang_berjalan' ? 'text-blue-600' :
