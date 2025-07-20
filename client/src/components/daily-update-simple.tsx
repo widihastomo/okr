@@ -127,6 +127,7 @@ export function DailyUpdateSimple() {
   const { data: successMetrics = [] } = useQuery({
     queryKey: ['/api/success-metrics', initiatives.length > 0 ? initiatives.map(i => i.id).sort().join(',') : 'none'],
     queryFn: async () => {
+      console.log('Success metrics queryFn triggered, initiatives:', initiatives);
       if (initiatives.length === 0) return [];
       
       const allMetrics = [];
@@ -152,12 +153,15 @@ export function DailyUpdateSimple() {
       console.log('Final success metrics:', allMetrics);
       return allMetrics;
     },
-    enabled: initiatives.length > 0
+    enabled: initiatives.length > 0,
+    staleTime: 0, // Force fresh data
+    refetchOnMount: true
   });
 
   const { data: deliverables = [] } = useQuery({
     queryKey: ['/api/deliverables', initiatives.length > 0 ? initiatives.map(i => i.id).sort().join(',') : 'none'],
     queryFn: async () => {
+      console.log('Deliverables queryFn triggered, initiatives:', initiatives);
       if (initiatives.length === 0) return [];
       
       const allDeliverables = [];
@@ -183,7 +187,9 @@ export function DailyUpdateSimple() {
       console.log('Final deliverables:', allDeliverables);
       return allDeliverables;
     },
-    enabled: initiatives.length > 0
+    enabled: initiatives.length > 0,
+    staleTime: 0, // Force fresh data
+    refetchOnMount: true
   });
 
   // Initialize data when modal opens
