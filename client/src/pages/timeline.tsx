@@ -158,24 +158,24 @@ export default function TimelinePage() {
             <TimelineIcon className="w-8 h-8" />
             Activity Timeline
           </h1>
-          <div className="lg:hidden">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowMobileFilters(true)}
-              className="flex items-center gap-2"
-            >
-              <Filter className="w-4 h-4" />
-              Filter
-            </Button>
+          <div className="flex items-center gap-3">
+            <DailyCheckInButton data-tour="timeline-checkin" />
+            <div className="lg:hidden">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowMobileFilters(true)}
+                className="flex items-center gap-2"
+              >
+                <Filter className="w-4 h-4" />
+                Filter
+              </Button>
+            </div>
           </div>
         </div>
         <p className="text-gray-600 text-sm mb-3">
           Timeline aktivitas dan update progress dari tim Anda dalam format feed
         </p>
-        <div className="flex items-center justify-center">
-          <DailyCheckInButton data-tour="timeline-checkin" />
-        </div>
       </div>
 
       <div className="flex gap-6">
