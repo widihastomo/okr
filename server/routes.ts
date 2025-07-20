@@ -3938,16 +3938,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const initiative = await storage.getInitiativeWithDetails(updatedTask.initiativeId);
           console.log(`📋 Initiative found: ${initiative ? 'YES' : 'NO'}, current status: ${initiative?.status}`);
           
+          let initiativeStatusChanged = false;
+          let oldInitiativeStatus = initiative?.status;
+          let newInitiativeStatus = initiative?.status;
+          
           if (status === 'in_progress' || status === 'completed') {
             // Change to "sedang_berjalan" when any task starts or is completed
             console.log(`✅ Task status is ${status}, checking initiative...`);
             if (initiative && initiative.status === 'draft') {
               console.log(`🔄 Updating initiative status from "draft" to "sedang_berjalan"...`);
+              oldInitiativeStatus = 'draft';
+              newInitiativeStatus = 'sedang_berjalan';
               await storage.updateInitiative(updatedTask.initiativeId, {
                 status: 'sedang_berjalan',
                 updatedAt: new Date(),
                 lastUpdateBy: currentUser.id
               });
+              initiativeStatusChanged = true;
               console.log(`🚀 Initiative ${updatedTask.initiativeId} status updated to "sedang_berjalan" due to task progress`);
             } else if (initiative) {
               console.log(`ℹ️ Initiative status is already "${initiative.status}", no update needed`);
@@ -3964,16 +3971,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
             
             if (allTasksNotStarted) {
               console.log(`🔄 Updating initiative status from "sedang_berjalan" to "draft"...`);
+              oldInitiativeStatus = 'sedang_berjalan';
+              newInitiativeStatus = 'draft';
               await storage.updateInitiative(updatedTask.initiativeId, {
                 status: 'draft',
                 updatedAt: new Date(),
                 lastUpdateBy: currentUser.id
               });
+              initiativeStatusChanged = true;
               console.log(`🚀 Initiative ${updatedTask.initiativeId} status updated to "draft" - all tasks back to not_started`);
             }
           } else {
             console.log(`ℹ️ Task status "${status}" requires no initiative update`);
           }
+          
+          // Add status change info to response
+          (updatedTask as any).initiativeStatusChange = initiativeStatusChanged ? {
+            changed: true,
+            oldStatus: oldInitiativeStatus,
+            newStatus: newInitiativeStatus
+          } : { changed: false };
         } catch (error) {
           console.error("Error updating initiative progress:", error);
         }
@@ -4030,6 +4047,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Recalculate initiative status after task deletion
+      let initiativeStatusChange = { changed: false };
       if (initiativeId) {
         try {
           console.log(`🔍 Debug: Task deleted from initiative: ${initiativeId}, recalculating status...`);
@@ -4037,6 +4055,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           if (initiative) {
             console.log(`📋 Initiative found with status: ${initiative.status}`);
+            const oldStatus = initiative.status;
+            let newStatus = initiative.status;
+            let statusChanged = false;
             
             // Check if there are any remaining tasks
             const remainingTasks = initiative.tasks || [];
@@ -4051,6 +4072,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   updatedAt: new Date(),
                   lastUpdateBy: currentUser.id
                 });
+                newStatus = 'draft';
+                statusChanged = true;
                 console.log(`🚀 Initiative ${initiativeId} status updated to "draft" - no tasks remaining`);
               } else {
                 console.log(`ℹ️ Initiative already has draft status, no update needed`);
@@ -4069,6 +4092,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   updatedAt: new Date(),
                   lastUpdateBy: currentUser.id
                 });
+                newStatus = 'draft';
+                statusChanged = true;
                 console.log(`🚀 Initiative ${initiativeId} status updated to "draft" - all remaining tasks not_started/cancelled`);
               } else if (!allTasksInactive && initiative.status === 'draft') {
                 console.log(`🔄 Some tasks are in progress/completed, updating initiative status to "sedang_berjalan"...`);
@@ -4077,10 +4102,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   updatedAt: new Date(),
                   lastUpdateBy: currentUser.id
                 });
+                newStatus = 'sedang_berjalan';
+                statusChanged = true;
                 console.log(`🚀 Initiative ${initiativeId} status updated to "sedang_berjalan" - some tasks active`);
               } else {
                 console.log(`ℹ️ Initiative status "${initiative.status}" is appropriate for current task states`);
               }
+            }
+            
+            if (statusChanged) {
+              initiativeStatusChange = {
+                changed: true,
+                oldStatus,
+                newStatus
+              };
             }
           }
         } catch (error) {
@@ -4088,7 +4123,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      res.status(200).json({ message: "Task deleted successfully" });
+      res.status(200).json({ 
+        message: "Task deleted successfully",
+        initiativeStatusChange
+      });
     } catch (error) {
       console.error("Error deleting task:", error);
       res.status(500).json({ message: "Failed to delete task" });

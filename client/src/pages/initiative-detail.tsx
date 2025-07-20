@@ -946,15 +946,42 @@ export default function InitiativeDetailPage() {
     mutationFn: async (taskId: string) => {
       return apiRequest("DELETE", `/api/tasks/${taskId}`);
     },
-    onSuccess: () => {
+    onSuccess: (data: any) => {
       queryClient.invalidateQueries({
         queryKey: [`/api/initiatives/${id}/tasks`],
       });
+      // Invalidate initiative detail (to refresh status)
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}`] });
+      // Invalidate initiative list (if user navigates back)
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives`] });
+      
+      // Show task deletion toast
       toast({
-        title: "Berhasil",
+        title: "Task berhasil dihapus",
         description: "Task berhasil dihapus",
         variant: "success",
       });
+      
+      // Show initiative status change toast if applicable
+      if (data?.initiativeStatusChange?.changed) {
+        const getStatusLabel = (status: string) => {
+          switch (status) {
+            case 'draft': return 'Draft';
+            case 'sedang_berjalan': return 'Sedang Berjalan';
+            case 'selesai': return 'Selesai';
+            case 'dibatalkan': return 'Dibatalkan';
+            case 'on_hold': return 'Ditunda';
+            default: return status;
+          }
+        };
+        
+        const { oldStatus, newStatus } = data.initiativeStatusChange;
+        toast({
+          title: "Status inisiatif berubah otomatis",
+          description: `Status inisiatif berubah dari "${getStatusLabel(oldStatus)}" ke "${getStatusLabel(newStatus)}" karena task dihapus`,
+          variant: "default",
+        });
+      }
     },
     onError: (error: any) => {
       toast({
@@ -1090,7 +1117,7 @@ export default function InitiativeDetailPage() {
     }) => {
       return await apiRequest("PATCH", `/api/tasks/${taskId}`, { status });
     },
-    onSuccess: () => {
+    onSuccess: (data: any) => {
       // Invalidate task list
       queryClient.invalidateQueries({
         queryKey: [`/api/initiatives/${id}/tasks`],
@@ -1099,11 +1126,34 @@ export default function InitiativeDetailPage() {
       queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}`] });
       // Invalidate initiative list (if user navigates back)
       queryClient.invalidateQueries({ queryKey: [`/api/initiatives`] });
+      
+      // Show task status update toast
       toast({
-        title: "Status berhasil diperbarui",
+        title: "Status task berhasil diperbarui",
         description: "Status task berhasil diperbarui",
         variant: "success",
       });
+      
+      // Show initiative status change toast if applicable
+      if (data?.initiativeStatusChange?.changed) {
+        const getStatusLabel = (status: string) => {
+          switch (status) {
+            case 'draft': return 'Draft';
+            case 'sedang_berjalan': return 'Sedang Berjalan';
+            case 'selesai': return 'Selesai';
+            case 'dibatalkan': return 'Dibatalkan';
+            case 'on_hold': return 'Ditunda';
+            default: return status;
+          }
+        };
+        
+        const { oldStatus, newStatus } = data.initiativeStatusChange;
+        toast({
+          title: "Status inisiatif berubah otomatis",
+          description: `Status inisiatif berubah dari "${getStatusLabel(oldStatus)}" ke "${getStatusLabel(newStatus)}" berdasarkan progress task`,
+          variant: "default",
+        });
+      }
     },
     onError: (error: any) => {
       toast({
