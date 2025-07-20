@@ -66,17 +66,8 @@ export default function TimelinePage() {
   const [dateRangeFilter, setDateRangeFilter] = useState('all');
   const [contentTypeFilter, setContentTypeFilter] = useState('all');
   
-  // Social interaction states with demo data
-  const [reactions, setReactions] = useState<Record<string, { [emoji: string]: number }>>({
-    // Add some demo reactions
-    ...(timelineData?.[0] && {
-      [timelineData[0].id]: {
-        '👍': 3,
-        '🔥': 2,
-        '💪': 1
-      }
-    })
-  });
+  // Social interaction states
+  const [reactions, setReactions] = useState<Record<string, { [emoji: string]: number }>>({});
   const [userReactions, setUserReactions] = useState<Record<string, string>>({});
   const [showReactionPicker, setShowReactionPicker] = useState<Record<string, boolean>>({});
   const [showComments, setShowComments] = useState<Record<string, boolean>>({});
@@ -169,20 +160,7 @@ export default function TimelinePage() {
   }, []);
 
   // Emoji options for coworker expressions
-  const REACTION_EMOJIS = [
-    { emoji: '👍', label: 'Bagus!' },
-    { emoji: '❤️', label: 'Suka' },
-    { emoji: '🎉', label: 'Selamat!' },
-    { emoji: '💪', label: 'Keren!' },
-    { emoji: '🔥', label: 'Mantap!' },
-    { emoji: '👏', label: 'Tepuk tangan' },
-    { emoji: '😍', label: 'Luar biasa' },
-    { emoji: '🚀', label: 'Amazing!' },
-    { emoji: '⭐', label: 'Excellent' },
-    { emoji: '💯', label: 'Perfect!' },
-    { emoji: '👌', label: 'OK' },
-    { emoji: '🤝', label: 'Support' }
-  ];
+  const REACTION_EMOJIS = ['👍', '❤️', '🎉', '💪', '🔥', '👏', '😍', '🚀', '⭐', '💯', '👌', '🤝'];
 
   const handleReaction = (itemId: string, emoji: string) => {
     const currentUserReaction = userReactions[itemId];
@@ -614,17 +592,15 @@ export default function TimelinePage() {
                                   onClick={(e) => e.stopPropagation()}
                                 >
                                   <div className="grid grid-cols-6 gap-1">
-                                    {REACTION_EMOJIS.map((reaction) => (
+                                    {REACTION_EMOJIS.map((emoji) => (
                                       <Button
-                                        key={reaction.emoji}
+                                        key={emoji}
                                         variant="ghost"
                                         size="sm"
-                                        onClick={() => handleReaction(item.id, reaction.emoji)}
-                                        className="flex flex-col items-center p-2 h-auto hover:bg-gray-100 rounded-md transition-all duration-200 hover:scale-105"
-                                        title={reaction.label}
+                                        onClick={() => handleReaction(item.id, emoji)}
+                                        className="flex items-center justify-center p-2 h-10 w-10 hover:bg-gray-100 rounded-md transition-all duration-200 hover:scale-110"
                                       >
-                                        <span className="text-lg mb-1">{reaction.emoji}</span>
-                                        <span className="text-xs text-gray-600">{reaction.label}</span>
+                                        <span className="text-xl">{emoji}</span>
                                       </Button>
                                     ))}
                                   </div>
