@@ -14,8 +14,29 @@ interface LeaderboardProps {
   limit?: number;
 }
 
+interface LeaderboardUser {
+  id: string;
+  userId: string;
+  totalPoints: number;
+  level: number;
+  currentStreak: number;
+  longestStreak: number;
+  lastActivityDate: string;
+  objectivesCompleted: number;
+  keyResultsCompleted: number;
+  checkInsCreated: number;
+  initiativesCreated: number;
+  collaborationScore: number;
+  updatedAt: string;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+  };
+}
+
 export function Leaderboard({ limit = 10 }: LeaderboardProps) {
-  const { data: leaderboard, isLoading } = useQuery({
+  const { data: leaderboard = [], isLoading } = useQuery<LeaderboardUser[]>({
     queryKey: [`/api/gamification/leaderboard?limit=${limit}`],
   });
 

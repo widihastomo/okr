@@ -20,6 +20,7 @@ import { format } from 'date-fns';
 import { getUserInitials } from '@/lib/utils';
 import DailyCheckInButton from '@/components/daily-checkin-button';
 import TimelineIcon from '@/components/ui/timeline-icon';
+import { Leaderboard } from '@/components/gamification/leaderboard';
 import { apiRequest } from '@/lib/queryClient';
 
 interface TimelineItem {
@@ -179,7 +180,7 @@ export default function TimelinePage() {
 
       <div className="flex gap-6">
         {/* Filter Sidebar */}
-        <div className={`${showMobileFilters ? 'fixed inset-0 z-50 bg-white' : 'hidden'} lg:block lg:w-80 lg:flex-shrink-0`}>
+        <div className={`${showMobileFilters ? 'fixed inset-0 z-50 bg-white' : 'hidden'} lg:block lg:w-72 lg:flex-shrink-0`}>
           <div className="h-full bg-white border border-gray-200 rounded-lg overflow-y-auto">
             {/* Mobile header */}
             <div className="lg:hidden flex items-center justify-between p-4 border-b border-gray-200">
@@ -595,6 +596,13 @@ export default function TimelinePage() {
               </div>
             </div>
           )}
+        </div>
+        
+        {/* Leaderboard Sidebar */}
+        <div className="hidden xl:block xl:w-80 xl:flex-shrink-0">
+          <div className="sticky top-6">
+            <Leaderboard limit={8} />
+          </div>
         </div>
       </div>
     </>
