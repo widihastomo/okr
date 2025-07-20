@@ -72,6 +72,14 @@ export default function TimelinePage() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   
+  // Helper function for thousand separator formatting
+  const formatWithThousandSeparator = (value: string | number) => {
+    if (!value && value !== 0) return '';
+    const numValue = typeof value === 'string' ? parseFloat(value) : value;
+    if (isNaN(numValue)) return value.toString();
+    return numValue.toLocaleString('id-ID');
+  };
+  
   // Filter states
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [activityTypeFilter, setActivityTypeFilter] = useState('all');
@@ -558,13 +566,13 @@ export default function TimelinePage() {
                                   <div className="flex items-center justify-between mb-1">
                                     <span className="text-xs font-medium text-purple-800">Progress Capaian:</span>
                                     <span className="text-xs font-bold text-purple-900">
-                                      {item.checkInValue} {item.keyResultUnit || ''}
+                                      {formatWithThousandSeparator(item.checkInValue || '')} {item.keyResultUnit || ''}
                                     </span>
                                   </div>
                                   <div className="flex items-center justify-between mb-2">
                                     <span className="text-xs text-purple-700">Target:</span>
                                     <span className="text-xs text-purple-700">
-                                      {item.keyResultTargetValue} {item.keyResultUnit || ''}
+                                      {formatWithThousandSeparator(item.keyResultTargetValue || '')} {item.keyResultUnit || ''}
                                     </span>
                                   </div>
                                   
