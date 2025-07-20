@@ -111,6 +111,15 @@ export default function InitiativeClosureModal({
   // Initialize metrics, tasks, and DOD when modal opens
   useEffect(() => {
     if (isOpen) {
+      // Reset form to ensure clean state
+      form.reset({
+        result: undefined,
+        reason: "",
+        learningNote: "",
+        budgetUsed: "",
+        notes: "",
+      });
+
       const metricsArray = Array.isArray(successMetrics) ? successMetrics : [];
       const tasksArray = Array.isArray(tasks) ? tasks : [];
       const dodArray = Array.isArray(dodItems) ? dodItems : [];
@@ -141,7 +150,7 @@ export default function InitiativeClosureModal({
         }))
       );
     }
-  }, [isOpen, successMetrics, tasks, dodItems]);
+  }, [isOpen, successMetrics, tasks, dodItems, form]);
 
   const getResultIcon = (result: string) => {
     switch (result) {
