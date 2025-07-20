@@ -341,6 +341,12 @@ The system includes comprehensive database connection troubleshooting tools:
 
 ## Changelog
 ```
+- July 20, 2025. **KEY RESULT UPDATE FIX IN INITIATIVE EDIT** - Successfully fixed initiative updates not changing related key results:
+  * FIXED: Changed edit mode API call from PATCH to PUT endpoint to handle all fields including keyResultId
+  * RESOLVED: PATCH endpoint only handled limited fields (title, description, status, priority, dueDate)
+  * ENHANCED: PUT endpoint properly processes keyResultId, picId, budget, startDate and all initiative fields
+  * IMPROVED: Added console logging for better debugging of edit operations
+  * RESULT: Initiative edits now properly update key result associations and all form fields
 - July 20, 2025. **INITIATIVE FORM SUBMIT BUTTON FIX** - Successfully resolved form submission validation errors preventing button functionality:
   * FIXED: Task dueDate and startDate fields now properly converted to Date objects in edit mode
   * ENHANCED: Added startDate field to task schema for proper validation

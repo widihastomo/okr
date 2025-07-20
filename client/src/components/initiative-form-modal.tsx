@@ -601,11 +601,13 @@ export default function InitiativeFormModal({
         console.log("Initiative form payload:", payload);
 
         if (isEditMode && initiative) {
-          return apiRequest(
-            "PATCH",
+          const result = await apiRequest(
+            "PUT",
             `/api/initiatives/${initiative.id}`,
             payload,
           );
+          console.log("Edit initiative success");
+          return result;
         } else {
           return apiRequest("POST", "/api/initiatives", payload);
         }
@@ -615,6 +617,7 @@ export default function InitiativeFormModal({
       }
     },
     onSuccess: () => {
+      console.log("Closing edit initiative modal");
       toast({
         title: isEditMode
           ? "Inisiatif berhasil diperbarui"
