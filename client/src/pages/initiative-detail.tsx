@@ -1475,7 +1475,7 @@ export default function InitiativeDetailPage() {
                 variant="outline"
                 size="sm"
                 onClick={() => setIsCloseInitiativeModalOpen(true)}
-                className="border-green-300 text-green-600 hover:bg-green-50 hover:border-green-400"
+                className="border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400"
               >
                 <CheckCircle className="w-4 h-4 mr-2" />
                 Tutup Inisiatif
