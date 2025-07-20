@@ -86,7 +86,7 @@ export function DailyUpdateSimple() {
   });
 
   // Filter key results for current user only
-  const keyResults = allKeyResults.filter((kr: any) => kr.assignedTo === user?.id);
+  const keyResults = (allKeyResults as any[]).filter((kr: any) => kr.assignedTo === user?.id);
 
   const { data: allInitiatives = [] } = useQuery({
     queryKey: ['/api/initiatives'],
@@ -94,7 +94,7 @@ export function DailyUpdateSimple() {
 
   // Filter initiatives for current user only (where user is PIC) using useMemo for stability
   const initiatives = useMemo(() => {
-    const filtered = allInitiatives.filter((initiative: any) => initiative.picId === user?.id);
+    const filtered = (allInitiatives as any[]).filter((initiative: any) => initiative.picId === user?.id);
     console.log('All initiatives:', allInitiatives);
     console.log('User ID:', user?.id);
     console.log('Filtered initiatives (user is PIC):', filtered);
@@ -106,7 +106,7 @@ export function DailyUpdateSimple() {
   });
 
   // Filter tasks for current user only
-  const userTasks = allTasks.filter((task: any) => task.assignedTo === user?.id);
+  const userTasks = (allTasks as any[]).filter((task: any) => task.assignedTo === user?.id);
 
   // Filter tasks for today and overdue
   const todayTasks = userTasks.filter((task: any) => {
@@ -252,9 +252,9 @@ export function DailyUpdateSimple() {
     mutationFn: async (data: SimpleUpdateData) => {
       // Update key results
       for (const kr of data.keyResults) {
-        if (kr.newValue !== kr.currentValue) {
+        if (parseFloat(kr.newValue) !== kr.currentValue) {
           await apiRequest('PATCH', `/api/key-results/${kr.id}`, {
-            currentValue: kr.newValue
+            currentValue: parseFloat(kr.newValue)
           });
         }
       }
@@ -724,7 +724,7 @@ export function DailyUpdateSimple() {
                               Nilai Saat Ini
                             </label>
                             <div className="text-lg font-semibold text-gray-900">
-                              {parseFloat(kr.currentValue) || 0}{kr.unit === 'percentage' ? '%' : ` ${kr.unit}`}
+                              {kr.currentValue || 0}{kr.unit === 'percentage' ? '%' : ` ${kr.unit}`}
                             </div>
                           </div>
                           <div className="lg:col-span-1">

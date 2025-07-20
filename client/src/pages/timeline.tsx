@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { getUserInitials } from '@/lib/utils';
-import DailyCheckInButton from '@/components/daily-checkin-button';
+import { DailyUpdateSimple } from '@/components/daily-update-simple';
 import TimelineIcon from '@/components/ui/timeline-icon';
 import { Leaderboard } from '@/components/gamification/leaderboard';
 import { apiRequest } from '@/lib/queryClient';
@@ -271,7 +271,7 @@ export default function TimelinePage() {
             Activity Timeline
           </h1>
           <div className="flex items-center gap-3">
-            <DailyCheckInButton data-tour="timeline-checkin" />
+            <DailyUpdateSimple />
             <div className="lg:hidden">
               <Button
                 variant="outline"
