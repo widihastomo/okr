@@ -433,7 +433,7 @@ export default function TimelinePage() {
                             </span>
                             {item.type === 'check_in' ? (
                               <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-800">
-                                Capaian Key Result
+                                Capaian Angka target
                               </Badge>
                             ) : (
                               <Badge variant="default" className="text-xs">
