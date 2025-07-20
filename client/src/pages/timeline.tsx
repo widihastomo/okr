@@ -264,38 +264,40 @@ export default function TimelinePage() {
   return (
     <>
       {/* Page Header */}
-      <div className="mb-6 bg-white rounded-lg shadow-sm p-4">
-        <div className="flex items-center justify-between mb-2">
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <TimelineIcon className="w-8 h-8" />
-            Activity Timeline
+      <div className="mb-4 md:mb-6 bg-white rounded-lg shadow-sm p-3 md:p-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-2">
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <TimelineIcon className="w-6 h-6 md:w-8 md:h-8" />
+            <span className="hidden sm:inline">Activity Timeline</span>
+            <span className="sm:hidden">Timeline</span>
           </h1>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 md:gap-3">
             <DailyUpdateSimple />
             <div className="lg:hidden">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setShowMobileFilters(true)}
-                className="flex items-center gap-2"
+                className="flex items-center gap-1 text-xs"
               >
                 <Filter className="w-4 h-4" />
-                Filter
+                <span className="hidden xs:inline">Filter</span>
               </Button>
             </div>
           </div>
         </div>
-        <p className="text-gray-600 text-sm mb-3">
+        <p className="text-gray-600 text-xs md:text-sm">
           Timeline aktivitas dan update progress dari tim Anda dalam format feed
         </p>
       </div>
 
-      <div className="flex gap-6">
+      <div className="flex gap-4 lg:gap-6">
         {/* Filter Sidebar */}
         <div className={`${showMobileFilters ? 'fixed inset-0 z-50 bg-white' : 'hidden'} lg:block lg:w-72 lg:flex-shrink-0`}>
-          <div className="h-full bg-white border border-gray-200 rounded-lg overflow-y-auto">
+          <div className="h-full bg-white border border-gray-200 rounded-lg overflow-y-auto"
+               style={{ height: showMobileFilters ? '100vh' : 'auto' }}>
             {/* Mobile header */}
-            <div className="lg:hidden flex items-center justify-between p-4 border-b border-gray-200">
+            <div className="lg:hidden flex items-center justify-between p-3 md:p-4 border-b border-gray-200">
               <h2 className="text-lg font-semibold text-gray-900">Filter Timeline</h2>
               <Button
                 variant="ghost"
@@ -308,9 +310,9 @@ export default function TimelinePage() {
             </div>
 
             {/* Filter Content */}
-            <div className="p-4 space-y-6">
+            <div className="p-3 md:p-4 space-y-4 md:space-y-6">
               {/* Filter Counter */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-2 md:p-3">
                 <div className="text-sm font-medium text-blue-900">
                   Menampilkan {filteredData.length} dari {timelineData.length} aktivitas
                 </div>
@@ -407,74 +409,83 @@ export default function TimelinePage() {
         {/* Main Content */}
         <div className="flex-1 min-w-0">
           {timelineData.length > 0 ? (
-            <div className="space-y-4">
+            <div className="space-y-3 md:space-y-4">
               {filteredData.map((item) => (
                 <Card key={item.id} className="w-full bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden">
                   <CardContent className="p-0">
                     {/* Post Header */}
-                    <div className="p-4 border-b border-gray-100">
-                      <div className="flex items-start space-x-3">
+                    <div className="p-3 md:p-4 border-b border-gray-100">
+                      <div className="flex items-start space-x-2 md:space-x-3">
                         <div className="flex-shrink-0">
                           {item.userProfileImageUrl ? (
                             <img 
                               src={item.userProfileImageUrl} 
                               alt={item.userName}
-                              className="w-10 h-10 rounded-full object-cover"
+                              className="w-8 h-8 md:w-10 md:h-10 rounded-full object-cover"
                             />
                           ) : (
-                            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-green-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                            <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-blue-500 to-green-500 rounded-full flex items-center justify-center text-white font-semibold text-xs md:text-sm">
                               {getUserInitials({ name: item.userName })}
                             </div>
                           )}
                         </div>
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-2">
-                              <h3 className="font-semibold text-gray-900 text-sm">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center space-x-1 md:space-x-2 min-w-0">
+                              <h3 className="font-semibold text-gray-900 text-xs md:text-sm truncate">
                                 {item.userName}
                               </h3>
-                              <span className="text-gray-500 text-xs">•</span>
-                              <span className="text-gray-500 text-xs">
+                              <span className="text-gray-500 text-xs hidden sm:inline">•</span>
+                              <span className="text-gray-500 text-xs hidden sm:inline">
                                 {format(new Date(item.updateDate), "MMM dd, HH:mm")}
                               </span>
                             </div>
-                            {item.type === 'check_in' ? (
-                              <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-800">
-                                Capaian Angka target
-                              </Badge>
-                            ) : (
-                              <Badge variant="default" className="text-xs">
-                                Update Harian
-                              </Badge>
-                            )}
+                            <div className="flex-shrink-0">
+                              {item.type === 'check_in' ? (
+                                <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-800 whitespace-nowrap">
+                                  <span className="hidden sm:inline">Capaian Angka target</span>
+                                  <span className="sm:hidden">Check-in</span>
+                                </Badge>
+                              ) : (
+                                <Badge variant="default" className="text-xs whitespace-nowrap">
+                                  <span className="hidden sm:inline">Update Harian</span>
+                                  <span className="sm:hidden">Update</span>
+                                </Badge>
+                              )}
+                            </div>
                           </div>
-                          <p className="text-gray-700 text-sm mt-1">
-                            {item.type === 'check_in' 
-                              ? (
-                                <span>
-                                  Update capaian: {item.keyResultId ? (
-                                    <Link href={`/key-results/${item.keyResultId}`} className="text-blue-600 hover:text-blue-800 hover:underline font-medium">
-                                      {item.keyResultTitle || 'Key Result'}
-                                    </Link>
-                                  ) : (
-                                    <span className="font-medium">{item.keyResultTitle || 'Key Result'}</span>
-                                  )}
-                                </span>
-                              )
-                              : 'Membagikan update progress harian'
-                            }
-                          </p>
+                          <div className="mt-1">
+                            <span className="text-gray-500 text-xs sm:hidden block">
+                              {format(new Date(item.updateDate), "MMM dd, HH:mm")}
+                            </span>
+                            <p className="text-gray-700 text-xs md:text-sm mt-1">
+                              {item.type === 'check_in' 
+                                ? (
+                                  <span>
+                                    Update capaian: {item.keyResultId ? (
+                                      <Link href={`/key-results/${item.keyResultId}`} className="text-blue-600 hover:text-blue-800 hover:underline font-medium">
+                                        {item.keyResultTitle || 'Key Result'}
+                                      </Link>
+                                    ) : (
+                                      <span className="font-medium">{item.keyResultTitle || 'Key Result'}</span>
+                                    )}
+                                  </span>
+                                )
+                                : 'Membagikan update progress harian'
+                              }
+                            </p>
+                          </div>
                         </div>
                       </div>
                     </div>
 
                     {/* Post Content */}
-                    <div className="p-4">
-                      <div className="space-y-3">
+                    <div className="p-3 md:p-4">
+                      <div className="space-y-2 md:space-y-3">
                         {/* Summary Statistics - Hide for check_in items */}
                         {item.type !== 'check_in' && (
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2 flex-wrap">
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-1 md:gap-2 flex-wrap">
                               {item.tasksUpdated + item.tasksCompleted > 0 && (
                                 <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-800">
                                   📋 {item.tasksUpdated + item.tasksCompleted} tugas
@@ -503,9 +514,10 @@ export default function TimelinePage() {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => toggleDetails(item.id)}
-                                className="flex items-center gap-1 text-xs h-7 px-2 text-gray-500 hover:text-gray-700"
+                                className="flex items-center gap-1 text-xs h-6 md:h-7 px-1 md:px-2 text-gray-500 hover:text-gray-700 flex-shrink-0"
                               >
-                                <span>{expandedDetails[item.id] ? 'Sembunyikan' : 'Lihat Detail'}</span>
+                                <span className="hidden sm:inline">{expandedDetails[item.id] ? 'Sembunyikan' : 'Lihat Detail'}</span>
+                                <span className="sm:hidden">{expandedDetails[item.id] ? 'Tutup' : 'Detail'}</span>
                                 {expandedDetails[item.id] ? (
                                   <ChevronUp className="w-3 h-3" />
                                 ) : (
@@ -521,7 +533,7 @@ export default function TimelinePage() {
                           <div className="space-y-2">
                             {/* Tasks Details */}
                           {item.tasksSummary && (
-                            <div className="bg-blue-50 rounded-lg p-2">
+                            <div className="bg-blue-50 rounded-lg p-2 md:p-3">
                               <div className="flex items-center gap-1 mb-1">
                                 <span className="text-xs font-medium text-blue-800">📋 Tugas ({item.tasksUpdated + item.tasksCompleted})</span>
                                 {item.tasksCompleted > 0 && <span className="bg-green-200 text-green-800 text-xs px-1 rounded">{item.tasksCompleted} selesai</span>}
@@ -697,28 +709,28 @@ export default function TimelinePage() {
                       </div>
 
                       {/* Engagement Section */}
-                      <div className="mt-3 pt-3 border-t border-gray-100">
+                      <div className="mt-3 pt-2 md:pt-3 border-t border-gray-100">
                         <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-3">
+                          <div className="flex items-center space-x-1 md:space-x-3">
                             <Button
                               variant="ghost"
                               size="sm"
                               onClick={() => toggleReaction(item.id)}
-                              className={`flex items-center space-x-1 text-xs h-7 px-2 rounded-full ${
+                              className={`flex items-center space-x-1 text-xs h-6 md:h-7 px-1 md:px-2 rounded-full ${
                                 (timelineReactions[item.id] as any)?.['❤️'] > 0 ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:text-blue-600'
                               }`}
                             >
                               <Heart className={`w-3 h-3 ${(timelineReactions[item.id] as any)?.['❤️'] > 0 ? 'fill-current' : ''}`} />
-                              <span>{(timelineReactions[item.id] as any)?.['❤️'] > 0 ? 'Disukai' : 'Suka'}</span>
+                              <span className="hidden sm:inline">{(timelineReactions[item.id] as any)?.['❤️'] > 0 ? 'Disukai' : 'Suka'}</span>
                             </Button>
                             <Button
                               variant="ghost"
                               size="sm"
                               onClick={() => toggleComments(item.id)}
-                              className="flex items-center space-x-1 text-xs h-7 px-2 rounded-full text-gray-500 hover:text-blue-600"
+                              className="flex items-center space-x-1 text-xs h-6 md:h-7 px-1 md:px-2 rounded-full text-gray-500 hover:text-blue-600"
                             >
                               <MessageCircle className="w-3 h-3" />
-                              <span>Komentar</span>
+                              <span className="hidden sm:inline">Komentar</span>
                             </Button>
                             <div className="relative">
                               {/* Reaction Button */}
@@ -729,28 +741,28 @@ export default function TimelinePage() {
                                   e.stopPropagation();
                                   setShowReactionPicker(prev => ({ ...prev, [item.id]: !prev[item.id] }));
                                 }}
-                                className="flex items-center space-x-1 text-xs h-7 px-2 rounded-full text-gray-500 hover:text-blue-600 hover:bg-gray-100"
+                                className="flex items-center space-x-1 text-xs h-6 md:h-7 px-1 md:px-2 rounded-full text-gray-500 hover:text-blue-600 hover:bg-gray-100"
                               >
                                 <Smile className="w-3 h-3" />
-                                <span>Reaksi</span>
+                                <span className="hidden sm:inline">Reaksi</span>
                               </Button>
 
                               {/* Reaction Picker Dropdown */}
                               {showReactionPicker[item.id] && (
                                 <div 
-                                  className="absolute bottom-full mb-2 left-0 bg-white border border-gray-200 rounded-lg shadow-lg p-2 z-10 min-w-[280px]"
+                                  className="absolute bottom-full mb-2 left-0 bg-white border border-gray-200 rounded-lg shadow-lg p-2 z-10 w-[240px] md:min-w-[280px]"
                                   onClick={(e) => e.stopPropagation()}
                                 >
-                                  <div className="grid grid-cols-6 gap-1">
+                                  <div className="grid grid-cols-5 md:grid-cols-6 gap-1">
                                     {REACTION_EMOJIS.map((emoji) => (
                                       <Button
                                         key={emoji}
                                         variant="ghost"
                                         size="sm"
                                         onClick={() => handleReaction(item.id, emoji)}
-                                        className="flex items-center justify-center p-2 h-10 w-10 hover:bg-gray-100 rounded-md transition-all duration-200 hover:scale-110"
+                                        className="flex items-center justify-center p-1 md:p-2 h-8 w-8 md:h-10 md:w-10 hover:bg-gray-100 rounded-md transition-all duration-200 hover:scale-110"
                                       >
-                                        <span className="text-xl">{emoji}</span>
+                                        <span className="text-lg md:text-xl">{emoji}</span>
                                       </Button>
                                     ))}
                                   </div>
@@ -817,13 +829,13 @@ export default function TimelinePage() {
                                   </div>
                                 )}
                               </div>
-                              <div className="flex-1 flex items-center space-x-2">
+                              <div className="flex-1 flex items-center space-x-1 md:space-x-2">
                                 <div className="flex-1 relative">
                                   <Textarea
                                     placeholder="Tulis komentar..."
                                     value={commentTexts[item.id] || ""}
                                     onChange={(e) => setCommentTexts(prev => ({ ...prev, [item.id]: e.target.value }))}
-                                    className="flex-1 min-h-[36px] resize-none border-gray-300 rounded-full px-3 py-2 text-sm"
+                                    className="flex-1 min-h-[32px] md:min-h-[36px] resize-none border-gray-300 rounded-full px-2 md:px-3 py-1 md:py-2 text-xs md:text-sm"
                                     rows={1}
                                   />
                                 </div>
@@ -832,9 +844,9 @@ export default function TimelinePage() {
                                   disabled={!commentTexts[item.id]?.trim() || addCommentMutation.isPending}
                                   size="sm"
                                   variant="ghost"
-                                  className="p-2 h-8 w-8 rounded-full hover:bg-gray-100"
+                                  className="p-1 md:p-2 h-7 w-7 md:h-8 md:w-8 rounded-full hover:bg-gray-100"
                                 >
-                                  <Send className="w-4 h-4 text-blue-600" />
+                                  <Send className="w-3 h-3 md:w-4 md:h-4 text-blue-600" />
                                 </Button>
                               </div>
                             </div>
@@ -843,16 +855,16 @@ export default function TimelinePage() {
 
                         {/* Reaction Detail Modal */}
                         {showReactionModal[item.id] && (
-                          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                            <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 max-h-[80vh] overflow-hidden">
+                          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2">
+                            <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-2 max-h-[80vh] overflow-hidden">
                               {/* Modal Header */}
-                              <div className="flex items-center justify-between p-4 border-b border-gray-200">
+                              <div className="flex items-center justify-between p-3 md:p-4 border-b border-gray-200">
                                 <h3 className="text-lg font-semibold text-gray-900">Reactions</h3>
                                 <Button
                                   variant="ghost"
                                   size="sm"
                                   onClick={() => setShowReactionModal(prev => ({ ...prev, [item.id]: false }))}
-                                  className="p-1 h-8 w-8 rounded-full hover:bg-gray-100"
+                                  className="p-1 h-7 w-7 md:h-8 md:w-8 rounded-full hover:bg-gray-100"
                                 >
                                   <span className="text-gray-500 text-lg">×</span>
                                 </Button>
@@ -905,15 +917,15 @@ export default function TimelinePage() {
               ))}
             </div>
           ) : (
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 text-center py-12">
-              <TimelineIcon className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 text-center py-8 md:py-12 px-4">
+              <TimelineIcon className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-3 md:mb-4 text-gray-400" />
+              <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-2">
                 Belum ada activity yang ditampilkan
               </h3>
-              <p className="text-gray-600 mb-4">
+              <p className="text-gray-600 mb-3 md:mb-4 text-sm md:text-base">
                 Timeline akan menampilkan update harian dan progress check-in dari tim Anda
               </p>
-              <div className="text-sm text-gray-500">
+              <div className="text-xs md:text-sm text-gray-500">
                 Mulai dengan melakukan check-in atau update harian untuk melihat activity feed
               </div>
             </div>
