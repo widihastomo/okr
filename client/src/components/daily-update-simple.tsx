@@ -28,7 +28,18 @@ interface SimpleUpdateData {
     target: string;
     achievement: string;
     initiativeTitle: string;
+    initiativeId: string;
     newValue: string;
+    notes: string;
+  }>;
+  deliverables: Array<{
+    id: string;
+    title: string;
+    description: string;
+    isCompleted: boolean;
+    initiativeTitle: string;
+    initiativeId: string;
+    newCompleted: boolean;
     notes: string;
   }>;
   tasks: Array<{
@@ -57,6 +68,7 @@ export function DailyUpdateSimple() {
   const initialUpdateData: SimpleUpdateData = {
     keyResults: [],
     successMetrics: [],
+    deliverables: [],
     tasks: [],
     reflection: {
       whatWorkedWell: '',
@@ -115,17 +127,47 @@ export function DailyUpdateSimple() {
       for (const initiative of initiatives) {
         try {
           const metrics = await apiRequest('GET', `/api/initiatives/${initiative.id}/success-metrics`);
+
           if (Array.isArray(metrics)) {
             allMetrics.push(...metrics.map((metric: any) => ({
               ...metric,
-              initiativeTitle: initiative.title
+              initiativeTitle: initiative.title,
+              initiativeId: initiative.id
             })));
           }
         } catch (error) {
           console.error(`Error fetching metrics for initiative ${initiative.id}:`, error);
         }
       }
+
       return allMetrics;
+    },
+    enabled: initiatives.length > 0
+  });
+
+  const { data: deliverables = [] } = useQuery({
+    queryKey: ['/api/deliverables', initiatives.map(i => i.id).join(',')],
+    queryFn: async () => {
+      if (initiatives.length === 0) return [];
+      
+      const allDeliverables = [];
+      for (const initiative of initiatives) {
+        try {
+          const deliverableItems = await apiRequest('GET', `/api/initiatives/${initiative.id}/definition-of-done`);
+
+          if (Array.isArray(deliverableItems)) {
+            allDeliverables.push(...deliverableItems.map((item: any) => ({
+              ...item,
+              initiativeTitle: initiative.title,
+              initiativeId: initiative.id
+            })));
+          }
+        } catch (error) {
+          console.error(`Error fetching deliverables for initiative ${initiative.id}:`, error);
+        }
+      }
+
+      return allDeliverables;
     },
     enabled: initiatives.length > 0
   });
@@ -150,7 +192,18 @@ export function DailyUpdateSimple() {
           target: sm.target || '',
           achievement: sm.achievement || '',
           initiativeTitle: sm.initiativeTitle || '',
+          initiativeId: sm.initiativeId || '',
           newValue: sm.achievement || '',
+          notes: ''
+        })),
+        deliverables: deliverables.map((d: any) => ({
+          id: d.id,
+          title: d.title || '',
+          description: d.description || '',
+          isCompleted: d.isCompleted || false,
+          initiativeTitle: d.initiativeTitle || '',
+          initiativeId: d.initiativeId || '',
+          newCompleted: d.isCompleted || false,
           notes: ''
         })),
         tasks: relevantTasks.map((task: any) => ({
@@ -163,7 +216,7 @@ export function DailyUpdateSimple() {
         totalTasks: relevantTasks.length
       }));
     }
-  }, [isOpen, keyResults, successMetrics, relevantTasks, initiatives, user?.id]);
+  }, [isOpen, keyResults, successMetrics, deliverables, relevantTasks, initiatives, user?.id]);
 
   // Submit mutation
   const submitMutation = useMutation({
@@ -190,6 +243,19 @@ export function DailyUpdateSimple() {
         }
       }
 
+      // Update deliverables
+      for (const deliverable of data.deliverables) {
+        if (deliverable.newCompleted !== deliverable.isCompleted && deliverable.id) {
+          try {
+            await apiRequest('PATCH', `/api/definition-of-done/${deliverable.id}`, {
+              isCompleted: deliverable.newCompleted
+            });
+          } catch (error) {
+            console.error(`Error updating deliverable ${deliverable.id}:`, error);
+          }
+        }
+      }
+
       // Update task statuses based on user selections
       for (const taskUpdate of data.tasks) {
         if (taskUpdate.newStatus !== taskUpdate.currentStatus) {
@@ -208,6 +274,7 @@ export function DailyUpdateSimple() {
             challenges: data.reflection.challenges,
             keyResultUpdates: data.keyResults.filter(kr => kr.notes),
             successMetricUpdates: data.successMetrics.filter(sm => sm.notes),
+            deliverableUpdates: data.deliverables?.filter(d => d.notes) || [],
             tasksCompleted: data.tasks.filter(t => t.newStatus === 'selesai').length
           });
         } catch (error) {
@@ -587,14 +654,14 @@ export function DailyUpdateSimple() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <TrendingUp className="h-5 w-5 text-green-600" />
-                  Bulk Update Metrik & Deliverables
+                  Success Metrics
                 </CardTitle>
                 <div className="text-sm text-gray-600">
                   Update pencapaian success metrics dan deliverables dari inisiatif Anda
                 </div>
               </CardHeader>
               <CardContent>
-                {updateData.successMetrics.length === 0 ? (
+                {(!updateData.successMetrics || updateData.successMetrics.length === 0) ? (
                   <div className="text-center p-8">
                     <TrendingUp className="h-12 w-12 text-gray-400 mx-auto mb-3" />
                     <div className="text-gray-500 font-medium">Tidak ada Success Metrics yang perlu diupdate</div>
@@ -657,6 +724,89 @@ export function DailyUpdateSimple() {
                               }}
                               placeholder="Catatan progress..."
                               className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Deliverables Section */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-blue-600" />
+                  Output/Deliverables
+                </CardTitle>
+                <div className="text-sm text-gray-600">
+                  Update status completion deliverables dari inisiatif Anda
+                </div>
+              </CardHeader>
+              <CardContent>
+                {(!updateData.deliverables || updateData.deliverables.length === 0) ? (
+                  <div className="text-center p-8">
+                    <CheckCircle2 className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                    <div className="text-gray-500 font-medium">Tidak ada Deliverables yang perlu diupdate</div>
+                    <div className="text-sm text-gray-400">Anda belum memiliki output/deliverables dari inisiatif</div>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {updateData.deliverables.map((deliverable, index) => (
+                      <div key={deliverable.id} className="border rounded-lg p-4 bg-white">
+                        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+                          <div className="lg:col-span-1">
+                            <h4 className="font-medium text-gray-900 mb-1">{deliverable.title}</h4>
+                            <div className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                              {deliverable.initiativeTitle}
+                            </div>
+                            {deliverable.description && (
+                              <div className="text-sm text-gray-600 mt-1">
+                                {deliverable.description}
+                              </div>
+                            )}
+                          </div>
+                          <div className="lg:col-span-1">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Status Saat Ini
+                            </label>
+                            <Badge variant={deliverable.isCompleted ? 'default' : 'secondary'}>
+                              {deliverable.isCompleted ? 'Selesai' : 'Belum Selesai'}
+                            </Badge>
+                          </div>
+                          <div className="lg:col-span-1">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Status Baru *
+                            </label>
+                            <select
+                              value={deliverable.newCompleted ? 'true' : 'false'}
+                              onChange={(e) => {
+                                const newDeliverables = [...updateData.deliverables];
+                                newDeliverables[index].newCompleted = e.target.value === 'true';
+                                setUpdateData({ ...updateData, deliverables: newDeliverables });
+                              }}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            >
+                              <option value="false">Belum Selesai</option>
+                              <option value="true">Selesai</option>
+                            </select>
+                          </div>
+                          <div className="lg:col-span-1">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Catatan
+                            </label>
+                            <input
+                              type="text"
+                              value={deliverable.notes || ''}
+                              onChange={(e) => {
+                                const newDeliverables = [...updateData.deliverables];
+                                newDeliverables[index].notes = e.target.value || '';
+                                setUpdateData({ ...updateData, deliverables: newDeliverables });
+                              }}
+                              placeholder="Catatan completion..."
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             />
                           </div>
                         </div>
