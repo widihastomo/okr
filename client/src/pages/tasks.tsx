@@ -200,6 +200,7 @@ const TasksPage = () => {
   };
 
   // Helper function to categorize tasks by due date
+  // Helper function to categorize tasks by date - matching Daily Focus logic
   const categorizeTaskByDate = (task: Task): 'overdue' | 'today' | 'upcoming' => {
     if (!task.dueDate) return 'upcoming';
     
@@ -251,13 +252,75 @@ const TasksPage = () => {
 
   // Group tasks by date categories
   const groupedTasks = useMemo(() => {
-    const overdueTasks = filteredTasks.filter(task => categorizeTaskByDate(task) === 'overdue');
-    const todayTasks = filteredTasks.filter(task => categorizeTaskByDate(task) === 'today');
-    const upcomingTasks = filteredTasks.filter(task => categorizeTaskByDate(task) === 'upcoming');
+    // Overdue tasks use dueDate (tasks that were due before today)
+    const overdueTasks = filteredTasks.filter((task: Task) => {
+      return categorizeTaskByDate(task) === 'overdue';
+    });
+
+    // Today's tasks - use startDate if available, otherwise fallback to dueDate
+    // Also include in-progress tasks regardless of date
+    const todayTasks = filteredTasks.filter((task: Task) => {
+      if (task.status === "in_progress") return true;
+      
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      // Check startDate first for today's tasks
+      if (task.startDate) {
+        const startDate = new Date(task.startDate);
+        startDate.setHours(0, 0, 0, 0);
+        if (startDate.getTime() === today.getTime()) return true;
+      }
+      
+      // Fallback to dueDate logic for backward compatibility
+      return categorizeTaskByDate(task) === 'today';
+    });
+
+    // Tomorrow's tasks - use startDate if available, otherwise fallback to dueDate
+    const tomorrowTasks = filteredTasks.filter((task: Task) => {
+      if (task.status === "completed" || task.status === "cancelled") return false;
+      
+      const today = new Date();
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      
+      // Reset time to compare only dates
+      today.setHours(0, 0, 0, 0);
+      tomorrow.setHours(0, 0, 0, 0);
+      
+      // Check startDate first for tomorrow's tasks
+      if (task.startDate) {
+        const startDate = new Date(task.startDate);
+        startDate.setHours(0, 0, 0, 0);
+        return startDate.getTime() === tomorrow.getTime();
+      }
+      
+      // Fallback to dueDate logic for backward compatibility
+      if (task.dueDate) {
+        const dueDate = new Date(task.dueDate);
+        dueDate.setHours(0, 0, 0, 0);
+        return dueDate.getTime() === tomorrow.getTime();
+      }
+      
+      return false;
+    });
+
+    // Upcoming tasks (excluding overdue, today, and tomorrow)
+    const upcomingTasks = filteredTasks.filter((task: Task) => {
+      if (task.status === "completed" || task.status === "cancelled") return false;
+      
+      // Exclude tasks that are in other categories
+      const isOverdue = categorizeTaskByDate(task) === 'overdue';
+      const isToday = todayTasks.includes(task);
+      const isTomorrow = tomorrowTasks.includes(task);
+      
+      return !isOverdue && !isToday && !isTomorrow;
+    });
     
     return {
       overdue: overdueTasks,
       today: todayTasks,
+      tomorrow: tomorrowTasks,
       upcoming: upcomingTasks
     };
   }, [filteredTasks]);
@@ -820,6 +883,7 @@ const TasksPage = () => {
     const categories = [
       { key: 'overdue', title: 'Terlambat', tasks: groupedTasks.overdue, color: 'text-red-600' },
       { key: 'today', title: 'Hari Ini', tasks: groupedTasks.today, color: 'text-blue-600' },
+      { key: 'tomorrow', title: 'Besok', tasks: groupedTasks.tomorrow, color: 'text-green-600' },
       { key: 'upcoming', title: 'Akan Datang', tasks: groupedTasks.upcoming, color: 'text-gray-600' }
     ];
 
