@@ -25,6 +25,7 @@ import DailyCheckInButton from '@/components/daily-checkin-button';
 import TimelineIcon from '@/components/ui/timeline-icon';
 import { Leaderboard } from '@/components/gamification/leaderboard';
 import { apiRequest } from '@/lib/queryClient';
+import { useToast } from '@/hooks/use-toast';
 
 interface TimelineItem {
   id: string;
@@ -71,6 +72,7 @@ interface TimelineItem {
 export default function TimelinePage() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const { toast } = useToast();
   
   // Helper function for thousand separator formatting
   const formatWithThousandSeparator = (value: string | number) => {
@@ -87,10 +89,7 @@ export default function TimelinePage() {
   const [dateRangeFilter, setDateRangeFilter] = useState('all');
   const [contentTypeFilter, setContentTypeFilter] = useState('all');
   
-  // Social interaction states
-  const [reactions, setReactions] = useState<Record<string, { [emoji: string]: number }>>({});
-  const [userReactions, setUserReactions] = useState<Record<string, string>>({});
-  const [reactionUsers, setReactionUsers] = useState<Record<string, { [emoji: string]: string[] }>>({});
+  // Social interaction states - now using API data
   const [showReactionPicker, setShowReactionPicker] = useState<Record<string, boolean>>({});
   const [showComments, setShowComments] = useState<Record<string, boolean>>({});
   const [showReactionModal, setShowReactionModal] = useState<Record<string, boolean>>({});
@@ -103,6 +102,98 @@ export default function TimelinePage() {
   const { data: timelineData = [], isLoading } = useQuery<TimelineItem[]>({
     queryKey: ['/api/timeline'],
   });
+
+  // Fetch comments for timeline items
+  const { data: timelineComments = {} } = useQuery({
+    queryKey: ['/api/timeline/comments'],
+    enabled: timelineData.length > 0,
+  });
+
+  // Fetch reactions for timeline items
+  const { data: timelineReactions = {} } = useQuery({
+    queryKey: ['/api/timeline/reactions'],
+    enabled: timelineData.length > 0,
+  });
+
+  // Mutation for adding comments
+  const addCommentMutation = useMutation({
+    mutationFn: async ({ checkInId, content }: { checkInId: string; content: string }) => {
+      return apiRequest(`/api/timeline/${checkInId}/comments`, {
+        method: 'POST',
+        body: { content }
+      });
+    },
+    onSuccess: (_, { checkInId }) => {
+      setCommentTexts(prev => ({ ...prev, [checkInId]: '' }));
+      queryClient.invalidateQueries({ queryKey: ['/api/timeline/comments'] });
+      toast({
+        title: "Berhasil",
+        description: "Komentar berhasil ditambahkan",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Gagal menambahkan komentar",
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Mutation for reactions
+  const reactionMutation = useMutation({
+    mutationFn: async ({ checkInId, emoji }: { checkInId: string; emoji: string }) => {
+      return apiRequest(`/api/timeline/${checkInId}/reactions`, {
+        method: 'POST',
+        body: { type: emoji }
+      });
+    },
+    onSuccess: (response, { checkInId, emoji }) => {
+      setShowReactionPicker(prev => ({ ...prev, [checkInId]: false }));
+      queryClient.invalidateQueries({ queryKey: ['/api/timeline/reactions'] });
+      
+      // Show appropriate toast message
+      if (response.action === 'added') {
+        toast({
+          title: "Berhasil",
+          description: "Reaksi berhasil ditambahkan",
+        });
+      } else if (response.action === 'removed') {
+        toast({
+          title: "Berhasil", 
+          description: "Reaksi berhasil dihapus",
+        });
+      }
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Gagal menambahkan reaksi",
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Handler functions
+  const handleReaction = (timelineItemId: string, emoji: string) => {
+    reactionMutation.mutate({ checkInId: timelineItemId, emoji });
+  };
+
+  const handleAddComment = (timelineItemId: string) => {
+    const content = commentTexts[timelineItemId];
+    if (!content?.trim()) return;
+    
+    addCommentMutation.mutate({ checkInId: timelineItemId, content: content.trim() });
+  };
+
+  const toggleComments = (timelineItemId: string) => {
+    setShowComments(prev => ({ ...prev, [timelineItemId]: !prev[timelineItemId] }));
+  };
+
+  const toggleReaction = (timelineItemId: string) => {
+    // For simple like/unlike - using heart emoji
+    handleReaction(timelineItemId, '❤️');
+  };
 
   // Filter data based on current filters
   const filteredData = useMemo(() => {
@@ -144,29 +235,9 @@ export default function TimelinePage() {
   const isDefaultFilter = activityTypeFilter === 'all' && userFilter === 'all' && 
     dateRangeFilter === 'all' && contentTypeFilter === 'all';
 
-  const toggleReaction = (itemId: string) => {
-    setReactions(prev => ({ ...prev, [itemId]: !prev[itemId] }));
-  };
 
-  const toggleComments = (itemId: string) => {
-    setShowComments(prev => ({ ...prev, [itemId]: !prev[itemId] }));
-  };
 
-  const createCommentMutation = useMutation({
-    mutationFn: (data: { timelineId: string; comment: string }) => 
-      apiRequest(`/api/timeline/${data.timelineId}/comments`, 'POST', { comment: data.comment }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/timeline'] });
-    }
-  });
 
-  const handleComment = (itemId: string) => {
-    const comment = commentTexts[itemId]?.trim();
-    if (!comment) return;
-    
-    createCommentMutation.mutate({ timelineId: itemId, comment });
-    setCommentTexts(prev => ({ ...prev, [itemId]: '' }));
-  };
 
   const toggleDetails = (itemId: string) => {
     setExpandedDetails(prev => ({ ...prev, [itemId]: !prev[itemId] }));
@@ -182,96 +253,10 @@ export default function TimelinePage() {
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
-  // Set demo data for reactions when timeline data is loaded
-  useEffect(() => {
-    if (timelineData && timelineData.length > 0) {
-      const firstItemId = timelineData[0].id;
-      setReactions({
-        [firstItemId]: {
-          '👍': 5,
-          '🔥': 3,
-          '💪': 2
-        }
-      });
-      setReactionUsers({
-        [firstItemId]: {
-          '👍': ['Test User5', 'Belina Yee', 'John Doe', 'Jane Smith', 'Mike Wilson'],
-          '🔥': ['Alice Cooper', 'Bob Johnson', 'Charlie Brown'],
-          '💪': ['David Lee', 'Emily Davis']
-        }
-      });
-    }
-  }, [timelineData]);
+
 
   // Emoji options for coworker expressions
   const REACTION_EMOJIS = ['👍', '❤️', '🎉', '💪', '🔥', '👏', '😍', '🚀', '⭐', '💯', '👌', '🤝'];
-
-  const handleReaction = (itemId: string, emoji: string) => {
-    const currentUserReaction = userReactions[itemId];
-    const currentUser = (user as any)?.name || 'Anonymous User';
-    
-    // Close reaction picker
-    setShowReactionPicker(prev => ({ ...prev, [itemId]: false }));
-    
-    // If user already reacted with this emoji, remove it
-    if (currentUserReaction === emoji) {
-      setUserReactions(prev => {
-        const newReactions = { ...prev };
-        delete newReactions[itemId];
-        return newReactions;
-      });
-      setReactions(prev => ({
-        ...prev,
-        [itemId]: {
-          ...prev[itemId],
-          [emoji]: Math.max(0, (prev[itemId]?.[emoji] || 1) - 1)
-        }
-      }));
-      setReactionUsers(prev => ({
-        ...prev,
-        [itemId]: {
-          ...prev[itemId],
-          [emoji]: (prev[itemId]?.[emoji] || []).filter(name => name !== currentUser)
-        }
-      }));
-    } else {
-      // Add new reaction or change existing
-      if (currentUserReaction) {
-        // Remove old reaction
-        setReactions(prev => ({
-          ...prev,
-          [itemId]: {
-            ...prev[itemId],
-            [currentUserReaction]: Math.max(0, (prev[itemId]?.[currentUserReaction] || 1) - 1)
-          }
-        }));
-        setReactionUsers(prev => ({
-          ...prev,
-          [itemId]: {
-            ...prev[itemId],
-            [currentUserReaction]: (prev[itemId]?.[currentUserReaction] || []).filter(name => name !== currentUser)
-          }
-        }));
-      }
-      
-      // Add new reaction
-      setUserReactions(prev => ({ ...prev, [itemId]: emoji }));
-      setReactions(prev => ({
-        ...prev,
-        [itemId]: {
-          ...prev[itemId],
-          [emoji]: (prev[itemId]?.[emoji] || 0) + 1
-        }
-      }));
-      setReactionUsers(prev => ({
-        ...prev,
-        [itemId]: {
-          ...prev[itemId],
-          [emoji]: [...(prev[itemId]?.[emoji] || []), currentUser]
-        }
-      }));
-    }
-  };
 
   if (isLoading) {
     return <div className="text-center py-12">Loading timeline...</div>;
@@ -693,7 +678,7 @@ export default function TimelinePage() {
 
                         {/* Reaction Summary Display - positioned between content and engagement buttons */}
                         {(() => {
-                          const itemReactions = reactions[item.id] || {};
+                          const itemReactions = timelineReactions[item.id] || {};
                           const activeReactions = Object.entries(itemReactions).filter(([, count]) => count > 0);
                           
                           if (activeReactions.length === 0) return null;
@@ -728,11 +713,11 @@ export default function TimelinePage() {
                               size="sm"
                               onClick={() => toggleReaction(item.id)}
                               className={`flex items-center space-x-1 text-xs h-7 px-2 rounded-full ${
-                                reactions[item.id] ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:text-blue-600'
+                                timelineReactions[item.id]?.['❤️'] > 0 ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:text-blue-600'
                               }`}
                             >
-                              <Heart className={`w-3 h-3 ${reactions[item.id] ? 'fill-current' : ''}`} />
-                              <span>{reactions[item.id] ? 'Disukai' : 'Suka'}</span>
+                              <Heart className={`w-3 h-3 ${timelineReactions[item.id]?.['❤️'] > 0 ? 'fill-current' : ''}`} />
+                              <span>{timelineReactions[item.id]?.['❤️'] > 0 ? 'Disukai' : 'Suka'}</span>
                             </Button>
                             <Button
                               variant="ghost"
@@ -789,19 +774,40 @@ export default function TimelinePage() {
                         {showComments[item.id] && (
                           <div className="mt-3 pt-3 border-t border-gray-100">
                             <div className="space-y-2 mb-3">
-                              {/* Sample comment */}
-                              <div className="flex space-x-2">
-                                <div className="w-6 h-6 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-semibold text-xs">
-                                  JD
-                                </div>
-                                <div className="flex-1">
-                                  <div className="text-sm">
-                                    <span className="font-medium text-gray-900 mr-2">John Doe</span>
-                                    <span className="text-gray-700">Progress bagus! Lanjutkan 👍</span>
+                              {/* Real comments from API */}
+                              {(timelineComments[item.id] || []).map((comment: any) => (
+                                <div key={comment.id} className="flex space-x-2">
+                                  <div className="flex-shrink-0">
+                                    {comment.user?.profileImageUrl ? (
+                                      <img 
+                                        src={comment.user.profileImageUrl} 
+                                        alt={comment.user.name}
+                                        className="w-6 h-6 rounded-full object-cover"
+                                      />
+                                    ) : (
+                                      <div className="w-6 h-6 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-semibold text-xs">
+                                        {getUserInitials(comment.user?.name || comment.user?.email || "U")}
+                                      </div>
+                                    )}
                                   </div>
-                                  <div className="text-xs text-gray-500 mt-1">2 jam lalu</div>
+                                  <div className="flex-1">
+                                    <div className="text-sm">
+                                      <span className="font-medium text-gray-900 mr-2">{comment.user?.name || comment.user?.email}</span>
+                                      <span className="text-gray-700">{comment.content}</span>
+                                    </div>
+                                    <div className="text-xs text-gray-500 mt-1">
+                                      {format(new Date(comment.createdAt), "MMM dd, HH:mm")}
+                                    </div>
+                                  </div>
                                 </div>
-                              </div>
+                              ))}
+                              
+                              {/* No comments message */}
+                              {(!timelineComments[item.id] || timelineComments[item.id].length === 0) && (
+                                <div className="text-center text-gray-500 text-sm py-2">
+                                  Belum ada komentar. Jadilah yang pertama!
+                                </div>
+                              )}
                             </div>
 
                             {/* Add Comment */}
@@ -830,8 +836,8 @@ export default function TimelinePage() {
                                   />
                                 </div>
                                 <Button
-                                  onClick={() => handleComment(item.id)}
-                                  disabled={!commentTexts[item.id]?.trim() || createCommentMutation.isPending}
+                                  onClick={() => handleAddComment(item.id)}
+                                  disabled={!commentTexts[item.id]?.trim() || addCommentMutation.isPending}
                                   size="sm"
                                   variant="ghost"
                                   className="p-2 h-8 w-8 rounded-full hover:bg-gray-100"
@@ -863,7 +869,7 @@ export default function TimelinePage() {
                               {/* Modal Content */}
                               <div className="max-h-[60vh] overflow-y-auto">
                                 {(() => {
-                                  const itemReactions = reactions[item.id] || {};
+                                  const itemReactions = timelineReactions[item.id] || {};
                                   const activeReactions = Object.entries(itemReactions).filter(([, count]) => count > 0);
                                   const sortedReactions = activeReactions.sort(([,a], [,b]) => b - a);
                                   const totalCount = activeReactions.reduce((sum, [, count]) => sum + count, 0);
@@ -887,22 +893,11 @@ export default function TimelinePage() {
                                         ))}
                                       </div>
                                       
-                                      {/* User List */}
+                                      {/* User List - will need API integration for user details */}
                                       <div className="p-4 space-y-3">
-                                        {sortedReactions.map(([emoji, count]) => {
-                                          const users = reactionUsers[item.id]?.[emoji] || [];
-                                          return users.map((userName, index) => (
-                                            <div key={`${emoji}-${index}`} className="flex items-center space-x-3">
-                                              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">
-                                                {userName.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                                              </div>
-                                              <div className="flex-1">
-                                                <div className="font-medium text-gray-900">{userName}</div>
-                                              </div>
-                                              <div className="text-lg">{emoji}</div>
-                                            </div>
-                                          ));
-                                        })}
+                                        <div className="text-center text-gray-500 text-sm py-4">
+                                          Detail pengguna yang memberikan reaksi akan segera tersedia
+                                        </div>
                                       </div>
                                     </div>
                                   );

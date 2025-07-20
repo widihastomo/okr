@@ -252,6 +252,17 @@ export interface IStorage {
     action: string;
     changeDescription: string;
   }): Promise<any>;
+
+  // Timeline Interactions
+  getTimelineComments(timelineItemId: string): Promise<TimelineComment[]>;
+  createTimelineComment(comment: InsertTimelineComment): Promise<TimelineComment>;
+  updateTimelineComment(id: string, comment: Partial<InsertTimelineComment>): Promise<TimelineComment | undefined>;
+  deleteTimelineComment(id: string): Promise<boolean>;
+  
+  getTimelineReactions(timelineItemId: string): Promise<TimelineReaction[]>;
+  createTimelineReaction(reaction: InsertTimelineReaction): Promise<TimelineReaction>;
+  deleteTimelineReaction(id: string): Promise<boolean>;
+  getUserTimelineReaction(timelineItemId: string, userId: string, emoji: string): Promise<TimelineReaction | undefined>;
 }
 
 // Helper function to calculate and update status automatically
@@ -3223,6 +3234,106 @@ export class DatabaseStorage implements IStorage {
       ))
       .returning();
     return result && result.length > 0 ? result[0] : undefined;
+  }
+
+  // Timeline Interactions Implementation
+  async getTimelineComments(timelineItemId: string): Promise<TimelineComment[]> {
+    const comments = await db
+      .select({
+        id: timelineComments.id,
+        timelineItemId: timelineComments.timelineItemId,
+        content: timelineComments.content,
+        createdBy: timelineComments.createdBy,
+        organizationId: timelineComments.organizationId,
+        createdAt: timelineComments.createdAt,
+        updatedAt: timelineComments.updatedAt,
+        // Include user data
+        userName: users.name,
+        userEmail: users.email,
+        userProfileImageUrl: users.profileImageUrl
+      })
+      .from(timelineComments)
+      .innerJoin(users, eq(users.id, timelineComments.createdBy))
+      .where(eq(timelineComments.timelineItemId, timelineItemId))
+      .orderBy(desc(timelineComments.createdAt));
+    
+    return comments as TimelineComment[];
+  }
+
+  async createTimelineComment(comment: InsertTimelineComment): Promise<TimelineComment> {
+    const [newComment] = await db
+      .insert(timelineComments)
+      .values(comment)
+      .returning();
+    return newComment;
+  }
+
+  async updateTimelineComment(id: string, comment: Partial<InsertTimelineComment>): Promise<TimelineComment | undefined> {
+    const [updatedComment] = await db
+      .update(timelineComments)
+      .set({
+        ...comment,
+        updatedAt: new Date()
+      })
+      .where(eq(timelineComments.id, id))
+      .returning();
+    return updatedComment || undefined;
+  }
+
+  async deleteTimelineComment(id: string): Promise<boolean> {
+    const result = await db
+      .delete(timelineComments)
+      .where(eq(timelineComments.id, id));
+    return (result.rowCount || 0) > 0;
+  }
+
+  async getTimelineReactions(timelineItemId: string): Promise<TimelineReaction[]> {
+    const reactions = await db
+      .select({
+        id: timelineReactions.id,
+        timelineItemId: timelineReactions.timelineItemId,
+        emoji: timelineReactions.emoji,
+        createdBy: timelineReactions.createdBy,
+        organizationId: timelineReactions.organizationId,
+        createdAt: timelineReactions.createdAt,
+        // Include user data
+        userName: users.name,
+        userEmail: users.email,
+        userProfileImageUrl: users.profileImageUrl
+      })
+      .from(timelineReactions)
+      .innerJoin(users, eq(users.id, timelineReactions.createdBy))
+      .where(eq(timelineReactions.timelineItemId, timelineItemId))
+      .orderBy(desc(timelineReactions.createdAt));
+    
+    return reactions as TimelineReaction[];
+  }
+
+  async createTimelineReaction(reaction: InsertTimelineReaction): Promise<TimelineReaction> {
+    const [newReaction] = await db
+      .insert(timelineReactions)
+      .values(reaction)
+      .returning();
+    return newReaction;
+  }
+
+  async deleteTimelineReaction(id: string): Promise<boolean> {
+    const result = await db
+      .delete(timelineReactions)
+      .where(eq(timelineReactions.id, id));
+    return (result.rowCount || 0) > 0;
+  }
+
+  async getUserTimelineReaction(timelineItemId: string, userId: string, emoji: string): Promise<TimelineReaction | undefined> {
+    const [reaction] = await db
+      .select()
+      .from(timelineReactions)
+      .where(and(
+        eq(timelineReactions.timelineItemId, timelineItemId),
+        eq(timelineReactions.createdBy, userId),
+        eq(timelineReactions.emoji, emoji)
+      ));
+    return reaction || undefined;
   }
 }
 

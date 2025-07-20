@@ -2846,6 +2846,68 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get all timeline comments by timeline items
+  app.get("/api/timeline/comments", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as User;
+      if (!user?.organizationId) {
+        return res.status(401).json({ message: "User organization not found" });
+      }
+
+      // Get timeline updates first
+      const timeline = await storage.getTimelineUpdates(user.organizationId);
+      const timelineIds = timeline.map(item => item.id);
+      
+      // Get comments for all timeline items
+      const allComments = {};
+      for (const timelineId of timelineIds) {
+        const comments = await storage.getTimelineComments(timelineId);
+        if (comments.length > 0) {
+          allComments[timelineId] = comments;
+        }
+      }
+      
+      res.json(allComments);
+    } catch (error) {
+      console.error("Error fetching timeline comments:", error);
+      res.status(500).json({ message: "Failed to fetch timeline comments" });
+    }
+  });
+
+  // Get all timeline reactions by timeline items
+  app.get("/api/timeline/reactions", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as User;
+      if (!user?.organizationId) {
+        return res.status(401).json({ message: "User organization not found" });
+      }
+
+      // Get timeline updates first
+      const timeline = await storage.getTimelineUpdates(user.organizationId);
+      const timelineIds = timeline.map(item => item.id);
+      
+      // Get reactions for all timeline items and aggregate by emoji
+      const allReactions = {};
+      for (const timelineId of timelineIds) {
+        const reactions = await storage.getTimelineReactions(timelineId);
+        if (reactions.length > 0) {
+          // Aggregate reactions by emoji type
+          const reactionCounts = {};
+          reactions.forEach(reaction => {
+            const emoji = reaction.emoji;
+            reactionCounts[emoji] = (reactionCounts[emoji] || 0) + 1;
+          });
+          allReactions[timelineId] = reactionCounts;
+        }
+      }
+      
+      res.json(allReactions);
+    } catch (error) {
+      console.error("Error fetching timeline reactions:", error);
+      res.status(500).json({ message: "Failed to fetch timeline reactions" });
+    }
+  });
+
   // Create timeline update
   app.post("/api/timeline", requireAuth, async (req, res) => {
     try {
@@ -4562,107 +4624,94 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Comment content is required" });
       }
 
-      // For now, return success for demo
-      res.status(201).json({ 
-        success: true, 
-        message: "Comment added successfully",
-        comment: {
-          id: `comment-${Date.now()}`,
-          content: content.trim(),
-          checkInId,
-          createdAt: new Date().toISOString(),
-          creator: user
-        }
+      const commentData = insertTimelineCommentSchema.parse({
+        timelineItemId: checkInId,
+        content: content.trim(),
+        createdBy: user.id,
+        organizationId: user.organizationId
       });
+
+      const newComment = await storage.createTimelineComment(commentData);
+      
+      // Get the comment with user details
+      const commentsWithUser = await storage.getTimelineComments(checkInId);
+      const commentWithUser = commentsWithUser.find(c => c.id === newComment.id);
+
+      res.status(201).json(commentWithUser || newComment);
     } catch (error) {
-      console.error("Error creating comment:", error);
-      res.status(500).json({ message: "Failed to create comment" });
+      console.error("Error creating timeline comment:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create timeline comment" });
     }
   });
 
   // Timeline reactions endpoints
-  app.get("/api/timeline/reactions", requireAuth, async (req, res) => {
-    try {
-      const user = req.user as User;
-      
-      // For now, return empty array as demo
-      res.json([]);
-    } catch (error) {
-      console.error("Error fetching timeline reactions:", error);
-      res.status(500).json({ 
-        success: false, 
-        message: "Error fetching timeline reactions" 
-      });
-    }
-  });
-
-  app.post("/api/timeline/:checkInId/reactions", requireAuth, async (req, res) => {
-    try {
-      const user = req.user as User;
-      const { checkInId } = req.params;
-      const { type } = req.body;
-      
-      if (!type) {
-        return res.status(400).json({ 
-          success: false, 
-          message: "Reaction type is required" 
-        });
-      }
-
-      // For now, return success for demo
-      res.json({ 
-        success: true, 
-        message: "Reaction added successfully",
-        reaction: {
-          id: `reaction-${Date.now()}`,
-          type,
-          checkInId,
-          createdAt: new Date().toISOString(),
-          creator: user
-        }
-      });
-    } catch (error) {
-      console.error("Error adding reaction:", error);
-      res.status(500).json({ 
-        success: false, 
-        message: "Error adding reaction" 
-      });
-    }
-  });
-
   app.get("/api/timeline/:checkInId/reactions", requireAuth, async (req, res) => {
     try {
       const { checkInId } = req.params;
       const reactions = await storage.getTimelineReactions(checkInId);
       res.json(reactions);
     } catch (error) {
-      console.error("Error fetching reactions:", error);
-      res.status(500).json({ message: "Failed to fetch reactions" });
+      console.error("Error fetching timeline reactions:", error);
+      res.status(500).json({ message: "Failed to fetch timeline reactions" });
     }
   });
 
   app.post("/api/timeline/:checkInId/reactions", requireAuth, async (req, res) => {
     try {
-      const { checkInId } = req.params;
       const user = req.user as User;
-      const { type } = req.body;
-
-      if (!type || !["like", "love", "support", "celebrate"].includes(type)) {
-        return res.status(400).json({ message: "Invalid reaction type" });
+      const { checkInId } = req.params;
+      const { type, timelineType } = req.body;
+      
+      if (!type) {
+        return res.status(400).json({ message: "Reaction type is required" });
       }
 
-      const reaction = await storage.createTimelineReaction({
-        checkInId,
-        organizationId: user.organizationId,
-        type,
-        createdBy: user.id,
-      });
-      res.status(201).json(reaction);
+      // Check if user already has this reaction type for this timeline item
+      const existingReaction = await storage.getUserTimelineReaction(checkInId, user.id, type);
+      
+      if (existingReaction) {
+        // Remove existing reaction (toggle off)
+        await storage.deleteTimelineReaction(existingReaction.id);
+        return res.json({ 
+          success: true, 
+          message: "Reaction removed",
+          action: 'removed'
+        });
+      } else {
+        // Add new reaction
+        const reactionData = insertTimelineReactionSchema.parse({
+          timelineItemId: checkInId,
+          emoji: type,
+          createdBy: user.id,
+          organizationId: user.organizationId
+        });
+
+        const newReaction = await storage.createTimelineReaction(reactionData);
+        
+        // Get the reaction with user details
+        const reactionsWithUser = await storage.getTimelineReactions(checkInId);
+        const reactionWithUser = reactionsWithUser.find(r => r.id === newReaction.id);
+
+        res.status(201).json({ 
+          success: true, 
+          message: "Reaction added successfully",
+          action: 'added',
+          reaction: reactionWithUser || newReaction
+        });
+      }
     } catch (error) {
-      console.error("Error creating reaction:", error);
-      res.status(500).json({ message: "Failed to create reaction" });
+      console.error("Error managing timeline reaction:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to manage timeline reaction" });
     }
   });
+
+
 
   app.delete("/api/timeline/comments/:commentId", requireAuth, async (req, res) => {
     try {

@@ -951,6 +951,8 @@ export type InitiativeComment = typeof initiativeComments.$inferSelect;
 export type Task = typeof tasks.$inferSelect;
 export type TimelineComment = typeof timelineComments.$inferSelect;
 export type TimelineReaction = typeof timelineReactions.$inferSelect;
+export type InsertTimelineComment = z.infer<typeof insertTimelineCommentSchema>;
+export type InsertTimelineReaction = z.infer<typeof insertTimelineReactionSchema>;
 export type TaskComment = typeof taskComments.$inferSelect;
 export type SystemSetting = typeof systemSettings.$inferSelect;
 export type DailyReflection = typeof dailyReflections.$inferSelect;
@@ -1025,7 +1027,7 @@ export const checkInsRelations = relations(checkIns, ({ one }) => ({
 // Timeline Comments table for interactive timeline feature
 export const timelineComments = pgTable("timeline_comments", {
   id: uuid("id").primaryKey().defaultRandom(),
-  checkInId: uuid("check_in_id").references(() => checkIns.id).notNull(),
+  timelineItemId: text("timeline_item_id").notNull(), // References timeline item ID (can be check-in or daily update)
   organizationId: uuid("organization_id").notNull().references(() => organizations.id),
   content: text("content").notNull(),
   createdBy: uuid("created_by").notNull().references(() => users.id),
@@ -1036,34 +1038,55 @@ export const timelineComments = pgTable("timeline_comments", {
 // Timeline Reactions table for interactive timeline feature
 export const timelineReactions = pgTable("timeline_reactions", {
   id: uuid("id").primaryKey().defaultRandom(),
-  checkInId: uuid("check_in_id").references(() => checkIns.id).notNull(),
+  timelineItemId: text("timeline_item_id").notNull(), // References timeline item ID (can be check-in or daily update)
   organizationId: uuid("organization_id").notNull().references(() => organizations.id),
-  type: text("type").notNull(), // "like", "love", "support", "celebrate"
+  emoji: text("emoji").notNull(), // Reaction emoji
+  createdBy: uuid("created_by").notNull().references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Timeline Likes table for interactive timeline feature
+export const timelineLikes = pgTable("timeline_likes", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  timelineItemId: text("timeline_item_id").notNull(), // References timeline item ID (can be check-in or daily update)
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id),
   createdBy: uuid("created_by").notNull().references(() => users.id),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
 // Timeline Comments Relations
 export const timelineCommentsRelations = relations(timelineComments, ({ one }) => ({
-  checkIn: one(checkIns, {
-    fields: [timelineComments.checkInId],
-    references: [checkIns.id],
-  }),
   creator: one(users, {
     fields: [timelineComments.createdBy],
     references: [users.id],
+  }),
+  organization: one(organizations, {
+    fields: [timelineComments.organizationId],
+    references: [organizations.id],
   }),
 }));
 
 // Timeline Reactions Relations
 export const timelineReactionsRelations = relations(timelineReactions, ({ one }) => ({
-  checkIn: one(checkIns, {
-    fields: [timelineReactions.checkInId],
-    references: [checkIns.id],
-  }),
   creator: one(users, {
     fields: [timelineReactions.createdBy],
     references: [users.id],
+  }),
+  organization: one(organizations, {
+    fields: [timelineReactions.organizationId],
+    references: [organizations.id],
+  }),
+}));
+
+// Timeline Likes Relations
+export const timelineLikesRelations = relations(timelineLikes, ({ one }) => ({
+  creator: one(users, {
+    fields: [timelineLikes.createdBy],
+    references: [users.id],
+  }),
+  organization: one(organizations, {
+    fields: [timelineLikes.organizationId],
+    references: [organizations.id],
   }),
 }));
 
@@ -1075,6 +1098,11 @@ export const insertTimelineCommentSchema = createInsertSchema(timelineComments).
 });
 
 export const insertTimelineReactionSchema = createInsertSchema(timelineReactions).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertTimelineLikeSchema = createInsertSchema(timelineLikes).omit({
   id: true,
   createdAt: true,
 });
@@ -1161,6 +1189,8 @@ export const trialAchievements = pgTable("trial_achievements", {
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
+
+
 
 export const userTrialAchievements = pgTable("user_trial_achievements", {
   id: uuid("id").primaryKey().defaultRandom(),
