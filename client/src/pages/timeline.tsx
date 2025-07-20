@@ -118,7 +118,7 @@ export default function TimelinePage() {
   // Mutation for adding comments
   const addCommentMutation = useMutation({
     mutationFn: async ({ checkInId, content }: { checkInId: string; content: string }) => {
-      return apiRequest(`/api/timeline/${checkInId}/comments`, 'POST', { content });
+      return apiRequest('POST', `/api/timeline/${checkInId}/comments`, { content });
     },
     onSuccess: (_, { checkInId }) => {
       setCommentTexts(prev => ({ ...prev, [checkInId]: '' }));
@@ -140,7 +140,7 @@ export default function TimelinePage() {
   // Mutation for reactions
   const reactionMutation = useMutation({
     mutationFn: async ({ checkInId, emoji }: { checkInId: string; emoji: string }) => {
-      return apiRequest(`/api/timeline/${checkInId}/reactions`, 'POST', { type: emoji });
+      return apiRequest('POST', `/api/timeline/${checkInId}/reactions`, { type: emoji });
     },
     onSuccess: (response: any, { checkInId, emoji }) => {
       setShowReactionPicker(prev => ({ ...prev, [checkInId]: false }));
