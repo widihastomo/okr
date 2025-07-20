@@ -65,7 +65,8 @@ export default function TimelinePage() {
   const [contentTypeFilter, setContentTypeFilter] = useState('all');
   
   // Social interaction states
-  const [reactions, setReactions] = useState<Record<string, boolean>>({});
+  const [reactions, setReactions] = useState<Record<string, { [emoji: string]: number }>>({});
+  const [userReactions, setUserReactions] = useState<Record<string, string>>({});
   const [showComments, setShowComments] = useState<Record<string, boolean>>({});
   const [commentTexts, setCommentTexts] = useState<Record<string, string>>({});
   
@@ -143,6 +144,48 @@ export default function TimelinePage() {
 
   const toggleDetails = (itemId: string) => {
     setExpandedDetails(prev => ({ ...prev, [itemId]: !prev[itemId] }));
+  };
+
+  const handleReaction = (itemId: string, emoji: string) => {
+    const currentUserReaction = userReactions[itemId];
+    
+    // If user already reacted with this emoji, remove it
+    if (currentUserReaction === emoji) {
+      setUserReactions(prev => {
+        const newReactions = { ...prev };
+        delete newReactions[itemId];
+        return newReactions;
+      });
+      setReactions(prev => ({
+        ...prev,
+        [itemId]: {
+          ...prev[itemId],
+          [emoji]: Math.max(0, (prev[itemId]?.[emoji] || 1) - 1)
+        }
+      }));
+    } else {
+      // Add new reaction or change existing
+      if (currentUserReaction) {
+        // Remove old reaction
+        setReactions(prev => ({
+          ...prev,
+          [itemId]: {
+            ...prev[itemId],
+            [currentUserReaction]: Math.max(0, (prev[itemId]?.[currentUserReaction] || 1) - 1)
+          }
+        }));
+      }
+      
+      // Add new reaction
+      setUserReactions(prev => ({ ...prev, [itemId]: emoji }));
+      setReactions(prev => ({
+        ...prev,
+        [itemId]: {
+          ...prev[itemId],
+          [emoji]: (prev[itemId]?.[emoji] || 0) + 1
+        }
+      }));
+    }
   };
 
   if (isLoading) {
@@ -508,14 +551,26 @@ export default function TimelinePage() {
                               <MessageCircle className="w-3 h-3" />
                               <span>Komentar</span>
                             </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="flex items-center space-x-1 text-xs h-7 px-2 rounded-full text-gray-500 hover:text-blue-600"
-                            >
-                              <Share2 className="w-3 h-3" />
-                              <span>Bagikan</span>
-                            </Button>
+                            <div className="flex items-center space-x-1">
+                              {['👍', '❤️', '😂', '😲'].map((emoji) => (
+                                <Button
+                                  key={emoji}
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleReaction(item.id, emoji)}
+                                  className={`flex items-center space-x-1 text-xs h-7 px-2 rounded-full transition-colors ${
+                                    userReactions[item.id] === emoji 
+                                      ? 'bg-blue-100 text-blue-600' 
+                                      : 'text-gray-500 hover:text-blue-600 hover:bg-gray-100'
+                                  }`}
+                                >
+                                  <span className="text-sm">{emoji}</span>
+                                  {reactions[item.id]?.[emoji] > 0 && (
+                                    <span className="text-xs">{reactions[item.id][emoji]}</span>
+                                  )}
+                                </Button>
+                              ))}
+                            </div>
                           </div>
                         </div>
 
