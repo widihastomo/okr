@@ -537,7 +537,7 @@ export default function TimelinePage() {
                           {/* Key Results Details */}
                           {item.keyResultsSummary && (
                             <div className="bg-purple-50 rounded-lg p-2">
-                              <div className="text-xs font-medium text-purple-800 mb-1">🎯 Angka Target ({item.keyResultsUpdated})</div>
+                              
                               <div className="text-xs text-purple-700">
                                 {item.keyResultsSummary && item.keyResultsSummary.split(', ').map((kr, index) => (
                                   <div key={index} className="mb-1 last:mb-0">
