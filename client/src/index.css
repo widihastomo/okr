@@ -792,3 +792,65 @@
 .animate-typing-cursor {
   animation: typing-cursor 1s infinite;
 }
+
+/* React Vertical Timeline Custom Styling */
+.vertical-timeline {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+}
+
+.vertical-timeline::before {
+  background: linear-gradient(to bottom, #e5e7eb, #d1d5db, #e5e7eb) !important;
+  width: 3px !important;
+}
+
+.vertical-timeline-element {
+  margin: 2em 0 !important;
+}
+
+.vertical-timeline-element-content {
+  border-radius: 8px !important;
+  padding: 1.5em !important;
+  position: relative;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+}
+
+.vertical-timeline-element-content .vertical-timeline-element-date {
+  color: #6b7280 !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+}
+
+.vertical-timeline-element-icon {
+  box-shadow: 0 0 0 4px #f3f4f6, inset 0 2px 0 rgba(0,0,0,.08), 0 3px 0 4px rgba(0,0,0,.05) !important;
+}
+
+/* Enhanced timeline content styling */
+.timeline-content {
+  font-family: inherit !important;
+}
+
+.timeline-content h3 {
+  margin-top: 0 !important;
+  color: #1f2937 !important;
+}
+
+.timeline-content h4 {
+  margin: 0.5em 0 0.25em 0 !important;
+  color: #374151 !important;
+}
+
+/* Mobile responsiveness */
+@media only screen and (max-width: 1170px) {
+  .vertical-timeline-element-content {
+    margin-left: 0 !important;
+  }
+  
+  .vertical-timeline-element-content .vertical-timeline-element-date {
+    display: block !important;
+    float: none !important;
+    margin-top: 1em !important;
+    color: #9ca3af !important;
+  }
+}
