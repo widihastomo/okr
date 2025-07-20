@@ -55,6 +55,19 @@ export function InitiativeHistory({ initiativeId }: InitiativeHistoryProps) {
     return user.email?.split('@')[0] || 'Unknown User';
   };
 
+  // Translate old terminology to new terminology for display
+  const translateDescription = (description: string) => {
+    return description
+      .replace(/Definition of done/gi, 'Output')
+      .replace(/definition of done/gi, 'output')
+      .replace(/Created Definition of done/gi, 'Created output')
+      .replace(/Added Definition of done/gi, 'Added output')
+      .replace(/Edited Definition of done/gi, 'Edited output')
+      .replace(/Deleted Definition of done/gi, 'Deleted output')
+      .replace(/Toggled Definition of done/gi, 'Toggled output')
+      .replace(/Updated Definition of done/gi, 'Updated output');
+  };
+
   const formatTimestamp = (timestamp: Date) => {
     if (!timestamp) return '';
     
@@ -157,7 +170,7 @@ export function InitiativeHistory({ initiativeId }: InitiativeHistoryProps) {
                 </div>
                 <div className="flex-1 pb-2">
                   <p className="text-xs font-medium text-gray-900">
-                    {entry.description}
+                    {translateDescription(entry.description)}
                   </p>
                   <div className="flex items-center gap-1 mt-1">
                     <span className="text-xs text-gray-500">{getUserDisplayName(entry.user)}</span>
