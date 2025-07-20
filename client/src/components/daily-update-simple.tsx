@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { useAuth } from '@/hooks/useAuth';
@@ -92,8 +92,14 @@ export function DailyUpdateSimple() {
     queryKey: ['/api/initiatives'],
   });
 
-  // Filter initiatives for current user only (where user is PIC)
-  const initiatives = allInitiatives.filter((initiative: any) => initiative.picId === user?.id);
+  // Filter initiatives for current user only (where user is PIC) using useMemo for stability
+  const initiatives = useMemo(() => {
+    const filtered = allInitiatives.filter((initiative: any) => initiative.picId === user?.id);
+    console.log('All initiatives:', allInitiatives);
+    console.log('User ID:', user?.id);
+    console.log('Filtered initiatives (user is PIC):', filtered);
+    return filtered;
+  }, [allInitiatives, user?.id]);
 
   const { data: allTasks = [] } = useQuery({
     queryKey: ['/api/tasks'],
@@ -119,14 +125,17 @@ export function DailyUpdateSimple() {
   const relevantTasks = [...overdueTasks, ...todayTasks];
 
   const { data: successMetrics = [] } = useQuery({
-    queryKey: ['/api/success-metrics', initiatives.map(i => i.id).join(',')],
+    queryKey: ['/api/success-metrics', initiatives.length > 0 ? initiatives.map(i => i.id).sort().join(',') : 'none'],
     queryFn: async () => {
       if (initiatives.length === 0) return [];
       
       const allMetrics = [];
       for (const initiative of initiatives) {
         try {
-          const metrics = await apiRequest('GET', `/api/initiatives/${initiative.id}/success-metrics`);
+          console.log(`Fetching metrics for initiative ${initiative.id}...`);
+          const response = await apiRequest('GET', `/api/initiatives/${initiative.id}/success-metrics`);
+          const metrics = await response.json();
+          console.log(`Metrics response for ${initiative.id}:`, metrics);
 
           if (Array.isArray(metrics)) {
             allMetrics.push(...metrics.map((metric: any) => ({
@@ -140,20 +149,24 @@ export function DailyUpdateSimple() {
         }
       }
 
+      console.log('Final success metrics:', allMetrics);
       return allMetrics;
     },
     enabled: initiatives.length > 0
   });
 
   const { data: deliverables = [] } = useQuery({
-    queryKey: ['/api/deliverables', initiatives.map(i => i.id).join(',')],
+    queryKey: ['/api/deliverables', initiatives.length > 0 ? initiatives.map(i => i.id).sort().join(',') : 'none'],
     queryFn: async () => {
       if (initiatives.length === 0) return [];
       
       const allDeliverables = [];
       for (const initiative of initiatives) {
         try {
-          const deliverableItems = await apiRequest('GET', `/api/initiatives/${initiative.id}/definition-of-done`);
+          console.log(`Fetching deliverables for initiative ${initiative.id}...`);
+          const response = await apiRequest('GET', `/api/initiatives/${initiative.id}/definition-of-done`);
+          const deliverableItems = await response.json();
+          console.log(`Deliverables response for ${initiative.id}:`, deliverableItems);
 
           if (Array.isArray(deliverableItems)) {
             allDeliverables.push(...deliverableItems.map((item: any) => ({
@@ -167,6 +180,7 @@ export function DailyUpdateSimple() {
         }
       }
 
+      console.log('Final deliverables:', allDeliverables);
       return allDeliverables;
     },
     enabled: initiatives.length > 0
