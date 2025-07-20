@@ -588,6 +588,38 @@ export default function TimelinePage() {
                             )}
                           </div>
                         )}
+
+                        {/* Reaction Users Display - positioned between content and engagement buttons */}
+                        {Object.entries(reactions[item.id] || {}).filter(([, count]) => count > 0).length > 0 && (
+                          <div className="mt-3 space-y-2">
+                            {Object.entries(reactions[item.id] || {})
+                              .filter(([, count]) => count > 0)
+                              .map(([emoji, count]) => {
+                                const users = reactionUsers[item.id]?.[emoji] || [];
+                                const displayUsers = users.slice(0, 2);
+                                const remainingCount = Math.max(0, count - 2);
+                                
+                                return (
+                                  <div key={emoji} className="flex items-center space-x-2">
+                                    <div className="flex items-center">
+                                      <div className="flex items-center bg-white border border-gray-200 rounded-full px-2 py-1">
+                                        <span className="text-base mr-1">{emoji}</span>
+                                        <span className="text-xs text-gray-600">{count}</span>
+                                      </div>
+                                    </div>
+                                    {users.length > 0 && (
+                                      <div className="text-xs text-gray-600">
+                                        {displayUsers.join(', ')}
+                                        {remainingCount > 0 && (
+                                          <span> dan {remainingCount} lainnya</span>
+                                        )}
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                          </div>
+                        )}
                       </div>
 
                       {/* Engagement Section */}
@@ -651,37 +683,7 @@ export default function TimelinePage() {
                                 </div>
                               )}
 
-                              {/* Display Active Reactions */}
-                              {Object.entries(reactions[item.id] || {}).filter(([, count]) => count > 0).length > 0 && (
-                                <div className="mt-6 space-y-2">
-                                  {Object.entries(reactions[item.id] || {})
-                                    .filter(([, count]) => count > 0)
-                                    .map(([emoji, count]) => {
-                                      const users = reactionUsers[item.id]?.[emoji] || [];
-                                      const displayUsers = users.slice(0, 2);
-                                      const remainingCount = Math.max(0, count - 2);
-                                      
-                                      return (
-                                        <div key={emoji} className="flex items-center space-x-2">
-                                          <div className="flex items-center">
-                                            <div className="flex items-center bg-white border border-gray-200 rounded-full px-2 py-1">
-                                              <span className="text-base mr-1">{emoji}</span>
-                                              <span className="text-xs text-gray-600">{count}</span>
-                                            </div>
-                                          </div>
-                                          {users.length > 0 && (
-                                            <div className="text-xs text-gray-600">
-                                              {displayUsers.join(', ')}
-                                              {remainingCount > 0 && (
-                                                <span> dan {remainingCount} lainnya</span>
-                                              )}
-                                            </div>
-                                          )}
-                                        </div>
-                                      );
-                                    })}
-                                </div>
-                              )}
+
                             </div>
                           </div>
                         </div>
