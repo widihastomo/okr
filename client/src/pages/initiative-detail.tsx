@@ -1163,6 +1163,9 @@ export default function InitiativeDetailPage() {
         queryKey: [`/api/initiatives/${id}/definition-of-done`],
       });
       queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}`] });
+      queryClient.invalidateQueries({
+        queryKey: [`/api/initiatives/${id}/history`],
+      });
       toast({
         title: "Deliverable berhasil ditambahkan",
         description: "Deliverable baru telah ditambahkan ke inisiatif",
@@ -1196,6 +1199,9 @@ export default function InitiativeDetailPage() {
         queryKey: [`/api/initiatives/${id}/definition-of-done`],
       });
       queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}`] });
+      queryClient.invalidateQueries({
+        queryKey: [`/api/initiatives/${id}/history`],
+      });
       toast({
         title: "Deliverable berhasil diubah",
         description: "Deliverable telah diperbarui",
@@ -1221,6 +1227,9 @@ export default function InitiativeDetailPage() {
         queryKey: [`/api/initiatives/${id}/definition-of-done`],
       });
       queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}`] });
+      queryClient.invalidateQueries({
+        queryKey: [`/api/initiatives/${id}/history`],
+      });
       toast({
         title: "Deliverable berhasil dihapus",
         description: "Deliverable telah dihapus dari inisiatif",
