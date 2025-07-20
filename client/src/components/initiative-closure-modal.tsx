@@ -532,7 +532,7 @@ export default function InitiativeClosureModal({
                           <FormControl>
                             <Input
                               type="text"
-                              placeholder="Contoh: 50.000 (untuk Rp 50.000)"
+                              placeholder="Contoh: 500 (untuk Rp 500)"
                               value={field.value ? formatNumber(field.value) : ''}
                               onChange={(e) => handleBudgetChange(e.target.value, field.onChange)}
                               className="border-gray-300"
