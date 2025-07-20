@@ -3474,7 +3474,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Output item not found" });
       }
 
-      res.json(result);
+      // Check if we need to update initiative status
+      let initiativeStatusChange = null;
+      
+      if (result.initiativeId && isCompleted) {
+        console.log(`🔍 Debug: DOD item checked, initiative ID: ${result.initiativeId}`);
+        
+        const initiative = await storage.getInitiative(result.initiativeId);
+        if (initiative) {
+          console.log(`📋 Initiative found: YES, current status: ${initiative.status}`);
+          
+          // If DOD item is checked and initiative is in draft, change to sedang_berjalan
+          if (initiative.status === 'draft') {
+            console.log('🔄 Updating initiative status from "draft" to "sedang_berjalan"...');
+            
+            await storage.updateInitiative(result.initiativeId, {
+              status: 'sedang_berjalan'
+            });
+            
+            console.log(`🚀 Initiative ${result.initiativeId} status updated to "sedang_berjalan" due to DOD completion`);
+            
+            initiativeStatusChange = {
+              changed: true,
+              oldStatus: 'draft',
+              newStatus: 'sedang_berjalan'
+            };
+          }
+        }
+      }
+
+      const response = {
+        ...result,
+        initiativeStatusChange
+      };
+
+      res.json(response);
     } catch (error) {
       console.error("Error toggling output item:", error);
       res.status(500).json({ message: "Failed to toggle output item" });

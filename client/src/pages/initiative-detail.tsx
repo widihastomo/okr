@@ -1034,7 +1034,7 @@ export default function InitiativeDetailPage() {
         isCompleted,
       });
     },
-    onSuccess: () => {
+    onSuccess: (data: any) => {
       queryClient.invalidateQueries({
         queryKey: [`/api/initiatives/${id}/definition-of-done`],
       });
@@ -1042,6 +1042,34 @@ export default function InitiativeDetailPage() {
         queryKey: [`/api/initiatives/${id}/history`],
       });
       queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}`] });
+      
+      // Show DOD update toast
+      toast({
+        title: "Deliverable berhasil diperbarui",
+        description: "Status deliverable berhasil diperbarui",
+        variant: "success",
+      });
+      
+      // Show initiative status change toast if applicable
+      if (data?.initiativeStatusChange?.changed) {
+        const getStatusLabel = (status: string) => {
+          switch (status) {
+            case 'draft': return 'Draft';
+            case 'sedang_berjalan': return 'Sedang Berjalan';
+            case 'selesai': return 'Selesai';
+            case 'dibatalkan': return 'Dibatalkan';
+            case 'on_hold': return 'Ditunda';
+            default: return status;
+          }
+        };
+        
+        const { oldStatus, newStatus } = data.initiativeStatusChange;
+        toast({
+          title: "Status inisiatif berubah otomatis",
+          description: `Status inisiatif berubah dari "${getStatusLabel(oldStatus)}" ke "${getStatusLabel(newStatus)}" karena deliverable diselesaikan`,
+          variant: "default",
+        });
+      }
     },
     onError: (error: any) => {
       toast({
