@@ -333,7 +333,15 @@ export default function TimelinePage() {
                     {/* Post Content */}
                     <div className="p-4">
                       <div className="space-y-3">
-                        
+                        {/* Main Summary - Compact */}
+                        {item.summary && (
+                          <div className="text-gray-700 text-sm">
+                            <div className="bg-gray-50 rounded-lg p-2">
+                              <div className="text-xs font-medium text-gray-600 mb-1">📝 Ringkasan:</div>
+                              <div className="text-xs line-clamp-3" dangerouslySetInnerHTML={{ __html: item.summary }} />
+                            </div>
+                          </div>
+                        )}
 
                         {/* Compact Statistics */}
                         {(item.tasksUpdated > 0 || item.tasksCompleted > 0 || item.keyResultsUpdated > 0 || item.successMetricsUpdated > 0 || item.deliverablesUpdated > 0 || item.deliverablesCompleted > 0) && (
