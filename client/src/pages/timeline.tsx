@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import DailyCheckInButton from "@/components/daily-checkin-button";
@@ -23,7 +24,11 @@ import {
   BarChart3,
   CheckCircle,
   CheckSquare,
-  Package
+  Package,
+  Filter,
+  X,
+  User,
+  Activity
 } from "lucide-react";
 import { TimelineIcon } from "@/components/ui/timeline-icon";
 
@@ -150,6 +155,13 @@ export default function TimelinePage() {
   const [commentTexts, setCommentTexts] = useState<Record<string, string>>({});
   const [showComments, setShowComments] = useState<Record<string, boolean>>({});
   const [reactionCounts, setReactionCounts] = useState<Record<string, any>>({});
+  const [filters, setFilters] = useState({
+    type: 'all', // 'all', 'check-in', 'daily-update'
+    user: 'all', // 'all' or specific user id
+    dateRange: 'all', // 'all', 'today', 'week', 'month'
+    activityType: 'all' // 'all', 'tasks', 'keyresults', 'metrics', 'deliverables'
+  });
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -174,6 +186,16 @@ export default function TimelinePage() {
         return data.filter((item: any) => item.summary && !item.keyResult);
       }
       return []; // Return empty array if endpoint doesn't exist yet
+    },
+    retry: 1,
+  });
+
+  // Fetch users for filter dropdown
+  const { data: usersData } = useQuery({
+    queryKey: ["/api/users"],
+    queryFn: async () => {
+      const response = await apiRequest("GET", "/api/users");
+      return await response.json();
     },
     retry: 1,
   });
@@ -215,9 +237,73 @@ export default function TimelinePage() {
   })) : [];
 
   // Combine and sort timeline data
-  const timelineData = [...checkInsTimeline, ...updatesTimeline].sort(
+  const allTimelineData = [...checkInsTimeline, ...updatesTimeline].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
+
+  // Filter function
+  const getFilteredTimelineData = () => {
+    let filtered = [...allTimelineData];
+
+    // Filter by type
+    if (filters.type !== 'all') {
+      filtered = filtered.filter(item => item.type === filters.type);
+    }
+
+    // Filter by user
+    if (filters.user !== 'all') {
+      filtered = filtered.filter(item => item.creator?.id === filters.user);
+    }
+
+    // Filter by date range
+    if (filters.dateRange !== 'all') {
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      
+      filtered = filtered.filter(item => {
+        const itemDate = new Date(item.createdAt);
+        switch (filters.dateRange) {
+          case 'today':
+            return itemDate >= today;
+          case 'week':
+            const weekAgo = new Date(today);
+            weekAgo.setDate(weekAgo.getDate() - 7);
+            return itemDate >= weekAgo;
+          case 'month':
+            const monthAgo = new Date(today);
+            monthAgo.setMonth(monthAgo.getMonth() - 1);
+            return itemDate >= monthAgo;
+          default:
+            return true;
+        }
+      });
+    }
+
+    // Filter by activity type (for daily updates)
+    if (filters.activityType !== 'all') {
+      filtered = filtered.filter(item => {
+        if (item.type === 'check-in') return filters.activityType === 'keyresults';
+        
+        const summary = item.content?.toLowerCase() || '';
+        switch (filters.activityType) {
+          case 'tasks':
+            return summary.includes('task');
+          case 'keyresults':
+            return summary.includes('angka target') || summary.includes('key result');
+          case 'metrics':
+            return summary.includes('success metric') || summary.includes('metrik');
+          case 'deliverables':
+            return summary.includes('deliverable') || summary.includes('output');
+          default:
+            return true;
+        }
+      });
+    }
+
+    return filtered;
+  };
+
+  const timelineData = getFilteredTimelineData();
 
   const createCommentMutation = useMutation({
     mutationFn: ({ checkInId, content }: { checkInId: string; content: string }) =>
@@ -329,24 +415,163 @@ export default function TimelinePage() {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <div className="max-w-2xl mx-auto py-6 px-4">
-        <div className="mb-6 bg-white rounded-lg shadow-sm p-4">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center space-x-3">
-              <TimelineIcon size="md" variant="primary" />
-              <div>
-                <h1 className="text-xl font-bold text-gray-900">Timeline</h1>
-                <p className="text-sm text-gray-600">Activity feed dan progress tim</p>
+      <div className="max-w-7xl mx-auto">
+        <div className="flex">
+          {/* Filter Sidebar */}
+          <div className={`${showMobileFilters ? 'fixed inset-0 z-50 bg-white' : 'hidden'} lg:block lg:w-80 lg:flex-shrink-0`}>
+            <div className="h-full bg-white border-r border-gray-200 overflow-y-auto">
+              {/* Mobile header */}
+              <div className="lg:hidden flex items-center justify-between p-4 border-b border-gray-200">
+                <h2 className="text-lg font-semibold text-gray-900">Filter Timeline</h2>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowMobileFilters(false)}
+                >
+                  <X className="w-5 h-5" />
+                </Button>
+              </div>
+
+              {/* Desktop header */}
+              <div className="hidden lg:block p-6 border-b border-gray-200">
+                <div className="flex items-center space-x-2">
+                  <Filter className="w-5 h-5 text-gray-600" />
+                  <h2 className="text-lg font-semibold text-gray-900">Filter Timeline</h2>
+                </div>
+              </div>
+
+              {/* Filter Controls */}
+              <div className="p-6 space-y-6">
+                {/* Activity Type Filter */}
+                <div>
+                  <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-3">
+                    <Activity className="w-4 h-4" />
+                    <span>Jenis Activity</span>
+                  </label>
+                  <Select value={filters.type} onValueChange={(value) => setFilters(prev => ({ ...prev, type: value }))}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Pilih jenis activity" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Semua Activity</SelectItem>
+                      <SelectItem value="check-in">Progress Check-in</SelectItem>
+                      <SelectItem value="daily-update">Update Harian</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* User Filter */}
+                <div>
+                  <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-3">
+                    <User className="w-4 h-4" />
+                    <span>Pengguna</span>
+                  </label>
+                  <Select value={filters.user} onValueChange={(value) => setFilters(prev => ({ ...prev, user: value }))}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Pilih pengguna" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Semua Pengguna</SelectItem>
+                      {usersData?.map((user: any) => (
+                        <SelectItem key={user.id} value={user.id}>
+                          {getUserName(user)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Date Range Filter */}
+                <div>
+                  <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-3">
+                    <Calendar className="w-4 h-4" />
+                    <span>Rentang Waktu</span>
+                  </label>
+                  <Select value={filters.dateRange} onValueChange={(value) => setFilters(prev => ({ ...prev, dateRange: value }))}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Pilih rentang waktu" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Semua Waktu</SelectItem>
+                      <SelectItem value="today">Hari Ini</SelectItem>
+                      <SelectItem value="week">7 Hari Terakhir</SelectItem>
+                      <SelectItem value="month">30 Hari Terakhir</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Content Type Filter */}
+                <div>
+                  <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-3">
+                    <Target className="w-4 h-4" />
+                    <span>Tipe Konten</span>
+                  </label>
+                  <Select value={filters.activityType} onValueChange={(value) => setFilters(prev => ({ ...prev, activityType: value }))}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Pilih tipe konten" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Semua Konten</SelectItem>
+                      <SelectItem value="tasks">Task Updates</SelectItem>
+                      <SelectItem value="keyresults">Angka Target</SelectItem>
+                      <SelectItem value="metrics">Success Metrics</SelectItem>
+                      <SelectItem value="deliverables">Deliverables</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Clear Filters */}
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => setFilters({
+                    type: 'all',
+                    user: 'all', 
+                    dateRange: 'all',
+                    activityType: 'all'
+                  })}
+                >
+                  Reset Filter
+                </Button>
+
+                {/* Filter Summary */}
+                <div className="pt-4 border-t border-gray-200">
+                  <p className="text-sm text-gray-600">
+                    Menampilkan {timelineData.length} dari {allTimelineData.length} activity
+                  </p>
+                </div>
               </div>
             </div>
-            <DailyCheckInButton data-tour="timeline-checkin" />
           </div>
-        </div>
 
-        {timelineData.length > 0 ? (
-          <div className="space-y-4">
-            {timelineData.map((item) => (
-              <Card key={item.id} className="w-full bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden">
+          {/* Main Content */}
+          <div className="flex-1 min-w-0">
+            <div className="max-w-2xl mx-auto py-6 px-4">
+              {/* Mobile filter button and header */}
+              <div className="mb-6 bg-white rounded-lg shadow-sm p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center space-x-3">
+                    <button
+                      onClick={() => setShowMobileFilters(true)}
+                      className="lg:hidden p-2 rounded-lg border border-gray-200 hover:bg-gray-50"
+                    >
+                      <Filter className="w-5 h-5 text-gray-600" />
+                    </button>
+                    <TimelineIcon size="md" variant="primary" />
+                    <div>
+                      <h1 className="text-xl font-bold text-gray-900">Timeline</h1>
+                      <p className="text-sm text-gray-600">Activity feed dan progress tim</p>
+                    </div>
+                  </div>
+                  <DailyCheckInButton data-tour="timeline-checkin" />
+                </div>
+              </div>
+
+              {/* Timeline Content */}
+              {timelineData.length > 0 ? (
+                <div className="space-y-4">
+                  {timelineData.map((item) => (
+                    <Card key={item.id} className="w-full bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden">
                 {/* Facebook-style header */}
                 <CardContent className="p-0">
                   <div className="p-4 pb-3">
@@ -633,7 +858,10 @@ export default function TimelinePage() {
               Mulai dengan melakukan check-in atau update harian untuk melihat activity feed
             </div>
           </div>
-        )}
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
