@@ -72,6 +72,7 @@ export default function TimelinePage() {
   const [reactionUsers, setReactionUsers] = useState<Record<string, { [emoji: string]: string[] }>>({});
   const [showReactionPicker, setShowReactionPicker] = useState<Record<string, boolean>>({});
   const [showComments, setShowComments] = useState<Record<string, boolean>>({});
+  const [showReactionModal, setShowReactionModal] = useState<Record<string, boolean>>({});
   const [commentTexts, setCommentTexts] = useState<Record<string, string>>({});
   
   // Expandable details state
@@ -589,39 +590,32 @@ export default function TimelinePage() {
                           </div>
                         )}
 
-                        {/* Reaction Users Display - positioned between content and engagement buttons */}
-                        {Object.entries(reactions[item.id] || {}).filter(([, count]) => count > 0).length > 0 && (
-                          <div className="mt-3">
-                            <div className="flex items-center flex-wrap gap-x-3 gap-y-2">
-                              {Object.entries(reactions[item.id] || {})
-                                .filter(([, count]) => count > 0)
-                                .map(([emoji, count]) => {
-                                  const users = reactionUsers[item.id]?.[emoji] || [];
-                                  const displayUsers = users.slice(0, 2);
-                                  const remainingCount = Math.max(0, count - 2);
-                                  
-                                  return (
-                                    <div key={emoji} className="flex items-center space-x-2">
-                                      <div className="flex items-center">
-                                        <div className="flex items-center bg-white border border-gray-200 rounded-full px-2 py-1">
-                                          <span className="text-base mr-1">{emoji}</span>
-                                          <span className="text-xs text-gray-600">{count}</span>
-                                        </div>
-                                      </div>
-                                      {users.length > 0 && (
-                                        <div className="text-xs text-gray-600">
-                                          {displayUsers.join(', ')}
-                                          {remainingCount > 0 && (
-                                            <span> dan {remainingCount} lainnya</span>
-                                          )}
-                                        </div>
-                                      )}
-                                    </div>
-                                  );
-                                })}
+                        {/* Reaction Summary Display - positioned between content and engagement buttons */}
+                        {(() => {
+                          const itemReactions = reactions[item.id] || {};
+                          const activeReactions = Object.entries(itemReactions).filter(([, count]) => count > 0);
+                          
+                          if (activeReactions.length === 0) return null;
+                          
+                          // Sort by count and get top emojis
+                          const sortedReactions = activeReactions.sort(([,a], [,b]) => b - a);
+                          const totalCount = activeReactions.reduce((sum, [, count]) => sum + count, 0);
+                          const topEmojis = sortedReactions.slice(0, 3).map(([emoji]) => emoji);
+                          
+                          return (
+                            <div className="mt-3">
+                              <button
+                                onClick={() => setShowReactionModal(prev => ({ ...prev, [item.id]: true }))}
+                                className="flex items-center space-x-2 hover:bg-gray-50 rounded px-2 py-1 transition-colors"
+                              >
+                                <div className="flex items-center bg-white border border-gray-200 rounded-full px-2 py-1">
+                                  <span className="text-base mr-1">{topEmojis.join('')}</span>
+                                  <span className="text-xs text-gray-600">{totalCount}</span>
+                                </div>
+                              </button>
                             </div>
-                          </div>
-                        )}
+                          );
+                        })()}
                       </div>
 
                       {/* Engagement Section */}
@@ -743,6 +737,75 @@ export default function TimelinePage() {
                                 >
                                   <Send className="w-4 h-4 text-blue-600" />
                                 </Button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Reaction Detail Modal */}
+                        {showReactionModal[item.id] && (
+                          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                            <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 max-h-[80vh] overflow-hidden">
+                              {/* Modal Header */}
+                              <div className="flex items-center justify-between p-4 border-b border-gray-200">
+                                <h3 className="text-lg font-semibold text-gray-900">Reactions</h3>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => setShowReactionModal(prev => ({ ...prev, [item.id]: false }))}
+                                  className="p-1 h-8 w-8 rounded-full hover:bg-gray-100"
+                                >
+                                  <span className="text-gray-500 text-lg">×</span>
+                                </Button>
+                              </div>
+                              
+                              {/* Modal Content */}
+                              <div className="max-h-[60vh] overflow-y-auto">
+                                {(() => {
+                                  const itemReactions = reactions[item.id] || {};
+                                  const activeReactions = Object.entries(itemReactions).filter(([, count]) => count > 0);
+                                  const sortedReactions = activeReactions.sort(([,a], [,b]) => b - a);
+                                  const totalCount = activeReactions.reduce((sum, [, count]) => sum + count, 0);
+                                  
+                                  return (
+                                    <div>
+                                      {/* Reaction Tabs */}
+                                      <div className="flex border-b border-gray-200 overflow-x-auto">
+                                        <button className="flex items-center space-x-2 px-4 py-3 border-b-2 border-blue-500 text-blue-600 font-medium whitespace-nowrap">
+                                          <span>Semua</span>
+                                          <span className="text-sm text-gray-500">{totalCount}</span>
+                                        </button>
+                                        {sortedReactions.map(([emoji, count]) => (
+                                          <button
+                                            key={emoji}
+                                            className="flex items-center space-x-2 px-4 py-3 text-gray-600 hover:text-gray-900 whitespace-nowrap"
+                                          >
+                                            <span className="text-lg">{emoji}</span>
+                                            <span className="text-sm text-gray-500">{count}</span>
+                                          </button>
+                                        ))}
+                                      </div>
+                                      
+                                      {/* User List */}
+                                      <div className="p-4 space-y-3">
+                                        {sortedReactions.map(([emoji, count]) => {
+                                          const users = reactionUsers[item.id]?.[emoji] || [];
+                                          return users.map((userName, index) => (
+                                            <div key={`${emoji}-${index}`} className="flex items-center space-x-3">
+                                              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                                                {userName.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                                              </div>
+                                              <div className="flex-1">
+                                                <div className="font-medium text-gray-900">{userName}</div>
+                                              </div>
+                                              <div className="text-lg">{emoji}</div>
+                                            </div>
+                                          ));
+                                        })}
+                                      </div>
+                                    </div>
+                                  );
+                                })()}
                               </div>
                             </div>
                           </div>
