@@ -3480,7 +3480,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (result.initiativeId && isCompleted) {
         console.log(`🔍 Debug: DOD item checked, initiative ID: ${result.initiativeId}`);
         
-        const initiative = await storage.getInitiative(result.initiativeId);
+        const initiative = await storage.getInitiativeWithDetails(result.initiativeId);
         if (initiative) {
           console.log(`📋 Initiative found: YES, current status: ${initiative.status}`);
           
