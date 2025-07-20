@@ -523,23 +523,8 @@ export function DailyUpdateSimple() {
                                   )}
                                 </div>
                               </div>
-                              <div className="text-xs sm:text-sm text-gray-500 space-y-1 sm:space-y-0">
-                                <div>
-                                  {task.dueDate && `Due: ${new Date(task.dueDate).toLocaleDateString('id-ID')}`}
-                                </div>
-                                <div className="sm:ml-3 sm:inline">
-                                  <span className={`font-medium ${
-                                    task.status === 'selesai' ? 'text-green-600' :
-                                    task.status === 'sedang_berjalan' ? 'text-blue-600' :
-                                    task.status === 'dibatalkan' ? 'text-red-600' :
-                                    'text-gray-600'
-                                  }`}>
-                                    {task.status === 'selesai' ? 'Selesai' :
-                                     task.status === 'sedang_berjalan' ? 'Sedang Berjalan' :
-                                     task.status === 'dibatalkan' ? 'Dibatalkan' :
-                                     'Belum Mulai'}
-                                  </span>
-                                </div>
+                              <div className="text-xs sm:text-sm text-gray-500">
+                                {task.dueDate && `Due: ${new Date(task.dueDate).toLocaleDateString('id-ID')}`}
                               </div>
                             </div>
                             <div className="flex items-center gap-3 flex-shrink-0">
