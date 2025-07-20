@@ -3055,13 +3055,13 @@ export class DatabaseStorage implements IStorage {
 
   // Timeline Updates
   async getTimelineUpdates(organizationId: string, userId?: string): Promise<any[]> {
-    const whereConditions = [eq(timelineUpdates.organizationId, organizationId)];
-    
+    // Get daily updates
+    const dailyUpdateConditions = [eq(timelineUpdates.organizationId, organizationId)];
     if (userId) {
-      whereConditions.push(eq(timelineUpdates.userId, userId));
+      dailyUpdateConditions.push(eq(timelineUpdates.userId, userId));
     }
 
-    const results = await db
+    const dailyUpdates = await db
       .select({
         id: timelineUpdates.id,
         userId: timelineUpdates.userId,
@@ -3084,6 +3084,7 @@ export class DatabaseStorage implements IStorage {
         updateTypes: timelineUpdates.updateTypes,
         createdAt: timelineUpdates.createdAt,
         updatedAt: timelineUpdates.updatedAt,
+        type: sql<string>`'daily_update'`.as('type'),
         user: {
           id: users.id,
           name: users.name,
@@ -3093,10 +3094,72 @@ export class DatabaseStorage implements IStorage {
       })
       .from(timelineUpdates)
       .innerJoin(users, eq(users.id, timelineUpdates.userId))
-      .where(and(...whereConditions))
-      .orderBy(desc(timelineUpdates.updateDate));
+      .where(and(...dailyUpdateConditions));
 
-    return results;
+    // Get key result check-ins
+    const checkInConditions = [eq(checkIns.organizationId, organizationId)];
+    if (userId) {
+      checkInConditions.push(eq(checkIns.createdBy, userId));
+    }
+
+    const keyResultCheckIns = await db
+      .select({
+        id: sql<string>`CONCAT('checkin-', ${checkIns.id})`.as('id'),
+        userId: checkIns.createdBy,
+        organizationId: checkIns.organizationId,
+        updateDate: checkIns.createdAt,
+        summary: sql<string>`CONCAT('Update capaian: ', ${keyResults.title}, ' - ', ${checkIns.value}, ' ', COALESCE(${keyResults.unit}, ''))`.as('summary'),
+        tasksUpdated: sql<number>`0`.as('tasksUpdated'),
+        tasksCompleted: sql<number>`0`.as('tasksCompleted'),
+        tasksSummary: sql<string>`NULL`.as('tasksSummary'),
+        keyResultsUpdated: sql<number>`1`.as('keyResultsUpdated'),
+        keyResultsSummary: sql<string>`CONCAT(${keyResults.title}, ': ', ${checkIns.value}, ' ', COALESCE(${keyResults.unit}, ''))`.as('keyResultsSummary'),
+        successMetricsUpdated: sql<number>`0`.as('successMetricsUpdated'),
+        successMetricsSummary: sql<string>`NULL`.as('successMetricsSummary'),
+        deliverablesUpdated: sql<number>`0`.as('deliverablesUpdated'),
+        deliverablesCompleted: sql<number>`0`.as('deliverablesCompleted'),
+        deliverablesSummary: sql<string>`NULL`.as('deliverablesSummary'),
+        whatWorkedWell: sql<string>`NULL`.as('whatWorkedWell'),
+        challenges: sql<string>`NULL`.as('challenges'),
+        totalUpdates: sql<number>`1`.as('totalUpdates'),
+        updateTypes: sql<string>`'check_in'`.as('updateTypes'),
+        createdAt: checkIns.createdAt,
+        updatedAt: checkIns.createdAt,
+        type: sql<string>`'check_in'`.as('type'),
+        checkInValue: checkIns.value,
+        checkInNotes: checkIns.notes,
+        keyResult: {
+          id: keyResults.id,
+          title: keyResults.title,
+          unit: keyResults.unit,
+          targetValue: keyResults.targetValue
+        },
+        user: {
+          id: users.id,
+          name: users.name,
+          email: users.email,
+          profileImageUrl: users.profileImageUrl
+        }
+      })
+      .from(checkIns)
+      .innerJoin(users, eq(users.id, checkIns.createdBy))
+      .innerJoin(keyResults, eq(keyResults.id, checkIns.keyResultId))
+      .where(and(...checkInConditions));
+
+    // Combine and sort by date
+    const allEntries = [
+      ...dailyUpdates.map(update => ({ ...update, type: 'daily_update' })),
+      ...keyResultCheckIns.map(checkIn => ({ ...checkIn, type: 'check_in' }))
+    ];
+
+    // Sort by updateDate/createdAt descending (newest first)
+    allEntries.sort((a, b) => {
+      const dateA = new Date(a.updateDate || a.createdAt).getTime();
+      const dateB = new Date(b.updateDate || b.createdAt).getTime();
+      return dateB - dateA;
+    });
+
+    return allEntries;
   }
 
   async getTimelineUpdate(userId: string, updateDate: string): Promise<any | undefined> {
