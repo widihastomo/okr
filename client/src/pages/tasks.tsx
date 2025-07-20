@@ -305,11 +305,27 @@ const TasksPage = () => {
       return false;
     });
 
-    // Upcoming tasks (excluding overdue, today, and tomorrow)
+    // Upcoming tasks (start date is more than tomorrow, or no start date but due date is in the future)
     const upcomingTasks = filteredTasks.filter((task: Task) => {
       if (task.status === "completed" || task.status === "cancelled") return false;
       
-      // Exclude tasks that are in other categories
+      const today = new Date();
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      
+      // Reset time to compare only dates
+      today.setHours(0, 0, 0, 0);
+      tomorrow.setHours(0, 0, 0, 0);
+      
+      // Check if task has startDate and it's after tomorrow
+      if (task.startDate) {
+        const startDate = new Date(task.startDate);
+        startDate.setHours(0, 0, 0, 0);
+        return startDate.getTime() > tomorrow.getTime();
+      }
+      
+      // For tasks without startDate, fallback to dueDate logic
+      // Only include if due date is in the future and not overdue/today/tomorrow
       const isOverdue = categorizeTaskByDate(task) === 'overdue';
       const isToday = todayTasks.includes(task);
       const isTomorrow = tomorrowTasks.includes(task);

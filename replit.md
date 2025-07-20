@@ -341,6 +341,15 @@ The system includes comprehensive database connection troubleshooting tools:
 
 ## Changelog
 ```
+- July 20, 2025. **TASKS PAGE TASK GROUPING ENHANCEMENT COMPLETED** - Successfully applied Daily Focus intelligent task grouping logic to Tasks page with comprehensive categorization:
+  * APPLIED: Daily Focus task grouping logic to Tasks page with enhanced categorization using startDate prioritization
+  * ADDED: "Besok" (Tomorrow) task category positioned between "Hari Ini" and "Akan Datang" with green color styling
+  * ENHANCED: Today's tasks now include in-progress tasks regardless of date (matching Daily Focus behavior)
+  * ENHANCED: Tomorrow tasks filtering uses startDate if available, otherwise fallbacks to dueDate for backward compatibility
+  * FIXED: "Akan Datang" (Upcoming) group now properly displays tasks with start dates after tomorrow (startDate > tomorrow)
+  * IMPLEMENTED: Comprehensive task filtering logic: startDate for today/tomorrow planning, dueDate for overdue detection
+  * MAINTAINED: Backward compatibility for tasks without startDate values throughout all enhancements
+  * RESULT: Tasks page now uses same intelligent grouping as Daily Focus with 4 logical categories (Terlambat, Hari Ini, Besok, Akan Datang)
 - July 20, 2025. **TASK FILTERING LOGIC ENHANCED** - Successfully improved Daily Focus task categorization logic based on user requirements:
   * CHANGED: Task terlambat (overdue) continues to use dueDate < today (no change needed)
   * ENHANCED: Task hari ini (today) now uses startDate = today if available, otherwise fallbacks to dueDate
