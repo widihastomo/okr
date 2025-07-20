@@ -536,29 +536,11 @@ export default function TimelinePage() {
                             </div>
                           )}
                           
-                          {/* Key Results Details */}
-                          {item.keyResultsSummary && (
-                            <div className="bg-purple-50 rounded-lg p-2">
-                              <div className="flex items-center gap-1 mb-1">
-                                <span className="text-xs font-medium text-purple-800">🎯 Key Results ({item.keyResultsUpdated})</span>
-                              </div>
-                              <div className="text-xs text-purple-700">
-                                {item.keyResultsSummary && item.keyResultsSummary.split(', ').map((kr, index) => (
-                                  <div key={index} className="mb-1 last:mb-0">
-                                    <span>{kr}</span>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
                           
                           {/* Progress Information for Check-ins */}
                           {item.type === 'check_in' && item.keyResultTitle && (
                             <div className="bg-purple-50 rounded-lg p-2">
-                              <div className="flex items-center gap-1 mb-1">
-                                <span className="text-xs font-medium text-purple-800">📊 Progress Check-in</span>
-                              </div>
-                              <div className="mt-2 pt-2 border-t border-purple-200">
+                              <div className="pt-2 border-purple-200">
                                 <div className="flex items-center justify-between mb-1">
                                   <span className="text-xs font-medium text-purple-800">Progress Capaian:</span>
                                   <span className="text-xs font-bold text-purple-900">
