@@ -341,6 +341,12 @@ The system includes comprehensive database connection troubleshooting tools:
 
 ## Changelog
 ```
+- July 20, 2025. **INITIATIVE FORM SUBMIT BUTTON FIX** - Successfully resolved form submission validation errors preventing button functionality:
+  * FIXED: Task dueDate and startDate fields now properly converted to Date objects in edit mode
+  * ENHANCED: Added startDate field to task schema for proper validation
+  * IMPROVED: Form initialization and reset functions now handle date string-to-Date conversion
+  * RESOLVED: Submit button now functional in edit mode without validation errors
+  * RESULT: Initiative form submit button now works correctly in both create and edit modes
 - July 20, 2025. **BUDGET INPUT DECIMAL FORMATTING FIX** - Successfully fixed budget input field to avoid displaying unnecessary ".00" decimal places:
   * ENHANCED: formatNumberWithSeparator function now removes ".00" suffix for whole numbers
   * IMPROVED: Budget field displays clean values without unnecessary decimal places (e.g., "80.000.000" instead of "80000000.00")

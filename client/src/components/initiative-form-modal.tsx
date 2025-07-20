@@ -159,6 +159,7 @@ const taskSchema = z.object({
     .default("not_started"),
   priority: z.enum(["low", "medium", "high"]).default("medium"),
   assignedTo: z.string().optional(),
+  startDate: z.date().optional(),
   dueDate: z.date({
     required_error: "Tanggal deadline wajib diisi",
   }),
@@ -303,7 +304,11 @@ export default function InitiativeFormModal({
           difficultyLevel: initiative.effortScore,
           beliefLevel: initiative.confidenceScore,
           successMetrics: existingSuccessMetrics || [{ name: "", target: "" }],
-          tasks: existingTasks || [],
+          tasks: existingTasks?.map(task => ({
+            ...task,
+            dueDate: new Date(task.dueDate),
+            startDate: task.startDate ? new Date(task.startDate) : new Date(),
+          })) || [],
         }
       : {
           initiative: {
@@ -358,7 +363,11 @@ export default function InitiativeFormModal({
           difficultyLevel: initiative.effortScore,
           beliefLevel: initiative.confidenceScore,
           successMetrics: existingSuccessMetrics || [{ name: "", target: "" }],
-          tasks: existingTasks || [],
+          tasks: existingTasks?.map(task => ({
+            ...task,
+            dueDate: new Date(task.dueDate),
+            startDate: task.startDate ? new Date(task.startDate) : new Date(),
+          })) || [],
         });
       }
     } else if (open && !isEditMode) {
