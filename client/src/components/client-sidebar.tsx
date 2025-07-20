@@ -296,14 +296,21 @@ export default function Sidebar({
                   <li key={item.path}>
                     {/* Show tooltip only on desktop when collapsed */}
                     {isCollapsed ? (
-                      <div className="lg:block hidden">
-                        <Tooltip>
-                          <TooltipTrigger asChild>{menuItem}</TooltipTrigger>
-                          <TooltipContent side="right">
-                            <p>{item.label}</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </div>
+                      <>
+                        {/* Desktop: tooltip version when collapsed */}
+                        <div className="lg:block hidden">
+                          <Tooltip>
+                            <TooltipTrigger asChild>{menuItem}</TooltipTrigger>
+                            <TooltipContent side="right">
+                              <p>{item.label}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </div>
+                        {/* Mobile: always show normal menu item */}
+                        <div className="lg:hidden">
+                          {menuItem}
+                        </div>
+                      </>
                     ) : (
                       menuItem
                     )}
@@ -315,39 +322,62 @@ export default function Sidebar({
 
           {/* Profile section at bottom */}
           <div className="border-t border-gray-200 p-2">
-            {/* Desktop: show tooltip when collapsed */}
-            {isCollapsed && (
-              <div className="lg:block hidden">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Link href="/profile">
-                      <button
-                        className={cn(
-                          "flex items-center justify-center px-4 py-3 rounded-lg text-sm font-medium transition-colors w-full",
-                          location === "/profile"
-                            ? "bg-gradient-to-r from-orange-600 to-orange-500 text-white"
-                            : "text-gray-700 hover:bg-gray-100",
-                        )}
-                        onClick={() => {
-                          // Only close sidebar on mobile, don't affect desktop collapsed state
-                          if (window.innerWidth < 1024) {
-                            onClose?.();
-                          }
-                        }}
-                      >
-                        <User className="w-5 h-5" />
-                      </button>
-                    </Link>
-                  </TooltipTrigger>
-                  <TooltipContent side="right">
-                    <p>Profile</p>
-                  </TooltipContent>
-                </Tooltip>
-              </div>
-            )}
-
-            {/* Desktop: show expanded when not collapsed, Mobile: always show expanded */}
-            <div className={cn(isCollapsed ? "lg:hidden" : "")}>
+            {/* Profile section rendering */}
+            {isCollapsed ? (
+              <>
+                {/* Desktop: tooltip version when collapsed */}
+                <div className="lg:block hidden">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Link href="/profile">
+                        <button
+                          className={cn(
+                            "flex items-center justify-center px-4 py-3 rounded-lg text-sm font-medium transition-colors w-full",
+                            location === "/profile"
+                              ? "bg-gradient-to-r from-orange-600 to-orange-500 text-white"
+                              : "text-gray-700 hover:bg-gray-100",
+                          )}
+                          onClick={() => {
+                            // Only close sidebar on mobile, don't affect desktop collapsed state
+                            if (window.innerWidth < 1024) {
+                              onClose?.();
+                            }
+                          }}
+                        >
+                          <User className="w-5 h-5" />
+                        </button>
+                      </Link>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">
+                      <p>Profile</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+                {/* Mobile: always show expanded profile */}
+                <div className="lg:hidden">
+                  <Link href="/profile">
+                    <button
+                      className={cn(
+                        "flex items-center space-x-4 px-4 py-3 rounded-lg text-sm font-medium transition-colors w-full text-left",
+                        location === "/profile"
+                          ? "bg-gradient-to-r from-orange-600 to-orange-500 text-white"
+                          : "text-gray-700 hover:bg-gray-100",
+                      )}
+                      onClick={() => {
+                        // Only close sidebar on mobile, don't affect desktop collapsed state
+                        if (window.innerWidth < 1024) {
+                          onClose?.();
+                        }
+                      }}
+                    >
+                      <User className="w-5 h-5" />
+                      <span>Profile</span>
+                    </button>
+                  </Link>
+                </div>
+              </>
+            ) : (
+              /* Desktop: show expanded when not collapsed, Mobile: always show expanded */
               <Link href="/profile">
                 <button
                   className={cn(
@@ -367,7 +397,7 @@ export default function Sidebar({
                   <span>Profile</span>
                 </button>
               </Link>
-            </div>
+            )}
           </div>
         </div>
       </TooltipProvider>
