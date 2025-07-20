@@ -477,52 +477,54 @@ export default function InitiativeClosureModal({
                 )}
 
                 {/* Update Budget */}
-                <div className="border-t border-gray-200 pt-4">
-                  <FormField
-                    control={form.control}
-                    name="budgetUsed"
-                    render={({ field }) => (
-                      <FormItem>
-                        <div className="flex items-center gap-2">
-                          <FormLabel className="text-sm font-medium text-gray-700">Budget yang digunakan (Rp)</FormLabel>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <button type="button" className="inline-flex items-center justify-center">
-                                <HelpCircle className="h-4 w-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                              </button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-80">
-                              <div className="space-y-2">
-                                <h4 className="font-medium">Panduan Update Budget</h4>
-                                <div className="space-y-2 text-sm">
-                                  <p>• Masukkan total budget yang sudah digunakan selama inisiatif berjalan</p>
-                                  <p>• Budget ini akan digunakan untuk evaluasi efisiensi biaya</p>
-                                  <p>• Kosongkan jika tidak ada perubahan budget</p>
-                                  <p>• Format: angka tanpa titik atau koma (contoh: 1000000)</p>
+                {selectedResult && (
+                  <div className="border-t border-gray-200 pt-4">
+                    <FormField
+                      control={form.control}
+                      name="budgetUsed"
+                      render={({ field }) => (
+                        <FormItem>
+                          <div className="flex items-center gap-2">
+                            <FormLabel className="text-sm font-medium text-gray-700">Budget yang digunakan (Rp)</FormLabel>
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <button type="button" className="inline-flex items-center justify-center">
+                                  <HelpCircle className="h-4 w-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                                </button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-80">
+                                <div className="space-y-2">
+                                  <h4 className="font-medium">Panduan Update Budget</h4>
+                                  <div className="space-y-2 text-sm">
+                                    <p>• Masukkan total budget yang sudah digunakan selama inisiatif berjalan</p>
+                                    <p>• Budget ini akan digunakan untuk evaluasi efisiensi biaya</p>
+                                    <p>• Kosongkan jika tidak ada perubahan budget</p>
+                                    <p>• Format: angka tanpa titik atau koma (contoh: 1000000)</p>
+                                  </div>
                                 </div>
-                              </div>
-                            </PopoverContent>
-                          </Popover>
-                        </div>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            placeholder="Contoh: 5000000 (untuk Rp 5.000.000)"
-                            {...field}
-                            className="border-gray-300"
-                          />
-                        </FormControl>
-                        <div className="text-xs text-gray-500 mt-1">
-                          Budget awal: Rp {initiative?.budget ? Number(initiative.budget).toLocaleString('id-ID') : '0'}
-                        </div>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                              </PopoverContent>
+                            </Popover>
+                          </div>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              placeholder="Contoh: 5000000 (untuk Rp 5.000.000)"
+                              {...field}
+                              className="border-gray-300"
+                            />
+                          </FormControl>
+                          <div className="text-xs text-gray-500 mt-1">
+                            Budget awal: Rp {initiative?.budget ? Number(initiative.budget).toLocaleString('id-ID') : '0'}
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                )}
 
                 {/* Update Success Metrics */}
-                {Array.isArray(successMetrics) && successMetrics.length > 0 && (
+                {selectedResult && Array.isArray(successMetrics) && successMetrics.length > 0 && (
                   <div className="border-t border-gray-200 pt-4">
                     <div className="mb-3 flex items-center gap-2">
                       <h3 className="text-sm font-medium text-gray-700">Update Metrik Keberhasilan</h3>
@@ -578,7 +580,7 @@ export default function InitiativeClosureModal({
                 )}
 
                 {/* Update DOD Status */}
-                {incompleteDodItems.length > 0 && (
+                {selectedResult && incompleteDodItems.length > 0 && (
                   <div className="border-t border-gray-200 pt-4">
                     <div className="mb-3 flex items-center gap-2">
                       <h3 className="text-sm font-medium text-gray-700">Update Status Deliverable (Output)</h3>
@@ -633,7 +635,7 @@ export default function InitiativeClosureModal({
                 )}
 
                 {/* Update Task Status */}
-                {incompleteTasks.length > 0 && (
+                {selectedResult && incompleteTasks.length > 0 && (
                   <div className="border-t border-gray-200 pt-4">
                     <div className="mb-3 flex items-center gap-2">
                       <h3 className="text-sm font-medium text-gray-700">Update Status Task</h3>
@@ -692,46 +694,48 @@ export default function InitiativeClosureModal({
                 )}
 
                 {/* Catatan Tambahan */}
-                <div className="border-t border-gray-200 pt-4">
-                  <FormField
-                    control={form.control}
-                    name="notes"
-                    render={({ field }) => (
-                      <FormItem>
-                        <div className="flex items-center gap-2">
-                          <FormLabel className="text-sm font-medium text-gray-700">Catatan Tambahan (Opsional)</FormLabel>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <button type="button" className="inline-flex items-center justify-center">
-                                <HelpCircle className="h-4 w-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                              </button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-80">
-                              <div className="space-y-2">
-                                <h4 className="font-medium">Panduan Catatan Tambahan</h4>
-                                <div className="space-y-2 text-sm">
-                                  <p>• Tambahkan informasi penting yang belum tercakup di bagian lain</p>
-                                  <p>• Catat kendala atau tantangan yang dihadapi</p>
-                                  <p>• Dokumentasikan hal-hal yang perlu diingat untuk inisiatif serupa</p>
-                                  <p>• Berikan rekomendasi untuk perbaikan di masa depan</p>
+                {selectedResult && (
+                  <div className="border-t border-gray-200 pt-4">
+                    <FormField
+                      control={form.control}
+                      name="notes"
+                      render={({ field }) => (
+                        <FormItem>
+                          <div className="flex items-center gap-2">
+                            <FormLabel className="text-sm font-medium text-gray-700">Catatan Tambahan (Opsional)</FormLabel>
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <button type="button" className="inline-flex items-center justify-center">
+                                  <HelpCircle className="h-4 w-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                                </button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-80">
+                                <div className="space-y-2">
+                                  <h4 className="font-medium">Panduan Catatan Tambahan</h4>
+                                  <div className="space-y-2 text-sm">
+                                    <p>• Tambahkan informasi penting yang belum tercakup di bagian lain</p>
+                                    <p>• Catat kendala atau tantangan yang dihadapi</p>
+                                    <p>• Dokumentasikan hal-hal yang perlu diingat untuk inisiatif serupa</p>
+                                    <p>• Berikan rekomendasi untuk perbaikan di masa depan</p>
+                                  </div>
                                 </div>
-                              </div>
-                            </PopoverContent>
-                          </Popover>
-                        </div>
-                        <FormControl>
-                          <Textarea
-                            placeholder="Contoh: Proses implementasi berjalan lancar, namun diperlukan pelatihan tambahan untuk tim. Rekomendasi untuk inisiatif serupa: libatkan stakeholder sejak awal perencanaan."
-                            {...field}
-                            rows={3}
-                            className="border-gray-300"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                              </PopoverContent>
+                            </Popover>
+                          </div>
+                          <FormControl>
+                            <Textarea
+                              placeholder="Contoh: Proses implementasi berjalan lancar, namun diperlukan pelatihan tambahan untuk tim. Rekomendasi untuk inisiatif serupa: libatkan stakeholder sejak awal perencanaan."
+                              {...field}
+                              rows={3}
+                              className="border-gray-300"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                )}
               </CardContent>
             </Card>
 
