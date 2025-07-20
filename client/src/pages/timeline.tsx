@@ -434,11 +434,7 @@ export default function TimelinePage() {
                             <Badge variant="default" className="text-xs">
                               Update Harian
                             </Badge>
-                            {item.totalUpdates > 0 && (
-                              <Badge variant="secondary" className="text-xs">
-                                {item.totalUpdates} updates
-                              </Badge>
-                            )}
+                            
                           </div>
                           <p className="text-gray-700 text-sm mt-1">
                             Membagikan update progress harian
