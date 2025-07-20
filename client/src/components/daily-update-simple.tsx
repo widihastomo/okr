@@ -86,7 +86,7 @@ export function DailyUpdateSimple() {
   });
 
   // Filter key results for current user only
-  const keyResults = (allKeyResults as any[]).filter((kr: any) => kr.assignedTo === user?.id);
+  const keyResults = Array.isArray(allKeyResults) ? allKeyResults.filter((kr: any) => kr.assignedTo === user?.id) : [];
 
   const { data: allInitiatives = [] } = useQuery({
     queryKey: ['/api/initiatives'],
@@ -94,7 +94,8 @@ export function DailyUpdateSimple() {
 
   // Filter initiatives for current user only (where user is PIC) using useMemo for stability
   const initiatives = useMemo(() => {
-    const filtered = (allInitiatives as any[]).filter((initiative: any) => initiative.picId === user?.id);
+    if (!Array.isArray(allInitiatives)) return [];
+    const filtered = allInitiatives.filter((initiative: any) => initiative.picId === user?.id);
     console.log('All initiatives:', allInitiatives);
     console.log('User ID:', user?.id);
     console.log('Filtered initiatives (user is PIC):', filtered);
@@ -106,7 +107,7 @@ export function DailyUpdateSimple() {
   });
 
   // Filter tasks for current user only
-  const userTasks = (allTasks as any[]).filter((task: any) => task.assignedTo === user?.id);
+  const userTasks = Array.isArray(allTasks) ? allTasks.filter((task: any) => task.assignedTo === user?.id) : [];
 
   // Filter tasks for today and overdue
   const todayTasks = userTasks.filter((task: any) => {
@@ -125,25 +126,25 @@ export function DailyUpdateSimple() {
   const relevantTasks = [...overdueTasks, ...todayTasks];
 
   const { data: successMetrics = [] } = useQuery({
-    queryKey: ['/api/success-metrics', initiatives.length > 0 ? initiatives.map(i => i.id).sort().join(',') : 'none'],
+    queryKey: ['/api/success-metrics', initiatives.length > 0 ? initiatives.map((i: any) => i.id).sort().join(',') : 'none'],
     queryFn: async () => {
           if (initiatives.length === 0) return [];
       
       const allMetrics = [];
       for (const initiative of initiatives) {
         try {
-          const response = await apiRequest('GET', `/api/initiatives/${initiative.id}/success-metrics`);
+          const response = await apiRequest('GET', `/api/initiatives/${(initiative as any).id}/success-metrics`);
           const metrics = await response.json();
 
           if (Array.isArray(metrics)) {
             allMetrics.push(...metrics.map((metric: any) => ({
               ...metric,
-              initiativeTitle: initiative.title,
-              initiativeId: initiative.id
+              initiativeTitle: (initiative as any).title,
+              initiativeId: (initiative as any).id
             })));
           }
         } catch (error) {
-          console.error(`Error fetching metrics for initiative ${initiative.id}:`, error);
+          console.error(`Error fetching metrics for initiative ${(initiative as any).id}:`, error);
         }
       }
 
@@ -155,21 +156,21 @@ export function DailyUpdateSimple() {
   });
 
   const { data: deliverables = [] } = useQuery({
-    queryKey: ['/api/deliverables', initiatives.length > 0 ? initiatives.map(i => i.id).sort().join(',') : 'none'],
+    queryKey: ['/api/deliverables', initiatives.length > 0 ? initiatives.map((i: any) => i.id).sort().join(',') : 'none'],
     queryFn: async () => {
           if (initiatives.length === 0) return [];
       
       const allDeliverables = [];
       for (const initiative of initiatives) {
         try {
-          const response = await apiRequest('GET', `/api/initiatives/${initiative.id}/definition-of-done`);
+          const response = await apiRequest('GET', `/api/initiatives/${(initiative as any).id}/definition-of-done`);
           const deliverableItems = await response.json();
 
           if (Array.isArray(deliverableItems)) {
             allDeliverables.push(...deliverableItems.map((item: any) => ({
               ...item,
-              initiativeTitle: initiative.title,
-              initiativeId: initiative.id
+              initiativeTitle: (initiative as any).title,
+              initiativeId: (initiative as any).id
             })));
           }
         } catch (error) {

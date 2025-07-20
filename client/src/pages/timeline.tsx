@@ -450,7 +450,17 @@ export default function TimelinePage() {
                           </div>
                           <p className="text-gray-700 text-sm mt-1">
                             {item.type === 'check_in' 
-                              ? `Update capaian: ${item.keyResultTitle || 'Key Result'}`
+                              ? (
+                                <span>
+                                  Update capaian: {item.keyResultId ? (
+                                    <Link href={`/key-results/${item.keyResultId}`} className="text-blue-600 hover:text-blue-800 hover:underline font-medium">
+                                      {item.keyResultTitle || 'Key Result'}
+                                    </Link>
+                                  ) : (
+                                    <span className="font-medium">{item.keyResultTitle || 'Key Result'}</span>
+                                  )}
+                                </span>
+                              )
                               : 'Membagikan update progress harian'
                             }
                           </p>
