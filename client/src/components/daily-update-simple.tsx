@@ -7,8 +7,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { Zap, TrendingUp, Target, Clock } from 'lucide-react';
+import { Zap, TrendingUp, Target, Clock, CheckCircle2, AlertTriangle, Calendar, ListTodo } from 'lucide-react';
 
 interface SimpleUpdateData {
   keyResults: Array<{
@@ -288,174 +290,251 @@ export function DailyUpdateSimple() {
           Update Harian Instan
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Update Harian Instan</DialogTitle>
+          <DialogTitle className="flex items-center gap-2">
+            <Zap className="h-5 w-5 text-orange-600" />
+            Bulk Update Harian
+          </DialogTitle>
           <DialogDescription>
-            Update cepat progress hari ini
+            Update massal untuk tasks, angka target, dan progress inisiatif
           </DialogDescription>
         </DialogHeader>
         
-        <div className="space-y-6">
-          {/* Test Input */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Test Input</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <input
-                type="text"
-                value={testValue}
-                onChange={(e) => setTestValue(e.target.value)}
-                placeholder="Test ketik di sini..."
-                className="w-full px-3 py-2 border border-gray-300 rounded"
-              />
-              <p className="mt-2 text-sm text-gray-600">Test value: {testValue}</p>
-            </CardContent>
-          </Card>
-          
-          {/* Tasks Summary */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Clock className="h-5 w-5 text-orange-600" />
-                Task ({overdueTasks.length} Overdue, {todayTasks.length} Hari Ini)
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
+        <Tabs defaultValue="tasks" className="w-full">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="tasks" className="flex items-center gap-2">
+              <ListTodo className="h-4 w-4" />
+              Tasks
+              {relevantTasks.length > 0 && (
+                <Badge variant="secondary" className="ml-1">
+                  {relevantTasks.length}
+                </Badge>
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="targets" className="flex items-center gap-2">
+              <Target className="h-4 w-4" />
+              Angka Target
+              {updateData.keyResults.length > 0 && (
+                <Badge variant="secondary" className="ml-1">
+                  {updateData.keyResults.length}
+                </Badge>
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="metrics" className="flex items-center gap-2">
+              <TrendingUp className="h-4 w-4" />
+              Metrik & Output
+              {updateData.successMetrics.length > 0 && (
+                <Badge variant="secondary" className="ml-1">
+                  {updateData.successMetrics.length}
+                </Badge>
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="reflection" className="flex items-center gap-2">
+              <Calendar className="h-4 w-4" />
+              Refleksi
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Tasks Tab */}
+          <TabsContent value="tasks" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-5 w-5 text-orange-600" />
+                    Bulk Update Tasks
+                  </div>
+                  <div className="flex gap-2">
+                    {overdueTasks.length > 0 && (
+                      <Badge variant="destructive" className="flex items-center gap-1">
+                        <AlertTriangle className="h-3 w-3" />
+                        {overdueTasks.length} Terlambat
+                      </Badge>
+                    )}
+                    {todayTasks.length > 0 && (
+                      <Badge variant="default" className="flex items-center gap-1">
+                        <Calendar className="h-3 w-3" />
+                        {todayTasks.length} Hari Ini
+                      </Badge>
+                    )}
+                  </div>
+                </CardTitle>
+                <div className="text-sm text-gray-600">
+                  Update status task yang terlambat dan jatuh tempo hari ini
+                </div>
+              </CardHeader>
+              <CardContent>
                 {relevantTasks.length === 0 ? (
-                  <div className="text-center p-4">
-                    <div className="text-gray-500">Tidak ada task yang perlu diupdate</div>
+                  <div className="text-center p-8">
+                    <CheckCircle2 className="h-12 w-12 text-green-500 mx-auto mb-3" />
+                    <div className="text-gray-500 font-medium">Tidak ada task yang perlu diupdate</div>
+                    <div className="text-sm text-gray-400">Semua task sudah up to date</div>
                   </div>
                 ) : (
-                  relevantTasks.map((task: any) => {
-                    const isOverdue = overdueTasks.some(t => t.id === task.id);
-                    return (
-                      <div key={task.id} className={`border rounded-lg p-3 ${isOverdue ? 'bg-red-50 border-red-200' : 'bg-white'}`}>
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex-1">
-                            <div className="font-medium text-gray-900 text-sm">
-                              {task.title.length > 40 ? `${task.title.substring(0, 40)}...` : task.title}
-                              {isOverdue && <span className="ml-2 text-xs bg-red-100 text-red-800 px-2 py-1 rounded">Terlambat</span>}
-                            </div>
-                            <div className="text-xs text-gray-500">
-                              {task.dueDate && `Due: ${new Date(task.dueDate).toLocaleDateString('id-ID')}`}
-                              <span className="ml-2">
-                                Status: <span className={`font-medium ${
-                                  task.status === 'selesai' ? 'text-green-600' :
-                                  task.status === 'sedang_berjalan' ? 'text-blue-600' :
-                                  task.status === 'dibatalkan' ? 'text-red-600' :
-                                  'text-gray-600'
-                                }`}>
-                                  {task.status === 'selesai' ? 'Selesai' :
-                                   task.status === 'sedang_berjalan' ? 'Sedang Berjalan' :
-                                   task.status === 'dibatalkan' ? 'Dibatalkan' :
-                                   'Belum Mulai'}
+                  <div className="space-y-3">
+                    {relevantTasks.map((task: any) => {
+                      const isOverdue = overdueTasks.some(t => t.id === task.id);
+                      const isToday = todayTasks.some(t => t.id === task.id);
+                      return (
+                        <div 
+                          key={task.id} 
+                          className={`border rounded-lg p-4 transition-colors ${
+                            isOverdue ? 'bg-red-50 border-red-200' : 
+                            isToday ? 'bg-blue-50 border-blue-200' : 
+                            'bg-white border-gray-200'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-2">
+                                <h4 className="font-medium text-gray-900">
+                                  {task.title}
+                                </h4>
+                                {isOverdue && (
+                                  <Badge variant="destructive" className="text-xs">
+                                    <AlertTriangle className="h-3 w-3 mr-1" />
+                                    Terlambat
+                                  </Badge>
+                                )}
+                                {isToday && (
+                                  <Badge variant="default" className="text-xs">
+                                    <Calendar className="h-3 w-3 mr-1" />
+                                    Hari Ini
+                                  </Badge>
+                                )}
+                              </div>
+                              <div className="text-sm text-gray-500">
+                                {task.dueDate && `Due: ${new Date(task.dueDate).toLocaleDateString('id-ID')}`}
+                                <span className="ml-3">
+                                  Status Saat Ini: <span className={`font-medium ${
+                                    task.status === 'selesai' ? 'text-green-600' :
+                                    task.status === 'sedang_berjalan' ? 'text-blue-600' :
+                                    task.status === 'dibatalkan' ? 'text-red-600' :
+                                    'text-gray-600'
+                                  }`}>
+                                    {task.status === 'selesai' ? 'Selesai' :
+                                     task.status === 'sedang_berjalan' ? 'Sedang Berjalan' :
+                                     task.status === 'dibatalkan' ? 'Dibatalkan' :
+                                     'Belum Mulai'}
+                                  </span>
                                 </span>
-                              </span>
+                              </div>
                             </div>
-                          </div>
-                          <div className="w-36 flex items-center gap-2">
-                            <Select
-                              value={(() => {
-                                const existingTask = updateData.tasks.find(t => t.id === task.id);
-                                const currentStatus = existingTask?.newStatus || task.status;
-                                
-                                // Ensure we have a valid status that matches our SelectItem values
-                                if (['belum_mulai', 'sedang_berjalan', 'selesai', 'dibatalkan'].includes(currentStatus)) {
-                                  return currentStatus;
+                            <div className="flex items-center gap-3">
+                              <Select
+                                value={(() => {
+                                  const existingTask = updateData.tasks.find(t => t.id === task.id);
+                                  const currentStatus = existingTask?.newStatus || task.status;
+                                  
+                                  // Map status values to expected ones
+                                  if (['belum_mulai', 'sedang_berjalan', 'selesai', 'dibatalkan'].includes(currentStatus)) {
+                                    return currentStatus;
+                                  }
+                                  
+                                  switch (currentStatus) {
+                                    case 'belum_dimulai':
+                                      return 'belum_mulai';
+                                    case 'sedang_dikerjakan':
+                                      return 'sedang_berjalan';
+                                    case 'completed':
+                                      return 'selesai';
+                                    case 'cancelled':
+                                      return 'dibatalkan';
+                                    default:
+                                      return 'belum_mulai';
+                                  }
+                                })()}
+                                onValueChange={(status) => {
+                                  const newTasks = [...updateData.tasks];
+                                  const taskIndex = newTasks.findIndex(t => t.id === task.id);
+                                  if (taskIndex !== -1) {
+                                    newTasks[taskIndex].newStatus = status;
+                                  } else {
+                                    newTasks.push({
+                                      id: task.id,
+                                      title: task.title,
+                                      currentStatus: task.status,
+                                      newStatus: status
+                                    });
+                                  }
+                                  setUpdateData({ ...updateData, tasks: newTasks });
+                                }}
+                              >
+                                <SelectTrigger className="w-40">
+                                  <SelectValue placeholder="Pilih status" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="belum_mulai">Belum Mulai</SelectItem>
+                                  <SelectItem value="sedang_berjalan">Sedang Berjalan</SelectItem>
+                                  <SelectItem value="selesai">Selesai</SelectItem>
+                                  <SelectItem value="dibatalkan">Dibatalkan</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              {(() => {
+                                const taskUpdate = updateData.tasks.find(t => t.id === task.id);
+                                if (taskUpdate && taskUpdate.newStatus !== task.status) {
+                                  return (
+                                    <Badge variant="outline" className="text-orange-600 border-orange-600">
+                                      Berubah
+                                    </Badge>
+                                  );
                                 }
-                                
-                                // Map any other status values to expected ones
-                                switch (currentStatus) {
-                                  case 'belum_dimulai':
-                                    return 'belum_mulai';
-                                  case 'sedang_dikerjakan':
-                                    return 'sedang_berjalan';
-                                  case 'completed':
-                                    return 'selesai';
-                                  case 'cancelled':
-                                    return 'dibatalkan';
-                                  default:
-                                    return 'belum_mulai'; // Default fallback
-                                }
+                                return null;
                               })()}
-                              onValueChange={(status) => {
-                                const newTasks = [...updateData.tasks];
-                                const taskIndex = newTasks.findIndex(t => t.id === task.id);
-                                if (taskIndex !== -1) {
-                                  newTasks[taskIndex].newStatus = status;
-                                } else {
-                                  newTasks.push({
-                                    id: task.id,
-                                    title: task.title,
-                                    currentStatus: task.status,
-                                    newStatus: status
-                                  });
-                                }
-                                setUpdateData({ ...updateData, tasks: newTasks });
-                              }}
-                            >
-                              <SelectTrigger className="h-8 text-xs">
-                                <SelectValue placeholder="Pilih status" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="belum_mulai">Belum Mulai</SelectItem>
-                                <SelectItem value="sedang_berjalan">Sedang Berjalan</SelectItem>
-                                <SelectItem value="selesai">Selesai</SelectItem>
-                                <SelectItem value="dibatalkan">Dibatalkan</SelectItem>
-                              </SelectContent>
-                            </Select>
-                            {(() => {
-                              const taskUpdate = updateData.tasks.find(t => t.id === task.id);
-                              if (taskUpdate && taskUpdate.newStatus !== task.status) {
-                                return (
-                                  <div className="text-xs text-orange-600 font-medium">
-                                    Berubah
-                                  </div>
-                                );
-                              }
-                              return null;
-                            })()}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    );
-                  })
+                      );
+                    })}
+                  </div>
                 )}
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-          {/* Key Results */}
-          {updateData.keyResults.length > 0 && (
+          {/* Key Results Tab */}
+          <TabsContent value="targets" className="space-y-4">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Target className="h-5 w-5 text-blue-600" />
-                  Key Results
+                  Bulk Update Key Results
                 </CardTitle>
+                <div className="text-sm text-gray-600">
+                  Update nilai pencapaian untuk key results yang Anda kelola
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b">
-                        <th className="text-left p-2 font-medium text-gray-900">Key Result</th>
-                        <th className="text-left p-2 font-medium text-gray-900">Saat Ini</th>
-                        <th className="text-left p-2 font-medium text-gray-900">Nilai Baru</th>
-                        <th className="text-left p-2 font-medium text-gray-900">Catatan</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {updateData.keyResults.map((kr, index) => (
-                        <tr key={kr.id} className="border-b">
-                          <td className="p-2 font-medium text-gray-900">{kr.title}</td>
-                          <td className="p-2 text-gray-600">
-                            {parseFloat(kr.currentValue) || 0}{kr.unit === 'percentage' ? '%' : ` ${kr.unit}`}
-                          </td>
-                          <td className="p-2">
+                {updateData.keyResults.length === 0 ? (
+                  <div className="text-center p-8">
+                    <Target className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                    <div className="text-gray-500 font-medium">Tidak ada Key Result yang perlu diupdate</div>
+                    <div className="text-sm text-gray-400">Anda belum memiliki key result yang ditugaskan</div>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {updateData.keyResults.map((kr, index) => (
+                      <div key={kr.id} className="border rounded-lg p-4 bg-white">
+                        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+                          <div className="lg:col-span-1">
+                            <h4 className="font-medium text-gray-900 mb-1">{kr.title}</h4>
+                            <div className="text-sm text-gray-500">
+                              Target: {kr.targetValue}{kr.unit === 'percentage' ? '%' : ` ${kr.unit}`}
+                            </div>
+                          </div>
+                          <div className="lg:col-span-1">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Nilai Saat Ini
+                            </label>
+                            <div className="text-lg font-semibold text-gray-900">
+                              {parseFloat(kr.currentValue) || 0}{kr.unit === 'percentage' ? '%' : ` ${kr.unit}`}
+                            </div>
+                          </div>
+                          <div className="lg:col-span-1">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Nilai Baru *
+                            </label>
                             <div className="flex items-center">
                               <input
                                 type="number"
@@ -469,14 +548,18 @@ export function DailyUpdateSimple() {
                                     keyResults: newKeyResults
                                   }));
                                 }}
-                                className="w-16 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-orange-500"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="Masukkan nilai baru"
                               />
-                              <span className="ml-1 text-gray-600 text-sm">
+                              <span className="ml-2 text-gray-600 text-sm">
                                 {kr.unit === 'percentage' ? '%' : kr.unit}
                               </span>
                             </div>
-                          </td>
-                          <td className="p-2">
+                          </div>
+                          <div className="lg:col-span-1">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Catatan
+                            </label>
                             <input
                               type="text"
                               value={kr.notes || ''}
@@ -485,47 +568,69 @@ export function DailyUpdateSimple() {
                                 newKeyResults[index].notes = e.target.value || '';
                                 setUpdateData({ ...updateData, keyResults: newKeyResults });
                               }}
-                              placeholder="Catatan..."
-                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                              placeholder="Catatan update..."
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             />
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
-          )}
+          </TabsContent>
 
-          {/* Success Metrics */}
-          {updateData.successMetrics.length > 0 && (
+          {/* Success Metrics Tab */}
+          <TabsContent value="metrics" className="space-y-4">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <TrendingUp className="h-5 w-5 text-green-600" />
-                  Success Metrics
+                  Bulk Update Metrik & Deliverables
                 </CardTitle>
+                <div className="text-sm text-gray-600">
+                  Update pencapaian success metrics dan deliverables dari inisiatif Anda
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b">
-                        <th className="text-left p-2 font-medium text-gray-900">Metric</th>
-                        <th className="text-left p-2 font-medium text-gray-900">Inisiatif</th>
-                        <th className="text-left p-2 font-medium text-gray-900">Target</th>
-                        <th className="text-left p-2 font-medium text-gray-900">Pencapaian Baru</th>
-                        <th className="text-left p-2 font-medium text-gray-900">Catatan</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {updateData.successMetrics.map((sm, index) => (
-                        <tr key={sm.id} className="border-b">
-                          <td className="p-2 font-medium text-gray-900">{sm.name}</td>
-                          <td className="p-2 text-gray-600 text-xs">{sm.initiativeTitle}</td>
-                          <td className="p-2 text-gray-600">{sm.target}</td>
-                          <td className="p-2">
+                {updateData.successMetrics.length === 0 ? (
+                  <div className="text-center p-8">
+                    <TrendingUp className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                    <div className="text-gray-500 font-medium">Tidak ada Success Metrics yang perlu diupdate</div>
+                    <div className="text-sm text-gray-400">Anda belum memiliki success metrics dari inisiatif</div>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {updateData.successMetrics.map((sm, index) => (
+                      <div key={sm.id} className="border rounded-lg p-4 bg-white">
+                        <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+                          <div className="lg:col-span-1">
+                            <h4 className="font-medium text-gray-900 mb-1">{sm.name}</h4>
+                            <div className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                              {sm.initiativeTitle}
+                            </div>
+                          </div>
+                          <div className="lg:col-span-1">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Target
+                            </label>
+                            <div className="text-sm text-gray-600 bg-gray-50 px-2 py-2 rounded">
+                              {sm.target}
+                            </div>
+                          </div>
+                          <div className="lg:col-span-1">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Pencapaian Saat Ini
+                            </label>
+                            <div className="text-sm text-gray-600 bg-gray-50 px-2 py-2 rounded">
+                              {sm.achievement || 'Belum ada'}
+                            </div>
+                          </div>
+                          <div className="lg:col-span-1">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Pencapaian Baru *
+                            </label>
                             <input
                               type="text"
                               value={sm.newValue || ''}
@@ -534,10 +639,14 @@ export function DailyUpdateSimple() {
                                 newMetrics[index].newValue = e.target.value || '';
                                 setUpdateData({ ...updateData, successMetrics: newMetrics });
                               }}
-                              className="w-24 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-green-500"
+                              placeholder="Masukkan pencapaian baru"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
                             />
-                          </td>
-                          <td className="p-2">
+                          </div>
+                          <div className="lg:col-span-1">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Catatan
+                            </label>
                             <input
                               type="text"
                               value={sm.notes || ''}
@@ -546,52 +655,64 @@ export function DailyUpdateSimple() {
                                 newMetrics[index].notes = e.target.value || '';
                                 setUpdateData({ ...updateData, successMetrics: newMetrics });
                               }}
-                              placeholder="Catatan..."
-                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-green-500"
+                              placeholder="Catatan progress..."
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
                             />
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Daily Reflection Tab */}
+          <TabsContent value="reflection" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Calendar className="h-5 w-5 text-purple-600" />
+                  Refleksi Harian
+                </CardTitle>
+                <div className="text-sm text-gray-600">
+                  Catat refleksi harian Anda untuk pembelajaran dan peningkatan
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Apa yang Berjalan Baik Hari Ini? 🎉
+                  </label>
+                  <Textarea
+                    value={updateData.reflection.whatWorkedWell}
+                    onChange={(e) => setUpdateData({
+                      ...updateData,
+                      reflection: { ...updateData.reflection, whatWorkedWell: e.target.value }
+                    })}
+                    placeholder="Ceritakan pencapaian, kesuksesan, atau hal positif yang terjadi hari ini..."
+                    className="min-h-[120px] resize-y"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Tantangan yang Dihadapi 🤔
+                  </label>
+                  <Textarea
+                    value={updateData.reflection.challenges}
+                    onChange={(e) => setUpdateData({
+                      ...updateData,
+                      reflection: { ...updateData.reflection, challenges: e.target.value }
+                    })}
+                    placeholder="Hambatan, kesulitan, atau masalah yang perlu diatasi besok..."
+                    className="min-h-[120px] resize-y"
+                  />
                 </div>
               </CardContent>
             </Card>
-          )}
-
-          {/* Daily Reflection */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Refleksi Harian</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <label className="text-sm font-medium text-gray-700">Apa yang Berjalan Baik Hari Ini?</label>
-                <Textarea
-                  value={updateData.reflection.whatWorkedWell}
-                  onChange={(e) => setUpdateData({
-                    ...updateData,
-                    reflection: { ...updateData.reflection, whatWorkedWell: e.target.value }
-                  })}
-                  placeholder="Ceritakan pencapaian atau hal positif hari ini..."
-                  className="mt-1"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium text-gray-700">Tantangan yang Dihadapi</label>
-                <Textarea
-                  value={updateData.reflection.challenges}
-                  onChange={(e) => setUpdateData({
-                    ...updateData,
-                    reflection: { ...updateData.reflection, challenges: e.target.value }
-                  })}
-                  placeholder="Hambatan atau kesulitan yang perlu diatasi..."
-                  className="mt-1"
-                />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+          </TabsContent>
+        </Tabs>
 
         {/* Footer */}
         <div className="flex justify-end gap-3 pt-6 border-t border-gray-200">
