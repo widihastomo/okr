@@ -3938,9 +3938,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const initiative = await storage.getInitiativeWithDetails(updatedTask.initiativeId);
           console.log(`📋 Initiative found: ${initiative ? 'YES' : 'NO'}, current status: ${initiative?.status}`);
           
-          if (status === 'in_progress') {
-            // Change to "sedang_berjalan" when any task starts
-            console.log(`✅ Task status is in_progress, checking initiative...`);
+          if (status === 'in_progress' || status === 'completed') {
+            // Change to "sedang_berjalan" when any task starts or is completed
+            console.log(`✅ Task status is ${status}, checking initiative...`);
             if (initiative && initiative.status === 'draft') {
               console.log(`🔄 Updating initiative status from "draft" to "sedang_berjalan"...`);
               await storage.updateInitiative(updatedTask.initiativeId, {
