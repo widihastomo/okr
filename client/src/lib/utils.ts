@@ -22,3 +22,21 @@ export function formatCurrency(amount: number): string {
     maximumFractionDigits: 0,
   }).format(amount);
 }
+
+export function getUserInitials(user: { name?: string; firstName?: string; lastName?: string } | null | undefined): string {
+  if (!user) return "U";
+  
+  // Use consolidated name field if available
+  if (user.name) {
+    const nameParts = user.name.trim().split(' ').filter(Boolean);
+    if (nameParts.length === 1) {
+      return nameParts[0].charAt(0).toUpperCase();
+    }
+    return (nameParts[0].charAt(0) + (nameParts[nameParts.length - 1]?.charAt(0) || '')).toUpperCase();
+  }
+  
+  // Fallback to firstName/lastName if name is not available
+  const first = user.firstName?.charAt(0)?.toUpperCase() || '';
+  const last = user.lastName?.charAt(0)?.toUpperCase() || '';
+  return (first + last) || 'U';
+}

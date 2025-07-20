@@ -1,868 +1,456 @@
-import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
-import DailyCheckInButton from "@/components/daily-checkin-button";
+import { useState, useMemo } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useAuth } from '@/hooks/useAuth';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import { 
+  Filter, 
+  X, 
   Heart, 
   MessageCircle, 
-  ThumbsUp, 
-  Star, 
-  Sparkles,
-  Send,
-  Users,
-  Target,
-  Calendar,
-  Clock,
-  TrendingUp,
-  CalendarCheck,
-  BarChart3,
-  CheckCircle,
-  CheckSquare,
-  Package,
-  Filter,
-  X,
-  User,
-  Activity
-} from "lucide-react";
-import { TimelineIcon } from "@/components/ui/timeline-icon";
+  Share2, 
+  Send 
+} from 'lucide-react';
+import { format } from 'date-fns';
+import { getUserInitials } from '@/lib/utils';
+import DailyCheckInButton from '@/components/daily-checkin-button';
+import TimelineIcon from '@/components/ui/timeline-icon';
+import { apiRequest } from '@/lib/queryClient';
 
 interface TimelineItem {
   id: string;
-  type: string;
-  content: string;
+  type: 'check_in' | 'daily_update';
   createdAt: string;
-  currentValue?: number;
-  targetValue?: number;
-  confidence: number;
-  creator: {
-    id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-  };
-  keyResult?: {
-    id: string;
-    title: string;
-    unit: string;
-  };
-  reactions: {
-    like: number;
-    love: number;
-    support: number;
-    celebrate: number;
-  };
-  comments: TimelineComment[];
-}
-
-interface TimelineUpdate {
-  id: string;
+  userName: string;
   userId: string;
-  organizationId: string;
-  updateDate: string;
-  summary: string;
-  tasksUpdated?: number;
-  tasksCompleted?: number;
-  tasksSummary?: string;
-  keyResultsUpdated?: number;
-  keyResultsSummary?: string;
-  successMetricsUpdated?: number;
-  successMetricsSummary?: string;
-  deliverablesUpdated?: number;
-  deliverablesCompleted?: number;
-  deliverablesSummary?: string;
-  whatWorkedWell?: string;
-  challenges?: string;
-  totalUpdates: number;
-  updateTypes: string[];
-  createdAt: string;
-  updatedAt: string;
-  user?: {
-    id: string;
-    name: string;
-    email: string;
-    profileImageUrl?: string;
-  };
+  keyResultTitle?: string;
+  previousValue?: number;
+  currentValue?: number;
+  notes?: string;
+  summary?: string;
 }
-
-interface TimelineComment {
-  id: string;
-  content: string;
-  createdAt: string;
-  creator: {
-    id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-  };
-}
-
-interface TimelineReaction {
-  id: string;
-  type: "like" | "love" | "support" | "celebrate";
-  createdAt: string;
-  creator: {
-    id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-  };
-}
-
-// Helper functions
-const getUserName = (user: any) => {
-  if (!user) return 'Unknown User';
-  
-  // Use consolidated name field
-  if (user.name && user.name.trim() !== '') {
-    return user.name.trim();
-  }
-  
-  // Fallback to email username
-  if (user.email) {
-    return user.email.split('@')[0];
-  }
-  
-  return 'Unknown User';
-};
-
-const getUserInitials = (user: any) => {
-  if (!user) return 'U';
-  
-  // Use consolidated name field
-  if (user.name && user.name.trim() !== '') {
-    const nameParts = user.name.trim().split(' ');
-    if (nameParts.length >= 2) {
-      return `${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}`.toUpperCase();
-    }
-    return nameParts[0][0].toUpperCase();
-  }
-  
-  // Fallback to email
-  if (user.email) {
-    return user.email[0].toUpperCase();
-  }
-  
-  return 'U';
-};
 
 export default function TimelinePage() {
-  const [commentTexts, setCommentTexts] = useState<Record<string, string>>({});
-  const [showComments, setShowComments] = useState<Record<string, boolean>>({});
-  const [reactionCounts, setReactionCounts] = useState<Record<string, any>>({});
-  const [filters, setFilters] = useState({
-    type: 'all', // 'all', 'check-in', 'daily-update'
-    user: 'all', // 'all' or specific user id
-    dateRange: 'all', // 'all', 'today', 'week', 'month'
-    activityType: 'all' // 'all', 'tasks', 'keyresults', 'metrics', 'deliverables'
-  });
-  const [showMobileFilters, setShowMobileFilters] = useState(false);
-  const { toast } = useToast();
+  const { user } = useAuth();
   const queryClient = useQueryClient();
+  
+  // Filter states
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const [activityTypeFilter, setActivityTypeFilter] = useState('all');
+  const [userFilter, setUserFilter] = useState('all');
+  const [dateRangeFilter, setDateRangeFilter] = useState('all');
+  const [contentTypeFilter, setContentTypeFilter] = useState('all');
+  
+  // Social interaction states
+  const [reactions, setReactions] = useState<Record<string, boolean>>({});
+  const [showComments, setShowComments] = useState<Record<string, boolean>>({});
+  const [commentTexts, setCommentTexts] = useState<Record<string, string>>({});
 
-  // Fetch check-ins data
-  const { data: checkInsData, isLoading: checkInsLoading } = useQuery({
-    queryKey: ["/api/timeline"],
-    queryFn: async () => {
-      const response = await apiRequest("GET", "/api/timeline");
-      return await response.json();
-    },
-    retry: 1,
+  // Fetch timeline data
+  const { data: timelineData = [], isLoading } = useQuery<TimelineItem[]>({
+    queryKey: ['/api/timeline'],
   });
 
-  // Fetch timeline updates data (using same endpoint but different query)
-  const { data: timelineUpdatesData, isLoading: timelineUpdatesLoading } = useQuery({
-    queryKey: ["/api/timeline", "updates"],
-    queryFn: async () => {
-      const response = await apiRequest("GET", "/api/timeline");
-      if (response.ok) {
-        const data = await response.json();
-        // Filter to get only timeline updates (not check-ins)
-        return data.filter((item: any) => item.summary && !item.keyResult);
-      }
-      return []; // Return empty array if endpoint doesn't exist yet
-    },
-    retry: 1,
-  });
-
-  // Fetch users for filter dropdown
-  const { data: usersData } = useQuery({
-    queryKey: ["/api/users"],
-    queryFn: async () => {
-      const response = await apiRequest("GET", "/api/users");
-      return await response.json();
-    },
-    retry: 1,
-  });
-
-  const isLoading = checkInsLoading || timelineUpdatesLoading;
-
-  // Transform check-ins data into timeline format
-  const checkInsTimeline = Array.isArray(checkInsData) ? checkInsData.map((checkIn: any) => ({
-    id: checkIn.id,
-    type: 'check-in',
-    content: checkIn.notes || checkIn.feedback,
-    currentValue: parseFloat(checkIn.value) || checkIn.currentValue,
-    targetValue: checkIn.targetValue,
-    keyResult: checkIn.keyResult,
-    creator: checkIn.creator,
-    createdAt: checkIn.createdAt,
-    confidence: checkIn.confidence || 7,
-    comments: [], // Will be loaded separately
-    reactions: reactionCounts[checkIn.id] || { like: 0, love: 0, support: 0, celebrate: 0 },
-  })) : [];
-
-  // Transform timeline updates into timeline format
-  const updatesTimeline = Array.isArray(timelineUpdatesData) ? timelineUpdatesData.map((update: TimelineUpdate, index) => ({
-    id: `update-${update.id}-${index}`, // Ensure unique keys
-    type: 'daily-update',
-    content: update.summary,
-    creator: {
-      id: update.userId,
-      firstName: update.user?.name ? update.user.name.split(' ')[0] : '',
-      lastName: update.user?.name ? update.user.name.split(' ').slice(1).join(' ') : '',
-      email: update.user?.email || '',
-      name: update.user?.name || update.user?.email?.split('@')[0] || 'User',
-    },
-    createdAt: update.createdAt,
-    confidence: 7,
-    comments: [],
-    reactions: { like: 0, love: 0, support: 0, celebrate: 0 },
-    updateData: update, // Include full update data
-  })) : [];
-
-  // Combine and sort timeline data
-  const allTimelineData = [...checkInsTimeline, ...updatesTimeline].sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  );
-
-  // Filter function
-  const getFilteredTimelineData = () => {
-    let filtered = [...allTimelineData];
-
-    // Filter by type
-    if (filters.type !== 'all') {
-      filtered = filtered.filter(item => item.type === filters.type);
-    }
-
-    // Filter by user
-    if (filters.user !== 'all') {
-      filtered = filtered.filter(item => item.creator?.id === filters.user);
-    }
-
-    // Filter by date range
-    if (filters.dateRange !== 'all') {
-      const now = new Date();
-      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  // Filter data based on current filters
+  const filteredData = useMemo(() => {
+    return timelineData.filter((item) => {
+      if (activityTypeFilter !== 'all' && item.type !== activityTypeFilter) return false;
+      if (userFilter !== 'all' && userFilter !== 'current' && item.userId !== userFilter) return false;
       
-      filtered = filtered.filter(item => {
+      // Date range filtering
+      if (dateRangeFilter !== 'all') {
         const itemDate = new Date(item.createdAt);
-        switch (filters.dateRange) {
-          case 'today':
-            return itemDate >= today;
-          case 'week':
-            const weekAgo = new Date(today);
-            weekAgo.setDate(weekAgo.getDate() - 7);
-            return itemDate >= weekAgo;
-          case 'month':
-            const monthAgo = new Date(today);
-            monthAgo.setMonth(monthAgo.getMonth() - 1);
-            return itemDate >= monthAgo;
-          default:
-            return true;
-        }
-      });
-    }
-
-    // Filter by activity type (for daily updates)
-    if (filters.activityType !== 'all') {
-      filtered = filtered.filter(item => {
-        if (item.type === 'check-in') return filters.activityType === 'keyresults';
+        const now = new Date();
+        const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const startOfWeek = new Date(startOfDay.getTime() - (startOfDay.getDay() * 24 * 60 * 60 * 1000));
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
         
-        const summary = item.content?.toLowerCase() || '';
-        switch (filters.activityType) {
-          case 'tasks':
-            return summary.includes('task');
-          case 'keyresults':
-            return summary.includes('angka target') || summary.includes('key result');
-          case 'metrics':
-            return summary.includes('success metric') || summary.includes('metrik');
-          case 'deliverables':
-            return summary.includes('deliverable') || summary.includes('output');
-          default:
-            return true;
+        switch (dateRangeFilter) {
+          case 'today':
+            if (itemDate < startOfDay) return false;
+            break;
+          case 'week':
+            if (itemDate < startOfWeek) return false;
+            break;
+          case 'month':
+            if (itemDate < startOfMonth) return false;
+            break;
         }
-      });
-    }
+      }
+      
+      return true;
+    });
+  }, [timelineData, activityTypeFilter, userFilter, dateRangeFilter, contentTypeFilter]);
 
-    return filtered;
+  const clearAllFilters = () => {
+    setActivityTypeFilter('all');
+    setUserFilter('all');
+    setDateRangeFilter('all');
+    setContentTypeFilter('all');
   };
 
-  const timelineData = getFilteredTimelineData();
+  const isDefaultFilter = activityTypeFilter === 'all' && userFilter === 'all' && 
+    dateRangeFilter === 'all' && contentTypeFilter === 'all';
+
+  const toggleReaction = (itemId: string) => {
+    setReactions(prev => ({ ...prev, [itemId]: !prev[itemId] }));
+  };
+
+  const toggleComments = (itemId: string) => {
+    setShowComments(prev => ({ ...prev, [itemId]: !prev[itemId] }));
+  };
 
   const createCommentMutation = useMutation({
-    mutationFn: ({ checkInId, content }: { checkInId: string; content: string }) =>
-      apiRequest("POST", `/api/timeline/${checkInId}/comments`, { content }),
-    onSuccess: (_, { checkInId }) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/timeline"] });
-      setCommentTexts(prev => ({ ...prev, [checkInId]: "" }));
-      toast({
-        title: "Berhasil",
-        description: "Komentar berhasil ditambahkan",
-      });
-    },
-    onError: () => {
-      toast({
-        title: "Berhasil",
-        description: "Komentar berhasil ditambahkan (demo mode)",
-      });
-    },
-  });
-
-  const createReactionMutation = useMutation({
-    mutationFn: ({ checkInId, type }: { checkInId: string; type: string }) =>
-      apiRequest("POST", `/api/timeline/${checkInId}/reactions`, { type }),
-    onSuccess: (_, { checkInId, type }) => {
-      // Update reaction counts locally for immediate feedback
-      setReactionCounts(prev => ({
-        ...prev,
-        [checkInId]: {
-          ...prev[checkInId],
-          [type]: (prev[checkInId]?.[type] || 0) + 1
-        }
-      }));
-      queryClient.invalidateQueries({ queryKey: ["/api/timeline"] });
-      toast({
-        title: "Berhasil",
-        description: "Reaksi berhasil ditambahkan",
-      });
-    },
-    onError: (_, { checkInId, type }) => {
-      // Update reaction counts locally for immediate feedback even on error
-      setReactionCounts(prev => ({
-        ...prev,
-        [checkInId]: {
-          ...prev[checkInId],
-          [type]: (prev[checkInId]?.[type] || 0) + 1
-        }
-      }));
-      toast({
-        title: "Berhasil",
-        description: "Reaksi berhasil ditambahkan (demo mode)",
-      });
-    },
-  });
-
-
-
-  const handleComment = (checkInId: string) => {
-    const content = commentTexts[checkInId]?.trim();
-    if (!content) return;
-
-    createCommentMutation.mutate({ checkInId, content });
-  };
-
-  const handleReaction = (checkInId: string, type: string) => {
-    createReactionMutation.mutate({ checkInId, type });
-  };
-
-  const toggleComments = (checkInId: string) => {
-    setShowComments(prev => ({
-      ...prev,
-      [checkInId]: !prev[checkInId]
-    }));
-  };
-
-  const getConfidenceColor = (confidence: number) => {
-    if (confidence >= 8) return 'text-green-600';
-    if (confidence >= 6) return 'text-yellow-600';
-    return 'text-red-600';
-  };
-
-  const getConfidenceText = (confidence: number) => {
-    if (confidence >= 8) return 'Sangat Yakin';
-    if (confidence >= 6) return 'Cukup Yakin';
-    return 'Kurang Yakin';
-  };
-
-  const getReactionIcon = (type: string) => {
-    switch (type) {
-      case "like": return <ThumbsUp className="w-4 h-4" />;
-      case "love": return <Heart className="w-4 h-4" />;
-      case "support": return <Star className="w-4 h-4" />;
-      case "celebrate": return <Sparkles className="w-4 h-4" />;
-      default: return <ThumbsUp className="w-4 h-4" />;
+    mutationFn: (data: { timelineId: string; comment: string }) => 
+      apiRequest(`/api/timeline/${data.timelineId}/comments`, {
+        method: 'POST',
+        body: { comment: data.comment }
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/timeline'] });
     }
+  });
+
+  const handleComment = (itemId: string) => {
+    const comment = commentTexts[itemId]?.trim();
+    if (!comment) return;
+    
+    createCommentMutation.mutate({ timelineId: itemId, comment });
+    setCommentTexts(prev => ({ ...prev, [itemId]: '' }));
   };
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-4xl mx-auto p-6">
-          <div className="text-center">
-            <div className="animate-spin w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-            <p className="text-gray-600">Memuat timeline...</p>
-          </div>
-        </div>
-      </div>
-    );
+    return <div className="text-center py-12">Loading timeline...</div>;
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex">
-          {/* Filter Sidebar */}
-          <div className={`${showMobileFilters ? 'fixed inset-0 z-50 bg-white' : 'hidden'} lg:block lg:w-80 lg:flex-shrink-0`}>
-            <div className="h-full bg-white border-r border-gray-200 overflow-y-auto">
-              {/* Mobile header */}
-              <div className="lg:hidden flex items-center justify-between p-4 border-b border-gray-200">
-                <h2 className="text-lg font-semibold text-gray-900">Filter Timeline</h2>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowMobileFilters(false)}
-                >
-                  <X className="w-5 h-5" />
-                </Button>
-              </div>
+    <>
+      {/* Page Header */}
+      <div className="mb-6 bg-white rounded-lg shadow-sm p-4">
+        <div className="flex items-center justify-between mb-2">
+          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <TimelineIcon size="md" variant="primary" className="w-8 h-8" />
+            Activity Timeline
+          </h1>
+          <div className="lg:hidden">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowMobileFilters(true)}
+              className="flex items-center gap-2"
+            >
+              <Filter className="w-4 h-4" />
+              Filter
+            </Button>
+          </div>
+        </div>
+        <p className="text-gray-600 text-sm mb-3">
+          Timeline aktivitas dan update progress dari tim Anda dalam format feed
+        </p>
+        <div className="flex items-center justify-center">
+          <DailyCheckInButton data-tour="timeline-checkin" />
+        </div>
+      </div>
 
-              {/* Desktop header */}
-              <div className="hidden lg:block p-6 border-b border-gray-200">
-                <div className="flex items-center space-x-2">
-                  <Filter className="w-5 h-5 text-gray-600" />
-                  <h2 className="text-lg font-semibold text-gray-900">Filter Timeline</h2>
-                </div>
-              </div>
-
-              {/* Filter Controls */}
-              <div className="p-6 space-y-6">
-                {/* Activity Type Filter */}
-                <div>
-                  <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-3">
-                    <Activity className="w-4 h-4" />
-                    <span>Jenis Activity</span>
-                  </label>
-                  <Select value={filters.type} onValueChange={(value) => setFilters(prev => ({ ...prev, type: value }))}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Pilih jenis activity" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Semua Activity</SelectItem>
-                      <SelectItem value="check-in">Progress Check-in</SelectItem>
-                      <SelectItem value="daily-update">Update Harian</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* User Filter */}
-                <div>
-                  <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-3">
-                    <User className="w-4 h-4" />
-                    <span>Pengguna</span>
-                  </label>
-                  <Select value={filters.user} onValueChange={(value) => setFilters(prev => ({ ...prev, user: value }))}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Pilih pengguna" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Semua Pengguna</SelectItem>
-                      {usersData?.map((user: any) => (
-                        <SelectItem key={user.id} value={user.id}>
-                          {getUserName(user)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Date Range Filter */}
-                <div>
-                  <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-3">
-                    <Calendar className="w-4 h-4" />
-                    <span>Rentang Waktu</span>
-                  </label>
-                  <Select value={filters.dateRange} onValueChange={(value) => setFilters(prev => ({ ...prev, dateRange: value }))}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Pilih rentang waktu" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Semua Waktu</SelectItem>
-                      <SelectItem value="today">Hari Ini</SelectItem>
-                      <SelectItem value="week">7 Hari Terakhir</SelectItem>
-                      <SelectItem value="month">30 Hari Terakhir</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Content Type Filter */}
-                <div>
-                  <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-3">
-                    <Target className="w-4 h-4" />
-                    <span>Tipe Konten</span>
-                  </label>
-                  <Select value={filters.activityType} onValueChange={(value) => setFilters(prev => ({ ...prev, activityType: value }))}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Pilih tipe konten" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Semua Konten</SelectItem>
-                      <SelectItem value="tasks">Task Updates</SelectItem>
-                      <SelectItem value="keyresults">Angka Target</SelectItem>
-                      <SelectItem value="metrics">Success Metrics</SelectItem>
-                      <SelectItem value="deliverables">Deliverables</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Clear Filters */}
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => setFilters({
-                    type: 'all',
-                    user: 'all', 
-                    dateRange: 'all',
-                    activityType: 'all'
-                  })}
-                >
-                  Reset Filter
-                </Button>
-
-                {/* Filter Summary */}
-                <div className="pt-4 border-t border-gray-200">
-                  <p className="text-sm text-gray-600">
-                    Menampilkan {timelineData.length} dari {allTimelineData.length} activity
-                  </p>
-                </div>
-              </div>
+      <div className="flex gap-6">
+        {/* Filter Sidebar */}
+        <div className={`${showMobileFilters ? 'fixed inset-0 z-50 bg-white' : 'hidden'} lg:block lg:w-80 lg:flex-shrink-0`}>
+          <div className="h-full bg-white border border-gray-200 rounded-lg overflow-y-auto">
+            {/* Mobile header */}
+            <div className="lg:hidden flex items-center justify-between p-4 border-b border-gray-200">
+              <h2 className="text-lg font-semibold text-gray-900">Filter Timeline</h2>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowMobileFilters(false)}
+                className="p-2"
+              >
+                <X className="w-5 h-5" />
+              </Button>
             </div>
-          </div>
 
-          {/* Main Content */}
-          <div className="flex-1 min-w-0">
-            <div className="max-w-2xl mx-auto py-6 px-4">
-              {/* Mobile filter button and header */}
-              <div className="mb-6 bg-white rounded-lg shadow-sm p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center space-x-3">
-                    <button
-                      onClick={() => setShowMobileFilters(true)}
-                      className="lg:hidden p-2 rounded-lg border border-gray-200 hover:bg-gray-50"
-                    >
-                      <Filter className="w-5 h-5 text-gray-600" />
-                    </button>
-                    <TimelineIcon size="md" variant="primary" />
-                    <div>
-                      <h1 className="text-xl font-bold text-gray-900">Timeline</h1>
-                      <p className="text-sm text-gray-600">Activity feed dan progress tim</p>
-                    </div>
-                  </div>
-                  <DailyCheckInButton data-tour="timeline-checkin" />
+            {/* Filter Content */}
+            <div className="p-4 space-y-6">
+              {/* Filter Counter */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                <div className="text-sm font-medium text-blue-900">
+                  Showing {filteredData.length} of {timelineData.length} activities
                 </div>
+                {filteredData.length !== timelineData.length && (
+                  <div className="text-xs text-blue-700 mt-1">
+                    {timelineData.length - filteredData.length} activities filtered out
+                  </div>
+                )}
               </div>
 
-              {/* Timeline Content */}
-              {timelineData.length > 0 ? (
-                <div className="space-y-4">
-                  {timelineData.map((item) => (
-                    <Card key={item.id} className="w-full bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden">
-                {/* Facebook-style header */}
-                <CardContent className="p-0">
-                  <div className="p-4 pb-3">
-                    <div className="flex items-start space-x-3">
-                      <div className="flex-shrink-0">
-                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold shadow-sm">
-                          {getUserInitials(item.creator)}
-                        </div>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center space-x-1">
-                              <h3 className="font-semibold text-gray-900 text-sm hover:underline cursor-pointer">
-                                {getUserName(item.creator)}
-                              </h3>
-                              <span className="text-gray-500 text-sm">
-                                {item.type === 'check-in' ? 'melaporkan progress angka target' : 'mengirim update harian'}
-                              </span>
-                            </div>
-                            <div className="flex items-center space-x-1 mt-1">
-                              <span className="text-gray-500 text-xs hover:underline cursor-pointer">
-                                {new Date(item.createdAt).toLocaleString('id-ID', {
-                                  day: 'numeric',
-                                  month: 'short',
-                                  hour: '2-digit',
-                                  minute: '2-digit',
-                                })}
-                              </span>
-                              <span className="text-gray-400 text-xs">•</span>
-                              <span className="text-gray-500 text-xs">🌐</span>
-                            </div>
-                          </div>
-                          <Button variant="ghost" size="sm" className="p-1 h-8 w-8 rounded-full hover:bg-gray-100">
-                            <span className="text-gray-500 font-bold">⋯</span>
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+              {/* Activity Type Filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Activity Type
+                </label>
+                <Select value={activityTypeFilter} onValueChange={setActivityTypeFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select activity type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Activities</SelectItem>
+                    <SelectItem value="check_in">Check-ins</SelectItem>
+                    <SelectItem value="daily_update">Daily Updates</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-                  {/* Facebook-style content */}
-                  <div className="px-4 pb-3">
-                    {item.type === 'check-in' ? (
-                      // Check-in content
-                      <div className="space-y-3">
-                        <div className="text-gray-800 text-sm leading-relaxed">
-                          {item.content}
-                        </div>
-                        
-                        {/* Progress card */}
-                        <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-4">
-                          <div className="flex items-center space-x-2 mb-3">
-                            <Target className="w-5 h-5 text-blue-600" />
-                            <h4 className="font-semibold text-gray-900 text-sm">
-                              {item.keyResult?.title}
-                            </h4>
-                          </div>
-                          
-                          <div className="space-y-2">
-                            <div className="flex items-center justify-between text-sm">
-                              <span className="text-gray-600">Progress saat ini:</span>
-                              <Badge variant="secondary" className="bg-blue-100 text-blue-700 border-blue-200">
-                                {item.currentValue || 0} / {item.targetValue || 0} {item.keyResult?.unit || ''}
-                              </Badge>
-                            </div>
-                            
-                            <div className="flex items-center justify-between text-sm">
-                              <span className="text-gray-600">Persentase:</span>
-                              <span className="font-semibold text-blue-700">
-                                {Math.round(((item.currentValue || 0) / (item.targetValue || 1)) * 100)}%
-                              </span>
-                            </div>
-                            
-                            <div className="flex items-center justify-between text-sm">
-                              <span className="text-gray-600">Tingkat yakin:</span>
-                              <span className={`font-semibold ${getConfidenceColor(item.confidence)}`}>
-                                {getConfidenceText(item.confidence)} ({item.confidence}/10)
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ) : (
-                      // Daily update content
-                      <div className="space-y-3">
-                        <div className="text-gray-800 text-sm leading-relaxed">
-                          {item.content}
-                        </div>
-                        
-                        {/* Activity breakdown */}
-                        {item.updateData && (() => {
-                          const summary = item.content;
-                          const sections = [];
-                          
-                          // Extract different types of updates
-                          if (summary.includes('task')) {
-                            const taskMatch = summary.match(/(\d+)\s*task/i);
-                            if (taskMatch) {
-                              sections.push({
-                                icon: <CheckSquare className="w-4 h-4 text-blue-600" />,
-                                label: "Task diperbarui",
-                                value: taskMatch[1],
-                                bgColor: "bg-blue-50",
-                                textColor: "text-blue-700"
-                              });
-                            }
-                          }
-                          
-                          if (summary.includes('angka target') || summary.includes('key result')) {
-                            const krMatch = summary.match(/(\d+)\s*(angka target|key result)/i);
-                            if (krMatch) {
-                              sections.push({
-                                icon: <Target className="w-4 h-4 text-purple-600" />,
-                                label: "Angka target diperbarui", 
-                                value: krMatch[1],
-                                bgColor: "bg-purple-50",
-                                textColor: "text-purple-700"
-                              });
-                            }
-                          }
-                          
-                          if (summary.includes('success metric') || summary.includes('metrik')) {
-                            const smMatch = summary.match(/(\d+)\s*(success metric|metrik)/i);
-                            if (smMatch) {
-                              sections.push({
-                                icon: <BarChart3 className="w-4 h-4 text-orange-600" />,
-                                label: "Success metrics diperbarui",
-                                value: smMatch[1], 
-                                bgColor: "bg-orange-50",
-                                textColor: "text-orange-700"
-                              });
-                            }
-                          }
-                          
-                          if (summary.includes('deliverable') || summary.includes('output')) {
-                            const delMatch = summary.match(/(\d+)\s*(deliverable|output)/i);
-                            if (delMatch) {
-                              sections.push({
-                                icon: <Package className="w-4 h-4 text-green-600" />,
-                                label: "Deliverables diperbarui",
-                                value: delMatch[1],
-                                bgColor: "bg-green-50", 
-                                textColor: "text-green-700"
-                              });
-                            }
-                          }
-                          
-                          return sections.length > 0 ? (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                              {sections.map((section, idx) => (
-                                <div key={idx} className={`${section.bgColor} border border-opacity-30 rounded-lg p-3 flex items-center space-x-3`}>
-                                  {section.icon}
-                                  <div>
-                                    <div className={`font-semibold text-sm ${section.textColor}`}>
-                                      {section.value}
-                                    </div>
-                                    <div className="text-xs text-gray-600">
-                                      {section.label}
-                                    </div>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          ) : null;
-                        })()}
-                      </div>
-                    )}
-                  </div>
+              {/* User Filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  User / Team Member
+                </label>
+                <Select value={userFilter} onValueChange={setUserFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select user" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Users</SelectItem>
+                    <SelectItem value="current">Current User</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-                  {/* Facebook-style engagement section */}
-                  <div className="border-t border-gray-200">
-                    {/* Reaction summary */}
-                    {(item.reactions?.like || item.reactions?.love || item.reactions?.support || item.reactions?.celebrate) > 0 && (
-                      <div className="px-4 py-2 border-b border-gray-100">
-                        <div className="flex items-center justify-between text-sm text-gray-600">
-                          <div className="flex items-center space-x-1">
-                            <div className="flex -space-x-1">
-                              {item.reactions?.like > 0 && (
-                                <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center text-xs text-white">👍</div>
-                              )}
-                              {item.reactions?.love > 0 && (
-                                <div className="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-xs text-white">❤️</div>
-                              )}
-                              {item.reactions?.support > 0 && (
-                                <div className="w-5 h-5 bg-yellow-500 rounded-full flex items-center justify-center text-xs text-white">⭐</div>
-                              )}
-                              {item.reactions?.celebrate > 0 && (
-                                <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center text-xs text-white">🎉</div>
-                              )}
-                            </div>
-                            <span className="ml-2">
-                              {(item.reactions?.like || 0) + (item.reactions?.love || 0) + (item.reactions?.support || 0) + (item.reactions?.celebrate || 0)}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                    
-                    {/* Action buttons */}
-                    <div className="px-4 py-2">
-                      <div className="flex items-center justify-around">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleReaction(item.id, "like")}
-                          className="flex-1 flex items-center justify-center space-x-2 py-2 hover:bg-gray-50 rounded-md text-gray-600 hover:text-blue-600"
-                        >
-                          <ThumbsUp className="w-4 h-4" />
-                          <span className="text-sm font-medium">Suka</span>
-                        </Button>
-                        
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => toggleComments(item.id)}
-                          className="flex-1 flex items-center justify-center space-x-2 py-2 hover:bg-gray-50 rounded-md text-gray-600 hover:text-blue-600"
-                        >
-                          <MessageCircle className="w-4 h-4" />
-                          <span className="text-sm font-medium">Komentar</span>
-                        </Button>
-                        
-                        {item.type === 'check-in' && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleReaction(item.id, "celebrate")}
-                            className="flex-1 flex items-center justify-center space-x-2 py-2 hover:bg-gray-50 rounded-md text-gray-600 hover:text-green-600"
-                          >
-                            <Sparkles className="w-4 h-4" />
-                            <span className="text-sm font-medium">Rayakan</span>
-                          </Button>
-                        )}
-                      </div>
-                    </div>
+              {/* Date Range Filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Date Range
+                </label>
+                <Select value={dateRangeFilter} onValueChange={setDateRangeFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select date range" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Time</SelectItem>
+                    <SelectItem value="today">Today</SelectItem>
+                    <SelectItem value="week">This Week</SelectItem>
+                    <SelectItem value="month">This Month</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-                    {/* Comments section */}
-                    {showComments[item.id] && (
-                      <div className="border-t border-gray-100 px-4 py-3">
-                        <div className="flex items-start space-x-2">
-                          <div className="flex-shrink-0">
-                            <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-blue-500 rounded-full flex items-center justify-center text-white font-semibold text-xs">
-                              {getUserInitials({ name: "Current User" })}
-                            </div>
-                          </div>
-                          <div className="flex-1 flex items-center space-x-2">
-                            <div className="flex-1 relative">
-                              <Textarea
-                                placeholder="Tulis komentar..."
-                                value={commentTexts[item.id] || ""}
-                                onChange={(e) => setCommentTexts(prev => ({ ...prev, [item.id]: e.target.value }))}
-                                className="flex-1 min-h-[36px] resize-none border-gray-300 rounded-full px-3 py-2 text-sm"
-                                rows={1}
-                              />
-                            </div>
-                            <Button
-                              onClick={() => handleComment(item.id)}
-                              disabled={!commentTexts[item.id]?.trim() || createCommentMutation.isPending}
-                              size="sm"
-                              variant="ghost"
-                              className="p-2 h-8 w-8 rounded-full hover:bg-gray-100"
-                            >
-                              <Send className="w-4 h-4 text-blue-600" />
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        ) : (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 text-center py-12">
-            <TimelineIcon size="lg" variant="muted" className="w-16 h-16 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
-              Belum ada activity yang ditampilkan
-            </h3>
-            <p className="text-gray-600 mb-4">
-              Timeline akan menampilkan update harian dan progress check-in dari tim Anda
-            </p>
-            <div className="text-sm text-gray-500">
-              Mulai dengan melakukan check-in atau update harian untuk melihat activity feed
-            </div>
-          </div>
-              )}
+              {/* Content Type Filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Content Type
+                </label>
+                <Select value={contentTypeFilter} onValueChange={setContentTypeFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select content type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Content</SelectItem>
+                    <SelectItem value="tasks">Tasks</SelectItem>
+                    <SelectItem value="key_results">Key Results</SelectItem>
+                    <SelectItem value="metrics">Success Metrics</SelectItem>
+                    <SelectItem value="deliverables">Deliverables</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Clear Filters */}
+              <Button
+                variant="outline"
+                onClick={clearAllFilters}
+                className="w-full"
+                disabled={isDefaultFilter}
+              >
+                Clear All Filters
+              </Button>
             </div>
           </div>
         </div>
+
+        {/* Main Content */}
+        <div className="flex-1 min-w-0">
+          {timelineData.length > 0 ? (
+            <div className="space-y-4">
+              {filteredData.map((item) => (
+                <Card key={item.id} className="w-full bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden">
+                  <CardContent className="p-0">
+                    {/* Post Header */}
+                    <div className="p-4 border-b border-gray-100">
+                      <div className="flex items-start space-x-3">
+                        <div className="flex-shrink-0">
+                          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-green-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                            {getUserInitials({ name: item.userName || "User" })}
+                          </div>
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-2">
+                            <h3 className="font-semibold text-gray-900 text-sm">
+                              {item.userName || "Unknown User"}
+                            </h3>
+                            <span className="text-gray-500 text-xs">•</span>
+                            <span className="text-gray-500 text-xs">
+                              {format(new Date(item.createdAt), "MMM dd, HH:mm")}
+                            </span>
+                            <Badge variant={item.type === 'check_in' ? 'default' : 'secondary'} className="text-xs">
+                              {item.type === 'check_in' ? 'Check-in' : 'Daily Update'}
+                            </Badge>
+                          </div>
+                          <p className="text-gray-700 text-sm mt-1">
+                            {item.type === 'check_in' 
+                              ? `Updated ${item.keyResultTitle} progress` 
+                              : 'Shared daily update with team'
+                            }
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Post Content */}
+                    <div className="p-4">
+                      <div className="space-y-3">
+                        {item.type === 'check_in' ? (
+                          <div className="bg-gray-50 rounded-lg p-3">
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="text-sm font-medium text-gray-700">
+                                {item.keyResultTitle}
+                              </div>
+                              <Badge variant="secondary" className="text-xs">
+                                Progress Update
+                              </Badge>
+                            </div>
+                            <div className="flex items-center space-x-4 text-sm">
+                              <div className="text-gray-600">
+                                Previous: <span className="font-medium text-gray-900">{item.previousValue}</span>
+                              </div>
+                              <div className="text-blue-600">
+                                Current: <span className="font-medium text-blue-700">{item.currentValue}</span>
+                              </div>
+                            </div>
+                            {item.notes && (
+                              <div className="mt-2 text-sm text-gray-700 bg-white rounded p-2">
+                                <div className="font-medium text-gray-600 mb-1">Notes:</div>
+                                {item.notes}
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="text-gray-700 text-sm leading-relaxed">
+                            <div className="font-medium text-gray-600 mb-2">Daily Update Summary:</div>
+                            <div className="bg-gray-50 rounded-lg p-3">
+                              <div dangerouslySetInnerHTML={{ __html: item.summary || "No summary available" }} />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Engagement Section */}
+                      <div className="mt-4 pt-3 border-t border-gray-100">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-4">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => toggleReaction(item.id)}
+                              className={`flex items-center space-x-2 text-sm h-8 px-3 rounded-full ${
+                                reactions[item.id] ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:text-blue-600'
+                              }`}
+                            >
+                              <Heart className={`w-4 h-4 ${reactions[item.id] ? 'fill-current' : ''}`} />
+                              <span>{reactions[item.id] ? 'Liked' : 'Like'}</span>
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => toggleComments(item.id)}
+                              className="flex items-center space-x-2 text-sm h-8 px-3 rounded-full text-gray-500 hover:text-blue-600"
+                            >
+                              <MessageCircle className="w-4 h-4" />
+                              <span>Comment</span>
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="flex items-center space-x-2 text-sm h-8 px-3 rounded-full text-gray-500 hover:text-blue-600"
+                            >
+                              <Share2 className="w-4 h-4" />
+                              <span>Share</span>
+                            </Button>
+                          </div>
+                        </div>
+
+                        {/* Comments Section */}
+                        {showComments[item.id] && (
+                          <div className="mt-4 pt-3 border-t border-gray-100">
+                            <div className="space-y-3 mb-3">
+                              {/* Sample comment */}
+                              <div className="flex space-x-3">
+                                <div className="w-6 h-6 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-semibold text-xs">
+                                  JD
+                                </div>
+                                <div className="flex-1">
+                                  <div className="text-sm">
+                                    <span className="font-medium text-gray-900 mr-2">John Doe</span>
+                                    <span className="text-gray-700">Great progress! Keep it up 👍</span>
+                                  </div>
+                                  <div className="text-xs text-gray-500 mt-1">2h ago</div>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Add Comment */}
+                            <div className="flex space-x-2">
+                              <div className="flex-shrink-0">
+                                <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-blue-500 rounded-full flex items-center justify-center text-white font-semibold text-xs">
+                                  {getUserInitials({ name: "Current User" })}
+                                </div>
+                              </div>
+                              <div className="flex-1 flex items-center space-x-2">
+                                <div className="flex-1 relative">
+                                  <Textarea
+                                    placeholder="Tulis komentar..."
+                                    value={commentTexts[item.id] || ""}
+                                    onChange={(e) => setCommentTexts(prev => ({ ...prev, [item.id]: e.target.value }))}
+                                    className="flex-1 min-h-[36px] resize-none border-gray-300 rounded-full px-3 py-2 text-sm"
+                                    rows={1}
+                                  />
+                                </div>
+                                <Button
+                                  onClick={() => handleComment(item.id)}
+                                  disabled={!commentTexts[item.id]?.trim() || createCommentMutation.isPending}
+                                  size="sm"
+                                  variant="ghost"
+                                  className="p-2 h-8 w-8 rounded-full hover:bg-gray-100"
+                                >
+                                  <Send className="w-4 h-4 text-blue-600" />
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 text-center py-12">
+              <TimelineIcon size="lg" variant="muted" className="w-16 h-16 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                Belum ada activity yang ditampilkan
+              </h3>
+              <p className="text-gray-600 mb-4">
+                Timeline akan menampilkan update harian dan progress check-in dari tim Anda
+              </p>
+              <div className="text-sm text-gray-500">
+                Mulai dengan melakukan check-in atau update harian untuk melihat activity feed
+              </div>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
