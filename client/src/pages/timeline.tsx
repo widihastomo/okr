@@ -12,7 +12,9 @@ import {
   Heart, 
   MessageCircle, 
   Share2, 
-  Send 
+  Send,
+  ChevronDown,
+  ChevronUp 
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { getUserInitials } from '@/lib/utils';
@@ -65,6 +67,9 @@ export default function TimelinePage() {
   const [reactions, setReactions] = useState<Record<string, boolean>>({});
   const [showComments, setShowComments] = useState<Record<string, boolean>>({});
   const [commentTexts, setCommentTexts] = useState<Record<string, string>>({});
+  
+  // Expandable details state
+  const [expandedDetails, setExpandedDetails] = useState<Record<string, boolean>>({});
 
   // Fetch timeline data
   const { data: timelineData = [], isLoading } = useQuery<TimelineItem[]>({
@@ -133,6 +138,10 @@ export default function TimelinePage() {
     
     createCommentMutation.mutate({ timelineId: itemId, comment });
     setCommentTexts(prev => ({ ...prev, [itemId]: '' }));
+  };
+
+  const toggleDetails = (itemId: string) => {
+    setExpandedDetails(prev => ({ ...prev, [itemId]: !prev[itemId] }));
   };
 
   if (isLoading) {
@@ -333,9 +342,53 @@ export default function TimelinePage() {
                     {/* Post Content */}
                     <div className="p-4">
                       <div className="space-y-3">
-                        {/* Detailed Update Information */}
-                        <div className="space-y-2">
-                          {/* Tasks Details */}
+                        {/* Summary Statistics */}
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            {item.tasksUpdated + item.tasksCompleted > 0 && (
+                              <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-800">
+                                📋 {item.tasksUpdated + item.tasksCompleted} tugas
+                              </Badge>
+                            )}
+                            {item.keyResultsUpdated > 0 && (
+                              <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-800">
+                                🎯 {item.keyResultsUpdated} target
+                              </Badge>
+                            )}
+                            {item.successMetricsUpdated > 0 && (
+                              <Badge variant="secondary" className="text-xs bg-orange-100 text-orange-800">
+                                📊 {item.successMetricsUpdated} metrik
+                              </Badge>
+                            )}
+                            {item.deliverablesUpdated > 0 && (
+                              <Badge variant="secondary" className="text-xs bg-indigo-100 text-indigo-800">
+                                📦 {item.deliverablesUpdated} output
+                              </Badge>
+                            )}
+                          </div>
+                          
+                          {/* Toggle Details Button */}
+                          {(item.tasksSummary || item.keyResultsSummary || item.successMetricsSummary || item.deliverablesSummary) && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => toggleDetails(item.id)}
+                              className="flex items-center gap-1 text-xs h-7 px-2 text-gray-500 hover:text-gray-700"
+                            >
+                              <span>{expandedDetails[item.id] ? 'Sembunyikan' : 'Lihat Detail'}</span>
+                              {expandedDetails[item.id] ? (
+                                <ChevronUp className="w-3 h-3" />
+                              ) : (
+                                <ChevronDown className="w-3 h-3" />
+                              )}
+                            </Button>
+                          )}
+                        </div>
+
+                        {/* Detailed Update Information - Expandable */}
+                        {expandedDetails[item.id] && (
+                          <div className="space-y-2 border-t pt-3">
+                            {/* Tasks Details */}
                           {item.tasksSummary && (
                             <div className="bg-blue-50 rounded-lg p-2">
                               <div className="flex items-center gap-1 mb-1">
@@ -408,7 +461,8 @@ export default function TimelinePage() {
                               <div className="text-xs line-clamp-3" dangerouslySetInnerHTML={{ __html: item.summary }} />
                             </div>
                           )}
-                        </div>
+                          </div>
+                        )}
 
                         {/* Key Information Only */}
                         {(item.whatWorkedWell || item.challenges) && (
