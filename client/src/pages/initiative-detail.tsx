@@ -2899,6 +2899,7 @@ export default function InitiativeDetailPage() {
         initiative={initiativeData}
         successMetrics={successMetrics || []}
         tasks={tasks || []}
+        dodItems={definitionOfDoneItems || []}
         onSuccess={() => {
           queryClient.invalidateQueries({
             queryKey: [`/api/initiatives/${id}`],

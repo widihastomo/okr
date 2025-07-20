@@ -47,6 +47,7 @@ interface InitiativeClosureModalProps {
   initiative: any;
   successMetrics?: any[];
   tasks?: any[];
+  dodItems?: any[];
   onSuccess?: () => void;
 }
 
@@ -56,12 +57,14 @@ export default function InitiativeClosureModal({
   initiative,
   successMetrics = [],
   tasks = [],
+  dodItems = [],
   onSuccess
 }: InitiativeClosureModalProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [updatedMetrics, setUpdatedMetrics] = useState<any[]>([]);
   const [taskUpdates, setTaskUpdates] = useState<any[]>([]);
+  const [dodUpdates, setDodUpdates] = useState<any[]>([]);
   const [showIncompleteTasksConfirmation, setShowIncompleteTasksConfirmation] = useState(false);
   const [pendingFormData, setPendingFormData] = useState<ClosureFormData | null>(null);
 
@@ -78,14 +81,13 @@ export default function InitiativeClosureModal({
 
   const selectedResult = form.watch("result");
 
-  // Initialize metrics and tasks when modal opens
+  // Initialize metrics, tasks, and DOD when modal opens
   useEffect(() => {
     if (isOpen) {
       const metricsArray = Array.isArray(successMetrics) ? successMetrics : [];
       const tasksArray = Array.isArray(tasks) ? tasks : [];
-      
+      const dodArray = Array.isArray(dodItems) ? dodItems : [];
 
-      
       setUpdatedMetrics(metricsArray.map(metric => ({
         id: metric.id,
         currentValue: (metric.achievement || 0).toString(),
@@ -101,8 +103,18 @@ export default function InitiativeClosureModal({
           newStatus: task.status
         }))
       );
+
+      setDodUpdates(dodArray
+        .filter(dod => !dod.isCompleted)
+        .map(dod => ({
+          id: dod.id,
+          title: dod.title,
+          isCompleted: dod.isCompleted,
+          newStatus: dod.isCompleted
+        }))
+      );
     }
-  }, [isOpen, successMetrics, tasks]);
+  }, [isOpen, successMetrics, tasks, dodItems]);
 
   const getResultIcon = (result: string) => {
     switch (result) {
@@ -202,6 +214,16 @@ export default function InitiativeClosureModal({
     );
   };
 
+  const updateDodStatus = (dodId: string, isCompleted: boolean) => {
+    setDodUpdates(prev => 
+      prev.map(dod => 
+        dod.id === dodId 
+          ? { ...dod, newStatus: isCompleted }
+          : dod
+      )
+    );
+  };
+
   const closeInitiativeMutation = useMutation({
     mutationFn: async (data: ClosureFormData) => {
       // Update initiative with closure data
@@ -233,6 +255,15 @@ export default function InitiativeClosureModal({
         }
       }
 
+      // Update DOD item statuses
+      for (const dod of dodUpdates || []) {
+        if (dod.newStatus !== dod.isCompleted) {
+          await apiRequest("PATCH", `/api/definition-of-done/${dod.id}/toggle`, {
+            isCompleted: dod.newStatus
+          });
+        }
+      }
+
       return { success: true };
     },
     onSuccess: () => {
@@ -240,6 +271,7 @@ export default function InitiativeClosureModal({
       queryClient.invalidateQueries({ queryKey: [`/api/initiatives`] });
       queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiative.id}/success-metrics`] });
       queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiative.id}/tasks`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiative.id}/definition-of-done`] });
       queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiative.id}/history`] });
       
       toast({
@@ -306,6 +338,7 @@ export default function InitiativeClosureModal({
   };
 
   const incompleteTasks = Array.isArray(tasks) ? tasks.filter(task => task.status !== 'completed' && task.status !== 'cancelled') : [];
+  const incompleteDodItems = Array.isArray(dodItems) ? dodItems.filter(dod => !dod.isCompleted) : [];
 
   return (
     <>
@@ -536,6 +569,61 @@ export default function InitiativeClosureModal({
                                 placeholder="Final"
                                 className="text-xs h-8 border-blue-300"
                               />
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Update DOD Status */}
+                {incompleteDodItems.length > 0 && (
+                  <div className="border-t border-gray-200 pt-4">
+                    <div className="mb-3 flex items-center gap-2">
+                      <h3 className="text-sm font-medium text-gray-700">Update Status Deliverable (Output)</h3>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <button type="button" className="inline-flex items-center justify-center">
+                            <HelpCircle className="h-4 w-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                          </button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-80">
+                          <div className="space-y-2">
+                            <h4 className="font-medium">Panduan Update Status Deliverable</h4>
+                            <div className="space-y-2 text-sm">
+                              <p>• <strong>Selesai:</strong> Deliverable telah diselesaikan sepenuhnya</p>
+                              <p>• <strong>Belum Selesai:</strong> Deliverable belum diselesaikan</p>
+                              <p>• Update status ini untuk mencerminkan kondisi akhir deliverable</p>
+                              <p>• Deliverable yang sudah selesai akan membantu menentukan tingkat pencapaian inisiatif</p>
+                            </div>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                    <div className="space-y-2">
+                      {incompleteDodItems.map((dod) => (
+                        <div key={dod.id} className="p-3 bg-orange-50 rounded-lg border border-orange-200">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex-1 min-w-0">
+                              <h4 className="text-sm font-medium text-gray-900 truncate">{dod.title}</h4>
+                              <span className="text-xs text-gray-500 mt-1 block">
+                                Saat ini: {dod.isCompleted ? 'Selesai' : 'Belum Selesai'}
+                              </span>
+                            </div>
+                            <div className="flex-shrink-0 w-32">
+                              <Select
+                                value={dodUpdates.find(d => d.id === dod.id)?.newStatus ? 'completed' : 'not_completed'}
+                                onValueChange={(value) => updateDodStatus(dod.id, value === 'completed')}
+                              >
+                                <SelectTrigger className="text-xs h-8 border-orange-300">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="not_completed">Belum Selesai</SelectItem>
+                                  <SelectItem value="completed">Selesai</SelectItem>
+                                </SelectContent>
+                              </Select>
                             </div>
                           </div>
                         </div>
