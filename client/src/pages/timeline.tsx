@@ -342,7 +342,14 @@ export default function TimelinePage() {
                                 <span className="text-xs font-medium text-blue-800">📋 Tugas ({item.tasksUpdated + item.tasksCompleted})</span>
                                 {item.tasksCompleted > 0 && <span className="bg-green-200 text-green-800 text-xs px-1 rounded">{item.tasksCompleted} selesai</span>}
                               </div>
-                              <div className="text-xs text-blue-700">{item.tasksSummary}</div>
+                              <div className="text-xs text-blue-700">
+                                {item.tasksSummary && item.tasksSummary.split(', ').map((task, index) => (
+                                  <div key={index} className="flex items-start gap-1 mb-1 last:mb-0">
+                                    <span className="text-blue-600 mt-0.5">•</span>
+                                    <span className="flex-1">{task}</span>
+                                  </div>
+                                ))}
+                              </div>
                             </div>
                           )}
                           
@@ -350,7 +357,14 @@ export default function TimelinePage() {
                           {item.keyResultsSummary && (
                             <div className="bg-purple-50 rounded-lg p-2">
                               <div className="text-xs font-medium text-purple-800 mb-1">🎯 Angka Target ({item.keyResultsUpdated})</div>
-                              <div className="text-xs text-purple-700">{item.keyResultsSummary}</div>
+                              <div className="text-xs text-purple-700">
+                                {item.keyResultsSummary && item.keyResultsSummary.split(', ').map((kr, index) => (
+                                  <div key={index} className="flex items-start gap-1 mb-1 last:mb-0">
+                                    <span className="text-purple-600 mt-0.5">•</span>
+                                    <span className="flex-1">{kr}</span>
+                                  </div>
+                                ))}
+                              </div>
                             </div>
                           )}
 
@@ -358,7 +372,14 @@ export default function TimelinePage() {
                           {item.successMetricsSummary && (
                             <div className="bg-orange-50 rounded-lg p-2">
                               <div className="text-xs font-medium text-orange-800 mb-1">📊 Metrik Sukses ({item.successMetricsUpdated})</div>
-                              <div className="text-xs text-orange-700">{item.successMetricsSummary}</div>
+                              <div className="text-xs text-orange-700">
+                                {item.successMetricsSummary && item.successMetricsSummary.split(', ').map((metric, index) => (
+                                  <div key={index} className="flex items-start gap-1 mb-1 last:mb-0">
+                                    <span className="text-orange-600 mt-0.5">•</span>
+                                    <span className="flex-1">{metric}</span>
+                                  </div>
+                                ))}
+                              </div>
                             </div>
                           )}
 
@@ -369,7 +390,14 @@ export default function TimelinePage() {
                                 <span className="text-xs font-medium text-indigo-800">📦 Output ({item.deliverablesUpdated})</span>
                                 {item.deliverablesCompleted > 0 && <span className="bg-green-200 text-green-800 text-xs px-1 rounded">{item.deliverablesCompleted} selesai</span>}
                               </div>
-                              <div className="text-xs text-indigo-700">{item.deliverablesSummary}</div>
+                              <div className="text-xs text-indigo-700">
+                                {item.deliverablesSummary && item.deliverablesSummary.split(', ').map((deliverable, index) => (
+                                  <div key={index} className="flex items-start gap-1 mb-1 last:mb-0">
+                                    <span className="text-indigo-600 mt-0.5">•</span>
+                                    <span className="flex-1">{deliverable}</span>
+                                  </div>
+                                ))}
+                              </div>
                             </div>
                           )}
 
