@@ -756,6 +756,44 @@ export const activityLogs = pgTable("activity_logs", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Timeline Update Summaries table - stores daily update summaries for timeline display
+export const timelineUpdates = pgTable("timeline_updates", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id").notNull().references(() => users.id),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id),
+  updateDate: text("update_date").notNull(), // "2025-07-20" format
+  summary: text("summary").notNull(), // High-level summary of the day's updates
+  
+  // Task updates summary
+  tasksUpdated: integer("tasks_updated").default(0),
+  tasksCompleted: integer("tasks_completed").default(0),
+  tasksSummary: text("tasks_summary"), // Brief summary of task changes
+  
+  // Key Results updates summary  
+  keyResultsUpdated: integer("key_results_updated").default(0),
+  keyResultsSummary: text("key_results_summary"), // Brief summary of KR updates
+  
+  // Success Metrics updates summary
+  successMetricsUpdated: integer("success_metrics_updated").default(0),
+  successMetricsSummary: text("success_metrics_summary"),
+  
+  // Deliverables updates summary
+  deliverablesUpdated: integer("deliverables_updated").default(0),
+  deliverablesCompleted: integer("deliverables_completed").default(0),
+  deliverablesSummary: text("deliverables_summary"),
+  
+  // Daily reflection
+  whatWorkedWell: text("what_worked_well"),
+  challenges: text("challenges"),
+  
+  // Metadata
+  totalUpdates: integer("total_updates").default(0), // Total count of all updates
+  updateTypes: text("update_types").array(), // ["tasks", "key_results", "metrics", "deliverables"]
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 export const updateKeyResultProgressSchema = z.object({
   id: z.string(),
   currentValue: z.number(),
@@ -790,6 +828,12 @@ export const insertLevelRewardSchema = createInsertSchema(levelRewards).omit({
 export const insertActivityLogSchema = createInsertSchema(activityLogs).omit({
   id: true,
   createdAt: true,
+});
+
+export const insertTimelineUpdateSchema = createInsertSchema(timelineUpdates).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
 });
 
 // SaaS Insert Schemas

@@ -17,7 +17,11 @@ import {
   Users,
   Target,
   Calendar,
-  Clock
+  Clock,
+  TrendingUp,
+  CalendarCheck,
+  BarChart3,
+  CheckCircle
 } from "lucide-react";
 import { TimelineIcon } from "@/components/ui/timeline-icon";
 
@@ -47,6 +51,36 @@ interface TimelineItem {
     celebrate: number;
   };
   comments: TimelineComment[];
+}
+
+interface TimelineUpdate {
+  id: string;
+  userId: string;
+  organizationId: string;
+  updateDate: string;
+  summary: string;
+  tasksUpdated?: number;
+  tasksCompleted?: number;
+  tasksSummary?: string;
+  keyResultsUpdated?: number;
+  keyResultsSummary?: string;
+  successMetricsUpdated?: number;
+  successMetricsSummary?: string;
+  deliverablesUpdated?: number;
+  deliverablesCompleted?: number;
+  deliverablesSummary?: string;
+  whatWorkedWell?: string;
+  challenges?: string;
+  totalUpdates: number;
+  updateTypes: string[];
+  createdAt: string;
+  updatedAt: string;
+  user?: {
+    id: string;
+    name: string;
+    email: string;
+    profileImageUrl?: string;
+  };
 }
 
 interface TimelineComment {
@@ -106,7 +140,8 @@ export default function TimelinePage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: checkInsData, isLoading } = useQuery({
+  // Fetch check-ins data
+  const { data: checkInsData, isLoading: checkInsLoading } = useQuery({
     queryKey: ["/api/timeline"],
     queryFn: async () => {
       const response = await apiRequest("GET", "/api/timeline");
@@ -115,8 +150,23 @@ export default function TimelinePage() {
     retry: 1,
   });
 
+  // Fetch timeline updates data
+  const { data: timelineUpdatesData, isLoading: timelineUpdatesLoading } = useQuery({
+    queryKey: ["/api/timeline-updates"],
+    queryFn: async () => {
+      const response = await apiRequest("GET", "/api/timeline-updates");
+      if (response.ok) {
+        return await response.json();
+      }
+      return []; // Return empty array if endpoint doesn't exist yet
+    },
+    retry: 1,
+  });
+
+  const isLoading = checkInsLoading || timelineUpdatesLoading;
+
   // Transform check-ins data into timeline format
-  const timelineData = Array.isArray(checkInsData) ? checkInsData.map((checkIn: any) => ({
+  const checkInsTimeline = Array.isArray(checkInsData) ? checkInsData.map((checkIn: any) => ({
     id: checkIn.id,
     type: 'check-in',
     content: checkIn.notes || checkIn.feedback,
@@ -129,6 +179,29 @@ export default function TimelinePage() {
     comments: [], // Will be loaded separately
     reactions: reactionCounts[checkIn.id] || { like: 0, love: 0, support: 0, celebrate: 0 },
   })) : [];
+
+  // Transform timeline updates into timeline format
+  const updatesTimeline = Array.isArray(timelineUpdatesData) ? timelineUpdatesData.map((update: TimelineUpdate) => ({
+    id: update.id,
+    type: 'daily-update',
+    content: update.summary,
+    creator: {
+      id: update.userId,
+      firstName: update.user?.name?.split(' ')[0] || '',
+      lastName: update.user?.name?.split(' ').slice(1).join(' ') || '',
+      email: update.user?.email || '',
+    },
+    createdAt: update.createdAt,
+    confidence: 7,
+    comments: [],
+    reactions: { like: 0, love: 0, support: 0, celebrate: 0 },
+    updateData: update, // Include full update data
+  })) : [];
+
+  // Combine and sort timeline data
+  const timelineData = [...checkInsTimeline, ...updatesTimeline].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
 
   const createCommentMutation = useMutation({
     mutationFn: ({ checkInId, content }: { checkInId: string; content: string }) =>
@@ -287,11 +360,15 @@ export default function TimelinePage() {
                             {getUserName(item.creator)}
                           </h3>
                           <p className="text-sm text-gray-600">
-                            melaporkan progress
+                            {item.type === 'check-in' ? 'melaporkan progress' : 'mengirim update harian'}
                           </p>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <TimelineIcon size="sm" variant="muted" />
+                          {item.type === 'check-in' ? (
+                            <TrendingUp className="w-4 h-4 text-blue-500" />
+                          ) : (
+                            <CalendarCheck className="w-4 h-4 text-green-500" />
+                          )}
                           <span className="text-sm text-gray-500">
                             {new Date(item.createdAt).toLocaleString('id-ID', {
                               day: 'numeric',
@@ -306,107 +383,130 @@ export default function TimelinePage() {
                   </div>
 
                   <div className="mt-4">
-                    <div className="flex items-center space-x-2 mb-2">
-                      <TimelineIcon size="sm" variant="secondary" />
-                      <span className="text-sm font-medium text-gray-700">
-                        {item.keyResult?.title}
-                      </span>
-                    </div>
-                    <p className="text-gray-800 mb-3">
-                      {item.content}
-                    </p>
-                    <div className="flex items-center space-x-4 text-sm text-gray-600">
-                      <div className="flex items-center space-x-1">
-                        <Badge variant="secondary">
-                          {item.currentValue || 0} / {item.targetValue || 0} {item.keyResult?.unit || ''}
-                        </Badge>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <span>Progress: {Math.round(((item.currentValue || 0) / (item.targetValue || 1)) * 100)}%</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <span className={`font-medium ${getConfidenceColor(item.confidence)}`}>
-                          {getConfidenceText(item.confidence)} ({item.confidence}/10)
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mt-4 pt-4 border-t border-gray-200">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-4">
-                        <div className="flex items-center space-x-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleReaction(item.id, "like")}
-                            className="flex items-center space-x-1 hover:text-blue-600"
-                          >
-                            {getReactionIcon("like")}
-                            <span>{item.reactions?.like || 0}</span>
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleReaction(item.id, "love")}
-                            className="flex items-center space-x-1 hover:text-red-600"
-                          >
-                            {getReactionIcon("love")}
-                            <span>{item.reactions?.love || 0}</span>
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleReaction(item.id, "support")}
-                            className="flex items-center space-x-1 hover:text-yellow-600"
-                          >
-                            {getReactionIcon("support")}
-                            <span>{item.reactions?.support || 0}</span>
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleReaction(item.id, "celebrate")}
-                            className="flex items-center space-x-1 hover:text-green-600"
-                          >
-                            {getReactionIcon("celebrate")}
-                            <span>{item.reactions?.celebrate || 0}</span>
-                          </Button>
+                    {item.type === 'check-in' ? (
+                      // Check-in display
+                      <>
+                        <div className="flex items-center space-x-2 mb-2">
+                          <Target className="w-4 h-4 text-blue-500" />
+                          <span className="text-sm font-medium text-gray-700">
+                            {item.keyResult?.title}
+                          </span>
                         </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => toggleComments(item.id)}
-                          className="flex items-center space-x-1"
-                        >
-                          <MessageCircle className="w-4 h-4" />
-                          <span>Komentar</span>
-                        </Button>
-                      </div>
-                    </div>
-
-                    {showComments[item.id] && (
-                      <div className="mt-3 space-y-3">
-                        <div className="flex items-center space-x-2">
-                          <Textarea
-                            placeholder="Tulis komentar..."
-                            value={commentTexts[item.id] || ""}
-                            onChange={(e) => setCommentTexts(prev => ({ ...prev, [item.id]: e.target.value }))}
-                            className="flex-1 min-h-[40px] resize-none"
-                            rows={1}
-                          />
-                          <Button
-                            onClick={() => handleComment(item.id)}
-                            disabled={!commentTexts[item.id]?.trim() || createCommentMutation.isPending}
-                            size="sm"
-                            className="px-3"
-                          >
-                            <Send className="w-4 h-4" />
-                          </Button>
+                        <p className="text-gray-800 mb-3">
+                          {item.content}
+                        </p>
+                        <div className="flex items-center space-x-4 text-sm text-gray-600">
+                          <div className="flex items-center space-x-1">
+                            <Badge variant="secondary">
+                              {item.currentValue || 0} / {item.targetValue || 0} {item.keyResult?.unit || ''}
+                            </Badge>
+                          </div>
+                          <div className="flex items-center space-x-1">
+                            <BarChart3 className="w-4 h-4" />
+                            <span>Progress: {Math.round(((item.currentValue || 0) / (item.targetValue || 1)) * 100)}%</span>
+                          </div>
+                          <div className="flex items-center space-x-1">
+                            <span className={`font-medium ${getConfidenceColor(item.confidence)}`}>
+                              {getConfidenceText(item.confidence)} ({item.confidence}/10)
+                            </span>
+                          </div>
                         </div>
-                      </div>
+                      </>
+                    ) : (
+                      // Daily update display
+                      <>
+                        <div className="flex items-center space-x-2 mb-2">
+                          <CalendarCheck className="w-4 h-4 text-green-500" />
+                          <span className="text-sm font-medium text-gray-700">
+                            Update Harian
+                          </span>
+                        </div>
+                        <div className="bg-green-50 p-4 rounded-lg">
+                          <p className="text-gray-800 text-sm whitespace-pre-wrap">
+                            {item.content}
+                          </p>
+                        </div>
+                      </>
                     )}
                   </div>
+
+                  {item.type === 'check-in' && (
+                    <div className="mt-4 pt-4 border-t border-gray-200">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-4">
+                          <div className="flex items-center space-x-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleReaction(item.id, "like")}
+                              className="flex items-center space-x-1 hover:text-blue-600"
+                            >
+                              {getReactionIcon("like")}
+                              <span>{item.reactions?.like || 0}</span>
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleReaction(item.id, "love")}
+                              className="flex items-center space-x-1 hover:text-red-600"
+                            >
+                              {getReactionIcon("love")}
+                              <span>{item.reactions?.love || 0}</span>
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleReaction(item.id, "support")}
+                              className="flex items-center space-x-1 hover:text-yellow-600"
+                            >
+                              {getReactionIcon("support")}
+                              <span>{item.reactions?.support || 0}</span>
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleReaction(item.id, "celebrate")}
+                              className="flex items-center space-x-1 hover:text-green-600"
+                            >
+                              {getReactionIcon("celebrate")}
+                              <span>{item.reactions?.celebrate || 0}</span>
+                            </Button>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => toggleComments(item.id)}
+                            className="flex items-center space-x-1"
+                          >
+                            <MessageCircle className="w-4 h-4" />
+                            <span>Komentar</span>
+                          </Button>
+                        </div>
+                      </div>
+
+                      {showComments[item.id] && (
+                        <div className="mt-3 space-y-3">
+                          <div className="flex items-center space-x-2">
+                            <Textarea
+                              placeholder="Tulis komentar..."
+                              value={commentTexts[item.id] || ""}
+                              onChange={(e) => setCommentTexts(prev => ({ ...prev, [item.id]: e.target.value }))}
+                              className="flex-1 min-h-[40px] resize-none"
+                              rows={1}
+                            />
+                            <Button
+                              onClick={() => handleComment(item.id)}
+                              disabled={!commentTexts[item.id]?.trim() || createCommentMutation.isPending}
+                              size="sm"
+                              className="px-3"
+                            >
+                              <Send className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             ))}

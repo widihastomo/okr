@@ -2824,6 +2824,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Timeline Routes
+  // Get timeline updates
+  app.get("/api/timeline", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as User;
+      if (!user?.organizationId) {
+        return res.status(401).json({ message: "User organization not found" });
+      }
+
+      const { userId } = req.query;
+      const timeline = await storage.getTimelineUpdates(
+        user.organizationId, 
+        userId as string | undefined
+      );
+      
+      res.json(timeline);
+    } catch (error) {
+      console.error("Error fetching timeline:", error);
+      res.status(500).json({ message: "Failed to fetch timeline" });
+    }
+  });
+
+  // Create timeline update
+  app.post("/api/timeline", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as User;
+      if (!user?.organizationId || !user?.id) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      const timelineData = {
+        ...req.body,
+        userId: user.id,
+        organizationId: user.organizationId
+      };
+
+      const timeline = await storage.insertTimelineUpdate(timelineData);
+      res.status(201).json(timeline);
+    } catch (error) {
+      console.error("Error creating timeline update:", error);
+      res.status(500).json({ message: "Failed to create timeline update" });
+    }
+  });
+
+  // Update timeline update
+  app.patch("/api/timeline/:userId/:updateDate", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as User;
+      const { userId, updateDate } = req.params;
+
+      // Ensure user can only update their own timeline or has proper permissions
+      if (userId !== user.id && !user.isSystemOwner) {
+        return res.status(403).json({ message: "Not authorized to update this timeline" });
+      }
+
+      const updatedTimeline = await storage.updateTimelineUpdate(userId, updateDate, req.body);
+      
+      if (!updatedTimeline) {
+        return res.status(404).json({ message: "Timeline update not found" });
+      }
+      
+      res.json(updatedTimeline);
+    } catch (error) {
+      console.error("Error updating timeline:", error);
+      res.status(500).json({ message: "Failed to update timeline" });
+    }
+  });
+
   // Get initiatives for a key result
   app.get("/api/key-results/:id/initiatives", async (req, res) => {
     try {

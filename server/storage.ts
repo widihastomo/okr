@@ -3,6 +3,7 @@ import {
   initiativeMembers, initiativeDocuments, initiativeNotes, initiativeComments, initiativeSuccessMetrics, successMetricUpdates,
   notifications, notificationPreferences, userOnboardingProgress, organizations, applicationSettings, auditTrail,
   subscriptionPlans, billingPeriods, organizationSubscriptions, timelineComments, timelineReactions, definitionOfDoneItems,
+  timelineUpdates,
   type Cycle, type Template, type Objective, type KeyResult, type User, type Team, type TeamMember,
   type CheckIn, type Initiative, type Task, type TaskComment, type TaskAuditTrail, type KeyResultWithDetails, type InitiativeMember, type InitiativeDocument,
   type InitiativeNote, type InitiativeComment, type InsertCycle, type InsertTemplate, type InsertObjective, type InsertKeyResult, 
@@ -14,7 +15,7 @@ import {
   type UserOnboardingProgress, type InsertUserOnboardingProgress, type UpdateOnboardingProgress,
   type ApplicationSetting, type InsertApplicationSetting, type UpdateApplicationSetting,
   type Organization, type TimelineComment, type TimelineReaction, type InsertTimelineComment, type InsertTimelineReaction,
-  type InsertDefinitionOfDoneItem
+  type InsertDefinitionOfDoneItem, insertTimelineUpdateSchema
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, asc, inArray, count } from "drizzle-orm";
@@ -108,6 +109,12 @@ export interface IStorage {
   createTimelineReaction(reaction: InsertTimelineReaction): Promise<TimelineReaction>;
   deleteTimelineComment(commentId: string): Promise<void>;
   deleteTimelineReaction(reactionId: string): Promise<void>;
+  
+  // Timeline Updates
+  getTimelineUpdates(organizationId: string, userId?: string): Promise<any[]>;
+  getTimelineUpdate(userId: string, updateDate: string): Promise<any | undefined>;
+  createTimelineUpdate(timelineUpdate: any): Promise<any>;
+  updateTimelineUpdate(userId: string, updateDate: string, timelineUpdate: any): Promise<any | undefined>;
   
   // Initiatives
   getInitiatives(): Promise<Initiative[]>;
@@ -3044,6 +3051,119 @@ export class DatabaseStorage implements IStorage {
         updatedAt: new Date()
       })
       .where(eq(organizationSubscriptions.organizationId, organizationId));
+  }
+
+  // Timeline Updates
+  async getTimelineUpdates(organizationId: string, userId?: string): Promise<any[]> {
+    const whereConditions = [eq(timelineUpdates.organizationId, organizationId)];
+    
+    if (userId) {
+      whereConditions.push(eq(timelineUpdates.userId, userId));
+    }
+
+    const results = await db
+      .select({
+        id: timelineUpdates.id,
+        userId: timelineUpdates.userId,
+        organizationId: timelineUpdates.organizationId,
+        updateDate: timelineUpdates.updateDate,
+        summary: timelineUpdates.summary,
+        tasksUpdated: timelineUpdates.tasksUpdated,
+        tasksCompleted: timelineUpdates.tasksCompleted,
+        tasksSummary: timelineUpdates.tasksSummary,
+        keyResultsUpdated: timelineUpdates.keyResultsUpdated,
+        keyResultsSummary: timelineUpdates.keyResultsSummary,
+        successMetricsUpdated: timelineUpdates.successMetricsUpdated,
+        successMetricsSummary: timelineUpdates.successMetricsSummary,
+        deliverablesUpdated: timelineUpdates.deliverablesUpdated,
+        deliverablesCompleted: timelineUpdates.deliverablesCompleted,
+        deliverablesSummary: timelineUpdates.deliverablesSummary,
+        whatWorkedWell: timelineUpdates.whatWorkedWell,
+        challenges: timelineUpdates.challenges,
+        totalUpdates: timelineUpdates.totalUpdates,
+        updateTypes: timelineUpdates.updateTypes,
+        createdAt: timelineUpdates.createdAt,
+        updatedAt: timelineUpdates.updatedAt,
+        user: {
+          id: users.id,
+          name: users.name,
+          email: users.email,
+          profileImageUrl: users.profileImageUrl
+        }
+      })
+      .from(timelineUpdates)
+      .innerJoin(users, eq(users.id, timelineUpdates.userId))
+      .where(and(...whereConditions))
+      .orderBy(desc(timelineUpdates.updateDate));
+
+    return results;
+  }
+
+  async getTimelineUpdate(userId: string, updateDate: string): Promise<any | undefined> {
+    const [result] = await db
+      .select()
+      .from(timelineUpdates)
+      .where(and(
+        eq(timelineUpdates.userId, userId),
+        eq(timelineUpdates.updateDate, updateDate)
+      ));
+    return result || undefined;
+  }
+
+  async createTimelineUpdate(timelineUpdate: any): Promise<any> {
+    const [result] = await db
+      .insert(timelineUpdates)
+      .values({
+        userId: timelineUpdate.userId,
+        organizationId: timelineUpdate.organizationId,
+        updateDate: timelineUpdate.updateDate,
+        summary: timelineUpdate.summary,
+        tasksUpdated: timelineUpdate.tasksUpdated || 0,
+        tasksCompleted: timelineUpdate.tasksCompleted || 0,
+        tasksSummary: timelineUpdate.tasksSummary,
+        keyResultsUpdated: timelineUpdate.keyResultsUpdated || 0,
+        keyResultsSummary: timelineUpdate.keyResultsSummary,
+        successMetricsUpdated: timelineUpdate.successMetricsUpdated || 0,
+        successMetricsSummary: timelineUpdate.successMetricsSummary,
+        deliverablesUpdated: timelineUpdate.deliverablesUpdated || 0,
+        deliverablesCompleted: timelineUpdate.deliverablesCompleted || 0,
+        deliverablesSummary: timelineUpdate.deliverablesSummary,
+        whatWorkedWell: timelineUpdate.whatWorkedWell,
+        challenges: timelineUpdate.challenges,
+        totalUpdates: timelineUpdate.totalUpdates || 0,
+        updateTypes: timelineUpdate.updateTypes || []
+      })
+      .returning();
+    return result;
+  }
+
+  async updateTimelineUpdate(userId: string, updateDate: string, timelineUpdate: any): Promise<any | undefined> {
+    const result = await db
+      .update(timelineUpdates)
+      .set({
+        summary: timelineUpdate.summary,
+        tasksUpdated: timelineUpdate.tasksUpdated,
+        tasksCompleted: timelineUpdate.tasksCompleted,
+        tasksSummary: timelineUpdate.tasksSummary,
+        keyResultsUpdated: timelineUpdate.keyResultsUpdated,
+        keyResultsSummary: timelineUpdate.keyResultsSummary,
+        successMetricsUpdated: timelineUpdate.successMetricsUpdated,
+        successMetricsSummary: timelineUpdate.successMetricsSummary,
+        deliverablesUpdated: timelineUpdate.deliverablesUpdated,
+        deliverablesCompleted: timelineUpdate.deliverablesCompleted,
+        deliverablesSummary: timelineUpdate.deliverablesSummary,
+        whatWorkedWell: timelineUpdate.whatWorkedWell,
+        challenges: timelineUpdate.challenges,
+        totalUpdates: timelineUpdate.totalUpdates,
+        updateTypes: timelineUpdate.updateTypes,
+        updatedAt: new Date()
+      })
+      .where(and(
+        eq(timelineUpdates.userId, userId),
+        eq(timelineUpdates.updateDate, updateDate)
+      ))
+      .returning();
+    return result && result.length > 0 ? result[0] : undefined;
   }
 }
 
