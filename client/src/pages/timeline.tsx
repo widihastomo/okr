@@ -454,48 +454,50 @@ export default function TimelinePage() {
                     {/* Post Content */}
                     <div className="p-4">
                       <div className="space-y-3">
-                        {/* Summary Statistics */}
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            {item.tasksUpdated + item.tasksCompleted > 0 && (
-                              <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-800">
-                                📋 {item.tasksUpdated + item.tasksCompleted} tugas
-                              </Badge>
-                            )}
-                            {item.keyResultsUpdated > 0 && (
-                              <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-800">
-                                🎯 {item.keyResultsUpdated} target
-                              </Badge>
-                            )}
-                            {item.successMetricsUpdated > 0 && (
-                              <Badge variant="secondary" className="text-xs bg-orange-100 text-orange-800">
-                                📊 {item.successMetricsUpdated} metrik
-                              </Badge>
-                            )}
-                            {item.deliverablesUpdated > 0 && (
-                              <Badge variant="secondary" className="text-xs bg-indigo-100 text-indigo-800">
-                                📦 {item.deliverablesUpdated} output
-                              </Badge>
+                        {/* Summary Statistics - Hide for check_in items */}
+                        {item.type !== 'check_in' && (
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              {item.tasksUpdated + item.tasksCompleted > 0 && (
+                                <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-800">
+                                  📋 {item.tasksUpdated + item.tasksCompleted} tugas
+                                </Badge>
+                              )}
+                              {item.keyResultsUpdated > 0 && (
+                                <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-800">
+                                  🎯 {item.keyResultsUpdated} target
+                                </Badge>
+                              )}
+                              {item.successMetricsUpdated > 0 && (
+                                <Badge variant="secondary" className="text-xs bg-orange-100 text-orange-800">
+                                  📊 {item.successMetricsUpdated} metrik
+                                </Badge>
+                              )}
+                              {item.deliverablesUpdated > 0 && (
+                                <Badge variant="secondary" className="text-xs bg-indigo-100 text-indigo-800">
+                                  📦 {item.deliverablesUpdated} output
+                                </Badge>
+                              )}
+                            </div>
+                            
+                            {/* Toggle Details Button - only for non-check_in items */}
+                            {(item.tasksSummary || item.keyResultsSummary || item.successMetricsSummary || item.deliverablesSummary) && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => toggleDetails(item.id)}
+                                className="flex items-center gap-1 text-xs h-7 px-2 text-gray-500 hover:text-gray-700"
+                              >
+                                <span>{expandedDetails[item.id] ? 'Sembunyikan' : 'Lihat Detail'}</span>
+                                {expandedDetails[item.id] ? (
+                                  <ChevronUp className="w-3 h-3" />
+                                ) : (
+                                  <ChevronDown className="w-3 h-3" />
+                                )}
+                              </Button>
                             )}
                           </div>
-                          
-                          {/* Toggle Details Button - only for non-check_in items */}
-                          {item.type !== 'check_in' && (item.tasksSummary || item.keyResultsSummary || item.successMetricsSummary || item.deliverablesSummary) && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => toggleDetails(item.id)}
-                              className="flex items-center gap-1 text-xs h-7 px-2 text-gray-500 hover:text-gray-700"
-                            >
-                              <span>{expandedDetails[item.id] ? 'Sembunyikan' : 'Lihat Detail'}</span>
-                              {expandedDetails[item.id] ? (
-                                <ChevronUp className="w-3 h-3" />
-                              ) : (
-                                <ChevronDown className="w-3 h-3" />
-                              )}
-                            </Button>
-                          )}
-                        </div>
+                        )}
 
                         {/* Detailed Update Information - Always show for check_in, expandable for others */}
                         {(item.type === 'check_in' || expandedDetails[item.id]) && (
