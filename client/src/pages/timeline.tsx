@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent } from '@/components/ui/card';
@@ -14,7 +14,9 @@ import {
   Share2, 
   Send,
   ChevronDown,
-  ChevronUp 
+  ChevronUp,
+  Smile,
+  Plus
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { getUserInitials } from '@/lib/utils';
@@ -64,9 +66,19 @@ export default function TimelinePage() {
   const [dateRangeFilter, setDateRangeFilter] = useState('all');
   const [contentTypeFilter, setContentTypeFilter] = useState('all');
   
-  // Social interaction states
-  const [reactions, setReactions] = useState<Record<string, { [emoji: string]: number }>>({});
+  // Social interaction states with demo data
+  const [reactions, setReactions] = useState<Record<string, { [emoji: string]: number }>>({
+    // Add some demo reactions
+    ...(timelineData?.[0] && {
+      [timelineData[0].id]: {
+        '👍': 3,
+        '🔥': 2,
+        '💪': 1
+      }
+    })
+  });
   const [userReactions, setUserReactions] = useState<Record<string, string>>({});
+  const [showReactionPicker, setShowReactionPicker] = useState<Record<string, boolean>>({});
   const [showComments, setShowComments] = useState<Record<string, boolean>>({});
   const [commentTexts, setCommentTexts] = useState<Record<string, string>>({});
   
@@ -146,8 +158,37 @@ export default function TimelinePage() {
     setExpandedDetails(prev => ({ ...prev, [itemId]: !prev[itemId] }));
   };
 
+  // Close reaction picker when clicking outside
+  useEffect(() => {
+    const handleClickOutside = () => {
+      setShowReactionPicker({});
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
+
+  // Emoji options for coworker expressions
+  const REACTION_EMOJIS = [
+    { emoji: '👍', label: 'Bagus!' },
+    { emoji: '❤️', label: 'Suka' },
+    { emoji: '🎉', label: 'Selamat!' },
+    { emoji: '💪', label: 'Keren!' },
+    { emoji: '🔥', label: 'Mantap!' },
+    { emoji: '👏', label: 'Tepuk tangan' },
+    { emoji: '😍', label: 'Luar biasa' },
+    { emoji: '🚀', label: 'Amazing!' },
+    { emoji: '⭐', label: 'Excellent' },
+    { emoji: '💯', label: 'Perfect!' },
+    { emoji: '👌', label: 'OK' },
+    { emoji: '🤝', label: 'Support' }
+  ];
+
   const handleReaction = (itemId: string, emoji: string) => {
     const currentUserReaction = userReactions[itemId];
+    
+    // Close reaction picker
+    setShowReactionPicker(prev => ({ ...prev, [itemId]: false }));
     
     // If user already reacted with this emoji, remove it
     if (currentUserReaction === emoji) {
@@ -551,25 +592,68 @@ export default function TimelinePage() {
                               <MessageCircle className="w-3 h-3" />
                               <span>Komentar</span>
                             </Button>
-                            <div className="flex items-center space-x-1">
-                              {['👍', '❤️', '😂', '😲'].map((emoji) => (
-                                <Button
-                                  key={emoji}
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => handleReaction(item.id, emoji)}
-                                  className={`flex items-center space-x-1 text-xs h-7 px-2 rounded-full transition-colors ${
-                                    userReactions[item.id] === emoji 
-                                      ? 'bg-blue-100 text-blue-600' 
-                                      : 'text-gray-500 hover:text-blue-600 hover:bg-gray-100'
-                                  }`}
+                            <div className="relative">
+                              {/* Reaction Button */}
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setShowReactionPicker(prev => ({ ...prev, [item.id]: !prev[item.id] }));
+                                }}
+                                className="flex items-center space-x-1 text-xs h-7 px-2 rounded-full text-gray-500 hover:text-blue-600 hover:bg-gray-100"
+                              >
+                                <Smile className="w-3 h-3" />
+                                <span>Reaksi</span>
+                              </Button>
+
+                              {/* Reaction Picker Dropdown */}
+                              {showReactionPicker[item.id] && (
+                                <div 
+                                  className="absolute bottom-full mb-2 left-0 bg-white border border-gray-200 rounded-lg shadow-lg p-2 z-10 min-w-[280px]"
+                                  onClick={(e) => e.stopPropagation()}
                                 >
-                                  <span className="text-sm">{emoji}</span>
-                                  {reactions[item.id]?.[emoji] > 0 && (
-                                    <span className="text-xs">{reactions[item.id][emoji]}</span>
-                                  )}
-                                </Button>
-                              ))}
+                                  <div className="grid grid-cols-6 gap-1">
+                                    {REACTION_EMOJIS.map((reaction) => (
+                                      <Button
+                                        key={reaction.emoji}
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => handleReaction(item.id, reaction.emoji)}
+                                        className="flex flex-col items-center p-2 h-auto hover:bg-gray-100 rounded-md transition-all duration-200 hover:scale-105"
+                                        title={reaction.label}
+                                      >
+                                        <span className="text-lg mb-1">{reaction.emoji}</span>
+                                        <span className="text-xs text-gray-600">{reaction.label}</span>
+                                      </Button>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Display Active Reactions */}
+                              {Object.entries(reactions[item.id] || {}).filter(([, count]) => count > 0).length > 0 && (
+                                <div className="flex items-center space-x-1 mt-2">
+                                  {Object.entries(reactions[item.id] || {})
+                                    .filter(([, count]) => count > 0)
+                                    .map(([emoji, count]) => (
+                                      <Button
+                                        key={emoji}
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => handleReaction(item.id, emoji)}
+                                        className={`flex items-center space-x-1 text-xs h-6 px-2 rounded-full transition-colors ${
+                                          userReactions[item.id] === emoji 
+                                            ? 'bg-blue-100 text-blue-600 border border-blue-200' 
+                                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                        }`}
+                                      >
+                                        <span className="text-sm">{emoji}</span>
+                                        <span className="text-xs">{count}</span>
+                                      </Button>
+                                    ))}
+                                </div>
+                              )}
                             </div>
                           </div>
                         </div>
