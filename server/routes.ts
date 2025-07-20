@@ -4018,10 +4018,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.error("Error creating task deletion audit trail:", auditError);
       }
       
+      // Store initiative ID before deleting task
+      const initiativeId = existingTask.initiativeId;
+      
       const deleted = await storage.deleteTask(id);
       
       if (!deleted) {
         return res.status(404).json({ message: "Task not found" });
+      }
+      
+      // Recalculate initiative status after task deletion
+      if (initiativeId) {
+        try {
+          console.log(`🔍 Debug: Task deleted from initiative: ${initiativeId}, recalculating status...`);
+          const initiative = await storage.getInitiativeWithDetails(initiativeId);
+          
+          if (initiative && initiative.status === 'sedang_berjalan') {
+            console.log(`📋 Initiative found with status: ${initiative.status}`);
+            
+            // Check if there are any remaining tasks
+            const remainingTasks = initiative.tasks || [];
+            console.log(`📊 Remaining tasks: ${remainingTasks.length}`);
+            
+            if (remainingTasks.length === 0) {
+              // No tasks left, change back to draft
+              console.log(`🔄 No tasks remaining, updating initiative status to "draft"...`);
+              await storage.updateInitiative(initiativeId, {
+                status: 'draft',
+                updatedAt: new Date(),
+                lastUpdateBy: currentUser.id
+              });
+              console.log(`🚀 Initiative ${initiativeId} status updated to "draft" - no tasks remaining`);
+            } else {
+              // Check if all remaining tasks are not_started
+              const allTasksNotStarted = remainingTasks.every(task => task.status === 'not_started');
+              console.log(`📊 All remaining tasks not_started: ${allTasksNotStarted}`);
+              
+              if (allTasksNotStarted) {
+                console.log(`🔄 All remaining tasks are not_started, updating initiative status to "draft"...`);
+                await storage.updateInitiative(initiativeId, {
+                  status: 'draft',
+                  updatedAt: new Date(),
+                  lastUpdateBy: currentUser.id
+                });
+                console.log(`🚀 Initiative ${initiativeId} status updated to "draft" - all remaining tasks not_started`);
+              } else {
+                console.log(`ℹ️ Some tasks are still in progress/completed, keeping initiative status as "sedang_berjalan"`);
+              }
+            }
+          } else if (initiative) {
+            console.log(`ℹ️ Initiative status is "${initiative.status}", no recalculation needed`);
+          }
+        } catch (error) {
+          console.error("Error recalculating initiative status after task deletion:", error);
+        }
       }
       
       res.status(200).json({ message: "Task deleted successfully" });

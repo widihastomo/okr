@@ -341,6 +341,13 @@ The system includes comprehensive database connection troubleshooting tools:
 
 ## Changelog
 ```
+- July 20, 2025. **INITIATIVE STATUS CALCULATION ENHANCEMENT** - Successfully implemented comprehensive initiative status recalculation logic:
+  * ADDED: Task deletion now triggers initiative status recalculation 
+  * ENHANCED: When tasks are deleted, initiative automatically changes back to "draft" if no tasks remain or all remaining tasks are "not_started"
+  * FIXED: Initiative status changes to "sedang_berjalan" when tasks are marked as "completed" (not just "in_progress")
+  * IMPLEMENTED: Complete cache invalidation for audit trail refresh when deliverables are added, edited, or deleted
+  * ADDED: Automatic translation of old "Definition of done" terminology to "Output" in audit trail display
+  * RESULT: Complete initiative lifecycle management with proper status transitions based on task progress and deletion
 - July 20, 2025. **TERMINOLOGY CHANGE COMPLETED: "Definition of done" → "Output"** - Successfully updated all terminology throughout the application:
   * UPDATED: All server-side error messages from "Definition of done" to "Output" terminology (12 error messages)
   * UPDATED: All server-side console.error messages to use "Output" terminology (5 console messages)
