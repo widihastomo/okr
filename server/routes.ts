@@ -2860,7 +2860,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         organizationId: user.organizationId
       };
 
-      const timeline = await storage.insertTimelineUpdate(timelineData);
+      const timeline = await storage.createTimelineUpdate(timelineData);
       res.status(201).json(timeline);
     } catch (error) {
       console.error("Error creating timeline update:", error);

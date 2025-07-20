@@ -294,17 +294,78 @@ export function DailyUpdateSimple() {
         }
       }
 
+      // Create timeline update summary
+      const todayDate = new Date().toISOString().split('T')[0];
+      
+      // Prepare summary data
+      const keyResultsUpdated = data.keyResults.filter(kr => kr.newValue !== kr.currentValue.toString()).length;
+      const successMetricsUpdated = data.successMetrics.filter(sm => sm.newValue !== sm.achievement).length;
+      const deliverablesUpdated = data.deliverables.filter(d => d.newCompleted !== d.isCompleted).length;
+      const deliverablesCompleted = data.deliverables.filter(d => d.newCompleted === true && d.isCompleted === false).length;
+      const tasksUpdated = data.tasks.filter(t => t.newStatus !== t.currentStatus).length;
+      const tasksCompleted = data.tasks.filter(t => t.newStatus === 'selesai').length;
+      
+      const totalUpdates = keyResultsUpdated + successMetricsUpdated + deliverablesUpdated + tasksUpdated;
+      
+      // Create update types array
+      const updateTypes = [];
+      if (keyResultsUpdated > 0) updateTypes.push('key_results');
+      if (successMetricsUpdated > 0) updateTypes.push('success_metrics');
+      if (deliverablesUpdated > 0) updateTypes.push('deliverables');
+      if (tasksUpdated > 0) updateTypes.push('tasks');
+      
+      // Create summary text
+      let summary = 'Daily Update - ';
+      const summaryParts = [];
+      if (keyResultsUpdated > 0) summaryParts.push(`${keyResultsUpdated} key result${keyResultsUpdated > 1 ? 's' : ''}`);
+      if (successMetricsUpdated > 0) summaryParts.push(`${successMetricsUpdated} success metric${successMetricsUpdated > 1 ? 's' : ''}`);
+      if (deliverablesUpdated > 0) summaryParts.push(`${deliverablesUpdated} deliverable${deliverablesUpdated > 1 ? 's' : ''}`);
+      if (tasksUpdated > 0) summaryParts.push(`${tasksUpdated} task${tasksUpdated > 1 ? 's' : ''}`);
+      
+      if (summaryParts.length > 0) {
+        summary += summaryParts.join(', ') + ' updated';
+      } else {
+        summary += 'No changes made';
+      }
+
+      // Create timeline entry if there are any updates
+      if (totalUpdates > 0) {
+        try {
+          await apiRequest('POST', '/api/timeline', {
+            updateDate: todayDate,
+            summary: summary,
+            tasksUpdated: tasksUpdated,
+            tasksCompleted: tasksCompleted,
+            tasksSummary: tasksUpdated > 0 ? `Updated ${tasksUpdated} task(s), completed ${tasksCompleted}` : null,
+            keyResultsUpdated: keyResultsUpdated,
+            keyResultsSummary: keyResultsUpdated > 0 ? `Updated ${keyResultsUpdated} key result(s)` : null,
+            successMetricsUpdated: successMetricsUpdated,
+            successMetricsSummary: successMetricsUpdated > 0 ? `Updated ${successMetricsUpdated} success metric(s)` : null,
+            deliverablesUpdated: deliverablesUpdated,
+            deliverablesCompleted: deliverablesCompleted,
+            deliverablesSummary: deliverablesUpdated > 0 ? `Updated ${deliverablesUpdated} deliverable(s), completed ${deliverablesCompleted}` : null,
+            whatWorkedWell: data.reflection.whatWorkedWell || null,
+            challenges: data.reflection.challenges || null,
+            totalUpdates: totalUpdates,
+            updateTypes: updateTypes
+          });
+        } catch (error) {
+          console.error('Error creating timeline update:', error);
+          // Continue even if timeline creation fails
+        }
+      }
+
       // Create daily reflection (if reflection content exists)
       if (data.reflection.whatWorkedWell || data.reflection.challenges) {
         try {
           await apiRequest('POST', '/api/daily-reflections', {
-            date: new Date().toISOString().split('T')[0],
+            date: todayDate,
             whatWorkedWell: data.reflection.whatWorkedWell,
             challenges: data.reflection.challenges,
             keyResultUpdates: data.keyResults.filter(kr => kr.notes),
             successMetricUpdates: data.successMetrics.filter(sm => sm.notes),
             deliverableUpdates: data.deliverables?.filter(d => d.notes) || [],
-            tasksCompleted: data.tasks.filter(t => t.newStatus === 'selesai').length
+            tasksCompleted: tasksCompleted
           });
         } catch (error) {
           console.error('Error creating daily reflection:', error);
@@ -324,6 +385,7 @@ export function DailyUpdateSimple() {
       queryClient.invalidateQueries({ queryKey: ['/api/success-metrics'] });
       queryClient.invalidateQueries({ queryKey: ['/api/tasks'] });
       queryClient.invalidateQueries({ queryKey: ['/api/daily-reflections'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/timeline'] });
     },
     onError: (error: Error) => {
       toast({
