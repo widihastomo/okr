@@ -271,13 +271,6 @@ export default function ActivityLogCard({ objectiveId }: ActivityLogCardProps) {
                   )}
                   {activity.createdBy && (
                     <div className="flex items-center gap-2 text-xs text-gray-500 mt-2">
-                      <div
-                        className={`w-6 h-6 ${getTypeColor(activity.type)} rounded-full flex items-center justify-center text-white text-xs font-medium`}
-                      >
-                        {getUserName(activity.createdBy)
-                          .charAt(0)
-                          .toUpperCase()}
-                      </div>
                       <span>{getUserName(activity.createdBy)}</span>
                     </div>
                   )}

@@ -341,6 +341,11 @@ The system includes comprehensive database connection troubleshooting tools:
 
 ## Changelog
 ```
+- July 20, 2025. **ACTIVITY LOG PROFILE IMAGE REMOVED** - Successfully removed profile image/avatar from activity log display:
+  * REMOVED: Circular avatar with user initials from activity log entries
+  * SIMPLIFIED: Activity log now shows only user name without profile image
+  * IMPROVED: Cleaner activity log interface with less visual clutter
+  * RESULT: Activity log entries display user names without circular avatar icons
 - July 20, 2025. **MANDATORY START DATE VALIDATION IMPLEMENTED** - Successfully made startDate field mandatory in task creation form:
   * ADDED: Client-side validation in task modal to require startDate before form submission
   * ENHANCED: Visual indicators including red asterisk (*) next to "Tanggal Mulai" label
