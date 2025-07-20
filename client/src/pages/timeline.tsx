@@ -23,19 +23,9 @@ import {
   BarChart3,
   CheckCircle,
   CheckSquare,
-  Package,
-  Activity,
-  Zap,
-  BookOpen,
-  Flag,
-  AlertCircle
+  Package
 } from "lucide-react";
 import { TimelineIcon } from "@/components/ui/timeline-icon";
-import { 
-  VerticalTimeline, 
-  VerticalTimelineElement 
-} from 'react-vertical-timeline-component';
-import 'react-vertical-timeline-component/style.min.css';
 
 interface TimelineItem {
   id: string;
@@ -337,360 +327,292 @@ export default function TimelinePage() {
     );
   }
 
-  // Helper function to get timeline element configuration
-  const getTimelineElementConfig = (item: any) => {
-    if (item.type === 'check-in') {
-      const progressPercent = Math.round(((item.currentValue || 0) / (item.targetValue || 1)) * 100);
-      let iconBgColor = '#3b82f6'; // blue
-      let contentArrowColor = '#3b82f6';
-      
-      if (progressPercent >= 100) {
-        iconBgColor = '#10b981'; // green
-        contentArrowColor = '#10b981';
-      } else if (progressPercent >= 75) {
-        iconBgColor = '#06b6d4'; // cyan
-        contentArrowColor = '#06b6d4';
-      } else if (progressPercent >= 50) {
-        iconBgColor = '#f59e0b'; // amber
-        contentArrowColor = '#f59e0b';
-      } else if (progressPercent < 25) {
-        iconBgColor = '#ef4444'; // red
-        contentArrowColor = '#ef4444';
-      }
-
-      return {
-        icon: <TrendingUp className="w-4 h-4" />,
-        iconBgColor,
-        contentArrowColor,
-        date: new Date(item.createdAt).toLocaleString('id-ID', {
-          day: 'numeric',
-          month: 'short',
-          hour: '2-digit',
-          minute: '2-digit',
-        })
-      };
-    } else {
-      return {
-        icon: <Activity className="w-4 h-4" />,
-        iconBgColor: '#10b981', // green for daily updates
-        contentArrowColor: '#10b981',
-        date: new Date(item.createdAt).toLocaleString('id-ID', {
-          day: 'numeric',
-          month: 'short',
-          hour: '2-digit',
-          minute: '2-digit',
-        })
-      };
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-6xl mx-auto p-6">
+      <div className="max-w-4xl mx-auto p-6">
         <div className="mb-6">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center space-x-2">
               <TimelineIcon size="md" variant="primary" />
-              <h1 className="text-2xl font-bold text-gray-900">Timeline Komprehensif</h1>
+              <h1 className="text-2xl font-bold text-gray-900">Timeline</h1>
             </div>
             <DailyCheckInButton data-tour="timeline-checkin" />
           </div>
-          <p className="text-gray-600">Timeline interaktif progress dan aktivitas tim</p>
-          
-          {/* Timeline Stats */}
-          {timelineData.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
-              <Card className="p-4">
-                <div className="flex items-center space-x-2">
-                  <Activity className="w-5 h-5 text-blue-500" />
-                  <div>
-                    <p className="text-sm text-gray-600">Total Aktivitas</p>
-                    <p className="text-lg font-semibold">{timelineData.length}</p>
-                  </div>
-                </div>
-              </Card>
-              <Card className="p-4">
-                <div className="flex items-center space-x-2">
-                  <TrendingUp className="w-5 h-5 text-green-500" />
-                  <div>
-                    <p className="text-sm text-gray-600">Progress Reports</p>
-                    <p className="text-lg font-semibold">{timelineData.filter(item => item.type === 'check-in').length}</p>
-                  </div>
-                </div>
-              </Card>
-              <Card className="p-4">
-                <div className="flex items-center space-x-2">
-                  <CalendarCheck className="w-5 h-5 text-orange-500" />
-                  <div>
-                    <p className="text-sm text-gray-600">Daily Updates</p>
-                    <p className="text-lg font-semibold">{timelineData.filter(item => item.type === 'daily-update').length}</p>
-                  </div>
-                </div>
-              </Card>
-              <Card className="p-4">
-                <div className="flex items-center space-x-2">
-                  <Users className="w-5 h-5 text-purple-500" />
-                  <div>
-                    <p className="text-sm text-gray-600">Contributors</p>
-                    <p className="text-lg font-semibold">{[...new Set(timelineData.map(item => item.creator?.id))].length}</p>
-                  </div>
-                </div>
-              </Card>
-            </div>
-          )}
+          <p className="text-gray-600">Timeline progress dan interaksi tim</p>
         </div>
 
         {timelineData.length > 0 ? (
-          <div className="timeline-container">
-            <VerticalTimeline>
-              {timelineData.map((item) => {
-                const config = getTimelineElementConfig(item);
-                
-                return (
-                  <VerticalTimelineElement
-                    key={item.id}
-                    className="vertical-timeline-element--work"
-                    contentStyle={{
-                      background: '#ffffff',
-                      boxShadow: '0 3px 0 #f3f4f6',
-                      border: '1px solid #e5e7eb',
-                      borderRadius: '8px',
-                    }}
-                    contentArrowStyle={{ borderRight: `7px solid ${config.contentArrowColor}` }}
-                    date={config.date}
-                    iconStyle={{ 
-                      background: config.iconBgColor, 
-                      color: '#ffffff',
-                      boxShadow: '0 0 0 4px #f3f4f6, inset 0 2px 0 rgba(0,0,0,.08), 0 3px 0 4px rgba(0,0,0,.05)'
-                    }}
-                    icon={config.icon}
-                  >
-                    {/* Timeline Element Content */}
-                    <div className="timeline-content">
-                      {/* Header */}
-                      <div className="flex items-start justify-between mb-3">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
-                            {getUserInitials(item.creator)}
+          <div className="space-y-6">
+            {timelineData.map((item) => (
+              <Card key={item.id} className="w-full">
+                <CardContent className="p-6">
+                  <div className="flex items-start space-x-3">
+                    <div className="flex-shrink-0">
+                      <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
+                        {getUserInitials(item.creator)}
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h3 className="font-semibold text-gray-900">
+                            {getUserName(item.creator)}
+                          </h3>
+                          <p className="text-sm text-gray-600">
+                            {item.type === 'check-in' ? 'melaporkan progress' : 'mengirim update harian'}
+                          </p>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          {item.type === 'check-in' ? (
+                            <TrendingUp className="w-4 h-4 text-blue-500" />
+                          ) : (
+                            <CalendarCheck className="w-4 h-4 text-green-500" />
+                          )}
+                          <span className="text-sm text-gray-500">
+                            {new Date(item.createdAt).toLocaleString('id-ID', {
+                              day: 'numeric',
+                              month: 'short',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-4">
+                    {item.type === 'check-in' ? (
+                      // Check-in display
+                      <>
+                        <div className="flex items-center space-x-2 mb-2">
+                          <Target className="w-4 h-4 text-blue-500" />
+                          <span className="text-sm font-medium text-gray-700">
+                            {item.keyResult?.title}
+                          </span>
+                        </div>
+                        <p className="text-gray-800 mb-3">
+                          {item.content}
+                        </p>
+                        <div className="flex items-center space-x-4 text-sm text-gray-600">
+                          <div className="flex items-center space-x-1">
+                            <Badge variant="secondary">
+                              {item.currentValue || 0} / {item.targetValue || 0} {item.keyResult?.unit || ''}
+                            </Badge>
                           </div>
-                          <div>
-                            <h3 className="font-semibold text-gray-900 text-sm">
-                              {getUserName(item.creator)}
-                            </h3>
-                            <p className="text-xs text-gray-600">
-                              {item.type === 'check-in' ? 'melaporkan progress' : 'mengirim update harian'}
-                            </p>
+                          <div className="flex items-center space-x-1">
+                            <BarChart3 className="w-4 h-4" />
+                            <span>Progress: {Math.round(((item.currentValue || 0) / (item.targetValue || 1)) * 100)}%</span>
+                          </div>
+                          <div className="flex items-center space-x-1">
+                            <span className={`font-medium ${getConfidenceColor(item.confidence)}`}>
+                              {getConfidenceText(item.confidence)} ({item.confidence}/10)
+                            </span>
                           </div>
                         </div>
-                        <Badge variant={item.type === 'check-in' ? 'default' : 'secondary'} className="text-xs">
-                          {item.type === 'check-in' ? 'Progress' : 'Update'}
-                        </Badge>
-                      </div>
-
-                      {/* Content */}
-                      {item.type === 'check-in' ? (
-                        // Check-in content
-                        <div className="space-y-3">
-                          {/* Key Result Info */}
-                          <div className="bg-blue-50 p-3 rounded-lg">
-                            <div className="flex items-center space-x-2 mb-2">
-                              <Target className="w-4 h-4 text-blue-600" />
-                              <span className="text-sm font-medium text-blue-900">
-                                {item.keyResult?.title || 'Target tidak ditemukan'}
-                              </span>
-                            </div>
-                            
-                            {/* Progress Bar */}
-                            <div className="space-y-2">
-                              <div className="flex justify-between text-xs text-blue-700">
-                                <span>Progress</span>
-                                <span>{Math.round(((item.currentValue || 0) / (item.targetValue || 1)) * 100)}%</span>
-                              </div>
-                              <div className="w-full bg-blue-200 rounded-full h-2">
-                                <div
-                                  className="bg-blue-600 h-2 rounded-full transition-all"
-                                  style={{
-                                    width: `${Math.min(100, Math.round(((item.currentValue || 0) / (item.targetValue || 1)) * 100))}%`
-                                  }}
-                                ></div>
-                              </div>
-                              <div className="flex justify-between items-center text-xs">
-                                <Badge variant="outline" className="text-blue-700 border-blue-300">
-                                  {item.currentValue || 0} / {item.targetValue || 0} {item.keyResult?.unit || ''}
-                                </Badge>
-                                <span className={`font-medium ${getConfidenceColor(item.confidence)}`}>
-                                  {getConfidenceText(item.confidence)} ({item.confidence}/10)
+                      </>
+                    ) : (
+                      // Daily update display with detailed breakdown
+                      <>
+                        <div className="flex items-center space-x-2 mb-3">
+                          <CalendarCheck className="w-4 h-4 text-green-500" />
+                          <span className="text-sm font-medium text-gray-700">
+                            Update Harian - Ringkasan Aktivitas
+                          </span>
+                        </div>
+                        
+                        <div className="bg-green-50 border border-green-200 rounded-lg p-4 space-y-3">
+                          {/* Main summary */}
+                          <div className="text-gray-800 text-sm font-medium">
+                            {item.content}
+                          </div>
+                          
+                          {/* Detailed breakdown if available */}
+                          {item.updateData && (
+                            <div className="pt-2 border-t border-green-200 space-y-2">
+                              {/* Parse and display specific updates */}
+                              {(() => {
+                                const summary = item.content;
+                                const sections = [];
+                                
+                                // Extract task updates
+                                if (summary.includes('task')) {
+                                  const taskMatch = summary.match(/(\d+)\s*task/i);
+                                  if (taskMatch) {
+                                    sections.push({
+                                      icon: <CheckSquare className="w-4 h-4 text-blue-500" />,
+                                      label: "Task",
+                                      value: `${taskMatch[1]} item diperbarui`,
+                                      color: "text-blue-700"
+                                    });
+                                  }
+                                }
+                                
+                                // Extract key results updates
+                                if (summary.includes('angka target') || summary.includes('key result')) {
+                                  const krMatch = summary.match(/(\d+)\s*(angka target|key result)/i);
+                                  if (krMatch) {
+                                    sections.push({
+                                      icon: <Target className="w-4 h-4 text-purple-500" />,
+                                      label: "Angka Target",
+                                      value: `${krMatch[1]} item diperbarui`,
+                                      color: "text-purple-700"
+                                    });
+                                  }
+                                }
+                                
+                                // Extract success metrics updates
+                                if (summary.includes('success metric') || summary.includes('metrik')) {
+                                  const smMatch = summary.match(/(\d+)\s*(success metric|metrik)/i);
+                                  if (smMatch) {
+                                    sections.push({
+                                      icon: <BarChart3 className="w-4 h-4 text-orange-500" />,
+                                      label: "Success Metrics",
+                                      value: `${smMatch[1]} item diperbarui`,
+                                      color: "text-orange-700"
+                                    });
+                                  }
+                                }
+                                
+                                // Extract deliverables updates
+                                if (summary.includes('deliverable') || summary.includes('output')) {
+                                  const delMatch = summary.match(/(\d+)\s*(deliverable|output)/i);
+                                  if (delMatch) {
+                                    sections.push({
+                                      icon: <Package className="w-4 h-4 text-green-600" />,
+                                      label: "Deliverables",
+                                      value: `${delMatch[1]} item diperbarui`,
+                                      color: "text-green-700"
+                                    });
+                                  }
+                                }
+                                
+                                return sections.length > 0 ? (
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                    {sections.map((section, idx) => (
+                                      <div key={idx} className="flex items-center space-x-2 bg-white bg-opacity-60 rounded px-2 py-1">
+                                        {section.icon}
+                                        <span className="text-xs text-gray-600">{section.label}:</span>
+                                        <span className={`text-xs font-medium ${section.color}`}>
+                                          {section.value}
+                                        </span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                ) : null;
+                              })()}
+                              
+                              {/* Update timestamp */}
+                              <div className="flex items-center justify-between text-xs text-gray-500 pt-1">
+                                <span>Update via Daily Focus</span>
+                                <span>
+                                  {new Date(item.createdAt).toLocaleString('id-ID', {
+                                    day: 'numeric',
+                                    month: 'short',
+                                    year: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                  })}
                                 </span>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Notes */}
-                          <div className="text-gray-800 text-sm bg-gray-50 p-3 rounded-lg">
-                            {item.content || 'Tidak ada catatan'}
-                          </div>
-
-                          {/* Reactions & Comments */}
-                          <div className="flex items-center justify-between pt-2 border-t border-gray-200">
-                            <div className="flex items-center space-x-2">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleReaction(item.id, "like")}
-                                className="flex items-center space-x-1 hover:text-blue-600 text-xs"
-                              >
-                                {getReactionIcon("like")}
-                                <span>{item.reactions?.like || 0}</span>
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleReaction(item.id, "celebrate")}
-                                className="flex items-center space-x-1 hover:text-green-600 text-xs"
-                              >
-                                {getReactionIcon("celebrate")}
-                                <span>{item.reactions?.celebrate || 0}</span>
-                              </Button>
-                            </div>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => toggleComments(item.id)}
-                              className="flex items-center space-x-1 text-xs"
-                            >
-                              <MessageCircle className="w-3 h-3" />
-                              <span>Komentar</span>
-                            </Button>
-                          </div>
-
-                          {/* Comments Section */}
-                          {showComments[item.id] && (
-                            <div className="mt-3 space-y-2">
-                              <div className="flex items-center space-x-2">
-                                <Textarea
-                                  placeholder="Tulis komentar..."
-                                  value={commentTexts[item.id] || ""}
-                                  onChange={(e) => setCommentTexts(prev => ({ ...prev, [item.id]: e.target.value }))}
-                                  className="flex-1 min-h-[40px] resize-none text-sm"
-                                  rows={1}
-                                />
-                                <Button
-                                  onClick={() => handleComment(item.id)}
-                                  disabled={!commentTexts[item.id]?.trim() || createCommentMutation.isPending}
-                                  size="sm"
-                                  className="px-2"
-                                >
-                                  <Send className="w-3 h-3" />
-                                </Button>
                               </div>
                             </div>
                           )}
                         </div>
-                      ) : (
-                        // Daily update content with enhanced breakdown
-                        <div className="space-y-3">
-                          <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                            <div className="flex items-center space-x-2 mb-2">
-                              <Zap className="w-4 h-4 text-green-600" />
-                              <span className="text-sm font-semibold text-green-900">
-                                Ringkasan Aktivitas
-                              </span>
-                            </div>
-                            
-                            <p className="text-sm text-gray-800 mb-3">
-                              {item.content}
-                            </p>
+                      </>
+                    )}
+                  </div>
 
-                            {/* Activity Breakdown */}
-                            {(() => {
-                              const summary = item.content;
-                              const activities = [];
-                              
-                              // Parse different types of updates
-                              if (summary.includes('task')) {
-                                const taskMatch = summary.match(/(\d+)\s*task/i);
-                                if (taskMatch) {
-                                  activities.push({
-                                    icon: <CheckSquare className="w-3 h-3" />,
-                                    label: "Tasks",
-                                    value: taskMatch[1],
-                                    color: "bg-blue-100 text-blue-800"
-                                  });
-                                }
-                              }
-                              
-                              if (summary.includes('angka target') || summary.includes('key result')) {
-                                const krMatch = summary.match(/(\d+)\s*(angka target|key result)/i);
-                                if (krMatch) {
-                                  activities.push({
-                                    icon: <Target className="w-3 h-3" />,
-                                    label: "Key Results",
-                                    value: krMatch[1],
-                                    color: "bg-purple-100 text-purple-800"
-                                  });
-                                }
-                              }
-                              
-                              if (summary.includes('success metric') || summary.includes('metrik')) {
-                                const smMatch = summary.match(/(\d+)\s*(success metric|metrik)/i);
-                                if (smMatch) {
-                                  activities.push({
-                                    icon: <BarChart3 className="w-3 h-3" />,
-                                    label: "Metrics",
-                                    value: smMatch[1],
-                                    color: "bg-orange-100 text-orange-800"
-                                  });
-                                }
-                              }
-                              
-                              if (summary.includes('deliverable') || summary.includes('output')) {
-                                const delMatch = summary.match(/(\d+)\s*(deliverable|output)/i);
-                                if (delMatch) {
-                                  activities.push({
-                                    icon: <Package className="w-3 h-3" />,
-                                    label: "Deliverables",
-                                    value: delMatch[1],
-                                    color: "bg-emerald-100 text-emerald-800"
-                                  });
-                                }
-                              }
-                              
-                              return activities.length > 0 && (
-                                <div className="grid grid-cols-2 gap-2">
-                                  {activities.map((activity, idx) => (
-                                    <div key={idx} className={`flex items-center justify-between p-2 rounded ${activity.color} text-xs`}>
-                                      <div className="flex items-center space-x-1">
-                                        {activity.icon}
-                                        <span>{activity.label}</span>
-                                      </div>
-                                      <Badge variant="secondary" className="text-xs">
-                                        {activity.value}
-                                      </Badge>
-                                    </div>
-                                  ))}
-                                </div>
-                              );
-                            })()}
+                  {item.type === 'check-in' && (
+                    <div className="mt-4 pt-4 border-t border-gray-200">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-4">
+                          <div className="flex items-center space-x-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleReaction(item.id, "like")}
+                              className="flex items-center space-x-1 hover:text-blue-600"
+                            >
+                              {getReactionIcon("like")}
+                              <span>{item.reactions?.like || 0}</span>
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleReaction(item.id, "love")}
+                              className="flex items-center space-x-1 hover:text-red-600"
+                            >
+                              {getReactionIcon("love")}
+                              <span>{item.reactions?.love || 0}</span>
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleReaction(item.id, "support")}
+                              className="flex items-center space-x-1 hover:text-yellow-600"
+                            >
+                              {getReactionIcon("support")}
+                              <span>{item.reactions?.support || 0}</span>
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleReaction(item.id, "celebrate")}
+                              className="flex items-center space-x-1 hover:text-green-600"
+                            >
+                              {getReactionIcon("celebrate")}
+                              <span>{item.reactions?.celebrate || 0}</span>
+                            </Button>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => toggleComments(item.id)}
+                            className="flex items-center space-x-1"
+                          >
+                            <MessageCircle className="w-4 h-4" />
+                            <span>Komentar</span>
+                          </Button>
+                        </div>
+                      </div>
+
+                      {showComments[item.id] && (
+                        <div className="mt-3 space-y-3">
+                          <div className="flex items-center space-x-2">
+                            <Textarea
+                              placeholder="Tulis komentar..."
+                              value={commentTexts[item.id] || ""}
+                              onChange={(e) => setCommentTexts(prev => ({ ...prev, [item.id]: e.target.value }))}
+                              className="flex-1 min-h-[40px] resize-none"
+                              rows={1}
+                            />
+                            <Button
+                              onClick={() => handleComment(item.id)}
+                              disabled={!commentTexts[item.id]?.trim() || createCommentMutation.isPending}
+                              size="sm"
+                              className="px-3"
+                            >
+                              <Send className="w-4 h-4" />
+                            </Button>
                           </div>
                         </div>
                       )}
                     </div>
-                  </VerticalTimelineElement>
-                );
-              })}
-            </VerticalTimeline>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
           </div>
         ) : (
           <Card className="text-center py-12">
             <CardContent>
               <TimelineIcon size="lg" variant="muted" className="w-16 h-16 mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                Timeline Masih Kosong
+                Belum ada progress yang dilaporkan
               </h3>
-              <p className="text-gray-600 mb-4">
-                Timeline akan muncul ketika ada member yang melaporkan progress atau mengirim update
+              <p className="text-gray-600">
+                Timeline akan muncul ketika ada member yang melaporkan progress mereka
               </p>
-              <DailyCheckInButton />
             </CardContent>
           </Card>
         )}
