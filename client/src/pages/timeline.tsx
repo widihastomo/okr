@@ -315,7 +315,7 @@ export default function TimelinePage() {
                               {format(new Date(item.updateDate), "MMM dd, HH:mm")}
                             </span>
                             <Badge variant="default" className="text-xs">
-                              Daily Update
+                              Update Harian
                             </Badge>
                             {item.totalUpdates > 0 && (
                               <Badge variant="secondary" className="text-xs">
@@ -324,7 +324,7 @@ export default function TimelinePage() {
                             )}
                           </div>
                           <p className="text-gray-700 text-sm mt-1">
-                            Shared comprehensive daily progress update
+                            Membagikan update progress harian
                           </p>
                         </div>
                       </div>
@@ -332,158 +332,123 @@ export default function TimelinePage() {
 
                     {/* Post Content */}
                     <div className="p-4">
-                      <div className="space-y-4">
+                      <div className="space-y-3">
                         {/* Main Summary */}
                         <div className="text-gray-700 text-sm leading-relaxed">
-                          <div className="font-medium text-gray-600 mb-2">Daily Update Summary:</div>
+                          <div className="font-medium text-gray-600 mb-2">Ringkasan Update Harian:</div>
                           <div className="bg-gray-50 rounded-lg p-3">
-                            <div dangerouslySetInnerHTML={{ __html: item.summary || "No summary available" }} />
+                            <div dangerouslySetInnerHTML={{ __html: item.summary || "Tidak ada ringkasan tersedia" }} />
                           </div>
                         </div>
 
-                        {/* Update Statistics Grid */}
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                          {item.tasksUpdated > 0 && (
-                            <div className="bg-blue-50 rounded-lg p-3 text-center">
-                              <div className="text-lg font-bold text-blue-600">{item.tasksUpdated}</div>
-                              <div className="text-xs text-blue-700">Tasks Updated</div>
+                        {/* Compact Statistics */}
+                        {(item.tasksUpdated > 0 || item.tasksCompleted > 0 || item.keyResultsUpdated > 0 || item.successMetricsUpdated > 0 || item.deliverablesUpdated > 0 || item.deliverablesCompleted > 0) && (
+                          <div className="bg-gray-50 rounded-lg p-3">
+                            <div className="text-xs font-medium text-gray-600 mb-2">📊 Statistik Update:</div>
+                            <div className="flex flex-wrap gap-2 text-xs">
+                              {item.tasksUpdated > 0 && (
+                                <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
+                                  {item.tasksUpdated} Tugas Diupdate
+                                </span>
+                              )}
+                              {item.tasksCompleted > 0 && (
+                                <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                                  {item.tasksCompleted} Tugas Selesai
+                                </span>
+                              )}
+                              {item.keyResultsUpdated > 0 && (
+                                <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded-full">
+                                  {item.keyResultsUpdated} Angka Target
+                                </span>
+                              )}
+                              {item.successMetricsUpdated > 0 && (
+                                <span className="bg-orange-100 text-orange-700 px-2 py-1 rounded-full">
+                                  {item.successMetricsUpdated} Metrik
+                                </span>
+                              )}
+                              {item.deliverablesUpdated > 0 && (
+                                <span className="bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full">
+                                  {item.deliverablesUpdated} Output
+                                </span>
+                              )}
+                              {item.deliverablesCompleted > 0 && (
+                                <span className="bg-teal-100 text-teal-700 px-2 py-1 rounded-full">
+                                  {item.deliverablesCompleted} Output Selesai
+                                </span>
+                              )}
                             </div>
-                          )}
-                          {item.tasksCompleted > 0 && (
-                            <div className="bg-green-50 rounded-lg p-3 text-center">
-                              <div className="text-lg font-bold text-green-600">{item.tasksCompleted}</div>
-                              <div className="text-xs text-green-700">Tasks Completed</div>
-                            </div>
-                          )}
-                          {item.keyResultsUpdated > 0 && (
-                            <div className="bg-purple-50 rounded-lg p-3 text-center">
-                              <div className="text-lg font-bold text-purple-600">{item.keyResultsUpdated}</div>
-                              <div className="text-xs text-purple-700">Key Results</div>
-                            </div>
-                          )}
-                          {item.successMetricsUpdated > 0 && (
-                            <div className="bg-orange-50 rounded-lg p-3 text-center">
-                              <div className="text-lg font-bold text-orange-600">{item.successMetricsUpdated}</div>
-                              <div className="text-xs text-orange-700">Success Metrics</div>
-                            </div>
-                          )}
-                          {item.deliverablesUpdated > 0 && (
-                            <div className="bg-indigo-50 rounded-lg p-3 text-center">
-                              <div className="text-lg font-bold text-indigo-600">{item.deliverablesUpdated}</div>
-                              <div className="text-xs text-indigo-700">Deliverables</div>
-                            </div>
-                          )}
-                          {item.deliverablesCompleted > 0 && (
-                            <div className="bg-teal-50 rounded-lg p-3 text-center">
-                              <div className="text-lg font-bold text-teal-600">{item.deliverablesCompleted}</div>
-                              <div className="text-xs text-teal-700">Completed</div>
-                            </div>
-                          )}
-                        </div>
+                          </div>
+                        )}
 
-                        {/* Detailed Information */}
-                        <div className="space-y-3">
-                          {item.tasksSummary && (
-                            <div className="bg-blue-50 rounded-lg p-3">
-                              <div className="font-medium text-blue-800 mb-1 text-sm">📋 Tasks Progress</div>
-                              <div className="text-sm text-blue-700">{item.tasksSummary}</div>
-                            </div>
-                          )}
-                          
-                          {item.keyResultsSummary && (
-                            <div className="bg-purple-50 rounded-lg p-3">
-                              <div className="font-medium text-purple-800 mb-1 text-sm">🎯 Key Results Progress</div>
-                              <div className="text-sm text-purple-700">{item.keyResultsSummary}</div>
-                            </div>
-                          )}
-
-                          {item.successMetricsSummary && (
-                            <div className="bg-orange-50 rounded-lg p-3">
-                              <div className="font-medium text-orange-800 mb-1 text-sm">📊 Success Metrics</div>
-                              <div className="text-sm text-orange-700">{item.successMetricsSummary}</div>
-                            </div>
-                          )}
-
-                          {item.deliverablesSummary && (
-                            <div className="bg-indigo-50 rounded-lg p-3">
-                              <div className="font-medium text-indigo-800 mb-1 text-sm">📦 Deliverables</div>
-                              <div className="text-sm text-indigo-700">{item.deliverablesSummary}</div>
-                            </div>
-                          )}
-
-                          {item.whatWorkedWell && (
-                            <div className="bg-green-50 rounded-lg p-3">
-                              <div className="font-medium text-green-800 mb-1 text-sm">✅ What Worked Well</div>
-                              <div className="text-sm text-green-700">{item.whatWorkedWell}</div>
-                            </div>
-                          )}
-
-                          {item.challenges && (
-                            <div className="bg-red-50 rounded-lg p-3">
-                              <div className="font-medium text-red-800 mb-1 text-sm">⚠️ Challenges</div>
-                              <div className="text-sm text-red-700">{item.challenges}</div>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Update Types */}
-                        {item.updateTypes && (
-                          <div className="text-xs text-gray-500 bg-gray-50 rounded px-2 py-1">
-                            Types: {item.updateTypes}
+                        {/* Key Information Only */}
+                        {(item.whatWorkedWell || item.challenges) && (
+                          <div className="space-y-2">
+                            {item.whatWorkedWell && (
+                              <div className="bg-green-50 rounded-lg p-2">
+                                <div className="font-medium text-green-800 mb-1 text-xs">✅ Yang Berjalan Baik:</div>
+                                <div className="text-xs text-green-700">{item.whatWorkedWell}</div>
+                              </div>
+                            )}
+                            {item.challenges && (
+                              <div className="bg-red-50 rounded-lg p-2">
+                                <div className="font-medium text-red-800 mb-1 text-xs">⚠️ Tantangan:</div>
+                                <div className="text-xs text-red-700">{item.challenges}</div>
+                              </div>
+                            )}
                           </div>
                         )}
                       </div>
 
                       {/* Engagement Section */}
-                      <div className="mt-4 pt-3 border-t border-gray-100">
+                      <div className="mt-3 pt-3 border-t border-gray-100">
                         <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-4">
+                          <div className="flex items-center space-x-3">
                             <Button
                               variant="ghost"
                               size="sm"
                               onClick={() => toggleReaction(item.id)}
-                              className={`flex items-center space-x-2 text-sm h-8 px-3 rounded-full ${
+                              className={`flex items-center space-x-1 text-xs h-7 px-2 rounded-full ${
                                 reactions[item.id] ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:text-blue-600'
                               }`}
                             >
-                              <Heart className={`w-4 h-4 ${reactions[item.id] ? 'fill-current' : ''}`} />
-                              <span>{reactions[item.id] ? 'Liked' : 'Like'}</span>
+                              <Heart className={`w-3 h-3 ${reactions[item.id] ? 'fill-current' : ''}`} />
+                              <span>{reactions[item.id] ? 'Disukai' : 'Suka'}</span>
                             </Button>
                             <Button
                               variant="ghost"
                               size="sm"
                               onClick={() => toggleComments(item.id)}
-                              className="flex items-center space-x-2 text-sm h-8 px-3 rounded-full text-gray-500 hover:text-blue-600"
+                              className="flex items-center space-x-1 text-xs h-7 px-2 rounded-full text-gray-500 hover:text-blue-600"
                             >
-                              <MessageCircle className="w-4 h-4" />
-                              <span>Comment</span>
+                              <MessageCircle className="w-3 h-3" />
+                              <span>Komentar</span>
                             </Button>
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="flex items-center space-x-2 text-sm h-8 px-3 rounded-full text-gray-500 hover:text-blue-600"
+                              className="flex items-center space-x-1 text-xs h-7 px-2 rounded-full text-gray-500 hover:text-blue-600"
                             >
-                              <Share2 className="w-4 h-4" />
-                              <span>Share</span>
+                              <Share2 className="w-3 h-3" />
+                              <span>Bagikan</span>
                             </Button>
                           </div>
                         </div>
 
                         {/* Comments Section */}
                         {showComments[item.id] && (
-                          <div className="mt-4 pt-3 border-t border-gray-100">
-                            <div className="space-y-3 mb-3">
+                          <div className="mt-3 pt-3 border-t border-gray-100">
+                            <div className="space-y-2 mb-3">
                               {/* Sample comment */}
-                              <div className="flex space-x-3">
+                              <div className="flex space-x-2">
                                 <div className="w-6 h-6 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-semibold text-xs">
                                   JD
                                 </div>
                                 <div className="flex-1">
                                   <div className="text-sm">
                                     <span className="font-medium text-gray-900 mr-2">John Doe</span>
-                                    <span className="text-gray-700">Great progress! Keep it up 👍</span>
+                                    <span className="text-gray-700">Progress bagus! Lanjutkan 👍</span>
                                   </div>
-                                  <div className="text-xs text-gray-500 mt-1">2h ago</div>
+                                  <div className="text-xs text-gray-500 mt-1">2 jam lalu</div>
                                 </div>
                               </div>
                             </div>
