@@ -423,14 +423,16 @@ export default function TimelinePage() {
                           )}
                         </div>
                         <div className="flex-1">
-                          <div className="flex items-center space-x-2">
-                            <h3 className="font-semibold text-gray-900 text-sm">
-                              {item.userName}
-                            </h3>
-                            <span className="text-gray-500 text-xs">•</span>
-                            <span className="text-gray-500 text-xs">
-                              {format(new Date(item.updateDate), "MMM dd, HH:mm")}
-                            </span>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-2">
+                              <h3 className="font-semibold text-gray-900 text-sm">
+                                {item.userName}
+                              </h3>
+                              <span className="text-gray-500 text-xs">•</span>
+                              <span className="text-gray-500 text-xs">
+                                {format(new Date(item.updateDate), "MMM dd, HH:mm")}
+                              </span>
+                            </div>
                             {item.type === 'check_in' ? (
                               <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-800">
                                 Capaian Angka target
