@@ -718,45 +718,44 @@ export default function TimelinePage() {
                               <MessageCircle className="w-3 h-3" />
                               <span>Komentar</span>
                             </Button>
-                            <div className="relative">
-                              {/* Reaction Button */}
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setShowReactionPicker(prev => ({ ...prev, [item.id]: !prev[item.id] }));
-                                }}
-                                className="flex items-center space-x-1 text-xs h-7 px-2 rounded-full text-gray-500 hover:text-blue-600 hover:bg-gray-100"
+                          </div>
+                          
+                          <div className="relative">
+                            {/* Reaction Button */}
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setShowReactionPicker(prev => ({ ...prev, [item.id]: !prev[item.id] }));
+                              }}
+                              className="flex items-center space-x-1 text-xs h-7 px-2 rounded-full text-gray-500 hover:text-blue-600 hover:bg-gray-100"
+                            >
+                              <Smile className="w-3 h-3" />
+                              <span>Reaksi</span>
+                            </Button>
+
+                            {/* Reaction Picker Dropdown */}
+                            {showReactionPicker[item.id] && (
+                              <div 
+                                className="absolute bottom-full mb-2 right-0 bg-white border border-gray-200 rounded-lg shadow-lg p-2 z-10 min-w-[280px]"
+                                onClick={(e) => e.stopPropagation()}
                               >
-                                <Smile className="w-3 h-3" />
-                                <span>Reaksi</span>
-                              </Button>
-
-                              {/* Reaction Picker Dropdown */}
-                              {showReactionPicker[item.id] && (
-                                <div 
-                                  className="absolute bottom-full mb-2 left-0 bg-white border border-gray-200 rounded-lg shadow-lg p-2 z-10 min-w-[280px]"
-                                  onClick={(e) => e.stopPropagation()}
-                                >
-                                  <div className="grid grid-cols-6 gap-1">
-                                    {REACTION_EMOJIS.map((emoji) => (
-                                      <Button
-                                        key={emoji}
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => handleReaction(item.id, emoji)}
-                                        className="flex items-center justify-center p-2 h-10 w-10 hover:bg-gray-100 rounded-md transition-all duration-200 hover:scale-110"
-                                      >
-                                        <span className="text-xl">{emoji}</span>
-                                      </Button>
-                                    ))}
-                                  </div>
+                                <div className="grid grid-cols-6 gap-1">
+                                  {REACTION_EMOJIS.map((emoji) => (
+                                    <Button
+                                      key={emoji}
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => handleReaction(item.id, emoji)}
+                                      className="flex items-center justify-center p-2 h-10 w-10 hover:bg-gray-100 rounded-md transition-all duration-200 hover:scale-110"
+                                    >
+                                      <span className="text-xl">{emoji}</span>
+                                    </Button>
+                                  ))}
                                 </div>
-                              )}
-
-
-                            </div>
+                              </div>
+                            )}
                           </div>
                         </div>
 
