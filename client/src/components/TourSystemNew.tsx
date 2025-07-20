@@ -606,9 +606,15 @@ export default function TourSystem() {
               const buttonElement = tourElement.querySelector('button');
               if (buttonElement) {
                 buttonElement.classList.add("tour-mobile-pulse");
+                buttonElement.classList.add("tour-highlight");
               }
               
-              console.log(`Mobile: Re-highlighted menu item ${currentStepData.id} after sidebar expansion`);
+              console.log(`Mobile: Re-highlighted menu item ${currentStepData.id} after sidebar expansion. Element:`, tourElement);
+              console.log(`Mobile: Button element found:`, buttonElement);
+              console.log(`Mobile: Classes applied to tour element:`, tourElement.className);
+              if (buttonElement) {
+                console.log(`Mobile: Classes applied to button:`, buttonElement.className);
+              }
             }
           }, 200);
         });
