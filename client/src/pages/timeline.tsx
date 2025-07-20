@@ -21,7 +21,9 @@ import {
   TrendingUp,
   CalendarCheck,
   BarChart3,
-  CheckCircle
+  CheckCircle,
+  CheckSquare,
+  Package
 } from "lucide-react";
 import { TimelineIcon } from "@/components/ui/timeline-icon";
 
@@ -194,8 +196,8 @@ export default function TimelinePage() {
   })) : [];
 
   // Transform timeline updates into timeline format
-  const updatesTimeline = Array.isArray(timelineUpdatesData) ? timelineUpdatesData.map((update: TimelineUpdate) => ({
-    id: update.id,
+  const updatesTimeline = Array.isArray(timelineUpdatesData) ? timelineUpdatesData.map((update: TimelineUpdate, index) => ({
+    id: `update-${update.id}-${index}`, // Ensure unique keys
     type: 'daily-update',
     content: update.summary,
     creator: {
@@ -410,18 +412,111 @@ export default function TimelinePage() {
                         </div>
                       </>
                     ) : (
-                      // Daily update display
+                      // Daily update display with detailed breakdown
                       <>
-                        <div className="flex items-center space-x-2 mb-2">
+                        <div className="flex items-center space-x-2 mb-3">
                           <CalendarCheck className="w-4 h-4 text-green-500" />
                           <span className="text-sm font-medium text-gray-700">
-                            Update Harian
+                            Update Harian - Ringkasan Aktivitas
                           </span>
                         </div>
-                        <div className="bg-green-50 p-4 rounded-lg">
-                          <p className="text-gray-800 text-sm whitespace-pre-wrap">
+                        
+                        <div className="bg-green-50 border border-green-200 rounded-lg p-4 space-y-3">
+                          {/* Main summary */}
+                          <div className="text-gray-800 text-sm font-medium">
                             {item.content}
-                          </p>
+                          </div>
+                          
+                          {/* Detailed breakdown if available */}
+                          {item.updateData && (
+                            <div className="pt-2 border-t border-green-200 space-y-2">
+                              {/* Parse and display specific updates */}
+                              {(() => {
+                                const summary = item.content;
+                                const sections = [];
+                                
+                                // Extract task updates
+                                if (summary.includes('task')) {
+                                  const taskMatch = summary.match(/(\d+)\s*task/i);
+                                  if (taskMatch) {
+                                    sections.push({
+                                      icon: <CheckSquare className="w-4 h-4 text-blue-500" />,
+                                      label: "Task",
+                                      value: `${taskMatch[1]} item diperbarui`,
+                                      color: "text-blue-700"
+                                    });
+                                  }
+                                }
+                                
+                                // Extract key results updates
+                                if (summary.includes('angka target') || summary.includes('key result')) {
+                                  const krMatch = summary.match(/(\d+)\s*(angka target|key result)/i);
+                                  if (krMatch) {
+                                    sections.push({
+                                      icon: <Target className="w-4 h-4 text-purple-500" />,
+                                      label: "Angka Target",
+                                      value: `${krMatch[1]} item diperbarui`,
+                                      color: "text-purple-700"
+                                    });
+                                  }
+                                }
+                                
+                                // Extract success metrics updates
+                                if (summary.includes('success metric') || summary.includes('metrik')) {
+                                  const smMatch = summary.match(/(\d+)\s*(success metric|metrik)/i);
+                                  if (smMatch) {
+                                    sections.push({
+                                      icon: <BarChart3 className="w-4 h-4 text-orange-500" />,
+                                      label: "Success Metrics",
+                                      value: `${smMatch[1]} item diperbarui`,
+                                      color: "text-orange-700"
+                                    });
+                                  }
+                                }
+                                
+                                // Extract deliverables updates
+                                if (summary.includes('deliverable') || summary.includes('output')) {
+                                  const delMatch = summary.match(/(\d+)\s*(deliverable|output)/i);
+                                  if (delMatch) {
+                                    sections.push({
+                                      icon: <Package className="w-4 h-4 text-green-600" />,
+                                      label: "Deliverables",
+                                      value: `${delMatch[1]} item diperbarui`,
+                                      color: "text-green-700"
+                                    });
+                                  }
+                                }
+                                
+                                return sections.length > 0 ? (
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                    {sections.map((section, idx) => (
+                                      <div key={idx} className="flex items-center space-x-2 bg-white bg-opacity-60 rounded px-2 py-1">
+                                        {section.icon}
+                                        <span className="text-xs text-gray-600">{section.label}:</span>
+                                        <span className={`text-xs font-medium ${section.color}`}>
+                                          {section.value}
+                                        </span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                ) : null;
+                              })()}
+                              
+                              {/* Update timestamp */}
+                              <div className="flex items-center justify-between text-xs text-gray-500 pt-1">
+                                <span>Update via Daily Focus</span>
+                                <span>
+                                  {new Date(item.createdAt).toLocaleString('id-ID', {
+                                    day: 'numeric',
+                                    month: 'short',
+                                    year: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                  })}
+                                </span>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </>
                     )}
