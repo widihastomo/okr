@@ -545,7 +545,7 @@ export default function GoalFormModal({ goal, open, onOpenChange }: ObjectiveFor
                         
                       </FormLabel>
                       <FormControl>
-                        <Input placeholder="Contoh: Meningkatkan Kepuasan Pelanggan" {...field} />
+                        <Input placeholder="Contoh : Mendorong pertumbuhan pendapatan penjualan secara berkelanjutan" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
