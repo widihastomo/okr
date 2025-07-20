@@ -543,16 +543,10 @@ export default function TimelinePage() {
                               <div className="text-xs text-purple-700">
                                 {item.keyResultsSummary && item.keyResultsSummary.split(', ').map((kr, index) => (
                                   <div key={index} className="mb-1 last:mb-0">
-                                    {item.type === 'check_in' && item.keyResultId ? (
-                                      <Link href={`/key-results/${item.keyResultId}`} className="text-purple-700 hover:text-purple-900 hover:underline">
-                                        {kr}
-                                      </Link>
-                                    ) : (
-                                      <span>{kr}</span>
-                                    )}
+                                    <span>{kr}</span>
                                   </div>
                                 ))}
-                              </div>
+                              </div></div>
                               
                               {/* Progress Information for Check-ins */}
                               {item.type === 'check_in' && item.keyResultTitle && (
