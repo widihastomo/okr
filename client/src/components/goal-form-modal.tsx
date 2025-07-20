@@ -582,7 +582,8 @@ export default function GoalFormModal({ goal, open, onOpenChange }: ObjectiveFor
                       </FormLabel>
                       <FormControl>
                         <Textarea 
-                          placeholder="Contoh: Goal ini akan meningkatkan loyalitas pelanggan melalui peningkatan kualitas layanan dan pengalaman pengguna yang lebih baik..." 
+                          placeholder="Kanapa goal ini penting?
+Contoh: Goal ini bertujuan memastikan bahwa peningkatan pendapatan tidak bersifat musiman atau sesaat, tetapi hasil dari strategi yang terukur dan bisa diulangi keberhasilannya." 
                           {...field} 
                         />
                       </FormControl>
@@ -1420,7 +1421,7 @@ export function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult,
                     
                   </FormLabel>
                   <FormControl>
-                    <Input placeholder="Contoh: Meningkatkan rating kepuasan menjadi 4.5" {...field} />
+                    <Input placeholder="Meningkatkan jumlah reseller aktif dari 500 ke 1000" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
