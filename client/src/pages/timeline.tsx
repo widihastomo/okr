@@ -530,6 +530,30 @@ export default function TimelinePage() {
                                   </div>
                                 ))}
                               </div>
+                              
+                              {/* Progress Information for Check-ins */}
+                              {item.type === 'check_in' && item.keyResult && (
+                                <div className="mt-2 pt-2 border-t border-purple-200">
+                                  <div className="flex items-center justify-between mb-1">
+                                    <span className="text-xs font-medium text-purple-800">Progress Capaian:</span>
+                                    <span className="text-xs font-bold text-purple-900">
+                                      {item.checkInValue} {item.keyResult.unit || ''}
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center justify-between mb-2">
+                                    <span className="text-xs text-purple-700">Target:</span>
+                                    <span className="text-xs text-purple-700">
+                                      {item.keyResult.targetValue} {item.keyResult.unit || ''}
+                                    </span>
+                                  </div>
+                                  {item.checkInNotes && (
+                                    <div className="mt-2">
+                                      <div className="text-xs font-medium text-purple-800 mb-1">Catatan:</div>
+                                      <div className="text-xs text-purple-700 italic">"{item.checkInNotes}"</div>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
                             </div>
                           )}
 
