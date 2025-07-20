@@ -125,12 +125,23 @@ const getUserName = (user: any) => {
 };
 
 const getUserInitials = (user: any) => {
-  if (user.firstName && user.lastName) {
-    return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
+  if (!user) return 'U';
+  
+  // Use consolidated name field
+  if (user.name && user.name.trim() !== '') {
+    const nameParts = user.name.trim().split(' ');
+    if (nameParts.length >= 2) {
+      return `${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}`.toUpperCase();
+    }
+    return nameParts[0][0].toUpperCase();
   }
-  if (user.firstName) return user.firstName[0].toUpperCase();
-  if (user.lastName) return user.lastName[0].toUpperCase();
-  return user.email?.[0]?.toUpperCase() || 'U';
+  
+  // Fallback to email
+  if (user.email) {
+    return user.email[0].toUpperCase();
+  }
+  
+  return 'U';
 };
 
 export default function TimelinePage() {
