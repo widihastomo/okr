@@ -127,16 +127,13 @@ export function DailyUpdateSimple() {
   const { data: successMetrics = [] } = useQuery({
     queryKey: ['/api/success-metrics', initiatives.length > 0 ? initiatives.map(i => i.id).sort().join(',') : 'none'],
     queryFn: async () => {
-      console.log('Success metrics queryFn triggered, initiatives:', initiatives);
-      if (initiatives.length === 0) return [];
+          if (initiatives.length === 0) return [];
       
       const allMetrics = [];
       for (const initiative of initiatives) {
         try {
-          console.log(`Fetching metrics for initiative ${initiative.id}...`);
           const response = await apiRequest('GET', `/api/initiatives/${initiative.id}/success-metrics`);
           const metrics = await response.json();
-          console.log(`Metrics response for ${initiative.id}:`, metrics);
 
           if (Array.isArray(metrics)) {
             allMetrics.push(...metrics.map((metric: any) => ({
@@ -150,7 +147,6 @@ export function DailyUpdateSimple() {
         }
       }
 
-      console.log('Final success metrics:', allMetrics);
       return allMetrics;
     },
     enabled: initiatives.length > 0,
@@ -161,16 +157,13 @@ export function DailyUpdateSimple() {
   const { data: deliverables = [] } = useQuery({
     queryKey: ['/api/deliverables', initiatives.length > 0 ? initiatives.map(i => i.id).sort().join(',') : 'none'],
     queryFn: async () => {
-      console.log('Deliverables queryFn triggered, initiatives:', initiatives);
-      if (initiatives.length === 0) return [];
+          if (initiatives.length === 0) return [];
       
       const allDeliverables = [];
       for (const initiative of initiatives) {
         try {
-          console.log(`Fetching deliverables for initiative ${initiative.id}...`);
           const response = await apiRequest('GET', `/api/initiatives/${initiative.id}/definition-of-done`);
           const deliverableItems = await response.json();
-          console.log(`Deliverables response for ${initiative.id}:`, deliverableItems);
 
           if (Array.isArray(deliverableItems)) {
             allDeliverables.push(...deliverableItems.map((item: any) => ({
@@ -184,7 +177,6 @@ export function DailyUpdateSimple() {
         }
       }
 
-      console.log('Final deliverables:', allDeliverables);
       return allDeliverables;
     },
     enabled: initiatives.length > 0,
@@ -717,7 +709,7 @@ export function DailyUpdateSimple() {
                   <div className="space-y-4">
                     {updateData.successMetrics.map((sm, index) => (
                       <div key={sm.id} className="border rounded-lg p-3 sm:p-4 bg-white">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                           <div className="lg:col-span-1">
                             <h4 className="font-medium text-gray-900 mb-1">{sm.name}</h4>
                             <div className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
@@ -756,22 +748,6 @@ export function DailyUpdateSimple() {
                               className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
                             />
                           </div>
-                          <div className="lg:col-span-1">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Catatan
-                            </label>
-                            <input
-                              type="text"
-                              value={sm.notes || ''}
-                              onChange={(e) => {
-                                const newMetrics = [...updateData.successMetrics];
-                                newMetrics[index].notes = e.target.value || '';
-                                setUpdateData({ ...updateData, successMetrics: newMetrics });
-                              }}
-                              placeholder="Catatan progress..."
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                            />
-                          </div>
                         </div>
                       </div>
                     ))}
@@ -802,7 +778,7 @@ export function DailyUpdateSimple() {
                   <div className="space-y-4">
                     {updateData.deliverables.map((deliverable, index) => (
                       <div key={deliverable.id} className="border rounded-lg p-3 sm:p-4 bg-white">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                           <div className="lg:col-span-1">
                             <h4 className="font-medium text-gray-900 mb-1">{deliverable.title}</h4>
                             <div className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
@@ -838,22 +814,6 @@ export function DailyUpdateSimple() {
                               <option value="false">Belum Selesai</option>
                               <option value="true">Selesai</option>
                             </select>
-                          </div>
-                          <div className="lg:col-span-1">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Catatan
-                            </label>
-                            <input
-                              type="text"
-                              value={deliverable.notes || ''}
-                              onChange={(e) => {
-                                const newDeliverables = [...updateData.deliverables];
-                                newDeliverables[index].notes = e.target.value || '';
-                                setUpdateData({ ...updateData, deliverables: newDeliverables });
-                              }}
-                              placeholder="Catatan completion..."
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            />
                           </div>
                         </div>
                       </div>

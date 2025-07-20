@@ -341,6 +341,21 @@ The system includes comprehensive database connection troubleshooting tools:
 
 ## Changelog
 ```
+- July 20, 2025. **BULK UPDATE FORM NOTES REMOVAL COMPLETED** - Successfully removed notes input fields from success metrics and deliverables sections:
+  * REMOVED: Notes/Catatan input field from success metrics section for cleaner interface
+  * REMOVED: Notes/Catatan input field from deliverables/output section for simplified updates
+  * OPTIMIZED: Grid layout changed from 5 to 4 columns for success metrics section
+  * OPTIMIZED: Grid layout changed from 4 to 3 columns for deliverables section
+  * SIMPLIFIED: Form now focuses only on essential data (values and completion status)
+  * RESULT: Cleaner, more focused bulk update interface without unnecessary note fields
+- July 20, 2025. **BULK UPDATE DATA FETCHING BUG COMPLETELY FIXED** - Successfully resolved critical issue where success metrics and deliverables weren't appearing in bulk update form:
+  * FIXED: React Query dependency instability causing empty data arrays in bulk update form
+  * ENHANCED: Implemented useMemo for initiatives filtering to prevent unnecessary re-renders
+  * FIXED: API response parsing by properly calling .json() on fetch response objects
+  * IMPROVED: Query keys made more stable with sorted initiative IDs and proper enabled conditions
+  * ENHANCED: Query configuration with staleTime: 0 and refetchOnMount: true for fresh data
+  * VERIFIED: Success metrics (2 items) and deliverables (2 items) now properly display in form
+  * RESULT: Bulk update form now successfully loads and displays all success metrics and deliverables data
 - July 20, 2025. **MEMBER PROFILE PHOTO FIX COMPLETED** - Successfully fixed member profile photos not displaying in initiative team modal:
   * FIXED: Created specialized getMemberProfileImage and getMemberInitials helper functions for member data structure
   * ENHANCED: Functions now check both member.user data and fallback to users array lookup
