@@ -85,6 +85,14 @@ export default function TaskModal({
   const { toast } = useToast();
   const { user } = useAuth();
 
+  // Helper function to get today's date in GMT+7
+  const getTodayDate = () => {
+    const now = new Date();
+    const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+    const gmt7Date = new Date(utc + 7 * 3600000);
+    return new Date(gmt7Date.getFullYear(), gmt7Date.getMonth(), gmt7Date.getDate());
+  };
+
   const [initiativePopoverOpen, setInitiativePopoverOpen] = useState(false);
   const [statusPopoverOpen, setStatusPopoverOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -93,8 +101,8 @@ export default function TaskModal({
     status: "not_started",
     priority: "medium",
     assignedTo: user?.id || "",
-    startDate: null as Date | null,
-    dueDate: null as Date | null,
+    startDate: getTodayDate(),
+    dueDate: getTodayDate(),
     initiativeId: "",
   });
 
@@ -107,8 +115,8 @@ export default function TaskModal({
       status: "not_started",
       priority: "medium",
       assignedTo: user?.id || "",
-      startDate: null,
-      dueDate: null,
+      startDate: getTodayDate(),
+      dueDate: getTodayDate(),
       initiativeId: initiativeId || "",
     });
 
@@ -192,8 +200,8 @@ export default function TaskModal({
         status: task.status || "not_started",
         priority: task.priority || "medium",
         assignedTo: task.assignedTo?.id || task.assignedTo || "",
-        startDate: task.startDate ? new Date(task.startDate) : null,
-        dueDate: task.dueDate ? new Date(task.dueDate) : null,
+        startDate: task.startDate ? new Date(task.startDate) : getTodayDate(),
+        dueDate: task.dueDate ? new Date(task.dueDate) : getTodayDate(),
         initiativeId: task.initiativeId || "",
       });
     } else {
@@ -203,8 +211,8 @@ export default function TaskModal({
         status: "not_started",
         priority: "medium",
         assignedTo: user?.id || "",
-        startDate: null,
-        dueDate: null,
+        startDate: getTodayDate(),
+        dueDate: getTodayDate(),
         initiativeId: initiativeId || "",
       });
     }
