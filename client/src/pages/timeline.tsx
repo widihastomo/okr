@@ -546,6 +546,52 @@ export default function TimelinePage() {
                                       {item.keyResult.targetValue} {item.keyResult.unit || ''}
                                     </span>
                                   </div>
+                                  
+                                  {/* Progress Bar */}
+                                  <div className="mb-2">
+                                    {(() => {
+                                      let progressPercentage = 0;
+                                      const current = parseFloat(item.checkInValue) || 0;
+                                      const target = parseFloat(item.keyResult.targetValue) || 1;
+                                      const baseline = parseFloat(item.keyResult.baselineValue) || 0;
+                                      
+                                      // Calculate progress based on key result type
+                                      if (item.keyResult.type === 'increase_to') {
+                                        progressPercentage = baseline !== target 
+                                          ? Math.min(100, Math.max(0, ((current - baseline) / (target - baseline)) * 100))
+                                          : current >= target ? 100 : 0;
+                                      } else if (item.keyResult.type === 'decrease_to') {
+                                        progressPercentage = baseline !== target 
+                                          ? Math.min(100, Math.max(0, ((baseline - current) / (baseline - target)) * 100))
+                                          : current <= target ? 100 : 0;
+                                      } else if (item.keyResult.type === 'achieve_or_not') {
+                                        progressPercentage = current >= target ? 100 : 0;
+                                      }
+                                      
+                                      return (
+                                        <div className="space-y-1">
+                                          <div className="flex items-center justify-between">
+                                            <span className="text-xs text-purple-700">Progress:</span>
+                                            <span className="text-xs font-bold text-purple-900">
+                                              {Math.round(progressPercentage)}%
+                                            </span>
+                                          </div>
+                                          <div className="w-full bg-purple-100 rounded-full h-2">
+                                            <div 
+                                              className={`h-2 rounded-full transition-all duration-300 ${
+                                                progressPercentage >= 100 ? 'bg-green-500' :
+                                                progressPercentage >= 75 ? 'bg-blue-500' :
+                                                progressPercentage >= 50 ? 'bg-yellow-500' :
+                                                progressPercentage >= 25 ? 'bg-orange-500' : 'bg-red-500'
+                                              }`}
+                                              style={{ width: `${Math.min(100, Math.max(0, progressPercentage))}%` }}
+                                            />
+                                          </div>
+                                        </div>
+                                      );
+                                    })()}
+                                  </div>
+                                  
                                   {item.checkInNotes && (
                                     <div className="mt-2">
                                       <div className="text-xs font-medium text-purple-800 mb-1">Catatan:</div>
