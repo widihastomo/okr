@@ -328,293 +328,311 @@ export default function TimelinePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto p-6">
-        <div className="mb-6">
+    <div className="min-h-screen bg-gray-100">
+      <div className="max-w-2xl mx-auto py-6 px-4">
+        <div className="mb-6 bg-white rounded-lg shadow-sm p-4">
           <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-3">
               <TimelineIcon size="md" variant="primary" />
-              <h1 className="text-2xl font-bold text-gray-900">Timeline</h1>
+              <div>
+                <h1 className="text-xl font-bold text-gray-900">Timeline</h1>
+                <p className="text-sm text-gray-600">Activity feed dan progress tim</p>
+              </div>
             </div>
             <DailyCheckInButton data-tour="timeline-checkin" />
           </div>
-          <p className="text-gray-600">Timeline progress dan interaksi tim</p>
         </div>
 
         {timelineData.length > 0 ? (
-          <div className="space-y-6">
+          <div className="space-y-4">
             {timelineData.map((item) => (
-              <Card key={item.id} className="w-full">
-                <CardContent className="p-6">
-                  <div className="flex items-start space-x-3">
-                    <div className="flex-shrink-0">
-                      <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
-                        {getUserInitials(item.creator)}
-                      </div>
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h3 className="font-semibold text-gray-900">
-                            {getUserName(item.creator)}
-                          </h3>
-                          <p className="text-sm text-gray-600">
-                            {item.type === 'check-in' ? 'melaporkan progress' : 'mengirim update harian'}
-                          </p>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          {item.type === 'check-in' ? (
-                            <TrendingUp className="w-4 h-4 text-blue-500" />
-                          ) : (
-                            <CalendarCheck className="w-4 h-4 text-green-500" />
-                          )}
-                          <span className="text-sm text-gray-500">
-                            {new Date(item.createdAt).toLocaleString('id-ID', {
-                              day: 'numeric',
-                              month: 'short',
-                              hour: '2-digit',
-                              minute: '2-digit',
-                            })}
-                          </span>
+              <Card key={item.id} className="w-full bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden">
+                {/* Facebook-style header */}
+                <CardContent className="p-0">
+                  <div className="p-4 pb-3">
+                    <div className="flex items-start space-x-3">
+                      <div className="flex-shrink-0">
+                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold shadow-sm">
+                          {getUserInitials(item.creator)}
                         </div>
                       </div>
-                    </div>
-                  </div>
-
-                  <div className="mt-4">
-                    {item.type === 'check-in' ? (
-                      // Check-in display
-                      <>
-                        <div className="flex items-center space-x-2 mb-2">
-                          <Target className="w-4 h-4 text-blue-500" />
-                          <span className="text-sm font-medium text-gray-700">
-                            {item.keyResult?.title}
-                          </span>
-                        </div>
-                        <p className="text-gray-800 mb-3">
-                          {item.content}
-                        </p>
-                        <div className="flex items-center space-x-4 text-sm text-gray-600">
-                          <div className="flex items-center space-x-1">
-                            <Badge variant="secondary">
-                              {item.currentValue || 0} / {item.targetValue || 0} {item.keyResult?.unit || ''}
-                            </Badge>
-                          </div>
-                          <div className="flex items-center space-x-1">
-                            <BarChart3 className="w-4 h-4" />
-                            <span>Progress: {Math.round(((item.currentValue || 0) / (item.targetValue || 1)) * 100)}%</span>
-                          </div>
-                          <div className="flex items-center space-x-1">
-                            <span className={`font-medium ${getConfidenceColor(item.confidence)}`}>
-                              {getConfidenceText(item.confidence)} ({item.confidence}/10)
-                            </span>
-                          </div>
-                        </div>
-                      </>
-                    ) : (
-                      // Daily update display with detailed breakdown
-                      <>
-                        <div className="flex items-center space-x-2 mb-3">
-                          <CalendarCheck className="w-4 h-4 text-green-500" />
-                          <span className="text-sm font-medium text-gray-700">
-                            Update Harian - Ringkasan Aktivitas
-                          </span>
-                        </div>
-                        
-                        <div className="bg-green-50 border border-green-200 rounded-lg p-4 space-y-3">
-                          {/* Main summary */}
-                          <div className="text-gray-800 text-sm font-medium">
-                            {item.content}
-                          </div>
-                          
-                          {/* Detailed breakdown if available */}
-                          {item.updateData && (
-                            <div className="pt-2 border-t border-green-200 space-y-2">
-                              {/* Parse and display specific updates */}
-                              {(() => {
-                                const summary = item.content;
-                                const sections = [];
-                                
-                                // Extract task updates
-                                if (summary.includes('task')) {
-                                  const taskMatch = summary.match(/(\d+)\s*task/i);
-                                  if (taskMatch) {
-                                    sections.push({
-                                      icon: <CheckSquare className="w-4 h-4 text-blue-500" />,
-                                      label: "Task",
-                                      value: `${taskMatch[1]} item diperbarui`,
-                                      color: "text-blue-700"
-                                    });
-                                  }
-                                }
-                                
-                                // Extract key results updates
-                                if (summary.includes('angka target') || summary.includes('key result')) {
-                                  const krMatch = summary.match(/(\d+)\s*(angka target|key result)/i);
-                                  if (krMatch) {
-                                    sections.push({
-                                      icon: <Target className="w-4 h-4 text-purple-500" />,
-                                      label: "Angka Target",
-                                      value: `${krMatch[1]} item diperbarui`,
-                                      color: "text-purple-700"
-                                    });
-                                  }
-                                }
-                                
-                                // Extract success metrics updates
-                                if (summary.includes('success metric') || summary.includes('metrik')) {
-                                  const smMatch = summary.match(/(\d+)\s*(success metric|metrik)/i);
-                                  if (smMatch) {
-                                    sections.push({
-                                      icon: <BarChart3 className="w-4 h-4 text-orange-500" />,
-                                      label: "Success Metrics",
-                                      value: `${smMatch[1]} item diperbarui`,
-                                      color: "text-orange-700"
-                                    });
-                                  }
-                                }
-                                
-                                // Extract deliverables updates
-                                if (summary.includes('deliverable') || summary.includes('output')) {
-                                  const delMatch = summary.match(/(\d+)\s*(deliverable|output)/i);
-                                  if (delMatch) {
-                                    sections.push({
-                                      icon: <Package className="w-4 h-4 text-green-600" />,
-                                      label: "Deliverables",
-                                      value: `${delMatch[1]} item diperbarui`,
-                                      color: "text-green-700"
-                                    });
-                                  }
-                                }
-                                
-                                return sections.length > 0 ? (
-                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                    {sections.map((section, idx) => (
-                                      <div key={idx} className="flex items-center space-x-2 bg-white bg-opacity-60 rounded px-2 py-1">
-                                        {section.icon}
-                                        <span className="text-xs text-gray-600">{section.label}:</span>
-                                        <span className={`text-xs font-medium ${section.color}`}>
-                                          {section.value}
-                                        </span>
-                                      </div>
-                                    ))}
-                                  </div>
-                                ) : null;
-                              })()}
-                              
-                              {/* Update timestamp */}
-                              <div className="flex items-center justify-between text-xs text-gray-500 pt-1">
-                                <span>Update via Daily Focus</span>
-                                <span>
-                                  {new Date(item.createdAt).toLocaleString('id-ID', {
-                                    day: 'numeric',
-                                    month: 'short',
-                                    year: 'numeric',
-                                    hour: '2-digit',
-                                    minute: '2-digit',
-                                  })}
-                                </span>
-                              </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center space-x-1">
+                              <h3 className="font-semibold text-gray-900 text-sm hover:underline cursor-pointer">
+                                {getUserName(item.creator)}
+                              </h3>
+                              <span className="text-gray-500 text-sm">
+                                {item.type === 'check-in' ? 'melaporkan progress angka target' : 'mengirim update harian'}
+                              </span>
                             </div>
-                          )}
-                        </div>
-                      </>
-                    )}
-                  </div>
-
-                  {item.type === 'check-in' && (
-                    <div className="mt-4 pt-4 border-t border-gray-200">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-4">
-                          <div className="flex items-center space-x-2">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleReaction(item.id, "like")}
-                              className="flex items-center space-x-1 hover:text-blue-600"
-                            >
-                              {getReactionIcon("like")}
-                              <span>{item.reactions?.like || 0}</span>
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleReaction(item.id, "love")}
-                              className="flex items-center space-x-1 hover:text-red-600"
-                            >
-                              {getReactionIcon("love")}
-                              <span>{item.reactions?.love || 0}</span>
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleReaction(item.id, "support")}
-                              className="flex items-center space-x-1 hover:text-yellow-600"
-                            >
-                              {getReactionIcon("support")}
-                              <span>{item.reactions?.support || 0}</span>
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleReaction(item.id, "celebrate")}
-                              className="flex items-center space-x-1 hover:text-green-600"
-                            >
-                              {getReactionIcon("celebrate")}
-                              <span>{item.reactions?.celebrate || 0}</span>
-                            </Button>
+                            <div className="flex items-center space-x-1 mt-1">
+                              <span className="text-gray-500 text-xs hover:underline cursor-pointer">
+                                {new Date(item.createdAt).toLocaleString('id-ID', {
+                                  day: 'numeric',
+                                  month: 'short',
+                                  hour: '2-digit',
+                                  minute: '2-digit',
+                                })}
+                              </span>
+                              <span className="text-gray-400 text-xs">•</span>
+                              <span className="text-gray-500 text-xs">🌐</span>
+                            </div>
                           </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => toggleComments(item.id)}
-                            className="flex items-center space-x-1"
-                          >
-                            <MessageCircle className="w-4 h-4" />
-                            <span>Komentar</span>
+                          <Button variant="ghost" size="sm" className="p-1 h-8 w-8 rounded-full hover:bg-gray-100">
+                            <span className="text-gray-500 font-bold">⋯</span>
                           </Button>
                         </div>
                       </div>
+                    </div>
+                  </div>
 
-                      {showComments[item.id] && (
-                        <div className="mt-3 space-y-3">
-                          <div className="flex items-center space-x-2">
-                            <Textarea
-                              placeholder="Tulis komentar..."
-                              value={commentTexts[item.id] || ""}
-                              onChange={(e) => setCommentTexts(prev => ({ ...prev, [item.id]: e.target.value }))}
-                              className="flex-1 min-h-[40px] resize-none"
-                              rows={1}
-                            />
+                  {/* Facebook-style content */}
+                  <div className="px-4 pb-3">
+                    {item.type === 'check-in' ? (
+                      // Check-in content
+                      <div className="space-y-3">
+                        <div className="text-gray-800 text-sm leading-relaxed">
+                          {item.content}
+                        </div>
+                        
+                        {/* Progress card */}
+                        <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-4">
+                          <div className="flex items-center space-x-2 mb-3">
+                            <Target className="w-5 h-5 text-blue-600" />
+                            <h4 className="font-semibold text-gray-900 text-sm">
+                              {item.keyResult?.title}
+                            </h4>
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-gray-600">Progress saat ini:</span>
+                              <Badge variant="secondary" className="bg-blue-100 text-blue-700 border-blue-200">
+                                {item.currentValue || 0} / {item.targetValue || 0} {item.keyResult?.unit || ''}
+                              </Badge>
+                            </div>
+                            
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-gray-600">Persentase:</span>
+                              <span className="font-semibold text-blue-700">
+                                {Math.round(((item.currentValue || 0) / (item.targetValue || 1)) * 100)}%
+                              </span>
+                            </div>
+                            
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-gray-600">Tingkat yakin:</span>
+                              <span className={`font-semibold ${getConfidenceColor(item.confidence)}`}>
+                                {getConfidenceText(item.confidence)} ({item.confidence}/10)
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      // Daily update content
+                      <div className="space-y-3">
+                        <div className="text-gray-800 text-sm leading-relaxed">
+                          {item.content}
+                        </div>
+                        
+                        {/* Activity breakdown */}
+                        {item.updateData && (() => {
+                          const summary = item.content;
+                          const sections = [];
+                          
+                          // Extract different types of updates
+                          if (summary.includes('task')) {
+                            const taskMatch = summary.match(/(\d+)\s*task/i);
+                            if (taskMatch) {
+                              sections.push({
+                                icon: <CheckSquare className="w-4 h-4 text-blue-600" />,
+                                label: "Task diperbarui",
+                                value: taskMatch[1],
+                                bgColor: "bg-blue-50",
+                                textColor: "text-blue-700"
+                              });
+                            }
+                          }
+                          
+                          if (summary.includes('angka target') || summary.includes('key result')) {
+                            const krMatch = summary.match(/(\d+)\s*(angka target|key result)/i);
+                            if (krMatch) {
+                              sections.push({
+                                icon: <Target className="w-4 h-4 text-purple-600" />,
+                                label: "Angka target diperbarui", 
+                                value: krMatch[1],
+                                bgColor: "bg-purple-50",
+                                textColor: "text-purple-700"
+                              });
+                            }
+                          }
+                          
+                          if (summary.includes('success metric') || summary.includes('metrik')) {
+                            const smMatch = summary.match(/(\d+)\s*(success metric|metrik)/i);
+                            if (smMatch) {
+                              sections.push({
+                                icon: <BarChart3 className="w-4 h-4 text-orange-600" />,
+                                label: "Success metrics diperbarui",
+                                value: smMatch[1], 
+                                bgColor: "bg-orange-50",
+                                textColor: "text-orange-700"
+                              });
+                            }
+                          }
+                          
+                          if (summary.includes('deliverable') || summary.includes('output')) {
+                            const delMatch = summary.match(/(\d+)\s*(deliverable|output)/i);
+                            if (delMatch) {
+                              sections.push({
+                                icon: <Package className="w-4 h-4 text-green-600" />,
+                                label: "Deliverables diperbarui",
+                                value: delMatch[1],
+                                bgColor: "bg-green-50", 
+                                textColor: "text-green-700"
+                              });
+                            }
+                          }
+                          
+                          return sections.length > 0 ? (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                              {sections.map((section, idx) => (
+                                <div key={idx} className={`${section.bgColor} border border-opacity-30 rounded-lg p-3 flex items-center space-x-3`}>
+                                  {section.icon}
+                                  <div>
+                                    <div className={`font-semibold text-sm ${section.textColor}`}>
+                                      {section.value}
+                                    </div>
+                                    <div className="text-xs text-gray-600">
+                                      {section.label}
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          ) : null;
+                        })()}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Facebook-style engagement section */}
+                  <div className="border-t border-gray-200">
+                    {/* Reaction summary */}
+                    {(item.reactions?.like || item.reactions?.love || item.reactions?.support || item.reactions?.celebrate) > 0 && (
+                      <div className="px-4 py-2 border-b border-gray-100">
+                        <div className="flex items-center justify-between text-sm text-gray-600">
+                          <div className="flex items-center space-x-1">
+                            <div className="flex -space-x-1">
+                              {item.reactions?.like > 0 && (
+                                <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center text-xs text-white">👍</div>
+                              )}
+                              {item.reactions?.love > 0 && (
+                                <div className="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-xs text-white">❤️</div>
+                              )}
+                              {item.reactions?.support > 0 && (
+                                <div className="w-5 h-5 bg-yellow-500 rounded-full flex items-center justify-center text-xs text-white">⭐</div>
+                              )}
+                              {item.reactions?.celebrate > 0 && (
+                                <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center text-xs text-white">🎉</div>
+                              )}
+                            </div>
+                            <span className="ml-2">
+                              {(item.reactions?.like || 0) + (item.reactions?.love || 0) + (item.reactions?.support || 0) + (item.reactions?.celebrate || 0)}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Action buttons */}
+                    <div className="px-4 py-2">
+                      <div className="flex items-center justify-around">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleReaction(item.id, "like")}
+                          className="flex-1 flex items-center justify-center space-x-2 py-2 hover:bg-gray-50 rounded-md text-gray-600 hover:text-blue-600"
+                        >
+                          <ThumbsUp className="w-4 h-4" />
+                          <span className="text-sm font-medium">Suka</span>
+                        </Button>
+                        
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => toggleComments(item.id)}
+                          className="flex-1 flex items-center justify-center space-x-2 py-2 hover:bg-gray-50 rounded-md text-gray-600 hover:text-blue-600"
+                        >
+                          <MessageCircle className="w-4 h-4" />
+                          <span className="text-sm font-medium">Komentar</span>
+                        </Button>
+                        
+                        {item.type === 'check-in' && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleReaction(item.id, "celebrate")}
+                            className="flex-1 flex items-center justify-center space-x-2 py-2 hover:bg-gray-50 rounded-md text-gray-600 hover:text-green-600"
+                          >
+                            <Sparkles className="w-4 h-4" />
+                            <span className="text-sm font-medium">Rayakan</span>
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Comments section */}
+                    {showComments[item.id] && (
+                      <div className="border-t border-gray-100 px-4 py-3">
+                        <div className="flex items-start space-x-2">
+                          <div className="flex-shrink-0">
+                            <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-blue-500 rounded-full flex items-center justify-center text-white font-semibold text-xs">
+                              {getUserInitials({ name: "Current User" })}
+                            </div>
+                          </div>
+                          <div className="flex-1 flex items-center space-x-2">
+                            <div className="flex-1 relative">
+                              <Textarea
+                                placeholder="Tulis komentar..."
+                                value={commentTexts[item.id] || ""}
+                                onChange={(e) => setCommentTexts(prev => ({ ...prev, [item.id]: e.target.value }))}
+                                className="flex-1 min-h-[36px] resize-none border-gray-300 rounded-full px-3 py-2 text-sm"
+                                rows={1}
+                              />
+                            </div>
                             <Button
                               onClick={() => handleComment(item.id)}
                               disabled={!commentTexts[item.id]?.trim() || createCommentMutation.isPending}
                               size="sm"
-                              className="px-3"
+                              variant="ghost"
+                              className="p-2 h-8 w-8 rounded-full hover:bg-gray-100"
                             >
-                              <Send className="w-4 h-4" />
+                              <Send className="w-4 h-4 text-blue-600" />
                             </Button>
                           </div>
                         </div>
-                      )}
-                    </div>
-                  )}
+                      </div>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
             ))}
           </div>
         ) : (
-          <Card className="text-center py-12">
-            <CardContent>
-              <TimelineIcon size="lg" variant="muted" className="w-16 h-16 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                Belum ada progress yang dilaporkan
-              </h3>
-              <p className="text-gray-600">
-                Timeline akan muncul ketika ada member yang melaporkan progress mereka
-              </p>
-            </CardContent>
-          </Card>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 text-center py-12">
+            <TimelineIcon size="lg" variant="muted" className="w-16 h-16 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              Belum ada activity yang ditampilkan
+            </h3>
+            <p className="text-gray-600 mb-4">
+              Timeline akan menampilkan update harian dan progress check-in dari tim Anda
+            </p>
+            <div className="text-sm text-gray-500">
+              Mulai dengan melakukan check-in atau update harian untuk melihat activity feed
+            </div>
+          </div>
         )}
       </div>
     </div>
