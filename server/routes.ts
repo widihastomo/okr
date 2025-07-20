@@ -3854,6 +3854,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (updateData.dueDate) {
         updateData.dueDate = new Date(updateData.dueDate);
       }
+      if (updateData.startDate) {
+        updateData.startDate = new Date(updateData.startDate);
+      }
       
       // Add UPDATE audit trail fields
       const updateDataWithAuditTrail = {
@@ -3886,6 +3889,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const oldName = oldAssignee ? (oldAssignee.name || oldAssignee.email) : "Tidak ada";
           const newName = newAssignee ? (newAssignee.name || newAssignee.email) : "Tidak ada";
           changes.push(`Penugasan diubah dari "${oldName}" menjadi "${newName}"`);
+        }
+        
+        if (updateData.startDate && updateData.startDate !== existingTask.startDate) {
+          const oldDate = existingTask.startDate ? new Date(existingTask.startDate).toLocaleDateString('id-ID') : "Tidak ada";
+          const newDate = updateData.startDate ? new Date(updateData.startDate).toLocaleDateString('id-ID') : "Tidak ada";
+          changes.push(`Tanggal mulai diubah dari "${oldDate}" menjadi "${newDate}"`);
         }
         
         if (updateData.dueDate && updateData.dueDate !== existingTask.dueDate) {
