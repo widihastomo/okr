@@ -1456,13 +1456,16 @@ export default function InitiativeDetailPage() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => {
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
               if (window.history.length > 1) {
                 window.history.back();
               } else {
                 window.location.href = "/dashboard?tab=initiatives";
               }
             }}
+            style={{ pointerEvents: 'auto', zIndex: 10 }}
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Kembali
