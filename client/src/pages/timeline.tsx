@@ -333,54 +333,54 @@ export default function TimelinePage() {
                     {/* Post Content */}
                     <div className="p-4">
                       <div className="space-y-3">
-                        {/* Main Summary - Compact */}
-                        {item.summary && (
-                          <div className="text-gray-700 text-sm">
+                        {/* Detailed Update Information */}
+                        <div className="space-y-2">
+                          {/* Tasks Details */}
+                          {item.tasksSummary && (
+                            <div className="bg-blue-50 rounded-lg p-2">
+                              <div className="flex items-center gap-1 mb-1">
+                                <span className="text-xs font-medium text-blue-800">📋 Tugas ({item.tasksUpdated + item.tasksCompleted})</span>
+                                {item.tasksCompleted > 0 && <span className="bg-green-200 text-green-800 text-xs px-1 rounded">{item.tasksCompleted} selesai</span>}
+                              </div>
+                              <div className="text-xs text-blue-700">{item.tasksSummary}</div>
+                            </div>
+                          )}
+                          
+                          {/* Key Results Details */}
+                          {item.keyResultsSummary && (
+                            <div className="bg-purple-50 rounded-lg p-2">
+                              <div className="text-xs font-medium text-purple-800 mb-1">🎯 Angka Target ({item.keyResultsUpdated})</div>
+                              <div className="text-xs text-purple-700">{item.keyResultsSummary}</div>
+                            </div>
+                          )}
+
+                          {/* Success Metrics Details */}
+                          {item.successMetricsSummary && (
+                            <div className="bg-orange-50 rounded-lg p-2">
+                              <div className="text-xs font-medium text-orange-800 mb-1">📊 Metrik Sukses ({item.successMetricsUpdated})</div>
+                              <div className="text-xs text-orange-700">{item.successMetricsSummary}</div>
+                            </div>
+                          )}
+
+                          {/* Deliverables Details */}
+                          {item.deliverablesSummary && (
+                            <div className="bg-indigo-50 rounded-lg p-2">
+                              <div className="flex items-center gap-1 mb-1">
+                                <span className="text-xs font-medium text-indigo-800">📦 Output ({item.deliverablesUpdated})</span>
+                                {item.deliverablesCompleted > 0 && <span className="bg-green-200 text-green-800 text-xs px-1 rounded">{item.deliverablesCompleted} selesai</span>}
+                              </div>
+                              <div className="text-xs text-indigo-700">{item.deliverablesSummary}</div>
+                            </div>
+                          )}
+
+                          {/* Summary if no detailed info */}
+                          {!item.tasksSummary && !item.keyResultsSummary && !item.successMetricsSummary && !item.deliverablesSummary && item.summary && (
                             <div className="bg-gray-50 rounded-lg p-2">
-                              <div className="text-xs font-medium text-gray-600 mb-1">📝 Ringkasan:</div>
+                              <div className="text-xs font-medium text-gray-600 mb-1">📝 Ringkasan Update:</div>
                               <div className="text-xs line-clamp-3" dangerouslySetInnerHTML={{ __html: item.summary }} />
                             </div>
-                          </div>
-                        )}
-
-                        {/* Compact Statistics */}
-                        {(item.tasksUpdated > 0 || item.tasksCompleted > 0 || item.keyResultsUpdated > 0 || item.successMetricsUpdated > 0 || item.deliverablesUpdated > 0 || item.deliverablesCompleted > 0) && (
-                          <div className="bg-gray-50 rounded-lg p-3">
-                            <div className="text-xs font-medium text-gray-600 mb-2">📊 Statistik Update:</div>
-                            <div className="flex flex-wrap gap-2 text-xs">
-                              {item.tasksUpdated > 0 && (
-                                <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
-                                  {item.tasksUpdated} Tugas Diupdate
-                                </span>
-                              )}
-                              {item.tasksCompleted > 0 && (
-                                <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full">
-                                  {item.tasksCompleted} Tugas Selesai
-                                </span>
-                              )}
-                              {item.keyResultsUpdated > 0 && (
-                                <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded-full">
-                                  {item.keyResultsUpdated} Angka Target
-                                </span>
-                              )}
-                              {item.successMetricsUpdated > 0 && (
-                                <span className="bg-orange-100 text-orange-700 px-2 py-1 rounded-full">
-                                  {item.successMetricsUpdated} Metrik
-                                </span>
-                              )}
-                              {item.deliverablesUpdated > 0 && (
-                                <span className="bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full">
-                                  {item.deliverablesUpdated} Output
-                                </span>
-                              )}
-                              {item.deliverablesCompleted > 0 && (
-                                <span className="bg-teal-100 text-teal-700 px-2 py-1 rounded-full">
-                                  {item.deliverablesCompleted} Output Selesai
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        )}
+                          )}
+                        </div>
 
                         {/* Key Information Only */}
                         {(item.whatWorkedWell || item.challenges) && (
