@@ -184,38 +184,41 @@ export function DailyUpdateSimple() {
     refetchOnMount: true
   });
 
-  // Initialize data when modal opens
+  // Track if data has been initialized to prevent resets
+  const [dataInitialized, setDataInitialized] = React.useState(false);
+
+  // Initialize data when modal opens (only once)
   React.useEffect(() => {
-    if (isOpen) {
-      setUpdateData(prev => ({
-        ...prev,
+    if (isOpen && !dataInitialized && keyResults.length > 0) {
+      console.log('Opening dialog with data:', { keyResults, successMetrics, deliverables });
+      const initialData = {
         keyResults: keyResults.map((kr: any) => ({
           id: kr.id,
           title: kr.title,
-          currentValue: kr.currentValue || 0,
-          targetValue: kr.targetValue || 0,
+          currentValue: Number(kr.currentValue) || 0,
+          targetValue: Number(kr.targetValue) || 0,
           unit: kr.unit || '',
-          newValue: kr.currentValue || 0,
+          newValue: String(kr.currentValue) || '0',
           notes: ''
         })),
         successMetrics: successMetrics.map((sm: any) => ({
           id: sm.id,
           name: sm.name,
           target: sm.target || '',
-          achievement: sm.achievement || '',
+          achievement: sm.achievement || '0',
           initiativeTitle: sm.initiativeTitle || '',
           initiativeId: sm.initiativeId || '',
-          newValue: sm.achievement || '',
+          newValue: String(sm.achievement) || '0',
           notes: ''
         })),
         deliverables: deliverables.map((d: any) => ({
           id: d.id,
           title: d.title || '',
           description: d.description || '',
-          isCompleted: d.isCompleted || false,
+          isCompleted: Boolean(d.isCompleted),
           initiativeTitle: d.initiativeTitle || '',
           initiativeId: d.initiativeId || '',
-          newCompleted: d.isCompleted || false,
+          newCompleted: Boolean(d.isCompleted),
           notes: ''
         })),
         tasks: relevantTasks.map((task: any) => ({
@@ -225,10 +228,24 @@ export function DailyUpdateSimple() {
           newStatus: task.status
         })),
         tasksCompleted: relevantTasks.filter((task: any) => task.status === 'selesai').length,
-        totalTasks: relevantTasks.length
-      }));
+        totalTasks: relevantTasks.length,
+        reflection: {
+          whatWorkedWell: '',
+          challenges: ''
+        }
+      };
+      console.log('Initial data:', initialData);
+      setUpdateData(initialData);
+      setDataInitialized(true);
     }
-  }, [isOpen, keyResults, successMetrics, deliverables, relevantTasks, initiatives, user?.id]);
+  }, [isOpen, keyResults, successMetrics, deliverables, relevantTasks, dataInitialized]);
+
+  // Reset initialization flag when modal closes
+  React.useEffect(() => {
+    if (!isOpen) {
+      setDataInitialized(false);
+    }
+  }, [isOpen]);
 
   // Submit mutation
   const submitMutation = useMutation({
