@@ -66,27 +66,10 @@ export default function TimelinePage() {
   const [dateRangeFilter, setDateRangeFilter] = useState('all');
   const [contentTypeFilter, setContentTypeFilter] = useState('all');
   
-  // Demo data for reactions
-  const demoReactions = timelineData?.[0] ? {
-    [timelineData[0].id]: {
-      '👍': 5,
-      '🔥': 3,
-      '💪': 2
-    }
-  } : {};
-
-  const demoReactionUsers = timelineData?.[0] ? {
-    [timelineData[0].id]: {
-      '👍': ['Test User5', 'Belina Yee', 'John Doe', 'Jane Smith', 'Mike Wilson'],
-      '🔥': ['Alice Cooper', 'Bob Johnson', 'Charlie Brown'],
-      '💪': ['David Lee', 'Emily Davis']
-    }
-  } : {};
-
   // Social interaction states
-  const [reactions, setReactions] = useState<Record<string, { [emoji: string]: number }>>(demoReactions);
+  const [reactions, setReactions] = useState<Record<string, { [emoji: string]: number }>>({});
   const [userReactions, setUserReactions] = useState<Record<string, string>>({});
-  const [reactionUsers, setReactionUsers] = useState<Record<string, { [emoji: string]: string[] }>>(demoReactionUsers);
+  const [reactionUsers, setReactionUsers] = useState<Record<string, { [emoji: string]: string[] }>>({});
   const [showReactionPicker, setShowReactionPicker] = useState<Record<string, boolean>>({});
   const [showComments, setShowComments] = useState<Record<string, boolean>>({});
   const [commentTexts, setCommentTexts] = useState<Record<string, string>>({});
@@ -177,12 +160,33 @@ export default function TimelinePage() {
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
+  // Set demo data for reactions when timeline data is loaded
+  useEffect(() => {
+    if (timelineData && timelineData.length > 0) {
+      const firstItemId = timelineData[0].id;
+      setReactions({
+        [firstItemId]: {
+          '👍': 5,
+          '🔥': 3,
+          '💪': 2
+        }
+      });
+      setReactionUsers({
+        [firstItemId]: {
+          '👍': ['Test User5', 'Belina Yee', 'John Doe', 'Jane Smith', 'Mike Wilson'],
+          '🔥': ['Alice Cooper', 'Bob Johnson', 'Charlie Brown'],
+          '💪': ['David Lee', 'Emily Davis']
+        }
+      });
+    }
+  }, [timelineData]);
+
   // Emoji options for coworker expressions
   const REACTION_EMOJIS = ['👍', '❤️', '🎉', '💪', '🔥', '👏', '😍', '🚀', '⭐', '💯', '👌', '🤝'];
 
   const handleReaction = (itemId: string, emoji: string) => {
     const currentUserReaction = userReactions[itemId];
-    const currentUser = user?.name || 'Anonymous User';
+    const currentUser = (user as any)?.name || 'Anonymous User';
     
     // Close reaction picker
     setShowReactionPicker(prev => ({ ...prev, [itemId]: false }));
@@ -704,15 +708,15 @@ export default function TimelinePage() {
                             {/* Add Comment */}
                             <div className="flex space-x-2">
                               <div className="flex-shrink-0">
-                                {user?.profileImageUrl ? (
+                                {(user as any)?.profileImageUrl ? (
                                   <img 
-                                    src={user.profileImageUrl} 
-                                    alt={user.name || user.email}
+                                    src={(user as any).profileImageUrl} 
+                                    alt={(user as any).name || (user as any).email}
                                     className="w-8 h-8 rounded-full object-cover"
                                   />
                                 ) : (
                                   <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-blue-500 rounded-full flex items-center justify-center text-white font-semibold text-xs">
-                                    {getUserInitials({ name: user?.name || user?.email || "User" })}
+                                    {getUserInitials((user as any)?.name || (user as any)?.email || "User")}
                                   </div>
                                 )}
                               </div>
