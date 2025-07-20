@@ -1064,9 +1064,10 @@ export default function InitiativeDetailPage() {
         };
         
         const { oldStatus, newStatus } = data.initiativeStatusChange;
+        const action = newStatus === 'sedang_berjalan' ? 'deliverable diselesaikan' : 'semua deliverable dan task tidak aktif';
         toast({
           title: "Status inisiatif berubah otomatis",
-          description: `Status inisiatif berubah dari "${getStatusLabel(oldStatus)}" ke "${getStatusLabel(newStatus)}" karena deliverable diselesaikan`,
+          description: `Status inisiatif berubah dari "${getStatusLabel(oldStatus)}" ke "${getStatusLabel(newStatus)}" karena ${action}`,
           variant: "default",
         });
       }

@@ -3477,28 +3477,61 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check if we need to update initiative status
       let initiativeStatusChange = null;
       
-      if (result.initiativeId && isCompleted) {
-        console.log(`🔍 Debug: DOD item checked, initiative ID: ${result.initiativeId}`);
+      if (result.initiativeId) {
+        console.log(`🔍 Debug: DOD item toggled (${isCompleted ? 'checked' : 'unchecked'}), initiative ID: ${result.initiativeId}`);
         
         const initiative = await storage.getInitiativeWithDetails(result.initiativeId);
         if (initiative) {
           console.log(`📋 Initiative found: YES, current status: ${initiative.status}`);
           
-          // If DOD item is checked and initiative is in draft, change to sedang_berjalan
-          if (initiative.status === 'draft') {
-            console.log('🔄 Updating initiative status from "draft" to "sedang_berjalan"...');
+          if (isCompleted) {
+            // If DOD item is checked and initiative is in draft, change to sedang_berjalan
+            if (initiative.status === 'draft') {
+              console.log('🔄 Updating initiative status from "draft" to "sedang_berjalan"...');
+              
+              await storage.updateInitiative(result.initiativeId, {
+                status: 'sedang_berjalan'
+              });
+              
+              console.log(`🚀 Initiative ${result.initiativeId} status updated to "sedang_berjalan" due to DOD completion`);
+              
+              initiativeStatusChange = {
+                changed: true,
+                oldStatus: 'draft',
+                newStatus: 'sedang_berjalan'
+              };
+            }
+          } else {
+            // If DOD item is unchecked, check if we should revert status
+            console.log('🔄 DOD item unchecked, checking if all DOD items and tasks are incomplete...');
             
-            await storage.updateInitiative(result.initiativeId, {
-              status: 'sedang_berjalan'
-            });
+            // Get all DOD items for this initiative
+            const allDodItems = await storage.getDefinitionOfDoneItems(result.initiativeId);
+            const completedDodItems = allDodItems.filter(item => item.isCompleted);
             
-            console.log(`🚀 Initiative ${result.initiativeId} status updated to "sedang_berjalan" due to DOD completion`);
+            // Get all tasks for this initiative
+            const allTasks = await storage.getTasksByInitiativeId(result.initiativeId);
+            const activeTasks = allTasks.filter(task => task.status === 'in_progress' || task.status === 'completed');
             
-            initiativeStatusChange = {
-              changed: true,
-              oldStatus: 'draft',
-              newStatus: 'sedang_berjalan'
-            };
+            console.log(`📊 DOD status: ${completedDodItems.length}/${allDodItems.length} completed`);
+            console.log(`📊 Task status: ${activeTasks.length}/${allTasks.length} active`);
+            
+            // If no DOD items are completed AND no tasks are active, revert to draft
+            if (completedDodItems.length === 0 && activeTasks.length === 0 && initiative.status === 'sedang_berjalan') {
+              console.log('🔄 Updating initiative status from "sedang_berjalan" to "draft"...');
+              
+              await storage.updateInitiative(result.initiativeId, {
+                status: 'draft'
+              });
+              
+              console.log(`🚀 Initiative ${result.initiativeId} status updated to "draft" - no DOD or tasks active`);
+              
+              initiativeStatusChange = {
+                changed: true,
+                oldStatus: 'sedang_berjalan',
+                newStatus: 'draft'
+              };
+            }
           }
         }
       }
