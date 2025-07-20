@@ -1640,6 +1640,9 @@ export default function DailyFocusPage() {
                             Status
                           </th>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Tanggal Mulai
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Tenggat
                           </th>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -1667,6 +1670,9 @@ export default function DailyFocusPage() {
                             </td>
                             <td className="px-4 py-4">
                               <Skeleton className="h-6 w-20 rounded-full" />
+                            </td>
+                            <td className="px-4 py-4">
+                              <Skeleton className="h-4 w-16" />
                             </td>
                             <td className="px-4 py-4">
                               <Skeleton className="h-4 w-16" />
@@ -1735,6 +1741,9 @@ export default function DailyFocusPage() {
                             Status
                           </th>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Tanggal Mulai
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Tenggat
                           </th>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -1750,7 +1759,7 @@ export default function DailyFocusPage() {
                         {overdueTasks.length > 0 && (
                           <tr>
                             <td
-                              colSpan={6}
+                              colSpan={7}
                               className="px-4 py-3 bg-red-50 border-b-2 border-red-200"
                             >
                               <div className="flex items-center gap-2 font-semibold text-red-800">
@@ -1867,6 +1876,15 @@ export default function DailyFocusPage() {
                               </DropdownMenu>
                             </td>
                             <td className="px-4 py-4">
+                              <div className="text-sm text-gray-600">
+                                {task.startDate
+                                  ? new Date(task.startDate).toLocaleDateString(
+                                      "id-ID",
+                                    )
+                                  : "Tidak diatur"}
+                              </div>
+                            </td>
+                            <td className="px-4 py-4">
                               <div className="text-sm text-red-600 font-medium">
                                 {task.dueDate
                                   ? new Date(task.dueDate).toLocaleDateString(
@@ -1941,7 +1959,7 @@ export default function DailyFocusPage() {
                         {todayTasks.length > 0 && (
                           <tr>
                             <td
-                              colSpan={6}
+                              colSpan={7}
                               className="px-4 py-3 bg-blue-50 border-b-2 border-blue-200"
                             >
                               <div className="flex items-center gap-2 font-semibold text-blue-800">
@@ -2054,6 +2072,15 @@ export default function DailyFocusPage() {
                             </td>
                             <td className="px-4 py-4">
                               <div className="text-sm text-gray-600">
+                                {task.startDate
+                                  ? new Date(task.startDate).toLocaleDateString(
+                                      "id-ID",
+                                    )
+                                  : "Tidak diatur"}
+                              </div>
+                            </td>
+                            <td className="px-4 py-4">
+                              <div className="text-sm text-gray-600">
                                 {task.dueDate
                                   ? new Date(task.dueDate).toLocaleDateString(
                                       "id-ID",
@@ -2127,7 +2154,7 @@ export default function DailyFocusPage() {
                         {tomorrowTasks.length > 0 && (
                           <tr>
                             <td
-                              colSpan={6}
+                              colSpan={7}
                               className="px-4 py-3 bg-green-50 border-b-2 border-green-200"
                             >
                               <div className="flex items-center gap-2 font-semibold text-green-800">
@@ -2240,6 +2267,15 @@ export default function DailyFocusPage() {
                                   </DropdownMenuItem>
                                 </DropdownMenuContent>
                               </DropdownMenu>
+                            </td>
+                            <td className="px-4 py-4">
+                              <div className="text-sm text-gray-600">
+                                {task.startDate
+                                  ? new Date(task.startDate).toLocaleDateString(
+                                      "id-ID",
+                                    )
+                                  : "Tidak diatur"}
+                              </div>
                             </td>
                             <td className="px-4 py-4">
                               <div className="text-sm text-green-600 font-medium">
@@ -2416,13 +2452,23 @@ export default function DailyFocusPage() {
                                 </DropdownMenuContent>
                               </DropdownMenu>
                             </div>
-                            <div className="text-sm text-red-600">
-                              Tenggat:{" "}
-                              {task.dueDate
-                                ? new Date(task.dueDate).toLocaleDateString(
-                                    "id-ID",
-                                  )
-                                : "Tidak ada"}
+                            <div className="flex flex-col gap-1">
+                              <div className="text-sm text-gray-600">
+                                Mulai:{" "}
+                                {task.startDate
+                                  ? new Date(task.startDate).toLocaleDateString(
+                                      "id-ID",
+                                    )
+                                  : "Tidak diatur"}
+                              </div>
+                              <div className="text-sm text-red-600">
+                                Tenggat:{" "}
+                                {task.dueDate
+                                  ? new Date(task.dueDate).toLocaleDateString(
+                                      "id-ID",
+                                    )
+                                  : "Tidak ada"}
+                              </div>
                             </div>
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-2">
@@ -2589,12 +2635,23 @@ export default function DailyFocusPage() {
                                 </DropdownMenuContent>
                               </DropdownMenu>
                             </div>
-                            <div className="text-sm text-gray-600">
-                              {task.dueDate
-                                ? new Date(task.dueDate).toLocaleDateString(
-                                    "id-ID",
-                                  )
-                                : "Tidak ada tenggat"}
+                            <div className="flex flex-col gap-1">
+                              <div className="text-sm text-gray-600">
+                                Mulai:{" "}
+                                {task.startDate
+                                  ? new Date(task.startDate).toLocaleDateString(
+                                      "id-ID",
+                                    )
+                                  : "Tidak diatur"}
+                              </div>
+                              <div className="text-sm text-gray-600">
+                                Tenggat:{" "}
+                                {task.dueDate
+                                  ? new Date(task.dueDate).toLocaleDateString(
+                                      "id-ID",
+                                    )
+                                  : "Tidak ada tenggat"}
+                              </div>
                             </div>
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-2">
@@ -2768,13 +2825,23 @@ export default function DailyFocusPage() {
                                   </DropdownMenuContent>
                                 </DropdownMenu>
                               </div>
-                              <div className="text-xs text-green-600 mt-2">
-                                <span className="font-medium">Tenggat:</span>{" "}
-                                {task.dueDate
-                                  ? new Date(task.dueDate).toLocaleDateString(
-                                      "id-ID",
-                                    )
-                                  : "Tidak ada"}
+                              <div className="flex flex-col gap-1 mt-2">
+                                <div className="text-xs text-gray-600">
+                                  <span className="font-medium">Mulai:</span>{" "}
+                                  {task.startDate
+                                    ? new Date(task.startDate).toLocaleDateString(
+                                        "id-ID",
+                                      )
+                                    : "Tidak diatur"}
+                                </div>
+                                <div className="text-xs text-green-600">
+                                  <span className="font-medium">Tenggat:</span>{" "}
+                                  {task.dueDate
+                                    ? new Date(task.dueDate).toLocaleDateString(
+                                        "id-ID",
+                                      )
+                                    : "Tidak ada"}
+                                </div>
                               </div>
                               <div className="text-xs text-gray-600 flex items-center gap-1">
                                 <span className="font-medium">PIC:</span>
