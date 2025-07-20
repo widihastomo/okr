@@ -2881,6 +2881,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             createdBy: currentUser.id,
             organizationId: currentUser.organizationId, // Add organization_id field
             assignedTo: taskData.assignedTo === "none" || !taskData.assignedTo ? null : taskData.assignedTo,
+            startDate: taskData.startDate ? new Date(taskData.startDate) : null,
             dueDate: taskData.dueDate ? new Date(taskData.dueDate) : null,
           });
           await storage.createTask(validatedTaskData);
@@ -5191,12 +5192,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         createdBy: currentUserId,
         organizationId: currentUser.organizationId, // Add organization_id field
         assignedTo: req.body.assignedTo === "unassigned" || !req.body.assignedTo ? null : req.body.assignedTo,
+        startDate: req.body.startDate ? new Date(req.body.startDate) : null,
         dueDate: req.body.dueDate ? new Date(req.body.dueDate) : null,
         initiativeId: req.body.initiativeId === "no-initiative" || !req.body.initiativeId ? null : req.body.initiativeId,
       };
 
       console.log("Creating standalone task with data:", {
         ...taskData,
+        startDate: taskData.startDate?.toISOString(),
         dueDate: taskData.dueDate?.toISOString(),
         currentUserId
       });
