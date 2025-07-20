@@ -627,7 +627,16 @@ export default function InitiativeFormModal({
           : "Inisiatif baru telah ditambahkan ke sistem",
         variant: "success",
       });
+      // Invalidate all related queries
       queryClient.invalidateQueries({ queryKey: ["/api/initiatives"] });
+      if (isEditMode && initiative) {
+        // Invalidate specific initiative data with exact query keys used in initiative-detail.tsx
+        queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiative.id}`] });
+        queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiative.id}/success-metrics`] });
+        queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiative.id}/definition-of-done`] });
+        queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiative.id}/tasks`] });
+        console.log("Invalidated all related queries for initiative:", initiative.id);
+      }
       if (onSuccess) onSuccess();
       onOpenChange(false);
     },

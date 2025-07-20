@@ -341,6 +341,12 @@ The system includes comprehensive database connection troubleshooting tools:
 
 ## Changelog
 ```
+- July 20, 2025. **INITIATIVE EDIT CACHE REFRESH FIX COMPLETED** - Successfully fixed frontend not refreshing success metrics, DoD, and tasks after initiative edit:
+  * FIXED: Enhanced cache invalidation to include all related queries with exact query key patterns
+  * ADDED: Specific invalidation for `/api/initiatives/${id}/success-metrics`, `/api/initiatives/${id}/definition-of-done`, `/api/initiatives/${id}/tasks`
+  * ENHANCED: Frontend now properly refreshes all data after initiative edit completion
+  * IMPROVED: Console logging for cache invalidation debugging and verification
+  * RESULT: Initiative edit now immediately refreshes all related data on the frontend without page reload
 - July 20, 2025. **SUCCESS METRICS AND DOD UPDATE FIX COMPLETED** - Successfully fixed initiative edit not updating success metrics and definition of done:
   * FIXED: Enhanced PUT endpoint to properly handle successMetrics, definitionOfDone, and tasks arrays
   * IMPLEMENTED: Delete-and-recreate strategy for success metrics, DoD items, and tasks during updates
