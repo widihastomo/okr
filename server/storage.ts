@@ -18,7 +18,7 @@ import {
   type InsertDefinitionOfDoneItem, insertTimelineUpdateSchema
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, desc, asc, inArray, count } from "drizzle-orm";
+import { eq, and, desc, asc, inArray, count, sql } from "drizzle-orm";
 import { calculateProgressStatus } from "./progress-tracker";
 import { calculateObjectiveStatus } from "./objective-status-tracker";
 
