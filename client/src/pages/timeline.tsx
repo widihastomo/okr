@@ -333,13 +333,7 @@ export default function TimelinePage() {
                     {/* Post Content */}
                     <div className="p-4">
                       <div className="space-y-3">
-                        {/* Main Summary */}
-                        <div className="text-gray-700 text-sm leading-relaxed">
-                          <div className="font-medium text-gray-600 mb-2">Ringkasan Update Harian:</div>
-                          <div className="bg-gray-50 rounded-lg p-3">
-                            <div dangerouslySetInnerHTML={{ __html: item.summary || "Tidak ada ringkasan tersedia" }} />
-                          </div>
-                        </div>
+                        
 
                         {/* Compact Statistics */}
                         {(item.tasksUpdated > 0 || item.tasksCompleted > 0 || item.keyResultsUpdated > 0 || item.successMetricsUpdated > 0 || item.deliverablesUpdated > 0 || item.deliverablesCompleted > 0) && (
