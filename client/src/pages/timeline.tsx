@@ -479,8 +479,8 @@ export default function TimelinePage() {
                             )}
                           </div>
                           
-                          {/* Toggle Details Button */}
-                          {(item.tasksSummary || item.keyResultsSummary || item.successMetricsSummary || item.deliverablesSummary) && (
+                          {/* Toggle Details Button - only for non-check_in items */}
+                          {item.type !== 'check_in' && (item.tasksSummary || item.keyResultsSummary || item.successMetricsSummary || item.deliverablesSummary) && (
                             <Button
                               variant="ghost"
                               size="sm"
@@ -497,8 +497,8 @@ export default function TimelinePage() {
                           )}
                         </div>
 
-                        {/* Detailed Update Information - Expandable */}
-                        {expandedDetails[item.id] && (
+                        {/* Detailed Update Information - Always show for check_in, expandable for others */}
+                        {(item.type === 'check_in' || expandedDetails[item.id]) && (
                           <div className="space-y-2 border-t pt-3">
                             {/* Tasks Details */}
                           {item.tasksSummary && (
