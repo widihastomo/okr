@@ -849,10 +849,57 @@ export default function TaskModal({
               </div>
             </div>
 
+            {/* PIC Field - Full Width */}
+            <div>
+              <Label className="flex items-center gap-2 mb-2">
+                PIC *
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-auto p-0 text-blue-500 hover:text-blue-600"
+                    >
+                      <HelpCircle className="h-4 w-4" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-80" side="top" sideOffset={5}>
+                    <div className="space-y-2">
+                      <h4 className="font-medium">Menentukan PIC (Wajib)</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Pilih anggota tim yang akan bertanggung jawab
+                        menyelesaikan task ini. PIC akan menerima notifikasi
+                        dan bertanggung jawab atas progress task. Field ini
+                        wajib diisi.
+                      </p>
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              </Label>
+              <SearchableUserSelect
+                users={
+                  availableUsers?.filter((user) => user.isActive === true) ||
+                  []
+                }
+                value={
+                  formData.assignedTo === "unassigned"
+                    ? ""
+                    : formData.assignedTo
+                }
+                onValueChange={(value) => {
+                  setFormData({ ...formData, assignedTo: value || "" });
+                }}
+                placeholder="Pilih anggota tim... (wajib)"
+                emptyMessage="Tidak ada anggota tim ditemukan"
+                allowUnassigned={false}
+              />
+            </div>
+
+            {/* Date Fields - Start and End Date */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
                 <Label className="flex items-center gap-2 mb-2">
-                  PIC *
+                  Tanggal Mulai
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
@@ -865,54 +912,9 @@ export default function TaskModal({
                     </PopoverTrigger>
                     <PopoverContent className="w-80" side="top" sideOffset={5}>
                       <div className="space-y-2">
-                        <h4 className="font-medium">Menentukan PIC (Wajib)</h4>
+                        <h4 className="font-medium">Tanggal Mulai Task</h4>
                         <p className="text-sm text-muted-foreground">
-                          Pilih anggota tim yang akan bertanggung jawab
-                          menyelesaikan task ini. PIC akan menerima notifikasi
-                          dan bertanggung jawab atas progress task. Field ini
-                          wajib diisi.
-                        </p>
-                      </div>
-                    </PopoverContent>
-                  </Popover>
-                </Label>
-                <SearchableUserSelect
-                  users={
-                    availableUsers?.filter((user) => user.isActive === true) ||
-                    []
-                  }
-                  value={
-                    formData.assignedTo === "unassigned"
-                      ? ""
-                      : formData.assignedTo
-                  }
-                  onValueChange={(value) => {
-                    setFormData({ ...formData, assignedTo: value || "" });
-                  }}
-                  placeholder="Pilih anggota tim... (wajib)"
-                  emptyMessage="Tidak ada anggota tim ditemukan"
-                  allowUnassigned={false}
-                />
-              </div>
-
-              <div>
-                <Label className="flex items-center gap-2 mb-2">
-                  Periode Task *
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-auto p-0 text-blue-500 hover:text-blue-600"
-                      >
-                        <HelpCircle className="h-4 w-4" />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-80" side="top" sideOffset={5}>
-                      <div className="space-y-2">
-                        <h4 className="font-medium">Menentukan Periode Task</h4>
-                        <p className="text-sm text-muted-foreground">
-                          Pilih tanggal untuk task ini (wajib). Jika Anda memilih 1 tanggal, maka itu akan menjadi tanggal selesai. Jika Anda memilih 2 tanggal, maka akan menjadi periode mulai dan selesai.
+                          Pilih tanggal kapan task ini akan dimulai. Jika tidak dipilih, task dianggap bisa dimulai kapan saja.
                         </p>
                       </div>
                     </PopoverContent>
@@ -925,47 +927,27 @@ export default function TaskModal({
                       className="w-full justify-start text-left font-normal focus:ring-orange-500 focus:border-orange-500"
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {formData.startDate && formData.dueDate
-                        ? `${formData.startDate.toLocaleDateString("id-ID")} - ${formData.dueDate.toLocaleDateString("id-ID")}`
-                        : formData.dueDate
-                        ? formData.dueDate.toLocaleDateString("id-ID")
-                        : "Pilih tanggal (wajib)"}
+                      {formData.startDate
+                        ? formData.startDate.toLocaleDateString("id-ID")
+                        : "Pilih tanggal mulai"}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
                     <DayPicker
-                      mode="range"
-                      selected={{
-                        from: formData.startDate,
-                        to: formData.dueDate,
-                      }}
-                      onSelect={(range) => {
-                        if (range?.from && range?.to) {
-                          // Range selected - set both dates
-                          const adjustedStartDate = new Date(range.from);
-                          adjustedStartDate.setHours(adjustedStartDate.getHours() + 7);
-                          const adjustedEndDate = new Date(range.to);
-                          adjustedEndDate.setHours(adjustedEndDate.getHours() + 7);
-                          setFormData({
-                            ...formData,
-                            startDate: adjustedStartDate,
-                            dueDate: adjustedEndDate,
-                          });
-                        } else if (range?.from) {
-                          // Single date selected - set as due date only
-                          const adjustedDate = new Date(range.from);
+                      mode="single"
+                      selected={formData.startDate}
+                      onSelect={(date) => {
+                        if (date) {
+                          const adjustedDate = new Date(date);
                           adjustedDate.setHours(adjustedDate.getHours() + 7);
                           setFormData({
                             ...formData,
-                            startDate: null,
-                            dueDate: adjustedDate,
+                            startDate: adjustedDate,
                           });
                         } else {
-                          // Nothing selected - clear both dates
                           setFormData({
                             ...formData,
                             startDate: null,
-                            dueDate: null,
                           });
                         }
                       }}
@@ -982,6 +964,88 @@ export default function TaskModal({
                         );
 
                         return date < today;
+                      }}
+                      className="p-3"
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              <div>
+                <Label className="flex items-center gap-2 mb-2">
+                  Tanggal Selesai *
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-auto p-0 text-blue-500 hover:text-blue-600"
+                      >
+                        <HelpCircle className="h-4 w-4" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-80" side="top" sideOffset={5}>
+                      <div className="space-y-2">
+                        <h4 className="font-medium">Tanggal Selesai Task (Wajib)</h4>
+                        <p className="text-sm text-muted-foreground">
+                          Pilih tanggal deadline kapan task ini harus selesai. Field ini wajib diisi untuk tracking progress.
+                        </p>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                </Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start text-left font-normal focus:ring-orange-500 focus:border-orange-500"
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {formData.dueDate
+                        ? formData.dueDate.toLocaleDateString("id-ID")
+                        : "Pilih tanggal selesai (wajib)"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <DayPicker
+                      mode="single"
+                      selected={formData.dueDate}
+                      onSelect={(date) => {
+                        if (date) {
+                          const adjustedDate = new Date(date);
+                          adjustedDate.setHours(adjustedDate.getHours() + 7);
+                          setFormData({
+                            ...formData,
+                            dueDate: adjustedDate,
+                          });
+                        } else {
+                          setFormData({
+                            ...formData,
+                            dueDate: null,
+                          });
+                        }
+                      }}
+                      disabled={(date) => {
+                        // Use GMT+7 timezone for date comparison
+                        const now = new Date();
+                        const utc =
+                          now.getTime() + now.getTimezoneOffset() * 60000;
+                        const gmt7Date = new Date(utc + 7 * 3600000);
+                        const today = new Date(
+                          gmt7Date.getFullYear(),
+                          gmt7Date.getMonth(),
+                          gmt7Date.getDate(),
+                        );
+
+                        // Disable dates before today
+                        if (date < today) return true;
+                        
+                        // If start date is selected, disable dates before start date
+                        if (formData.startDate && date < formData.startDate) {
+                          return true;
+                        }
+                        
+                        return false;
                       }}
                       className="p-3"
                     />
