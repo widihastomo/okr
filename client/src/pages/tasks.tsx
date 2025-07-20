@@ -56,6 +56,7 @@ interface Task {
   description: string;
   status: 'not_started' | 'in_progress' | 'completed' | 'cancelled';
   priority: 'low' | 'medium' | 'high';
+  startDate?: string;
   dueDate: string;
   assignedTo: string;
   createdAt: string;
@@ -655,6 +656,9 @@ const TasksPage = () => {
         </DropdownMenu>
       </td>
       <td className="px-4 py-4 text-sm text-gray-500">
+        {task.startDate ? formatDate(new Date(task.startDate), 'dd/MM/yyyy') : 'Tidak diatur'}
+      </td>
+      <td className="px-4 py-4 text-sm text-gray-500">
         {task.dueDate ? formatDate(new Date(task.dueDate), 'dd/MM/yyyy') : 'Tidak ada'}
       </td>
       <td className="px-4 py-4">
@@ -775,8 +779,15 @@ const TasksPage = () => {
               : "Belum ditentukan"}
           </span>
         </div>
+        <div className="flex flex-col gap-1 text-xs">
+          <div className="text-gray-600">
+            <span className="font-medium">Mulai:</span> {task.startDate ? formatDate(new Date(task.startDate), 'dd/MM/yyyy') : 'Tidak diatur'}
+          </div>
+          <div className="text-gray-600">
+            <span className="font-medium">Tenggat:</span> {task.dueDate ? formatDate(new Date(task.dueDate), 'dd/MM/yyyy') : 'Tidak ada'}
+          </div>
+        </div>
         <div className="flex items-center gap-2">
-          <span>{task.dueDate ? formatDate(new Date(task.dueDate), 'dd/MM/yyyy') : 'Tidak ada tenggat'}</span>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
@@ -836,6 +847,9 @@ const TasksPage = () => {
                         </th>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Status
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Tanggal Mulai
                         </th>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Tenggat
