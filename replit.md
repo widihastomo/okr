@@ -341,6 +341,13 @@ The system includes comprehensive database connection troubleshooting tools:
 
 ## Changelog
 ```
+- July 20, 2025. **SUCCESS METRICS AND DOD UPDATE FIX COMPLETED** - Successfully fixed initiative edit not updating success metrics and definition of done:
+  * FIXED: Enhanced PUT endpoint to properly handle successMetrics, definitionOfDone, and tasks arrays
+  * IMPLEMENTED: Delete-and-recreate strategy for success metrics, DoD items, and tasks during updates
+  * ENHANCED: Proper data extraction from request body before passing to storage layer
+  * ADDED: Comprehensive error handling and console logging for each update operation
+  * RESOLVED: Edit initiative now properly updates all related data (metrics, DoD, tasks, key results)
+  * RESULT: Complete initiative edit functionality with full data persistence across all related tables
 - July 20, 2025. **KEY RESULT UPDATE FIX IN INITIATIVE EDIT** - Successfully fixed initiative updates not changing related key results:
   * FIXED: Changed edit mode API call from PATCH to PUT endpoint to handle all fields including keyResultId
   * RESOLVED: PATCH endpoint only handled limited fields (title, description, status, priority, dueDate)

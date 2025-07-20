@@ -3066,8 +3066,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // Remove members from updateData before passing to storage
-      const { members, ...dataToUpdate } = updateData;
+      // Handle success metrics and definition of done updates
+      let successMetrics = updateData.successMetrics;
+      let definitionOfDone = updateData.definitionOfDone;
+      let tasks = updateData.tasks;
+      
+      // Remove success metrics, definition of done, tasks, and members from updateData before passing to storage
+      const { members, successMetrics: _, definitionOfDone: __, tasks: ___, ...dataToUpdate } = updateData;
       
       // Add UPDATE audit trail fields
       const dataWithAuditTrail = {
@@ -3080,6 +3085,90 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!updatedInitiative) {
         return res.status(404).json({ message: "Initiative not found" });
+      }
+
+      // Update success metrics if provided
+      if (successMetrics && Array.isArray(successMetrics)) {
+        try {
+          // Delete existing success metrics
+          const existingMetrics = await storage.getSuccessMetricsByInitiativeId(id);
+          for (const metric of existingMetrics) {
+            await storage.deleteSuccessMetric(metric.id);
+          }
+          
+          // Create new success metrics
+          for (const metric of successMetrics) {
+            await storage.createSuccessMetric({
+              name: metric.name,
+              target: metric.target,
+              achievement: metric.achievement || "",
+              initiativeId: id,
+              organizationId: currentUser.organizationId,
+              createdBy: currentUser.id,
+              lastUpdateBy: currentUser.id
+            });
+          }
+          console.log(`Updated ${successMetrics.length} success metrics for initiative ${id}`);
+        } catch (error) {
+          console.error("Error updating success metrics:", error);
+        }
+      }
+
+      // Update definition of done if provided
+      if (definitionOfDone && Array.isArray(definitionOfDone)) {
+        try {
+          // Delete existing definition of done items
+          const existingDoD = await storage.getDefinitionOfDoneByInitiativeId(id);
+          for (const dod of existingDoD) {
+            await storage.deleteDefinitionOfDone(dod.id);
+          }
+          
+          // Create new definition of done items
+          for (const dodItem of definitionOfDone) {
+            const title = typeof dodItem === 'string' ? dodItem : dodItem.title || dodItem.description;
+            if (title) {
+              await storage.createDefinitionOfDone({
+                title: title,
+                initiativeId: id,
+                organizationId: currentUser.organizationId,
+                createdBy: currentUser.id
+              });
+            }
+          }
+          console.log(`Updated ${definitionOfDone.length} definition of done items for initiative ${id}`);
+        } catch (error) {
+          console.error("Error updating definition of done:", error);
+        }
+      }
+
+      // Update tasks if provided
+      if (tasks && Array.isArray(tasks)) {
+        try {
+          // Delete existing tasks
+          const existingTasks = await storage.getTasksByInitiativeId(id);
+          for (const task of existingTasks) {
+            await storage.deleteTask(task.id);
+          }
+          
+          // Create new tasks
+          for (const task of tasks) {
+            await storage.createTask({
+              title: task.title,
+              description: task.description || "",
+              status: task.status || "not_started",
+              priority: task.priority || "medium",
+              assignedTo: task.assignedTo,
+              startDate: task.startDate ? new Date(task.startDate) : new Date(),
+              dueDate: task.dueDate ? new Date(task.dueDate) : new Date(),
+              initiativeId: id,
+              organizationId: currentUser.organizationId,
+              createdBy: currentUser.id
+            });
+          }
+          console.log(`Updated ${tasks.length} tasks for initiative ${id}`);
+        } catch (error) {
+          console.error("Error updating tasks:", error);
+        }
       }
       
       res.json(updatedInitiative);
