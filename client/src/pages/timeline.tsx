@@ -312,11 +312,11 @@ export default function TimelinePage() {
               {/* Filter Counter */}
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                 <div className="text-sm font-medium text-blue-900">
-                  Showing {filteredData.length} of {timelineData.length} activities
+                  Menampilkan {filteredData.length} dari {timelineData.length} aktivitas
                 </div>
                 {filteredData.length !== timelineData.length && (
                   <div className="text-xs text-blue-700 mt-1">
-                    {timelineData.length - filteredData.length} activities filtered out
+                    {timelineData.length - filteredData.length} aktivitas disembunyikan
                   </div>
                 )}
               </div>
@@ -324,16 +324,16 @@ export default function TimelinePage() {
               {/* Activity Type Filter */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Activity Type
+                  Tipe Aktivitas
                 </label>
                 <Select value={activityTypeFilter} onValueChange={setActivityTypeFilter}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select activity type" />
+                    <SelectValue placeholder="Pilih tipe aktivitas" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Activities</SelectItem>
-                    <SelectItem value="check_in">Check-ins</SelectItem>
-                    <SelectItem value="daily_update">Daily Updates</SelectItem>
+                    <SelectItem value="all">Semua Aktivitas</SelectItem>
+                    <SelectItem value="check_in">Check-in</SelectItem>
+                    <SelectItem value="daily_update">Update Harian</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -341,15 +341,15 @@ export default function TimelinePage() {
               {/* User Filter */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  User / Team Member
+                  Pengguna / Anggota Tim
                 </label>
                 <Select value={userFilter} onValueChange={setUserFilter}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select user" />
+                    <SelectValue placeholder="Pilih pengguna" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Users</SelectItem>
-                    <SelectItem value="current">Current User</SelectItem>
+                    <SelectItem value="all">Semua Pengguna</SelectItem>
+                    <SelectItem value="current">Pengguna Saat Ini</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -357,17 +357,17 @@ export default function TimelinePage() {
               {/* Date Range Filter */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Date Range
+                  Rentang Tanggal
                 </label>
                 <Select value={dateRangeFilter} onValueChange={setDateRangeFilter}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select date range" />
+                    <SelectValue placeholder="Pilih rentang tanggal" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Time</SelectItem>
-                    <SelectItem value="today">Today</SelectItem>
-                    <SelectItem value="week">This Week</SelectItem>
-                    <SelectItem value="month">This Month</SelectItem>
+                    <SelectItem value="all">Semua Waktu</SelectItem>
+                    <SelectItem value="today">Hari Ini</SelectItem>
+                    <SelectItem value="week">Minggu Ini</SelectItem>
+                    <SelectItem value="month">Bulan Ini</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -375,18 +375,18 @@ export default function TimelinePage() {
               {/* Content Type Filter */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Content Type
+                  Tipe Konten
                 </label>
                 <Select value={contentTypeFilter} onValueChange={setContentTypeFilter}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select content type" />
+                    <SelectValue placeholder="Pilih tipe konten" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Content</SelectItem>
-                    <SelectItem value="tasks">Tasks</SelectItem>
-                    <SelectItem value="key_results">Key Results</SelectItem>
-                    <SelectItem value="metrics">Success Metrics</SelectItem>
-                    <SelectItem value="deliverables">Deliverables</SelectItem>
+                    <SelectItem value="all">Semua Konten</SelectItem>
+                    <SelectItem value="tasks">Tugas</SelectItem>
+                    <SelectItem value="key_results">Target Utama</SelectItem>
+                    <SelectItem value="metrics">Metrik Sukses</SelectItem>
+                    <SelectItem value="deliverables">Output</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -398,7 +398,7 @@ export default function TimelinePage() {
                 className="w-full"
                 disabled={isDefaultFilter}
               >
-                Clear All Filters
+                Hapus Semua Filter
               </Button>
             </div>
           </div>
