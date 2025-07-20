@@ -338,10 +338,20 @@ export function DailyUpdateSimple() {
             tasksCompleted: tasksCompleted,
             tasksSummary: tasksUpdated > 0 ? (() => {
               const updatedTasks = data.tasks.filter(t => t.newStatus !== t.currentStatus);
-              const completedTasks = data.tasks.filter(t => t.newStatus === 'selesai');
-              const taskNames = updatedTasks.map(t => `"${t.title}"`).join(', ');
-              const completedNames = completedTasks.length > 0 ? ` (Selesai: ${completedTasks.map(t => `"${t.title}"`).join(', ')})` : '';
-              return `${taskNames}${completedNames}`;
+              
+              // Status mapping untuk display
+              const statusMap: Record<string, string> = {
+                'belum_dimulai': 'Belum Dimulai',
+                'sedang_berjalan': 'Sedang Berjalan', 
+                'selesai': 'Selesai',
+                'dibatalkan': 'Dibatalkan'
+              };
+              
+              return updatedTasks.map(t => {
+                const oldStatus = statusMap[t.currentStatus] || t.currentStatus;
+                const newStatus = statusMap[t.newStatus] || t.newStatus;
+                return `"${t.title}" (${oldStatus} → ${newStatus})`;
+              }).join(', ');
             })() : null,
             keyResultsUpdated: keyResultsUpdated,
             keyResultsSummary: keyResultsUpdated > 0 ? (() => {
