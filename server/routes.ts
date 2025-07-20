@@ -5311,6 +5311,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         createdBy: currentUserId,
         organizationId: currentUser.organizationId, // Add organization_id field
         assignedTo: req.body.assignedTo === "unassigned" || !req.body.assignedTo ? null : req.body.assignedTo,
+        startDate: req.body.startDate ? new Date(req.body.startDate) : null,
         dueDate: req.body.dueDate ? new Date(req.body.dueDate) : null,
       };
 
