@@ -79,13 +79,13 @@ export function Leaderboard({ limit = 10 }: LeaderboardProps) {
   const getRankIcon = (position: number) => {
     switch (position) {
       case 1:
-        return <Crown className="h-5 w-5 text-yellow-500" />;
+        return <Crown className="h-4 w-4 text-yellow-500" />;
       case 2:
-        return <Medal className="h-5 w-5 text-gray-400" />;
+        return <Medal className="h-4 w-4 text-gray-400" />;
       case 3:
-        return <Award className="h-5 w-5 text-amber-600" />;
+        return <Award className="h-4 w-4 text-amber-600" />;
       default:
-        return <span className="font-bold text-gray-600">#{position}</span>;
+        return <span className="font-bold text-gray-600 text-sm">#{position}</span>;
     }
   };
 
@@ -104,85 +104,57 @@ export function Leaderboard({ limit = 10 }: LeaderboardProps) {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Trophy className="h-5 w-5" />
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center gap-2 text-lg">
+          <Trophy className="h-4 w-4 text-yellow-500" />
           Leaderboard
-          <Badge variant="secondary" className="ml-auto">
+          <Badge variant="secondary" className="ml-auto text-xs">
             Top {leaderboard.length}
           </Badge>
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-1.5 pt-0">
         {leaderboard.map((entry: any, index: number) => {
           const position = index + 1;
           return (
             <div
               key={entry.userId}
-              className={`flex items-center gap-4 p-4 rounded-lg border transition-colors ${
+              className={`flex items-center gap-2 p-2 rounded-md border transition-colors ${
                 position <= 3 
                   ? 'bg-gradient-to-r from-yellow-50 to-orange-50 border-yellow-200' 
                   : 'bg-gray-50 border-gray-200'
               }`}
             >
-              {/* Rank */}
-              <div className="flex items-center justify-center w-12 h-12">
-                {position <= 3 ? (
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getRankBadgeColor(position)}`}>
-                    {getRankIcon(position)}
-                  </div>
-                ) : (
-                  <div className="w-10 h-10 rounded-full bg-gray-100 border flex items-center justify-center">
-                    {getRankIcon(position)}
-                  </div>
-                )}
+              {/* Rank Icon */}
+              <div className="flex items-center justify-center w-8 h-8">
+                {getRankIcon(position)}
               </div>
 
               {/* User Info */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
                   {/* Avatar */}
-                  <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                  <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-medium">
                     {entry.user.name ? entry.user.name.charAt(0) : entry.user.email?.charAt(0)}
                   </div>
                   
                   {/* Name */}
-                  <div className="font-medium text-gray-900 truncate">
+                  <div className="font-medium text-gray-900 text-sm truncate">
                     {entry.user.name || entry.user.email || 'User'}
                   </div>
-                  
-                  {/* Level Badge */}
-                  <Badge className="bg-purple-100 text-purple-800 border-purple-200" size="sm">
-                    Level {entry.level}
-                  </Badge>
                 </div>
 
-                {/* Stats Row */}
-                <div className="flex items-center gap-4 text-sm text-gray-600">
-                  <div className="flex items-center gap-1">
-                    <Star className="h-3 w-3 text-yellow-500" />
-                    <span className="font-medium">{entry.totalPoints.toLocaleString()}</span>
-                  </div>
-                  
-                  <div className="flex items-center gap-1">
-                    <TrendingUp className="h-3 w-3 text-green-500" />
-                    <span>{entry.currentStreak} day streak</span>
-                  </div>
-                  
-                  <div className="flex items-center gap-1">
-                    <Trophy className="h-3 w-3 text-blue-500" />
-                    <span>{entry.objectivesCompleted} objectives</span>
-                  </div>
+                {/* Points */}
+                <div className="flex items-center gap-1 text-xs text-gray-600">
+                  <Star className="h-3 w-3 text-yellow-500" />
+                  <span className="font-medium">{entry.totalPoints.toLocaleString()} poin</span>
                 </div>
               </div>
 
-              {/* Points Display */}
-              <div className="text-right">
-                <div className="text-lg font-bold text-gray-900">
-                  {entry.totalPoints.toLocaleString()}
-                </div>
-                <div className="text-xs text-gray-500">points</div>
-              </div>
+              {/* Level Badge */}
+              <Badge variant="secondary" className="text-xs">
+                Lv {entry.level}
+              </Badge>
             </div>
           );
         })}
