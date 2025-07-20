@@ -609,7 +609,7 @@ export default function TimelinePage() {
                                 className="flex items-center space-x-2 hover:bg-gray-50 rounded px-2 py-1 transition-colors"
                               >
                                 <div className="flex items-center bg-white border border-gray-200 rounded-full px-1 py-0.5">
-                                  <span className="text-xs mr-0.5">{topEmojis.join('')}</span>
+                                  <span className="text-xs mr-0.5 px-0.5">{topEmojis.join('')}</span>
                                   <span className="text-xs text-gray-600">{totalCount}</span>
                                 </div>
                               </button>
