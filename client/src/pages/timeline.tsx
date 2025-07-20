@@ -545,7 +545,7 @@ export default function TimelinePage() {
                                   <div className="flex items-center justify-between mb-2">
                                     <span className="text-xs text-purple-700">Target:</span>
                                     <span className="text-xs text-purple-700">
-                                      {item.keyResult.targetValue} {item.keyResult.unit || ''}
+                                      {item.keyResultTargetValue} {item.keyResultUnit || ''}
                                     </span>
                                   </div>
                                   
