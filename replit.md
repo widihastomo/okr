@@ -341,6 +341,19 @@ The system includes comprehensive database connection troubleshooting tools:
 
 ## Changelog
 ```
+- July 20, 2025. **MANDATORY START DATE VALIDATION IMPLEMENTED** - Successfully made startDate field mandatory in task creation form:
+  * ADDED: Client-side validation in task modal to require startDate before form submission
+  * ENHANCED: Visual indicators including red asterisk (*) next to "Tanggal Mulai" label
+  * UPDATED: Help text to reflect mandatory requirement with clear messaging
+  * UPDATED: Placeholder text to show "(wajib)" for start date field
+  * IMPROVED: Error toast notification when user tries to submit without start date
+  * RESULT: All new tasks now require a start date, improving task planning and organization
+- July 20, 2025. **START DATE SERVER PROCESSING BUG FIXED** - Successfully resolved critical server-side issue preventing startDate from being saved:
+  * FIXED: Added missing startDate field to server-side task creation logic in routes.ts
+  * UPDATED: Both standalone task creation and initiative task creation endpoints to process startDate
+  * ENHANCED: Server logging to include startDate in debug output for troubleshooting
+  * RESOLVED: Tasks now properly save and display startDate values in database
+  * RESULT: Complete startDate functionality working from form input to database storage
 - July 20, 2025. **TASKS PAGE TASK GROUPING ENHANCEMENT COMPLETED** - Successfully applied Daily Focus intelligent task grouping logic to Tasks page with comprehensive categorization:
   * APPLIED: Daily Focus task grouping logic to Tasks page with enhanced categorization using startDate prioritization
   * ADDED: "Besok" (Tomorrow) task category positioned between "Hari Ini" and "Akan Datang" with green color styling

@@ -419,6 +419,17 @@ export default function TaskModal({
       return;
     }
 
+    // Validate that start date is assigned
+    if (!formData.startDate) {
+      toast({
+        title: "Tanggal mulai harus diisi",
+        description:
+          "Silakan pilih tanggal mulai untuk task ini",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const submitData = {
       ...formData,
       assignedTo:
@@ -913,7 +924,7 @@ export default function TaskModal({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
                 <Label className="flex items-center gap-2 mb-2">
-                  Tanggal Mulai
+                  Tanggal Mulai *
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
@@ -926,9 +937,9 @@ export default function TaskModal({
                     </PopoverTrigger>
                     <PopoverContent className="w-80" side="top" sideOffset={5}>
                       <div className="space-y-2">
-                        <h4 className="font-medium">Tanggal Mulai Task</h4>
+                        <h4 className="font-medium">Tanggal Mulai Task (Wajib)</h4>
                         <p className="text-sm text-muted-foreground">
-                          Pilih tanggal kapan task ini akan dimulai. Jika tidak dipilih, task dianggap bisa dimulai kapan saja.
+                          Pilih tanggal kapan task ini akan dimulai. Field ini wajib diisi untuk perencanaan yang lebih baik.
                         </p>
                       </div>
                     </PopoverContent>
@@ -943,7 +954,7 @@ export default function TaskModal({
                       <CalendarIcon className="mr-2 h-4 w-4" />
                       {formData.startDate
                         ? formData.startDate.toLocaleDateString("id-ID")
-                        : "Pilih tanggal mulai"}
+                        : "Pilih tanggal mulai (wajib)"}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
