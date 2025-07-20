@@ -101,7 +101,7 @@ export default function InitiativeClosureModal({
       result: undefined,
       reason: "",
       learningNote: "",
-      budgetUsed: initiative?.budget?.toString() || "",
+      budgetUsed: "",
       notes: "",
     },
   });
