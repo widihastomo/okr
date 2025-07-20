@@ -341,6 +341,17 @@ The system includes comprehensive database connection troubleshooting tools:
 
 ## Changelog
 ```
+- July 20, 2025. **MEMBER PROFILE PHOTO FIX COMPLETED** - Successfully fixed member profile photos not displaying in initiative team modal:
+  * FIXED: Created specialized getMemberProfileImage and getMemberInitials helper functions for member data structure
+  * ENHANCED: Functions now check both member.user data and fallback to users array lookup
+  * RESOLVED: Member avatars now properly display profile images and initials in team modal
+  * IMPROVED: Better data handling for different member data structures
+  * RESULT: Team member profile photos and initials now display correctly in initiative detail page
+- July 20, 2025. **DEFINITION OF DONE SERVER ERROR FIX** - Successfully fixed storage method name error preventing DoD updates:
+  * FIXED: Corrected storage method call from getDefinitionOfDoneByInitiativeId to getDefinitionOfDoneItems
+  * RESOLVED: "storage.getDefinitionOfDoneByInitiativeId is not a function" error eliminated
+  * ENHANCED: Definition of done items now properly update during initiative edit
+  * RESULT: Complete initiative edit functionality now works for all related data (metrics, DoD, tasks, key results)
 - July 20, 2025. **INITIATIVE EDIT CACHE REFRESH FIX COMPLETED** - Successfully fixed frontend not refreshing success metrics, DoD, and tasks after initiative edit:
   * FIXED: Enhanced cache invalidation to include all related queries with exact query key patterns
   * ADDED: Specific invalidation for `/api/initiatives/${id}/success-metrics`, `/api/initiatives/${id}/definition-of-done`, `/api/initiatives/${id}/tasks`

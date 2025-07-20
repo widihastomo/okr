@@ -3118,7 +3118,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (definitionOfDone && Array.isArray(definitionOfDone)) {
         try {
           // Delete existing definition of done items
-          const existingDoD = await storage.getDefinitionOfDoneByInitiativeId(id);
+          const existingDoD = await storage.getDefinitionOfDoneItems(id);
           for (const dod of existingDoD) {
             await storage.deleteDefinitionOfDone(dod.id);
           }

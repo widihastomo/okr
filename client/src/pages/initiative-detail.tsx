@@ -929,6 +929,34 @@ export default function InitiativeDetailPage() {
     return user?.profileImageUrl || undefined;
   };
 
+  // Helper function specifically for member profile images
+  const getMemberProfileImage = (member: any): string | undefined => {
+    // First try to get from member.user data
+    if (member.user?.profileImageUrl) {
+      return member.user.profileImageUrl;
+    }
+    // Fallback to getUserProfileImage with member.userId
+    return getUserProfileImage(member.userId);
+  };
+
+  // Helper function specifically for member initials
+  const getMemberInitials = (member: any): string => {
+    // First try to get from member.user data
+    if (member.user) {
+      const name = member.user.name || "";
+      if (name && name.trim() !== "") {
+        const nameParts = name.trim().split(" ");
+        if (nameParts.length >= 2) {
+          return `${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}`.toUpperCase();
+        }
+        return nameParts[0][0].toUpperCase();
+      }
+      return member.user.email ? member.user.email[0].toUpperCase() : "U";
+    }
+    // Fallback to getUserInitials with member.userId
+    return getUserInitials(member.userId);
+  };
+
   const { data: relatedInitiatives } = useQuery({
     queryKey: ["/api/initiatives"],
     enabled: !!initiative,
@@ -2911,11 +2939,11 @@ export default function InitiativeDetailPage() {
                       >
                         <Avatar className="w-10 h-10">
                           <AvatarImage 
-                            src={getUserProfileImage(member.userId)} 
+                            src={getMemberProfileImage(member)} 
                             alt={member.user?.name || member.user?.email?.split("@")[0] || "Member"}
                           />
                           <AvatarFallback className="bg-gray-600 text-white font-medium">
-                            {getUserInitials(member.userId)}
+                            {getMemberInitials(member)}
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1">
