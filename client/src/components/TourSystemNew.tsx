@@ -596,8 +596,18 @@ export default function TourSystem() {
                 el.classList.remove("tour-highlight");
                 el.classList.remove("tour-click-required");
               });
-              // Then highlight the current element
-              updatedElement.classList.add("tour-highlight");
+              
+              // For mobile menu items, apply highlight to the container that has data-tour
+              // Find the element with data-tour attribute, not just any button
+              const tourElement = updatedElement.closest('[data-tour]') || updatedElement;
+              tourElement.classList.add("tour-highlight");
+              
+              // Also apply to nested button if exists
+              const buttonElement = tourElement.querySelector('button');
+              if (buttonElement) {
+                buttonElement.classList.add("tour-mobile-pulse");
+              }
+              
               console.log(`Mobile: Re-highlighted menu item ${currentStepData.id} after sidebar expansion`);
             }
           }, 200);
