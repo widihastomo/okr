@@ -3127,7 +3127,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           for (const dodItem of definitionOfDone) {
             const title = typeof dodItem === 'string' ? dodItem : dodItem.title || dodItem.description;
             if (title) {
-              await storage.createDefinitionOfDone({
+              await storage.createDefinitionOfDoneItem({
                 title: title,
                 initiativeId: id,
                 organizationId: currentUser.organizationId,
