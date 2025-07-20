@@ -3132,7 +3132,9 @@ export class DatabaseStorage implements IStorage {
           id: keyResults.id,
           title: keyResults.title,
           unit: keyResults.unit,
-          targetValue: keyResults.targetValue
+          targetValue: keyResults.targetValue,
+          baselineValue: keyResults.baselineValue,
+          type: keyResults.type
         },
         user: {
           id: users.id,
