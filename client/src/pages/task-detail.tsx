@@ -233,11 +233,22 @@ function TaskOverviewCard({ task, assignedUser, initiative }: any) {
 
         {/* Key Information - Responsive Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+          {/* Start Date */}
+          <div className="flex items-center gap-2">
+            <Calendar className="w-4 h-4 text-green-500 flex-shrink-0" />
+            <div className="min-w-0">
+              <p className="text-xs font-medium text-gray-900">Tanggal Mulai</p>
+              <p className="text-xs text-gray-600 break-words">
+                {task?.startDate ? formatDate(task.startDate) : "Tidak ditentukan"}
+              </p>
+            </div>
+          </div>
+
           {/* Due Date */}
           <div className="flex items-center gap-2">
-            <CalendarDays className="w-4 h-4 text-gray-500 flex-shrink-0" />
+            <CalendarDays className="w-4 h-4 text-red-500 flex-shrink-0" />
             <div className="min-w-0">
-              <p className="text-xs font-medium text-gray-900">Tenggat</p>
+              <p className="text-xs font-medium text-gray-900">Tanggal Selesai</p>
               <p className={`text-xs break-words ${isOverdue ? 'text-red-600 font-medium' : 'text-gray-600'}`}>
                 {task?.dueDate ? formatDate(task.dueDate) : "Tidak ditentukan"}
               </p>
