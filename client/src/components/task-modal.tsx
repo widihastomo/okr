@@ -475,7 +475,9 @@ export default function TaskModal({
           </DialogTitle>
           <DialogDescription className="text-left">
             {isAdding
-              ? "Buat task baru untuk initiative ini"
+              ? initiativeId 
+                ? "Buat task baru untuk initiative ini"
+                : "Buat task baru untuk project Anda"
               : "Modifikasi detail task dan penugasan"}
           </DialogDescription>
         </DialogHeader>
