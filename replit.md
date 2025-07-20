@@ -341,6 +341,11 @@ The system includes comprehensive database connection troubleshooting tools:
 
 ## Changelog
 ```
+- July 20, 2025. **BUDGET INPUT DECIMAL FORMATTING FIX** - Successfully fixed budget input field to avoid displaying unnecessary ".00" decimal places:
+  * ENHANCED: formatNumberWithSeparator function now removes ".00" suffix for whole numbers
+  * IMPROVED: Budget field displays clean values without unnecessary decimal places (e.g., "80.000.000" instead of "80000000.00")
+  * MAINTAINED: Full functionality for thousand separators using Indonesian dot notation
+  * RESULT: Budget input now shows cleaner formatting for whole number values
 - July 20, 2025. **TASK DELETION CONFIRMATION MODAL IMPLEMENTED** - Successfully added proper confirmation modal for task deletion in initiative detail page:
   * ADDED: isDeleteTaskModalOpen and taskToDelete state variables for modal management
   * REPLACED: Browser confirm() dialog with professional AlertDialog confirmation modal

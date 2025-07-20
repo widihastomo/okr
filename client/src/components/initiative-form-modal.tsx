@@ -119,8 +119,18 @@ const getTaskPriorityLabel = (priority: string): string => {
 
 // Helper function to format number with thousand separators
 const formatNumberWithSeparator = (value: string): string => {
+  if (!value) return '';
+  
+  // Handle decimal values - remove .00 if it's a whole number
+  let cleanValue = value;
+  if (typeof cleanValue === 'string' && cleanValue.endsWith('.00')) {
+    cleanValue = cleanValue.slice(0, -3);
+  }
+  
   // Remove all non-digits
-  const numbers = value.replace(/\D/g, '');
+  const numbers = cleanValue.replace(/\D/g, '');
+  if (!numbers) return '';
+  
   // Add thousand separators
   return numbers.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 };
