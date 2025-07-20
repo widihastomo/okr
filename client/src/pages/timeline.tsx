@@ -653,7 +653,7 @@ export default function TimelinePage() {
 
                               {/* Display Active Reactions */}
                               {Object.entries(reactions[item.id] || {}).filter(([, count]) => count > 0).length > 0 && (
-                                <div className="mt-3 space-y-2">
+                                <div className="mt-6 space-y-2">
                                   {Object.entries(reactions[item.id] || {})
                                     .filter(([, count]) => count > 0)
                                     .map(([emoji, count]) => {
