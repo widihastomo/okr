@@ -3085,12 +3085,10 @@ export class DatabaseStorage implements IStorage {
         createdAt: timelineUpdates.createdAt,
         updatedAt: timelineUpdates.updatedAt,
         type: sql<string>`'daily_update'`.as('type'),
-        user: {
-          id: users.id,
-          name: users.name,
-          email: users.email,
-          profileImageUrl: users.profileImageUrl
-        }
+        userId: users.id,
+        userName: users.name,
+        userEmail: users.email,
+        userProfileImageUrl: users.profileImageUrl
       })
       .from(timelineUpdates)
       .innerJoin(users, eq(users.id, timelineUpdates.userId))
@@ -3128,20 +3126,16 @@ export class DatabaseStorage implements IStorage {
         type: sql<string>`'check_in'`.as('type'),
         checkInValue: checkIns.value,
         checkInNotes: checkIns.notes,
-        keyResult: {
-          id: keyResults.id,
-          title: keyResults.title,
-          unit: keyResults.unit,
-          targetValue: keyResults.targetValue,
-          baselineValue: keyResults.baselineValue,
-          type: keyResults.type
-        },
-        user: {
-          id: users.id,
-          name: users.name,
-          email: users.email,
-          profileImageUrl: users.profileImageUrl
-        }
+        keyResultId: keyResults.id,
+        keyResultTitle: keyResults.title,
+        keyResultUnit: keyResults.unit,
+        keyResultTargetValue: keyResults.targetValue,
+        keyResultBaseValue: keyResults.baseValue,
+        keyResultType: keyResults.keyResultType,
+        userId: users.id,
+        userName: users.name,
+        userEmail: users.email,
+        userProfileImageUrl: users.profileImageUrl
       })
       .from(checkIns)
       .innerJoin(users, eq(users.id, checkIns.createdBy))

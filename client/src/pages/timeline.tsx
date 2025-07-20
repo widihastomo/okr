@@ -410,22 +410,22 @@ export default function TimelinePage() {
                     <div className="p-4 border-b border-gray-100">
                       <div className="flex items-start space-x-3">
                         <div className="flex-shrink-0">
-                          {item.user.profileImageUrl ? (
+                          {item.userProfileImageUrl ? (
                             <img 
-                              src={item.user.profileImageUrl} 
-                              alt={item.user.name}
+                              src={item.userProfileImageUrl} 
+                              alt={item.userName}
                               className="w-10 h-10 rounded-full object-cover"
                             />
                           ) : (
                             <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-green-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">
-                              {getUserInitials({ name: item.user.name })}
+                              {getUserInitials({ name: item.userName })}
                             </div>
                           )}
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center space-x-2">
                             <h3 className="font-semibold text-gray-900 text-sm">
-                              {item.user.name}
+                              {item.userName}
                             </h3>
                             <span className="text-gray-500 text-xs">•</span>
                             <span className="text-gray-500 text-xs">
@@ -443,7 +443,7 @@ export default function TimelinePage() {
                           </div>
                           <p className="text-gray-700 text-sm mt-1">
                             {item.type === 'check_in' 
-                              ? `Update capaian: ${item.keyResult?.title || 'Key Result'}`
+                              ? `Update capaian: ${item.keyResultTitle || 'Key Result'}`
                               : 'Membagikan update progress harian'
                             }
                           </p>
@@ -534,12 +534,12 @@ export default function TimelinePage() {
                               </div>
                               
                               {/* Progress Information for Check-ins */}
-                              {item.type === 'check_in' && item.keyResult && (
+                              {item.type === 'check_in' && item.keyResultTitle && (
                                 <div className="mt-2 pt-2 border-t border-purple-200">
                                   <div className="flex items-center justify-between mb-1">
                                     <span className="text-xs font-medium text-purple-800">Progress Capaian:</span>
                                     <span className="text-xs font-bold text-purple-900">
-                                      {item.checkInValue} {item.keyResult.unit || ''}
+                                      {item.checkInValue} {item.keyResultUnit || ''}
                                     </span>
                                   </div>
                                   <div className="flex items-center justify-between mb-2">
@@ -554,19 +554,19 @@ export default function TimelinePage() {
                                     {(() => {
                                       let progressPercentage = 0;
                                       const current = parseFloat(item.checkInValue) || 0;
-                                      const target = parseFloat(item.keyResult.targetValue) || 1;
-                                      const baseline = parseFloat(item.keyResult.baselineValue) || 0;
+                                      const target = parseFloat(item.keyResultTargetValue) || 1;
+                                      const baseline = parseFloat(item.keyResultBaseValue) || 0;
                                       
                                       // Calculate progress based on key result type
-                                      if (item.keyResult.type === 'increase_to') {
+                                      if (item.keyResultType === 'increase_to') {
                                         progressPercentage = baseline !== target 
                                           ? Math.min(100, Math.max(0, ((current - baseline) / (target - baseline)) * 100))
                                           : current >= target ? 100 : 0;
-                                      } else if (item.keyResult.type === 'decrease_to') {
+                                      } else if (item.keyResultType === 'decrease_to') {
                                         progressPercentage = baseline !== target 
                                           ? Math.min(100, Math.max(0, ((baseline - current) / (baseline - target)) * 100))
                                           : current <= target ? 100 : 0;
-                                      } else if (item.keyResult.type === 'achieve_or_not') {
+                                      } else if (item.keyResultType === 'achieve_or_not') {
                                         progressPercentage = current >= target ? 100 : 0;
                                       }
                                       
