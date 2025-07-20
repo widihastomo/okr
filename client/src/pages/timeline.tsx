@@ -66,9 +66,27 @@ export default function TimelinePage() {
   const [dateRangeFilter, setDateRangeFilter] = useState('all');
   const [contentTypeFilter, setContentTypeFilter] = useState('all');
   
+  // Demo data for reactions
+  const demoReactions = timelineData?.[0] ? {
+    [timelineData[0].id]: {
+      '👍': 5,
+      '🔥': 3,
+      '💪': 2
+    }
+  } : {};
+
+  const demoReactionUsers = timelineData?.[0] ? {
+    [timelineData[0].id]: {
+      '👍': ['Test User5', 'Belina Yee', 'John Doe', 'Jane Smith', 'Mike Wilson'],
+      '🔥': ['Alice Cooper', 'Bob Johnson', 'Charlie Brown'],
+      '💪': ['David Lee', 'Emily Davis']
+    }
+  } : {};
+
   // Social interaction states
-  const [reactions, setReactions] = useState<Record<string, { [emoji: string]: number }>>({});
+  const [reactions, setReactions] = useState<Record<string, { [emoji: string]: number }>>(demoReactions);
   const [userReactions, setUserReactions] = useState<Record<string, string>>({});
+  const [reactionUsers, setReactionUsers] = useState<Record<string, { [emoji: string]: string[] }>>(demoReactionUsers);
   const [showReactionPicker, setShowReactionPicker] = useState<Record<string, boolean>>({});
   const [showComments, setShowComments] = useState<Record<string, boolean>>({});
   const [commentTexts, setCommentTexts] = useState<Record<string, string>>({});
@@ -164,6 +182,7 @@ export default function TimelinePage() {
 
   const handleReaction = (itemId: string, emoji: string) => {
     const currentUserReaction = userReactions[itemId];
+    const currentUser = user?.name || 'Anonymous User';
     
     // Close reaction picker
     setShowReactionPicker(prev => ({ ...prev, [itemId]: false }));
@@ -182,6 +201,13 @@ export default function TimelinePage() {
           [emoji]: Math.max(0, (prev[itemId]?.[emoji] || 1) - 1)
         }
       }));
+      setReactionUsers(prev => ({
+        ...prev,
+        [itemId]: {
+          ...prev[itemId],
+          [emoji]: (prev[itemId]?.[emoji] || []).filter(name => name !== currentUser)
+        }
+      }));
     } else {
       // Add new reaction or change existing
       if (currentUserReaction) {
@@ -193,6 +219,13 @@ export default function TimelinePage() {
             [currentUserReaction]: Math.max(0, (prev[itemId]?.[currentUserReaction] || 1) - 1)
           }
         }));
+        setReactionUsers(prev => ({
+          ...prev,
+          [itemId]: {
+            ...prev[itemId],
+            [currentUserReaction]: (prev[itemId]?.[currentUserReaction] || []).filter(name => name !== currentUser)
+          }
+        }));
       }
       
       // Add new reaction
@@ -202,6 +235,13 @@ export default function TimelinePage() {
         [itemId]: {
           ...prev[itemId],
           [emoji]: (prev[itemId]?.[emoji] || 0) + 1
+        }
+      }));
+      setReactionUsers(prev => ({
+        ...prev,
+        [itemId]: {
+          ...prev[itemId],
+          [emoji]: [...(prev[itemId]?.[emoji] || []), currentUser]
         }
       }));
     }
@@ -609,25 +649,33 @@ export default function TimelinePage() {
 
                               {/* Display Active Reactions */}
                               {Object.entries(reactions[item.id] || {}).filter(([, count]) => count > 0).length > 0 && (
-                                <div className="flex items-center space-x-1 mt-2">
+                                <div className="mt-3 space-y-2">
                                   {Object.entries(reactions[item.id] || {})
                                     .filter(([, count]) => count > 0)
-                                    .map(([emoji, count]) => (
-                                      <Button
-                                        key={emoji}
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => handleReaction(item.id, emoji)}
-                                        className={`flex items-center space-x-1 text-xs h-6 px-2 rounded-full transition-colors ${
-                                          userReactions[item.id] === emoji 
-                                            ? 'bg-blue-100 text-blue-600 border border-blue-200' 
-                                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                                        }`}
-                                      >
-                                        <span className="text-sm">{emoji}</span>
-                                        <span className="text-xs">{count}</span>
-                                      </Button>
-                                    ))}
+                                    .map(([emoji, count]) => {
+                                      const users = reactionUsers[item.id]?.[emoji] || [];
+                                      const displayUsers = users.slice(0, 2);
+                                      const remainingCount = Math.max(0, count - 2);
+                                      
+                                      return (
+                                        <div key={emoji} className="flex items-center space-x-2">
+                                          <div className="flex items-center">
+                                            <div className="flex items-center bg-white border border-gray-200 rounded-full px-2 py-1">
+                                              <span className="text-base mr-1">{emoji}</span>
+                                              <span className="text-xs text-gray-600">{count}</span>
+                                            </div>
+                                          </div>
+                                          {users.length > 0 && (
+                                            <div className="text-xs text-gray-600">
+                                              {displayUsers.join(', ')}
+                                              {remainingCount > 0 && (
+                                                <span> dan {remainingCount} lainnya</span>
+                                              )}
+                                            </div>
+                                          )}
+                                        </div>
+                                      );
+                                    })}
                                 </div>
                               )}
                             </div>
