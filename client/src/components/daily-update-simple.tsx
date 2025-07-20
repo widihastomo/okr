@@ -336,14 +336,32 @@ export function DailyUpdateSimple() {
             summary: summary,
             tasksUpdated: tasksUpdated,
             tasksCompleted: tasksCompleted,
-            tasksSummary: tasksUpdated > 0 ? `Updated ${tasksUpdated} task(s), completed ${tasksCompleted}` : null,
+            tasksSummary: tasksUpdated > 0 ? (() => {
+              const updatedTasks = data.tasks.filter(t => t.newStatus !== t.currentStatus);
+              const completedTasks = data.tasks.filter(t => t.newStatus === 'selesai');
+              const taskNames = updatedTasks.map(t => `"${t.title}"`).join(', ');
+              const completedNames = completedTasks.length > 0 ? ` (Selesai: ${completedTasks.map(t => `"${t.title}"`).join(', ')})` : '';
+              return `${taskNames}${completedNames}`;
+            })() : null,
             keyResultsUpdated: keyResultsUpdated,
-            keyResultsSummary: keyResultsUpdated > 0 ? `Updated ${keyResultsUpdated} key result(s)` : null,
+            keyResultsSummary: keyResultsUpdated > 0 ? (() => {
+              const updatedKRs = data.keyResults.filter(kr => kr.newValue !== kr.currentValue.toString());
+              return updatedKRs.map(kr => `"${kr.title}" (${kr.currentValue} → ${kr.newValue})`).join(', ');
+            })() : null,
             successMetricsUpdated: successMetricsUpdated,
-            successMetricsSummary: successMetricsUpdated > 0 ? `Updated ${successMetricsUpdated} success metric(s)` : null,
+            successMetricsSummary: successMetricsUpdated > 0 ? (() => {
+              const updatedMetrics = data.successMetrics.filter(sm => sm.newValue !== sm.achievement);
+              return updatedMetrics.map(sm => `"${sm.name}" (${sm.achievement} → ${sm.newValue})`).join(', ');
+            })() : null,
             deliverablesUpdated: deliverablesUpdated,
             deliverablesCompleted: deliverablesCompleted,
-            deliverablesSummary: deliverablesUpdated > 0 ? `Updated ${deliverablesUpdated} deliverable(s), completed ${deliverablesCompleted}` : null,
+            deliverablesSummary: deliverablesUpdated > 0 ? (() => {
+              const updatedDeliverables = data.deliverables.filter(d => d.newCompleted !== d.isCompleted);
+              const completedDeliverables = updatedDeliverables.filter(d => d.newCompleted === true);
+              const deliverableNames = updatedDeliverables.map(d => `"${d.title}"`).join(', ');
+              const completedNames = completedDeliverables.length > 0 ? ` (Selesai: ${completedDeliverables.map(d => `"${d.title}"`).join(', ')})` : '';
+              return `${deliverableNames}${completedNames}`;
+            })() : null,
             whatWorkedWell: data.reflection.whatWorkedWell || null,
             challenges: data.reflection.challenges || null,
             totalUpdates: totalUpdates,
