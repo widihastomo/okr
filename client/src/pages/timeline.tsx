@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
+import { Link } from 'wouter';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -53,6 +54,18 @@ interface TimelineItem {
     email: string;
     profileImageUrl: string | null;
   };
+  // Check-in specific fields
+  type?: 'check_in' | 'daily_update';
+  userName?: string;
+  userProfileImageUrl?: string;
+  keyResultId?: string;
+  keyResultTitle?: string;
+  keyResultUnit?: string;
+  keyResultTargetValue?: string;
+  keyResultBaseValue?: string;
+  keyResultType?: string;
+  checkInValue?: string;
+  checkInNotes?: string;
 }
 
 export default function TimelinePage() {
@@ -513,9 +526,8 @@ export default function TimelinePage() {
                               </div>
                               <div className="text-xs text-blue-700">
                                 {item.tasksSummary && item.tasksSummary.split(', ').map((task, index) => (
-                                  <div key={index} className="flex items-start gap-1 mb-1 last:mb-0">
-                                    <span className="text-blue-600 mt-0.5">•</span>
-                                    <span className="flex-1">{task}</span>
+                                  <div key={index} className="mb-1 last:mb-0">
+                                    <span>{task}</span>
                                   </div>
                                 ))}
                               </div>
@@ -528,9 +540,14 @@ export default function TimelinePage() {
                               <div className="text-xs font-medium text-purple-800 mb-1">🎯 Angka Target ({item.keyResultsUpdated})</div>
                               <div className="text-xs text-purple-700">
                                 {item.keyResultsSummary && item.keyResultsSummary.split(', ').map((kr, index) => (
-                                  <div key={index} className="flex items-start gap-1 mb-1 last:mb-0">
-                                    <span className="text-purple-600 mt-0.5">•</span>
-                                    <span className="flex-1">{kr}</span>
+                                  <div key={index} className="mb-1 last:mb-0">
+                                    {item.type === 'check_in' && item.keyResultId ? (
+                                      <Link href={`/key-results/${item.keyResultId}`} className="text-purple-700 hover:text-purple-900 hover:underline">
+                                        {kr}
+                                      </Link>
+                                    ) : (
+                                      <span>{kr}</span>
+                                    )}
                                   </div>
                                 ))}
                               </div>
@@ -613,9 +630,8 @@ export default function TimelinePage() {
                               <div className="text-xs font-medium text-orange-800 mb-1">📊 Metrik Sukses ({item.successMetricsUpdated})</div>
                               <div className="text-xs text-orange-700">
                                 {item.successMetricsSummary && item.successMetricsSummary.split(', ').map((metric, index) => (
-                                  <div key={index} className="flex items-start gap-1 mb-1 last:mb-0">
-                                    <span className="text-orange-600 mt-0.5">•</span>
-                                    <span className="flex-1">{metric}</span>
+                                  <div key={index} className="mb-1 last:mb-0">
+                                    <span>{metric}</span>
                                   </div>
                                 ))}
                               </div>
@@ -631,9 +647,8 @@ export default function TimelinePage() {
                               </div>
                               <div className="text-xs text-indigo-700">
                                 {item.deliverablesSummary && item.deliverablesSummary.split(', ').map((deliverable, index) => (
-                                  <div key={index} className="flex items-start gap-1 mb-1 last:mb-0">
-                                    <span className="text-indigo-600 mt-0.5">•</span>
-                                    <span className="flex-1">{deliverable}</span>
+                                  <div key={index} className="mb-1 last:mb-0">
+                                    <span>{deliverable}</span>
                                   </div>
                                 ))}
                               </div>
