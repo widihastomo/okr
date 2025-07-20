@@ -969,9 +969,15 @@ export default function KeyResultDetailPage() {
                     <span className="font-medium text-gray-600">PIC:</span>
                     {keyResult.assignedTo ? (
                       <div className="flex items-center gap-2">
-                        <div className="w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-medium">
-                          {getUserName(keyResult.assignedTo).charAt(0).toUpperCase()}
-                        </div>
+                        <Avatar className="w-5 h-5">
+                          <AvatarImage 
+                            src={getUserProfileImage(keyResult.assignedTo)} 
+                            alt={getUserName(keyResult.assignedTo)}
+                          />
+                          <AvatarFallback className="bg-blue-500 text-white text-xs font-medium">
+                            {getUserInitials(keyResult.assignedTo)}
+                          </AvatarFallback>
+                        </Avatar>
                         <span className="text-xs text-gray-700 font-medium">
                           {getUserName(keyResult.assignedTo)}
                         </span>
@@ -1234,9 +1240,15 @@ export default function KeyResultDetailPage() {
                             
                             {checkIn.createdBy && (
                               <div className="flex items-center gap-2 text-xs text-gray-500">
-                                <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-medium">
-                                  {getUserName(checkIn.createdBy).charAt(0).toUpperCase()}
-                                </div>
+                                <Avatar className="w-6 h-6">
+                                  <AvatarImage 
+                                    src={getUserProfileImage(checkIn.createdBy)} 
+                                    alt={getUserName(checkIn.createdBy)}
+                                  />
+                                  <AvatarFallback className="bg-blue-500 text-white text-xs font-medium">
+                                    {getUserInitials(checkIn.createdBy)}
+                                  </AvatarFallback>
+                                </Avatar>
                                 <span>{getUserName(checkIn.createdBy)}</span>
                               </div>
                             )}
