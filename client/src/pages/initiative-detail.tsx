@@ -839,6 +839,8 @@ export default function InitiativeDetailPage() {
   const [isClosureModalOpen, setIsClosureModalOpen] = useState(false);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
+  const [isDeleteTaskModalOpen, setIsDeleteTaskModalOpen] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState<any>(null);
   const [isDeleteMetricModalOpen, setIsDeleteMetricModalOpen] = useState(false);
   const [isAddDeliverableModalOpen, setIsAddDeliverableModalOpen] = useState(false);
   const [isEditDeliverableModalOpen, setIsEditDeliverableModalOpen] = useState(false);
@@ -1399,9 +1401,16 @@ export default function InitiativeDetailPage() {
     updateTaskStatusMutation.mutate({ taskId, status: newStatus });
   };
 
-  const handleDeleteTask = (taskId: string) => {
-    if (confirm("Apakah Anda yakin ingin menghapus task ini?")) {
-      deleteTaskMutation.mutate(taskId);
+  const handleDeleteTask = (task: any) => {
+    setTaskToDelete(task);
+    setIsDeleteTaskModalOpen(true);
+  }
+
+  const confirmDeleteTask = () => {
+    if (taskToDelete) {
+      deleteTaskMutation.mutate(taskToDelete.id);
+      setIsDeleteTaskModalOpen(false);
+      setTaskToDelete(null);
     }
   };
 
@@ -2389,7 +2398,7 @@ export default function InitiativeDetailPage() {
                                   Ubah
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
-                                  onClick={() => handleDeleteTask(task.id)}
+                                  onClick={() => handleDeleteTask(task)}
                                   className="text-red-600 hover:text-red-700"
                                 >
                                   <Trash2 className="w-4 h-4 mr-2" />
@@ -2789,6 +2798,53 @@ export default function InitiativeDetailPage() {
               {reopenInitiativeMutation.isPending
                 ? "Membuka..."
                 : "Buka Kembali"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete Task Confirmation Modal */}
+      <AlertDialog open={isDeleteTaskModalOpen} onOpenChange={setIsDeleteTaskModalOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Trash2 className="h-5 w-5 text-red-500" />
+              Konfirmasi Hapus Task
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Apakah Anda yakin ingin menghapus task ini? Tindakan ini tidak dapat dibatalkan.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="py-4">
+            <div className="p-3 bg-gray-50 rounded-md">
+              <p className="text-sm font-medium text-gray-700">
+                Task yang akan dihapus:
+              </p>
+              <p className="text-sm text-gray-900 mt-1">
+                "{taskToDelete?.title}"
+              </p>
+              {taskToDelete?.description && (
+                <p className="text-xs text-gray-500 mt-1">
+                  {taskToDelete.description}
+                </p>
+              )}
+            </div>
+          </div>
+          <AlertDialogFooter className="gap-2">
+            <AlertDialogCancel
+              onClick={() => {
+                setIsDeleteTaskModalOpen(false);
+                setTaskToDelete(null);
+              }}
+            >
+              Batal
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeleteTask}
+              disabled={deleteTaskMutation.isPending}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {deleteTaskMutation.isPending ? "Menghapus..." : "Hapus Task"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
