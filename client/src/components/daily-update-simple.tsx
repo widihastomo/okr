@@ -311,7 +311,7 @@ export function DailyUpdateSimple() {
 
   const handleOpenDialog = () => {
     // Reset form data and populate with current values when opening dialog
-    console.log('Opening dialog with data:', { keyResults, successMetrics, relevantTasks });
+    console.log('Opening dialog with data:', { keyResults, successMetrics, deliverables, relevantTasks });
     
     const initialData: SimpleUpdateData = {
       keyResults: keyResults.map((kr: any) => ({
@@ -329,7 +329,18 @@ export function DailyUpdateSimple() {
         target: sm.target || '',
         achievement: sm.achievement || '',
         initiativeTitle: sm.initiativeTitle || '',
+        initiativeId: sm.initiativeId || '',
         newValue: sm.achievement || '', // Start with current achievement, ensure it's never undefined
+        notes: ''
+      })),
+      deliverables: deliverables.map((d: any) => ({
+        id: d.id,
+        title: d.title || '',
+        description: d.description || '',
+        isCompleted: d.isCompleted || false,
+        initiativeTitle: d.initiativeTitle || '',
+        initiativeId: d.initiativeId || '',
+        newCompleted: d.isCompleted || false, // Start with current completion status
         notes: ''
       })),
       tasks: [], // Will be populated when status is changed
