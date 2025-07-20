@@ -3120,7 +3120,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Delete existing definition of done items
           const existingDoD = await storage.getDefinitionOfDoneItems(id);
           for (const dod of existingDoD) {
-            await storage.deleteDefinitionOfDone(dod.id);
+            await storage.deleteDefinitionOfDoneItem(dod.id);
           }
           
           // Create new definition of done items

@@ -349,7 +349,9 @@ The system includes comprehensive database connection troubleshooting tools:
   * RESULT: Team member profile photos and initials now display correctly in initiative detail page
 - July 20, 2025. **DEFINITION OF DONE SERVER ERROR FIX** - Successfully fixed storage method name error preventing DoD updates:
   * FIXED: Corrected storage method call from getDefinitionOfDoneByInitiativeId to getDefinitionOfDoneItems
+  * FIXED: Corrected delete method call from deleteDefinitionOfDone to deleteDefinitionOfDoneItem
   * RESOLVED: "storage.getDefinitionOfDoneByInitiativeId is not a function" error eliminated
+  * RESOLVED: "storage.deleteDefinitionOfDone is not a function" error eliminated
   * ENHANCED: Definition of done items now properly update during initiative edit
   * RESULT: Complete initiative edit functionality now works for all related data (metrics, DoD, tasks, key results)
 - July 20, 2025. **INITIATIVE EDIT CACHE REFRESH FIX COMPLETED** - Successfully fixed frontend not refreshing success metrics, DoD, and tasks after initiative edit:
