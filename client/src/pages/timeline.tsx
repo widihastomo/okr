@@ -22,15 +22,32 @@ import { apiRequest } from '@/lib/queryClient';
 
 interface TimelineItem {
   id: string;
-  type: 'check_in' | 'daily_update';
-  createdAt: string;
-  userName: string;
   userId: string;
-  keyResultTitle?: string;
-  previousValue?: number;
-  currentValue?: number;
-  notes?: string;
-  summary?: string;
+  organizationId: string;
+  updateDate: string;
+  summary: string;
+  tasksUpdated: number;
+  tasksCompleted: number;
+  tasksSummary: string;
+  keyResultsUpdated: number;
+  keyResultsSummary: string;
+  successMetricsUpdated: number;
+  successMetricsSummary: string;
+  deliverablesUpdated: number;
+  deliverablesCompleted: number;
+  deliverablesSummary: string;
+  whatWorkedWell: string;
+  challenges: string;
+  totalUpdates: number;
+  updateTypes: string;
+  createdAt: string;
+  updatedAt: string;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    profileImageUrl: string | null;
+  };
 }
 
 export default function TimelinePage() {
@@ -57,12 +74,11 @@ export default function TimelinePage() {
   // Filter data based on current filters
   const filteredData = useMemo(() => {
     return timelineData.filter((item) => {
-      if (activityTypeFilter !== 'all' && item.type !== activityTypeFilter) return false;
       if (userFilter !== 'all' && userFilter !== 'current' && item.userId !== userFilter) return false;
       
       // Date range filtering
       if (dateRangeFilter !== 'all') {
-        const itemDate = new Date(item.createdAt);
+        const itemDate = new Date(item.updateDate);
         const now = new Date();
         const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         const startOfWeek = new Date(startOfDay.getTime() - (startOfDay.getDay() * 24 * 60 * 60 * 1000));
@@ -105,10 +121,7 @@ export default function TimelinePage() {
 
   const createCommentMutation = useMutation({
     mutationFn: (data: { timelineId: string; comment: string }) => 
-      apiRequest(`/api/timeline/${data.timelineId}/comments`, {
-        method: 'POST',
-        body: { comment: data.comment }
-      }),
+      apiRequest(`/api/timeline/${data.timelineId}/comments`, 'POST', { comment: data.comment }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/timeline'] });
     }
@@ -132,7 +145,7 @@ export default function TimelinePage() {
       <div className="mb-6 bg-white rounded-lg shadow-sm p-4">
         <div className="flex items-center justify-between mb-2">
           <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <TimelineIcon size="md" variant="primary" className="w-8 h-8" />
+            <TimelineIcon className="w-8 h-8" />
             Activity Timeline
           </h1>
           <div className="lg:hidden">
@@ -280,28 +293,38 @@ export default function TimelinePage() {
                     <div className="p-4 border-b border-gray-100">
                       <div className="flex items-start space-x-3">
                         <div className="flex-shrink-0">
-                          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-green-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">
-                            {getUserInitials({ name: item.userName || "User" })}
-                          </div>
+                          {item.user.profileImageUrl ? (
+                            <img 
+                              src={item.user.profileImageUrl} 
+                              alt={item.user.name}
+                              className="w-10 h-10 rounded-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-green-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                              {getUserInitials({ name: item.user.name })}
+                            </div>
+                          )}
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center space-x-2">
                             <h3 className="font-semibold text-gray-900 text-sm">
-                              {item.userName || "Unknown User"}
+                              {item.user.name}
                             </h3>
                             <span className="text-gray-500 text-xs">•</span>
                             <span className="text-gray-500 text-xs">
-                              {format(new Date(item.createdAt), "MMM dd, HH:mm")}
+                              {format(new Date(item.updateDate), "MMM dd, HH:mm")}
                             </span>
-                            <Badge variant={item.type === 'check_in' ? 'default' : 'secondary'} className="text-xs">
-                              {item.type === 'check_in' ? 'Check-in' : 'Daily Update'}
+                            <Badge variant="default" className="text-xs">
+                              Daily Update
                             </Badge>
+                            {item.totalUpdates > 0 && (
+                              <Badge variant="secondary" className="text-xs">
+                                {item.totalUpdates} updates
+                              </Badge>
+                            )}
                           </div>
                           <p className="text-gray-700 text-sm mt-1">
-                            {item.type === 'check_in' 
-                              ? `Updated ${item.keyResultTitle} progress` 
-                              : 'Shared daily update with team'
-                            }
+                            Shared comprehensive daily progress update
                           </p>
                         </div>
                       </div>
@@ -309,38 +332,104 @@ export default function TimelinePage() {
 
                     {/* Post Content */}
                     <div className="p-4">
-                      <div className="space-y-3">
-                        {item.type === 'check_in' ? (
+                      <div className="space-y-4">
+                        {/* Main Summary */}
+                        <div className="text-gray-700 text-sm leading-relaxed">
+                          <div className="font-medium text-gray-600 mb-2">Daily Update Summary:</div>
                           <div className="bg-gray-50 rounded-lg p-3">
-                            <div className="flex items-center justify-between mb-2">
-                              <div className="text-sm font-medium text-gray-700">
-                                {item.keyResultTitle}
-                              </div>
-                              <Badge variant="secondary" className="text-xs">
-                                Progress Update
-                              </Badge>
-                            </div>
-                            <div className="flex items-center space-x-4 text-sm">
-                              <div className="text-gray-600">
-                                Previous: <span className="font-medium text-gray-900">{item.previousValue}</span>
-                              </div>
-                              <div className="text-blue-600">
-                                Current: <span className="font-medium text-blue-700">{item.currentValue}</span>
-                              </div>
-                            </div>
-                            {item.notes && (
-                              <div className="mt-2 text-sm text-gray-700 bg-white rounded p-2">
-                                <div className="font-medium text-gray-600 mb-1">Notes:</div>
-                                {item.notes}
-                              </div>
-                            )}
+                            <div dangerouslySetInnerHTML={{ __html: item.summary || "No summary available" }} />
                           </div>
-                        ) : (
-                          <div className="text-gray-700 text-sm leading-relaxed">
-                            <div className="font-medium text-gray-600 mb-2">Daily Update Summary:</div>
-                            <div className="bg-gray-50 rounded-lg p-3">
-                              <div dangerouslySetInnerHTML={{ __html: item.summary || "No summary available" }} />
+                        </div>
+
+                        {/* Update Statistics Grid */}
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                          {item.tasksUpdated > 0 && (
+                            <div className="bg-blue-50 rounded-lg p-3 text-center">
+                              <div className="text-lg font-bold text-blue-600">{item.tasksUpdated}</div>
+                              <div className="text-xs text-blue-700">Tasks Updated</div>
                             </div>
+                          )}
+                          {item.tasksCompleted > 0 && (
+                            <div className="bg-green-50 rounded-lg p-3 text-center">
+                              <div className="text-lg font-bold text-green-600">{item.tasksCompleted}</div>
+                              <div className="text-xs text-green-700">Tasks Completed</div>
+                            </div>
+                          )}
+                          {item.keyResultsUpdated > 0 && (
+                            <div className="bg-purple-50 rounded-lg p-3 text-center">
+                              <div className="text-lg font-bold text-purple-600">{item.keyResultsUpdated}</div>
+                              <div className="text-xs text-purple-700">Key Results</div>
+                            </div>
+                          )}
+                          {item.successMetricsUpdated > 0 && (
+                            <div className="bg-orange-50 rounded-lg p-3 text-center">
+                              <div className="text-lg font-bold text-orange-600">{item.successMetricsUpdated}</div>
+                              <div className="text-xs text-orange-700">Success Metrics</div>
+                            </div>
+                          )}
+                          {item.deliverablesUpdated > 0 && (
+                            <div className="bg-indigo-50 rounded-lg p-3 text-center">
+                              <div className="text-lg font-bold text-indigo-600">{item.deliverablesUpdated}</div>
+                              <div className="text-xs text-indigo-700">Deliverables</div>
+                            </div>
+                          )}
+                          {item.deliverablesCompleted > 0 && (
+                            <div className="bg-teal-50 rounded-lg p-3 text-center">
+                              <div className="text-lg font-bold text-teal-600">{item.deliverablesCompleted}</div>
+                              <div className="text-xs text-teal-700">Completed</div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Detailed Information */}
+                        <div className="space-y-3">
+                          {item.tasksSummary && (
+                            <div className="bg-blue-50 rounded-lg p-3">
+                              <div className="font-medium text-blue-800 mb-1 text-sm">📋 Tasks Progress</div>
+                              <div className="text-sm text-blue-700">{item.tasksSummary}</div>
+                            </div>
+                          )}
+                          
+                          {item.keyResultsSummary && (
+                            <div className="bg-purple-50 rounded-lg p-3">
+                              <div className="font-medium text-purple-800 mb-1 text-sm">🎯 Key Results Progress</div>
+                              <div className="text-sm text-purple-700">{item.keyResultsSummary}</div>
+                            </div>
+                          )}
+
+                          {item.successMetricsSummary && (
+                            <div className="bg-orange-50 rounded-lg p-3">
+                              <div className="font-medium text-orange-800 mb-1 text-sm">📊 Success Metrics</div>
+                              <div className="text-sm text-orange-700">{item.successMetricsSummary}</div>
+                            </div>
+                          )}
+
+                          {item.deliverablesSummary && (
+                            <div className="bg-indigo-50 rounded-lg p-3">
+                              <div className="font-medium text-indigo-800 mb-1 text-sm">📦 Deliverables</div>
+                              <div className="text-sm text-indigo-700">{item.deliverablesSummary}</div>
+                            </div>
+                          )}
+
+                          {item.whatWorkedWell && (
+                            <div className="bg-green-50 rounded-lg p-3">
+                              <div className="font-medium text-green-800 mb-1 text-sm">✅ What Worked Well</div>
+                              <div className="text-sm text-green-700">{item.whatWorkedWell}</div>
+                            </div>
+                          )}
+
+                          {item.challenges && (
+                            <div className="bg-red-50 rounded-lg p-3">
+                              <div className="font-medium text-red-800 mb-1 text-sm">⚠️ Challenges</div>
+                              <div className="text-sm text-red-700">{item.challenges}</div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Update Types */}
+                        {item.updateTypes && (
+                          <div className="text-xs text-gray-500 bg-gray-50 rounded px-2 py-1">
+                            Types: {item.updateTypes}
                           </div>
                         )}
                       </div>
@@ -402,9 +491,17 @@ export default function TimelinePage() {
                             {/* Add Comment */}
                             <div className="flex space-x-2">
                               <div className="flex-shrink-0">
-                                <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-blue-500 rounded-full flex items-center justify-center text-white font-semibold text-xs">
-                                  {getUserInitials({ name: "Current User" })}
-                                </div>
+                                {user?.profileImageUrl ? (
+                                  <img 
+                                    src={user.profileImageUrl} 
+                                    alt={user.name || user.email}
+                                    className="w-8 h-8 rounded-full object-cover"
+                                  />
+                                ) : (
+                                  <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-blue-500 rounded-full flex items-center justify-center text-white font-semibold text-xs">
+                                    {getUserInitials({ name: user?.name || user?.email || "User" })}
+                                  </div>
+                                )}
                               </div>
                               <div className="flex-1 flex items-center space-x-2">
                                 <div className="flex-1 relative">
@@ -437,7 +534,7 @@ export default function TimelinePage() {
             </div>
           ) : (
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 text-center py-12">
-              <TimelineIcon size="lg" variant="muted" className="w-16 h-16 mx-auto mb-4" />
+              <TimelineIcon className="w-16 h-16 mx-auto mb-4 text-gray-400" />
               <h3 className="text-xl font-semibold text-gray-900 mb-2">
                 Belum ada activity yang ditampilkan
               </h3>
