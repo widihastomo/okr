@@ -516,9 +516,9 @@ export function DailyUpdateSimple() {
                                     </Badge>
                                   )}
                                   {isToday && (
-                                    <Badge variant="default" className="text-xs">
+                                    <Badge variant="default" className="text-xs hidden sm:inline-flex">
                                       <Calendar className="h-3 w-3 mr-1" />
-                                      <span className="hidden sm:inline">Hari Ini</span>
+                                      <span>Hari Ini</span>
                                     </Badge>
                                   )}
                                 </div>
