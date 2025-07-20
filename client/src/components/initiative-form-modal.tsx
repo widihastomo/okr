@@ -30,7 +30,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+
 
 import {
   Popover,
@@ -1318,16 +1318,9 @@ Contoh: Untuk mempercepat penetrasi pasar di wilayah timur, kami akan menghubung
                                 </h4>
                                 <div className="flex items-center gap-2 shrink-0">
                                   {assignedUser && (
-                                    <div className="flex items-center gap-1">
-                                      <Avatar className="w-4 h-4">
-                                        <AvatarFallback className="text-xs bg-blue-100 text-blue-700">
-                                          {getUserInitials(assignedUser)}
-                                        </AvatarFallback>
-                                      </Avatar>
-                                      <span className="text-xs text-blue-600">
-                                        {getUserName(assignedUser)}
-                                      </span>
-                                    </div>
+                                    <span className="text-xs text-blue-600">
+                                      {getUserName(assignedUser)}
+                                    </span>
                                   )}
                                   {task.dueDate && (
                                     <span className="text-xs text-gray-500">
@@ -1388,16 +1381,9 @@ Contoh: Untuk mempercepat penetrasi pasar di wilayah timur, kami akan menghubung
                                 </div>
                                 <div className="flex items-center justify-between text-xs">
                                   {assignedUser && (
-                                    <div className="flex items-center gap-1">
-                                      <Avatar className="w-4 h-4">
-                                        <AvatarFallback className="text-xs bg-blue-100 text-blue-700">
-                                          {getUserInitials(assignedUser)}
-                                        </AvatarFallback>
-                                      </Avatar>
-                                      <span className="text-blue-600">
-                                        {getUserName(assignedUser)}
-                                      </span>
-                                    </div>
+                                    <span className="text-blue-600">
+                                      {getUserName(assignedUser)}
+                                    </span>
                                   )}
                                   {task.dueDate && (
                                     <span className="text-gray-500">
