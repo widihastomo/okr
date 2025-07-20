@@ -104,13 +104,13 @@ export default function TimelinePage() {
   });
 
   // Fetch comments for timeline items
-  const { data: timelineComments = {} } = useQuery({
+  const { data: timelineComments = {} } = useQuery<Record<string, any[]>>({
     queryKey: ['/api/timeline/comments'],
     enabled: timelineData.length > 0,
   });
 
   // Fetch reactions for timeline items
-  const { data: timelineReactions = {} } = useQuery({
+  const { data: timelineReactions = {} } = useQuery<Record<string, any[]>>({
     queryKey: ['/api/timeline/reactions'],
     enabled: timelineData.length > 0,
   });
@@ -118,10 +118,7 @@ export default function TimelinePage() {
   // Mutation for adding comments
   const addCommentMutation = useMutation({
     mutationFn: async ({ checkInId, content }: { checkInId: string; content: string }) => {
-      return apiRequest(`/api/timeline/${checkInId}/comments`, {
-        method: 'POST',
-        body: { content }
-      });
+      return apiRequest(`/api/timeline/${checkInId}/comments`, 'POST', { content });
     },
     onSuccess: (_, { checkInId }) => {
       setCommentTexts(prev => ({ ...prev, [checkInId]: '' }));
@@ -143,25 +140,27 @@ export default function TimelinePage() {
   // Mutation for reactions
   const reactionMutation = useMutation({
     mutationFn: async ({ checkInId, emoji }: { checkInId: string; emoji: string }) => {
-      return apiRequest(`/api/timeline/${checkInId}/reactions`, {
-        method: 'POST',
-        body: { type: emoji }
-      });
+      return apiRequest(`/api/timeline/${checkInId}/reactions`, 'POST', { type: emoji });
     },
-    onSuccess: (response, { checkInId, emoji }) => {
+    onSuccess: (response: any, { checkInId, emoji }) => {
       setShowReactionPicker(prev => ({ ...prev, [checkInId]: false }));
       queryClient.invalidateQueries({ queryKey: ['/api/timeline/reactions'] });
       
       // Show appropriate toast message
-      if (response.action === 'added') {
+      if (response?.action === 'added') {
         toast({
           title: "Berhasil",
           description: "Reaksi berhasil ditambahkan",
         });
-      } else if (response.action === 'removed') {
+      } else if (response?.action === 'removed') {
         toast({
           title: "Berhasil", 
           description: "Reaksi berhasil dihapus",
+        });
+      } else {
+        toast({
+          title: "Berhasil",
+          description: "Reaksi berhasil diperbarui",
         });
       }
     },
@@ -565,9 +564,9 @@ export default function TimelinePage() {
                                   <div className="mb-2">
                                     {(() => {
                                       let progressPercentage = 0;
-                                      const current = parseFloat(item.checkInValue) || 0;
-                                      const target = parseFloat(item.keyResultTargetValue) || 1;
-                                      const baseline = parseFloat(item.keyResultBaseValue) || 0;
+                                      const current = parseFloat(item.checkInValue || '0') || 0;
+                                      const target = parseFloat(item.keyResultTargetValue || '1') || 1;
+                                      const baseline = parseFloat(item.keyResultBaseValue || '0') || 0;
                                       
                                       // Calculate progress based on key result type
                                       if (item.keyResultType === 'increase_to') {
@@ -713,11 +712,11 @@ export default function TimelinePage() {
                               size="sm"
                               onClick={() => toggleReaction(item.id)}
                               className={`flex items-center space-x-1 text-xs h-7 px-2 rounded-full ${
-                                timelineReactions[item.id]?.['❤️'] > 0 ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:text-blue-600'
+                                (timelineReactions[item.id] as any)?.['❤️'] > 0 ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:text-blue-600'
                               }`}
                             >
-                              <Heart className={`w-3 h-3 ${timelineReactions[item.id]?.['❤️'] > 0 ? 'fill-current' : ''}`} />
-                              <span>{timelineReactions[item.id]?.['❤️'] > 0 ? 'Disukai' : 'Suka'}</span>
+                              <Heart className={`w-3 h-3 ${(timelineReactions[item.id] as any)?.['❤️'] > 0 ? 'fill-current' : ''}`} />
+                              <span>{(timelineReactions[item.id] as any)?.['❤️'] > 0 ? 'Disukai' : 'Suka'}</span>
                             </Button>
                             <Button
                               variant="ghost"
