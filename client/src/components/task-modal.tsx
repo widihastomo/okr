@@ -95,6 +95,8 @@ export default function TaskModal({
 
   const [initiativePopoverOpen, setInitiativePopoverOpen] = useState(false);
   const [statusPopoverOpen, setStatusPopoverOpen] = useState(false);
+  const [startDatePopoverOpen, setStartDatePopoverOpen] = useState(false);
+  const [dueDatePopoverOpen, setDueDatePopoverOpen] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -123,6 +125,8 @@ export default function TaskModal({
     // Close popovers
     setInitiativePopoverOpen(false);
     setStatusPopoverOpen(false);
+    setStartDatePopoverOpen(false);
+    setDueDatePopoverOpen(false);
 
     // Call parent close handler
     onClose();
@@ -930,7 +934,7 @@ export default function TaskModal({
                     </PopoverContent>
                   </Popover>
                 </Label>
-                <Popover>
+                <Popover open={startDatePopoverOpen} onOpenChange={setStartDatePopoverOpen}>
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
@@ -954,11 +958,13 @@ export default function TaskModal({
                             ...formData,
                             startDate: adjustedDate,
                           });
+                          setStartDatePopoverOpen(false); // Auto-close on selection
                         } else {
                           setFormData({
                             ...formData,
                             startDate: null,
                           });
+                          setStartDatePopoverOpen(false); // Auto-close on selection
                         }
                       }}
                       disabled={(date) => {
@@ -1004,7 +1010,7 @@ export default function TaskModal({
                     </PopoverContent>
                   </Popover>
                 </Label>
-                <Popover>
+                <Popover open={dueDatePopoverOpen} onOpenChange={setDueDatePopoverOpen}>
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
@@ -1028,11 +1034,13 @@ export default function TaskModal({
                             ...formData,
                             dueDate: adjustedDate,
                           });
+                          setDueDatePopoverOpen(false); // Auto-close on selection
                         } else {
                           setFormData({
                             ...formData,
                             dueDate: null,
                           });
+                          setDueDatePopoverOpen(false); // Auto-close on selection
                         }
                       }}
                       disabled={(date) => {
