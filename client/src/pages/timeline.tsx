@@ -150,13 +150,15 @@ export default function TimelinePage() {
     retry: 1,
   });
 
-  // Fetch timeline updates data
+  // Fetch timeline updates data (using same endpoint but different query)
   const { data: timelineUpdatesData, isLoading: timelineUpdatesLoading } = useQuery({
-    queryKey: ["/api/timeline-updates"],
+    queryKey: ["/api/timeline", "updates"],
     queryFn: async () => {
-      const response = await apiRequest("GET", "/api/timeline-updates");
+      const response = await apiRequest("GET", "/api/timeline");
       if (response.ok) {
-        return await response.json();
+        const data = await response.json();
+        // Filter to get only timeline updates (not check-ins)
+        return data.filter((item: any) => item.summary && !item.keyResult);
       }
       return []; // Return empty array if endpoint doesn't exist yet
     },
