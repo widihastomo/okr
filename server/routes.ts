@@ -3411,19 +3411,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Definition of Done endpoints  
+  // Output endpoints  
   app.get("/api/initiatives/:initiativeId/definition-of-done", async (req, res) => {
     try {
       const initiativeId = req.params.initiativeId;
       const items = await storage.getDefinitionOfDoneItems(initiativeId);
       res.json(items);
     } catch (error) {
-      console.error("Error fetching definition of done items:", error);
-      res.status(500).json({ message: "Failed to fetch definition of done items" });
+      console.error("Error fetching output items:", error);
+      res.status(500).json({ message: "Failed to fetch output items" });
     }
   });
 
-  // Create new definition of done item
+  // Create new output item
   app.post("/api/initiatives/:initiativeId/definition-of-done", requireAuth, async (req, res) => {
     try {
       const initiativeId = req.params.initiativeId;
@@ -3456,12 +3456,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json(newItem);
     } catch (error) {
-      console.error("Error creating definition of done item:", error);
-      res.status(500).json({ message: "Failed to create definition of done item" });
+      console.error("Error creating output item:", error);
+      res.status(500).json({ message: "Failed to create output item" });
     }
   });
 
-  // Toggle Definition of Done item completion status
+  // Toggle Output item completion status
   app.patch("/api/definition-of-done/:id/toggle", requireAuth, async (req, res) => {
     try {
       const itemId = req.params.id;
@@ -3471,17 +3471,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const result = await storage.toggleDefinitionOfDoneItem(itemId, isCompleted, currentUser.id);
       
       if (!result) {
-        return res.status(404).json({ message: "Definition of done item not found" });
+        return res.status(404).json({ message: "Output item not found" });
       }
 
       res.json(result);
     } catch (error) {
-      console.error("Error toggling definition of done item:", error);
-      res.status(500).json({ message: "Failed to toggle definition of done item" });
+      console.error("Error toggling output item:", error);
+      res.status(500).json({ message: "Failed to toggle output item" });
     }
   });
 
-  // Edit definition of done item
+  // Edit output item
   app.patch("/api/definition-of-done/:id", requireAuth, async (req, res) => {
     try {
       const itemId = req.params.id;
@@ -3497,7 +3497,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       if (!updatedItem) {
-        return res.status(404).json({ message: "Definition of done item not found" });
+        return res.status(404).json({ message: "Output item not found" });
       }
 
       // Add audit trail entry
@@ -3512,12 +3512,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json(updatedItem);
     } catch (error) {
-      console.error("Error editing definition of done item:", error);
-      res.status(500).json({ message: "Failed to edit definition of done item" });
+      console.error("Error editing output item:", error);
+      res.status(500).json({ message: "Failed to edit output item" });
     }
   });
 
-  // Delete definition of done item
+  // Delete output item
   app.delete("/api/definition-of-done/:id", requireAuth, async (req, res) => {
     try {
       const itemId = req.params.id;
@@ -3526,13 +3526,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get item details before deletion for audit trail
       const item = await storage.getDefinitionOfDoneItem(itemId);
       if (!item) {
-        return res.status(404).json({ message: "Definition of done item not found" });
+        return res.status(404).json({ message: "Output item not found" });
       }
 
       const result = await storage.deleteDefinitionOfDoneItem(itemId);
       
       if (!result) {
-        return res.status(404).json({ message: "Definition of done item not found" });
+        return res.status(404).json({ message: "Output item not found" });
       }
 
       // Add audit trail entry
@@ -3545,10 +3545,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         changeDescription: `Deleted deliverable: ${item.title}`
       });
 
-      res.json({ message: "Definition of done item deleted successfully" });
+      res.json({ message: "Output item deleted successfully" });
     } catch (error) {
-      console.error("Error deleting definition of done item:", error);
-      res.status(500).json({ message: "Failed to delete definition of done item" });
+      console.error("Error deleting output item:", error);
+      res.status(500).json({ message: "Failed to delete output item" });
     }
   });
 
@@ -4434,7 +4434,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // Extract success metrics, tasks, and definition of done from request body  
+      // Extract success metrics, tasks, and output items from request body  
       const { successMetrics, tasks, definitionOfDone, ...initiativeBody } = req.body;
       
       // Process the initiative data with authentication
@@ -4514,9 +4514,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // Create definition of done items if provided
+      // Create output items if provided
       if (definitionOfDone && Array.isArray(definitionOfDone) && definitionOfDone.length > 0) {
-        console.log("Creating definition of done items:", definitionOfDone);
+        console.log("Creating output items:", definitionOfDone);
         
         for (const dodItem of definitionOfDone) {
           try {
@@ -4533,7 +4533,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               console.log("DoD item created:", dodItem.trim());
             }
           } catch (dodError) {
-            console.error("Error creating definition of done item:", dodError);
+            console.error("Error creating output item:", dodError);
           }
         }
       }

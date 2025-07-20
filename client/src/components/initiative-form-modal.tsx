@@ -568,7 +568,7 @@ export default function InitiativeFormModal({
           impactScore,
           effortScore,
           confidenceScore,
-          // Send definition of done as array to backend
+          // Send output items as array to backend
           definitionOfDone: data.initiative.definitionOfDone || [],
           // Format dates for API
           startDate: data.initiative.startDate.toISOString(),

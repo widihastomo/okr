@@ -872,7 +872,7 @@ export default function InitiativeDetailPage() {
     enabled: !!id,
   });
 
-  // Fetch definition of done items for the initiative
+  // Fetch output items for the initiative
   const { data: definitionOfDoneItems = [] } = useQuery<any[]>({
     queryKey: [`/api/initiatives/${id}/definition-of-done`],
     enabled: !!id,
@@ -1864,7 +1864,7 @@ export default function InitiativeDetailPage() {
                   </div>
                 )}
 
-                {/* Definition of Done Section */}
+                {/* Output Section */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
