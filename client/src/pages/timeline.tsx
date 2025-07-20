@@ -189,9 +189,10 @@ export default function TimelinePage() {
     content: update.summary,
     creator: {
       id: update.userId,
-      firstName: update.user?.name?.split(' ')[0] || '',
-      lastName: update.user?.name?.split(' ').slice(1).join(' ') || '',
+      firstName: update.user?.name ? update.user.name.split(' ')[0] : '',
+      lastName: update.user?.name ? update.user.name.split(' ').slice(1).join(' ') : '',
       email: update.user?.email || '',
+      name: update.user?.name || update.user?.email?.split('@')[0] || 'User',
     },
     createdAt: update.createdAt,
     confidence: 7,
@@ -258,24 +259,7 @@ export default function TimelinePage() {
     },
   });
 
-  const getUserName = (user: any) => {
-    if (user.name && user.name.trim() !== '') {
-      return user.name.trim();
-    }
-    return user.email?.split('@')[0] || 'User';
-  };
 
-  const getUserInitials = (user: any) => {
-    if (user.name && user.name.trim() !== '') {
-      const nameParts = user.name.trim().split(' ');
-      if (nameParts.length >= 2) {
-        return `${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}`.toUpperCase();
-      }
-      return nameParts[0][0].toUpperCase();
-    }
-    if (user.email) return user.email[0].toUpperCase();
-    return 'U';
-  };
 
   const handleComment = (checkInId: string) => {
     const content = commentTexts[checkInId]?.trim();
