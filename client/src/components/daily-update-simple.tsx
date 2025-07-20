@@ -86,7 +86,7 @@ export function DailyUpdateSimple() {
   });
 
   // Filter key results for current user only
-  const keyResults = Array.isArray(allKeyResults) ? allKeyResults.filter((kr: any) => kr.assignedTo === user?.id) : [];
+  const keyResults = Array.isArray(allKeyResults) && user && (user as any).id ? allKeyResults.filter((kr: any) => kr.assignedTo === (user as any).id) : [];
 
   const { data: allInitiatives = [] } = useQuery({
     queryKey: ['/api/initiatives'],
@@ -94,20 +94,20 @@ export function DailyUpdateSimple() {
 
   // Filter initiatives for current user only (where user is PIC) using useMemo for stability
   const initiatives = useMemo(() => {
-    if (!Array.isArray(allInitiatives)) return [];
-    const filtered = allInitiatives.filter((initiative: any) => initiative.picId === user?.id);
+    if (!Array.isArray(allInitiatives) || !user || !(user as any).id) return [];
+    const filtered = allInitiatives.filter((initiative: any) => initiative.picId === (user as any).id);
     console.log('All initiatives:', allInitiatives);
-    console.log('User ID:', user?.id);
+    console.log('User ID:', (user as any).id);
     console.log('Filtered initiatives (user is PIC):', filtered);
     return filtered;
-  }, [allInitiatives, user?.id]);
+  }, [allInitiatives, user]);
 
   const { data: allTasks = [] } = useQuery({
     queryKey: ['/api/tasks'],
   });
 
   // Filter tasks for current user only
-  const userTasks = Array.isArray(allTasks) ? allTasks.filter((task: any) => task.assignedTo === user?.id) : [];
+  const userTasks = Array.isArray(allTasks) && user && (user as any).id ? allTasks.filter((task: any) => task.assignedTo === (user as any).id) : [];
 
   // Filter tasks for today and overdue
   const todayTasks = userTasks.filter((task: any) => {

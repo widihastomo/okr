@@ -539,84 +539,91 @@ export default function TimelinePage() {
                           {/* Key Results Details */}
                           {item.keyResultsSummary && (
                             <div className="bg-purple-50 rounded-lg p-2">
-                              
+                              <div className="flex items-center gap-1 mb-1">
+                                <span className="text-xs font-medium text-purple-800">🎯 Key Results ({item.keyResultsUpdated})</span>
+                              </div>
                               <div className="text-xs text-purple-700">
                                 {item.keyResultsSummary && item.keyResultsSummary.split(', ').map((kr, index) => (
                                   <div key={index} className="mb-1 last:mb-0">
                                     <span>{kr}</span>
                                   </div>
                                 ))}
-                              </div></div>
-                              
-                              {/* Progress Information for Check-ins */}
-                              {item.type === 'check_in' && item.keyResultTitle && (
-                                <div className="mt-2 pt-2 border-t border-purple-200">
-                                  <div className="flex items-center justify-between mb-1">
-                                    <span className="text-xs font-medium text-purple-800">Progress Capaian:</span>
-                                    <span className="text-xs font-bold text-purple-900">
-                                      {formatWithThousandSeparator(item.checkInValue || '')} {item.keyResultUnit || ''}
-                                    </span>
-                                  </div>
-                                  <div className="flex items-center justify-between mb-2">
-                                    <span className="text-xs text-purple-700">Target:</span>
-                                    <span className="text-xs text-purple-700">
-                                      {formatWithThousandSeparator(item.keyResultTargetValue || '')} {item.keyResultUnit || ''}
-                                    </span>
-                                  </div>
-                                  
-                                  {/* Progress Bar */}
-                                  <div className="mb-2">
-                                    {(() => {
-                                      let progressPercentage = 0;
-                                      const current = parseFloat(item.checkInValue || '0') || 0;
-                                      const target = parseFloat(item.keyResultTargetValue || '1') || 1;
-                                      const baseline = parseFloat(item.keyResultBaseValue || '0') || 0;
-                                      
-                                      // Calculate progress based on key result type
-                                      if (item.keyResultType === 'increase_to') {
-                                        progressPercentage = baseline !== target 
-                                          ? Math.min(100, Math.max(0, ((current - baseline) / (target - baseline)) * 100))
-                                          : current >= target ? 100 : 0;
-                                      } else if (item.keyResultType === 'decrease_to') {
-                                        progressPercentage = baseline !== target 
-                                          ? Math.min(100, Math.max(0, ((baseline - current) / (baseline - target)) * 100))
-                                          : current <= target ? 100 : 0;
-                                      } else if (item.keyResultType === 'achieve_or_not') {
-                                        progressPercentage = current >= target ? 100 : 0;
-                                      }
-                                      
-                                      return (
-                                        <div className="space-y-1">
-                                          <div className="flex items-center justify-between">
-                                            <span className="text-xs text-purple-700">Progress:</span>
-                                            <span className="text-xs font-bold text-purple-900">
-                                              {Math.round(progressPercentage)}%
-                                            </span>
-                                          </div>
-                                          <div className="w-full bg-purple-100 rounded-full h-2">
-                                            <div 
-                                              className={`h-2 rounded-full transition-all duration-300 ${
-                                                progressPercentage >= 100 ? 'bg-green-500' :
-                                                progressPercentage >= 75 ? 'bg-blue-500' :
-                                                progressPercentage >= 50 ? 'bg-yellow-500' :
-                                                progressPercentage >= 25 ? 'bg-orange-500' : 'bg-red-500'
-                                              }`}
-                                              style={{ width: `${Math.min(100, Math.max(0, progressPercentage))}%` }}
-                                            />
-                                          </div>
-                                        </div>
-                                      );
-                                    })()}
-                                  </div>
-                                  
-                                  {item.checkInNotes && (
-                                    <div className="mt-2">
-                                      <div className="text-xs font-medium text-purple-800 mb-1">Catatan:</div>
-                                      <div className="text-xs text-purple-700 italic">"{item.checkInNotes}"</div>
-                                    </div>
-                                  )}
+                              </div>
+                            </div>
+                          )}
+                          
+                          {/* Progress Information for Check-ins */}
+                          {item.type === 'check_in' && item.keyResultTitle && (
+                            <div className="bg-purple-50 rounded-lg p-2">
+                              <div className="flex items-center gap-1 mb-1">
+                                <span className="text-xs font-medium text-purple-800">📊 Progress Check-in</span>
+                              </div>
+                              <div className="mt-2 pt-2 border-t border-purple-200">
+                                <div className="flex items-center justify-between mb-1">
+                                  <span className="text-xs font-medium text-purple-800">Progress Capaian:</span>
+                                  <span className="text-xs font-bold text-purple-900">
+                                    {formatWithThousandSeparator(item.checkInValue || '')} {item.keyResultUnit || ''}
+                                  </span>
                                 </div>
-                              )}
+                                <div className="flex items-center justify-between mb-2">
+                                  <span className="text-xs text-purple-700">Target:</span>
+                                  <span className="text-xs text-purple-700">
+                                    {formatWithThousandSeparator(item.keyResultTargetValue || '')} {item.keyResultUnit || ''}
+                                  </span>
+                                </div>
+                                
+                                {/* Progress Bar */}
+                                <div className="mb-2">
+                                  {(() => {
+                                    let progressPercentage = 0;
+                                    const current = parseFloat(item.checkInValue || '0') || 0;
+                                    const target = parseFloat(item.keyResultTargetValue || '1') || 1;
+                                    const baseline = parseFloat(item.keyResultBaseValue || '0') || 0;
+                                    
+                                    // Calculate progress based on key result type
+                                    if (item.keyResultType === 'increase_to') {
+                                      progressPercentage = baseline !== target 
+                                        ? Math.min(100, Math.max(0, ((current - baseline) / (target - baseline)) * 100))
+                                        : current >= target ? 100 : 0;
+                                    } else if (item.keyResultType === 'decrease_to') {
+                                      progressPercentage = baseline !== target 
+                                        ? Math.min(100, Math.max(0, ((baseline - current) / (baseline - target)) * 100))
+                                        : current <= target ? 100 : 0;
+                                    } else if (item.keyResultType === 'achieve_or_not') {
+                                      progressPercentage = current >= target ? 100 : 0;
+                                    }
+                                    
+                                    return (
+                                      <div className="space-y-1">
+                                        <div className="flex items-center justify-between">
+                                          <span className="text-xs text-purple-700">Progress:</span>
+                                          <span className="text-xs font-bold text-purple-900">
+                                            {Math.round(progressPercentage)}%
+                                          </span>
+                                        </div>
+                                        <div className="w-full bg-purple-100 rounded-full h-2">
+                                          <div 
+                                            className={`h-2 rounded-full transition-all duration-300 ${
+                                              progressPercentage >= 100 ? 'bg-green-500' :
+                                              progressPercentage >= 75 ? 'bg-blue-500' :
+                                              progressPercentage >= 50 ? 'bg-yellow-500' :
+                                              progressPercentage >= 25 ? 'bg-orange-500' : 'bg-red-500'
+                                            }`}
+                                            style={{ width: `${Math.min(100, Math.max(0, progressPercentage))}%` }}
+                                          />
+                                        </div>
+                                      </div>
+                                    );
+                                  })()}
+                                </div>
+                                
+                                {item.checkInNotes && (
+                                  <div className="mt-2">
+                                    <div className="text-xs font-medium text-purple-800 mb-1">Catatan:</div>
+                                    <div className="text-xs text-purple-700 italic">"{item.checkInNotes}"</div>
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           )}
 
