@@ -35,7 +35,13 @@ const closureSchema = z.object({
   }),
   reason: z.string().min(10, "Alasan minimal 10 karakter"),
   learningNote: z.string().min(10, "Catatan pembelajaran minimal 10 karakter"),
-  budgetUsed: z.string().optional(),
+  budgetUsed: z.string()
+    .optional()
+    .refine((val) => {
+      if (!val) return true; // Optional field
+      const numericValue = val.replace(/\D/g, ''); // Remove non-digits
+      return numericValue === '' || !isNaN(Number(numericValue));
+    }, "Budget harus berupa angka yang valid"),
   notes: z.string().optional(),
 });
 
@@ -67,6 +73,24 @@ export default function InitiativeClosureModal({
   const [dodUpdates, setDodUpdates] = useState<any[]>([]);
   const [showIncompleteTasksConfirmation, setShowIncompleteTasksConfirmation] = useState(false);
   const [pendingFormData, setPendingFormData] = useState<ClosureFormData | null>(null);
+
+  // Helper functions for number formatting
+  const formatNumber = (value: string): string => {
+    // Remove all non-digit characters
+    const numbers = value.replace(/\D/g, '');
+    // Add thousand separators
+    return numbers.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  };
+
+  const parseNumber = (value: string): string => {
+    // Remove thousand separators to get raw number
+    return value.replace(/\./g, '');
+  };
+
+  const handleBudgetChange = (value: string, onChange: (value: string) => void) => {
+    const formatted = formatNumber(value);
+    onChange(parseNumber(formatted)); // Store raw number without separators
+  };
 
   const form = useForm<ClosureFormData>({
     resolver: zodResolver(closureSchema),
@@ -507,9 +531,10 @@ export default function InitiativeClosureModal({
                           </div>
                           <FormControl>
                             <Input
-                              type="number"
-                              placeholder="Contoh: 5000000 (untuk Rp 5.000.000)"
-                              {...field}
+                              type="text"
+                              placeholder="Contoh: 5.000.000 (untuk Rp 5.000.000)"
+                              value={field.value ? formatNumber(field.value) : ''}
+                              onChange={(e) => handleBudgetChange(e.target.value, field.onChange)}
                               className="border-gray-300"
                             />
                           </FormControl>
