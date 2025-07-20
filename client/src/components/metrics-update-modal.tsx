@@ -26,7 +26,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Trash2, Plus } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Trash2, Plus, CheckSquare } from "lucide-react";
 
 const metricUpdateSchema = z.object({
   currentAchievement: z.string().min(1, "Capaian saat ini wajib diisi"),
@@ -50,6 +51,7 @@ export default function MetricsUpdateModal({
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [metricUpdates, setMetricUpdates] = useState<Record<string, string>>({});
+  const [deliverableUpdates, setDeliverableUpdates] = useState<Record<string, boolean>>({});
 
   // Fetch existing success metrics for this initiative
   const { data: successMetrics = [], isLoading } = useQuery({
@@ -57,50 +59,77 @@ export default function MetricsUpdateModal({
     enabled: open && !!initiativeId,
   });
 
+  // Fetch existing deliverables for this initiative
+  const { data: deliverables = [], isLoading: deliverablesLoading } = useQuery({
+    queryKey: [`/api/initiatives/${initiativeId}/definition-of-done`],
+    enabled: open && !!initiativeId,
+  });
+
   // Reset updates when modal opens
   useEffect(() => {
     if (open) {
       setMetricUpdates({});
+      setDeliverableUpdates({});
     }
   }, [open]);
 
   const updateMetricsMutation = useMutation({
     mutationFn: async () => {
-      const updates = Object.entries(metricUpdates)
+      const metricUpdatesList = Object.entries(metricUpdates)
         .filter(([_, value]) => value && value.trim() !== "")
         .map(([metricId, newValue]) => ({ metricId, newValue }));
 
-      if (updates.length === 0) {
+      const deliverableUpdatesList = Object.entries(deliverableUpdates)
+        .map(([deliverableId, isCompleted]) => ({ deliverableId, isCompleted }));
+
+      if (metricUpdatesList.length === 0 && deliverableUpdatesList.length === 0) {
         throw new Error("Tidak ada perubahan untuk disimpan");
       }
 
-      const promises = updates.map(({ metricId, newValue }) =>
-        apiRequest("POST", `/api/success-metrics/${metricId}/updates`, {
-          achievement: newValue,
-          notes: `Updated via Daily Focus on ${new Date().toLocaleDateString('id-ID')}`,
-          createdBy: "550e8400-e29b-41d4-a716-446655440001", // Current user ID - should be dynamic
-        })
-      );
+      const promises = [];
+
+      // Process metric updates
+      metricUpdatesList.forEach(({ metricId, newValue }) => {
+        promises.push(
+          apiRequest("POST", `/api/success-metrics/${metricId}/updates`, {
+            achievement: newValue,
+            notes: `Updated via Daily Focus on ${new Date().toLocaleDateString('id-ID')}`,
+            createdBy: "550e8400-e29b-41d4-a716-446655440001", // Current user ID - should be dynamic
+          })
+        );
+      });
+
+      // Process deliverable updates
+      deliverableUpdatesList.forEach(({ deliverableId, isCompleted }) => {
+        promises.push(
+          apiRequest("PATCH", `/api/definition-of-done/${deliverableId}/toggle`, {
+            isCompleted: isCompleted
+          })
+        );
+      });
 
       return Promise.all(promises);
     },
     onSuccess: async () => {
       toast({
-        title: "Metrik berhasil diperbarui",
-        description: "Progress metrik kesuksesan telah diperbarui",
+        title: "Update berhasil",
+        description: "Progress metrik dan deliverable telah diperbarui",
         className: "border-green-200 bg-green-50 text-green-800",
       });
       
       // Clear input state first
       setMetricUpdates({});
+      setDeliverableUpdates({});
       
       // Invalidate and refetch to ensure fresh data
       await queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}/success-metrics`] });
+      await queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}/definition-of-done`] });
       await queryClient.invalidateQueries({ queryKey: ["/api/initiatives"] });
       await queryClient.invalidateQueries({ queryKey: ["/api/goals"] });
       
-      // Force refetch the success metrics to update current achievement values
+      // Force refetch to update current values
       await queryClient.refetchQueries({ queryKey: [`/api/initiatives/${initiativeId}/success-metrics`] });
+      await queryClient.refetchQueries({ queryKey: [`/api/initiatives/${initiativeId}/definition-of-done`] });
       
       onOpenChange(false);
     },
@@ -121,20 +150,20 @@ export default function MetricsUpdateModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-[95vw] max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Update Metrik Keberhasilan</DialogTitle>
+          <DialogTitle>Update Progress Inisiatif</DialogTitle>
           <DialogDescription>
-            Perbarui capaian metrik keberhasilan untuk inisiatif ini
+            Perbarui capaian metrik keberhasilan dan status deliverable untuk inisiatif ini
           </DialogDescription>
         </DialogHeader>
 
-        {isLoading ? (
+        {(isLoading || deliverablesLoading) ? (
           <div className="flex justify-center py-8">
             <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
           </div>
-        ) : successMetrics.length === 0 ? (
+        ) : successMetrics.length === 0 && deliverables.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
-            <p>Belum ada metrik keberhasilan untuk inisiatif ini.</p>
-            <p className="text-sm mt-2">Silakan buat metrik keberhasilan terlebih dahulu di halaman detail inisiatif.</p>
+            <p>Belum ada metrik keberhasilan atau deliverable untuk inisiatif ini.</p>
+            <p className="text-sm mt-2">Silakan buat metrik keberhasilan dan deliverable terlebih dahulu di halaman detail inisiatif.</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -239,6 +268,95 @@ export default function MetricsUpdateModal({
               ))}
             </div>
 
+            {/* Deliverables Section */}
+            {deliverables.length > 0 && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 border-t pt-4">
+                  <CheckSquare className="w-5 h-5 text-blue-600" />
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Deliverables (Output Inisiatif)
+                  </h3>
+                </div>
+
+                {/* Desktop Table View for Deliverables */}
+                <div className="hidden md:block overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Status
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Deliverable
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {deliverables.map((deliverable: any) => (
+                        <tr key={deliverable.id}>
+                          <td className="px-4 py-4">
+                            <Checkbox
+                              checked={deliverableUpdates[deliverable.id] !== undefined 
+                                ? deliverableUpdates[deliverable.id] 
+                                : deliverable.isCompleted || false}
+                              onCheckedChange={(checked) => {
+                                setDeliverableUpdates(prev => ({
+                                  ...prev,
+                                  [deliverable.id]: !!checked
+                                }));
+                              }}
+                            />
+                          </td>
+                          <td className="px-4 py-4">
+                            <div className={`${
+                              (deliverableUpdates[deliverable.id] !== undefined 
+                                ? deliverableUpdates[deliverable.id] 
+                                : deliverable.isCompleted)
+                                ? 'text-gray-500 line-through' 
+                                : 'text-gray-900'
+                            }`}>
+                              {deliverable.title}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Mobile Card View for Deliverables */}
+                <div className="md:hidden space-y-3">
+                  {deliverables.map((deliverable: any) => (
+                    <div
+                      key={deliverable.id}
+                      className="bg-white border border-gray-200 rounded-lg p-4 flex items-center gap-3"
+                    >
+                      <Checkbox
+                        checked={deliverableUpdates[deliverable.id] !== undefined 
+                          ? deliverableUpdates[deliverable.id] 
+                          : deliverable.isCompleted || false}
+                        onCheckedChange={(checked) => {
+                          setDeliverableUpdates(prev => ({
+                            ...prev,
+                            [deliverable.id]: !!checked
+                          }));
+                        }}
+                      />
+                      <div className={`flex-1 ${
+                        (deliverableUpdates[deliverable.id] !== undefined 
+                          ? deliverableUpdates[deliverable.id] 
+                          : deliverable.isCompleted)
+                          ? 'text-gray-500 line-through' 
+                          : 'text-gray-900'
+                      }`}>
+                        {deliverable.title}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4">
               <Button
                 type="button"
@@ -250,7 +368,10 @@ export default function MetricsUpdateModal({
               </Button>
               <Button
                 onClick={handleSaveAll}
-                disabled={updateMetricsMutation.isPending || !Object.values(metricUpdates).some(value => value && value.trim() !== "")}
+                disabled={updateMetricsMutation.isPending || (
+                  !Object.values(metricUpdates).some(value => value && value.trim() !== "") &&
+                  Object.keys(deliverableUpdates).length === 0
+                )}
                 className="w-full sm:w-auto bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
               >
                 {updateMetricsMutation.isPending ? "Menyimpan..." : "Simpan Semua"}
