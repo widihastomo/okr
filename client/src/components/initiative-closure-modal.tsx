@@ -76,6 +76,7 @@ export default function InitiativeClosureModal({
 
   // Helper functions for number formatting
   const formatNumber = (value: string): string => {
+    if (!value) return '';
     // Remove all non-digit characters
     const numbers = value.replace(/\D/g, '');
     // Add thousand separators
@@ -88,8 +89,10 @@ export default function InitiativeClosureModal({
   };
 
   const handleBudgetChange = (value: string, onChange: (value: string) => void) => {
-    const formatted = formatNumber(value);
-    onChange(parseNumber(formatted)); // Store raw number without separators
+    // Remove all non-digits first
+    const cleanValue = value.replace(/\D/g, '');
+    // Store the clean numeric value
+    onChange(cleanValue);
   };
 
   const form = useForm<ClosureFormData>({
