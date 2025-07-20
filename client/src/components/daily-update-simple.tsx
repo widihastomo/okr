@@ -505,10 +505,10 @@ export function DailyUpdateSimple() {
                           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                             <div className="flex-1 min-w-0">
                               <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
-                                <h4 className="font-medium text-gray-900 text-sm sm:text-base truncate">
+                                <h4 className="font-medium text-gray-900 text-sm sm:text-base truncate text-right sm:text-left">
                                   {task.title}
                                 </h4>
-                                <div className="flex gap-2">
+                                <div className="flex gap-2 justify-end sm:justify-start">
                                   {isOverdue && (
                                     <Badge variant="destructive" className="text-xs">
                                       <AlertTriangle className="h-3 w-3 mr-1" />
