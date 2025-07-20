@@ -3952,13 +3952,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
             } else if (initiative) {
               console.log(`ℹ️ Initiative status is already "${initiative.status}", no update needed`);
             }
-          } else if (status === 'not_started' && initiative && initiative.status === 'sedang_berjalan') {
-            // Check if all tasks are back to "not_started", then change initiative back to "draft"
-            console.log(`🔄 Task changed to not_started, checking if all tasks are not_started...`);
+          } else if ((status === 'not_started' || status === 'cancelled') && initiative && initiative.status === 'sedang_berjalan') {
+            // Check if all tasks are back to "not_started" or "cancelled", then change initiative back to "draft"
+            console.log(`🔄 Task changed to ${status}, checking if all tasks are not_started or cancelled...`);
             const allTasksNotStarted = initiative.tasks.every(task => 
-              task.id === updatedTask.id ? status === 'not_started' : task.status === 'not_started'
+              task.id === updatedTask.id ? 
+                (status === 'not_started' || status === 'cancelled') : 
+                (task.status === 'not_started' || task.status === 'cancelled')
             );
-            console.log(`📊 All tasks not_started: ${allTasksNotStarted}`);
+            console.log(`📊 All tasks not_started/cancelled: ${allTasksNotStarted}`);
             
             if (allTasksNotStarted) {
               console.log(`🔄 Updating initiative status from "sedang_berjalan" to "draft"...`);
@@ -4033,7 +4035,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.log(`🔍 Debug: Task deleted from initiative: ${initiativeId}, recalculating status...`);
           const initiative = await storage.getInitiativeWithDetails(initiativeId);
           
-          if (initiative && initiative.status === 'sedang_berjalan') {
+          if (initiative) {
             console.log(`📋 Initiative found with status: ${initiative.status}`);
             
             // Check if there are any remaining tasks
@@ -4042,32 +4044,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
             
             if (remainingTasks.length === 0) {
               // No tasks left, change back to draft
-              console.log(`🔄 No tasks remaining, updating initiative status to "draft"...`);
-              await storage.updateInitiative(initiativeId, {
-                status: 'draft',
-                updatedAt: new Date(),
-                lastUpdateBy: currentUser.id
-              });
-              console.log(`🚀 Initiative ${initiativeId} status updated to "draft" - no tasks remaining`);
-            } else {
-              // Check if all remaining tasks are not_started
-              const allTasksNotStarted = remainingTasks.every(task => task.status === 'not_started');
-              console.log(`📊 All remaining tasks not_started: ${allTasksNotStarted}`);
-              
-              if (allTasksNotStarted) {
-                console.log(`🔄 All remaining tasks are not_started, updating initiative status to "draft"...`);
+              if (initiative.status !== 'draft') {
+                console.log(`🔄 No tasks remaining, updating initiative status to "draft"...`);
                 await storage.updateInitiative(initiativeId, {
                   status: 'draft',
                   updatedAt: new Date(),
                   lastUpdateBy: currentUser.id
                 });
-                console.log(`🚀 Initiative ${initiativeId} status updated to "draft" - all remaining tasks not_started`);
+                console.log(`🚀 Initiative ${initiativeId} status updated to "draft" - no tasks remaining`);
               } else {
-                console.log(`ℹ️ Some tasks are still in progress/completed, keeping initiative status as "sedang_berjalan"`);
+                console.log(`ℹ️ Initiative already has draft status, no update needed`);
+              }
+            } else {
+              // Check if all remaining tasks are not_started or cancelled
+              const allTasksInactive = remainingTasks.every(task => 
+                task.status === 'not_started' || task.status === 'cancelled'
+              );
+              console.log(`📊 All remaining tasks not_started/cancelled: ${allTasksInactive}`);
+              
+              if (allTasksInactive && initiative.status === 'sedang_berjalan') {
+                console.log(`🔄 All remaining tasks are not_started/cancelled, updating initiative status to "draft"...`);
+                await storage.updateInitiative(initiativeId, {
+                  status: 'draft',
+                  updatedAt: new Date(),
+                  lastUpdateBy: currentUser.id
+                });
+                console.log(`🚀 Initiative ${initiativeId} status updated to "draft" - all remaining tasks not_started/cancelled`);
+              } else if (!allTasksInactive && initiative.status === 'draft') {
+                console.log(`🔄 Some tasks are in progress/completed, updating initiative status to "sedang_berjalan"...`);
+                await storage.updateInitiative(initiativeId, {
+                  status: 'sedang_berjalan',
+                  updatedAt: new Date(),
+                  lastUpdateBy: currentUser.id
+                });
+                console.log(`🚀 Initiative ${initiativeId} status updated to "sedang_berjalan" - some tasks active`);
+              } else {
+                console.log(`ℹ️ Initiative status "${initiative.status}" is appropriate for current task states`);
               }
             }
-          } else if (initiative) {
-            console.log(`ℹ️ Initiative status is "${initiative.status}", no recalculation needed`);
           }
         } catch (error) {
           console.error("Error recalculating initiative status after task deletion:", error);
