@@ -951,8 +951,6 @@ export type InitiativeComment = typeof initiativeComments.$inferSelect;
 export type Task = typeof tasks.$inferSelect;
 export type TimelineComment = typeof timelineComments.$inferSelect;
 export type TimelineReaction = typeof timelineReactions.$inferSelect;
-export type InsertTimelineComment = z.infer<typeof insertTimelineCommentSchema>;
-export type InsertTimelineReaction = z.infer<typeof insertTimelineReactionSchema>;
 export type TaskComment = typeof taskComments.$inferSelect;
 export type SystemSetting = typeof systemSettings.$inferSelect;
 export type DailyReflection = typeof dailyReflections.$inferSelect;
@@ -1312,11 +1310,7 @@ export type InsertTeamMember = z.infer<typeof insertTeamMemberSchema>;
 export type LoginData = z.infer<typeof loginSchema>;
 export type RegisterData = z.infer<typeof registerSchema>;
 
-// Task Types
-export type Task = typeof tasks.$inferSelect;
-export type InsertTask = z.infer<typeof insertTaskSchema>;
-export type TaskComment = typeof taskComments.$inferSelect;
-export type InsertTaskComment = z.infer<typeof insertTaskCommentSchema>;
+// Task Types (already defined above, removing duplicates)
 export type TaskAuditTrail = typeof taskAuditTrail.$inferSelect;
 export type InsertTaskAuditTrail = z.infer<typeof insertTaskAuditTrailSchema>;
 
@@ -1375,13 +1369,7 @@ export type InitiativeWithSuccessMetrics = Initiative & {
   tasks: Task[];
 };
 
-// SaaS Types
-export type SubscriptionPlan = typeof subscriptionPlans.$inferSelect;
-export type InsertSubscriptionPlan = z.infer<typeof insertSubscriptionPlanSchema>;
-export type Organization = typeof organizations.$inferSelect;
-export type InsertOrganization = z.infer<typeof insertOrganizationSchema>;
-export type OrganizationSubscription = typeof organizationSubscriptions.$inferSelect;
-export type InsertOrganizationSubscription = z.infer<typeof insertOrganizationSubscriptionSchema>;
+// SaaS Types (already defined above, removing duplicates)
 
 // Invoice Types
 export type Invoice = typeof invoices.$inferSelect;
