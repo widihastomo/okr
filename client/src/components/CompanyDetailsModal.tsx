@@ -17,7 +17,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Building2, MapPin, Briefcase, Users, Search, Check, ChevronsUpDown } from "lucide-react";
+import { Building2, MapPin, Briefcase, Users, Search, Check, ChevronsUpDown, Loader2, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { SimpleSelect } from "@/components/SimpleSelect";
@@ -31,6 +31,7 @@ interface CompanyDetailsModalProps {
 export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalProps) {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGeneratingDummyData, setIsGeneratingDummyData] = useState(false);
   const [formData, setFormData] = useState({
     companyName: "",
     companyAddress: "",
@@ -146,6 +147,10 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
       const response = await apiRequest("POST", "/api/auth/update-company-details", formData);
       console.log("✅ Company details saved successfully:", response);
 
+      // Start dummy data generation with loading animation
+      setIsSubmitting(false);
+      setIsGeneratingDummyData(true);
+
       // Generate dummy data (cycles and teams) after company details completion
       try {
         console.log("🔄 Generating dummy data with business name:", formData.companyName);
@@ -181,6 +186,7 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
       });
     } finally {
       setIsSubmitting(false);
+      setIsGeneratingDummyData(false);
     }
   };
 
@@ -310,13 +316,40 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
           <div className="flex justify-end pt-4">
             <Button
               onClick={handleSubmit}
-              disabled={isSubmitting}
+              disabled={isSubmitting || isGeneratingDummyData}
               className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white px-8"
             >
               {isSubmitting ? "Menyimpan..." : "Simpan & Lanjutkan"}
             </Button>
           </div>
         </div>
+
+        {/* Loading Overlay for Dummy Data Generation */}
+        {isGeneratingDummyData && (
+          <div className="absolute inset-0 bg-white/95 backdrop-blur-sm flex items-center justify-center z-50 rounded-lg">
+            <div className="text-center space-y-4">
+              <div className="flex items-center justify-center">
+                <div className="relative">
+                  <Loader2 className="h-12 w-12 text-orange-500 animate-spin" />
+                  <Sparkles className="h-6 w-6 text-yellow-500 absolute top-1 right-1 animate-pulse" />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-lg font-semibold text-orange-700">
+                  Sedang menyiapkan sistem...
+                </h3>
+                <p className="text-sm text-gray-600">
+                  Kami sedang membuat struktur organisasi dan mengatur tim untuk {formData.companyName}
+                </p>
+                <div className="flex items-center justify-center gap-1 mt-3">
+                  <div className="h-2 w-2 bg-orange-500 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                  <div className="h-2 w-2 bg-orange-500 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                  <div className="h-2 w-2 bg-orange-500 rounded-full animate-bounce"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );
