@@ -306,6 +306,31 @@ All email configuration now uses environment variables:
 - **UI ENHANCEMENTS**: Added focused notification types interface with individual switch controls for precise user control
 - **ACTIVE USER FILTERING**: Only users with isActive === true are displayed in user selection interfaces throughout the application
 
+## Port Configuration & Deployment
+
+### **Port Management System**
+- **Default Development**: Port 5000 (mapped to external port 80)
+- **Custom Deployment**: Port 5001 (mapped to external port 4200) 
+- **Production Mode**: Port 3030 (mapped to external port 3000)
+- **Automatic Port Retry**: System tries up to 10 ports if primary port is busy
+
+### **Port Deployment Options**
+```bash
+# Standard development (port 5000)
+npm run dev
+
+# Custom port deployment (port 5001)  
+bash start-port-5001.sh
+
+# Manual port override
+PORT=5001 npm run dev
+```
+
+### **Port Conflict Resolution**
+- Enhanced automatic port detection and retry system
+- Prevents EADDRINUSE errors with fallback ports
+- Comprehensive logging for port allocation debugging
+
 ## Current Issues
 - **PERSISTENT DROPDOWN ISSUE**: Daily instant update task status dropdowns consistently fail to register clicks or onChange events despite multiple debugging approaches including native HTML select, custom buttons, visual debugging, and state management fixes. Root cause appears to be a deeper React/DOM interaction issue that requires alternative UI pattern.
 - **WORKAROUND IMPLEMENTED**: Created 4-button selection interface (Belum/Jalan/Selesai/Batal) to replace dropdown for task status changes
