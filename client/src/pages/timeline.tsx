@@ -727,9 +727,12 @@ export default function TimelinePage() {
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    toggleComments(item.id);
+                    if (!autoScrollPrevention) {
+                      toggleComments(item.id);
+                    }
                   }}
-                  className="flex items-center space-x-1 text-gray-500 hover:text-blue-500 transition-colors"
+                  className={`flex items-center space-x-1 ${autoScrollPrevention ? 'text-gray-300 cursor-not-allowed' : 'text-gray-500 hover:text-blue-500'} transition-colors`}
+                  title={autoScrollPrevention ? "Komentar dinonaktifkan saat auto-scroll prevention ON" : ""}
                 >
                   <MessageCircle className="w-4 h-4" />
                   <span className="text-xs md:text-sm">
@@ -795,7 +798,7 @@ export default function TimelinePage() {
             </div>
             
             {/* Comments Section */}
-            {showComments[item.id] && (
+            {showComments[item.id] && !autoScrollPrevention && (
               <div className="px-3 md:px-4 pb-3 space-y-2">
                 {/* Existing Comments */}
                 {timelineComments[item.id]?.map((comment: any) => (
