@@ -2215,6 +2215,12 @@ export class DatabaseStorage implements IStorage {
 
   async updateUserOnboardingProgress(userId: string, progressData: UpdateOnboardingProgress): Promise<UserOnboardingProgress> {
     try {
+      // Get user's organization_id first
+      const user = await this.getUser(userId);
+      if (!user) {
+        throw new Error("User not found");
+      }
+      
       // Check if user already has progress data
       const existingProgress = await this.getUserOnboardingProgress(userId);
       
@@ -2231,11 +2237,12 @@ export class DatabaseStorage implements IStorage {
         
         return updatedProgress;
       } else {
-        // Create new progress record
+        // Create new progress record with organization_id
         const [newProgress] = await db
           .insert(userOnboardingProgress)
           .values({
             userId,
+            organizationId: user.organizationId,
             ...progressData,
             createdAt: new Date(),
             updatedAt: new Date()

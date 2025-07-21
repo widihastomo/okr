@@ -2,6 +2,7 @@ import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import TourRestartButton, { CompactTourRestartButton } from "@/components/tour-restart-button";
 import { 
   HelpCircle, 
   Book, 
@@ -185,6 +186,17 @@ export default function HelpPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {/* Tour Restart Section */}
+          <div className="mb-6 p-4 bg-orange-50 rounded-lg border border-orange-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="font-semibold text-orange-800 mb-1">Tutorial Interaktif</h4>
+                <p className="text-sm text-orange-700">Ikuti panduan langkah demi langkah untuk memahami platform</p>
+              </div>
+              <CompactTourRestartButton />
+            </div>
+          </div>
+          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {features.map((feature, index) => (
               <div key={index} className="flex gap-4">
