@@ -127,6 +127,7 @@ import InitiativeFormModal from "@/components/initiative-form-modal";
 import TourStartButton from "@/components/tour-start-button";
 import { CompanyDetailsModal } from "@/components/CompanyDetailsModal";
 import WelcomeScreen from "@/components/WelcomeScreen";
+import { DummyDataGeneratorModal } from "@/components/DummyDataGeneratorModal";
 
 // Icon mapping for mission cards
 const iconMapping = {
@@ -1323,6 +1324,13 @@ export default function DailyFocusPage() {
             <div data-tour="update-harian-instan">
               <DailyUpdateSimple />
             </div>
+            <DummyDataGeneratorModal>
+              <Button variant="outline" size="sm" className="flex items-center gap-1.5">
+                <Sparkles className="h-4 w-4" />
+                <span className="hidden sm:inline">Data Contoh</span>
+                <span className="sm:hidden">Demo</span>
+              </Button>
+            </DummyDataGeneratorModal>
             <TourStartButton variant="outline" size="sm" />
           </div>
         </div>

@@ -2315,6 +2315,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Comprehensive dummy data generation endpoint
+  app.post("/api/auth/generate-comprehensive-dummy-data", requireAuth, async (req, res) => {
+    try {
+      const userId = req.user.id;
+      const organizationId = req.user.organizationId;
+      
+      console.log("🎯 Generating comprehensive dummy data for user:", userId);
+      
+      const { createComprehensiveDummyData } = await import("./comprehensive-dummy-data");
+      const result = await createComprehensiveDummyData(userId, organizationId);
+      
+      if (result.success) {
+        res.json({
+          message: "Comprehensive dummy data created successfully",
+          data: result.data
+        });
+      } else {
+        res.status(500).json({ 
+          message: "Failed to create comprehensive dummy data",
+          error: result.error
+        });
+      }
+    } catch (error) {
+      console.error("Error creating comprehensive dummy data:", error);
+      res.status(500).json({ 
+        message: "Failed to create comprehensive dummy data",
+        error: error.message
+      });
+    }
+  });
+
 
 
   // Create new OKR with key results
