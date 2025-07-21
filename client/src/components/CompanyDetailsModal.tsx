@@ -146,14 +146,31 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
       const response = await apiRequest("POST", "/api/auth/update-company-details", formData);
       console.log("✅ Company details saved successfully:", response);
 
+      // Generate dummy data (cycles and teams) after company details completion
+      try {
+        console.log("🔄 Generating dummy data with business name:", formData.companyName);
+        const dummyDataResponse = await apiRequest("POST", "/api/auth/generate-dummy-data", {
+          businessName: formData.companyName
+        });
+        console.log("✅ Dummy data generated successfully:", dummyDataResponse);
+        
+        toast({
+          title: "Selamat datang!",
+          description: `Data perusahaan tersimpan dan struktur organisasi untuk ${formData.companyName} telah disiapkan`,
+          variant: "default",
+        });
+      } catch (dummyDataError) {
+        console.error("⚠️ Error generating dummy data:", dummyDataError);
+        // Don't fail the whole process if dummy data generation fails
+        toast({
+          title: "Data berhasil disimpan",
+          description: "Informasi perusahaan telah tersimpan",
+          variant: "default",
+        });
+      }
+
       // Mark company details as completed
       localStorage.setItem("company-details-completed", "true");
-      
-      toast({
-        title: "Data berhasil disimpan",
-        description: "Informasi perusahaan telah tersimpan",
-        variant: "default",
-      });
 
       onComplete();
     } catch (error) {
