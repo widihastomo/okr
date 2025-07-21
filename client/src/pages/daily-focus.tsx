@@ -892,8 +892,8 @@ export default function DailyFocusPage() {
   const [showWelcomeScreen, setShowWelcomeScreen] = useState(false);
   
   // Fetch current user data to check company details completion
-  const { data: currentUserData } = useQuery({
-    queryKey: ['/api/my-organization-with-role'],
+  const { data: currentUserData, isLoading: isUserDataLoading } = useQuery({
+    queryKey: ['/api/auth/me'],
     enabled: !!userId,
   });
   
@@ -906,29 +906,34 @@ export default function DailyFocusPage() {
     const tourCompleted = localStorage.getItem("tour-completed");
     
     console.log("🔍 Company details check:", { companyDetailsCompleted, onboardingCompleted, welcomeShown, tourStarted, tourCompleted });
+    console.log("🔍 Current user data:", currentUserData);
+    console.log("🔍 Is loading:", isUserDataLoading);
     
     // Check if user has complete company details from database
     let hasCompleteCompanyDetails = false;
-    if (currentUserData?.user) {
-      const user = currentUserData.user;
-      hasCompleteCompanyDetails = !!(user.company_address && user.province && user.city);
+    if (currentUserData) {
+      const user = currentUserData;
+      hasCompleteCompanyDetails = !!(user.companyAddress && user.province && user.city);
       console.log("🏢 Database company details check:", { 
-        company_address: user.company_address, 
+        companyAddress: user.companyAddress, 
         province: user.province, 
         city: user.city,
         hasCompleteCompanyDetails
       });
     }
     
-    // Show company details modal if any required field is missing from database
-    if (currentUserData && !hasCompleteCompanyDetails) {
+    // Only show modal if we have loaded user data and company details are incomplete
+    if (currentUserData && !isUserDataLoading && !hasCompleteCompanyDetails) {
       console.log("📝 Showing company details modal - missing required fields");
       setShowCompanyDetailsModal(true);
       return;
     }
     
-    // For users with complete company details
+    // For users with complete company details, ensure modal is hidden
     if (hasCompleteCompanyDetails) {
+      console.log("✅ Company details are complete - hiding modal");
+      setShowCompanyDetailsModal(false);
+      
       // Update localStorage to reflect completion
       if (companyDetailsCompleted !== "true") {
         localStorage.setItem("company-details-completed", "true");
@@ -952,10 +957,14 @@ export default function DailyFocusPage() {
     return () => {
       window.removeEventListener('showWelcomeScreen', handleShowWelcomeScreen);
     };
-  }, [currentUserData]);
+  }, [currentUserData, isUserDataLoading]);
 
   const handleCompanyDetailsComplete = () => {
     setShowCompanyDetailsModal(false);
+    
+    // Force refresh user data to get updated company details
+    queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
+    
     // After company details, show welcome screen
     setShowWelcomeScreen(true);
   };
