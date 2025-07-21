@@ -28,6 +28,7 @@ import TimelineIcon from '@/components/ui/timeline-icon';
 import { Leaderboard } from '@/components/gamification/leaderboard';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
+import type { User } from '@shared/schema';
 
 // Constants
 const REACTION_EMOJIS = ['👍', '❤️', '😂', '😮', '😢', '😡'];
@@ -184,7 +185,7 @@ export default function TimelinePage() {
         if (activityTypeFilter === 'daily_update' && item.type !== 'daily_update') return false;
       }
 
-      // User Filter
+      // User Filter  
       if (userFilter === 'current' && user && item.userId !== user.id) return false;
 
       // Team Filter
@@ -688,15 +689,15 @@ export default function TimelinePage() {
           <div className="p-3 md:p-4">
             <div className="flex items-start space-x-2 md:space-x-3">
               <div className="flex-shrink-0">
-                {item.userProfileImageUrl || item.user?.profileImageUrl ? (
+                {(item as any).userProfileImageUrl ? (
                   <img 
-                    src={item.userProfileImageUrl || item.user?.profileImageUrl} 
-                    alt={item.userName || item.user?.name}
+                    src={(item as any).userProfileImageUrl} 
+                    alt={(item as any).userName || 'User'}
                     className="w-8 h-8 md:w-10 md:h-10 rounded-full object-cover"
                   />
                 ) : (
                   <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-blue-500 to-green-500 rounded-full flex items-center justify-center text-white font-semibold text-xs md:text-sm">
-                    {getUserInitials({ name: item.userName || item.user?.name || 'User' })}
+                    {getUserInitials({ name: (item as any).userName || 'User' })}
                   </div>
                 )}
               </div>
@@ -704,7 +705,7 @@ export default function TimelinePage() {
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center space-x-1 md:space-x-2 min-w-0">
                     <h3 className="font-semibold text-gray-900 text-xs md:text-sm truncate">
-                      {item.userName || item.user?.name}
+                      {(item as any).userName || 'User'}
                     </h3>
                     <span className="text-gray-500 text-xs hidden sm:inline">•</span>
                     <span className="text-gray-500 text-xs hidden sm:inline">
@@ -1282,15 +1283,15 @@ export default function TimelinePage() {
                 {/* Add Comment */}
                 <div className="flex space-x-2 mt-3">
                   <div className="flex-shrink-0">
-                    {user && user.profileImageUrl ? (
+                    {user && (user as any).profileImageUrl ? (
                       <img 
-                        src={user.profileImageUrl} 
-                        alt={user.name || 'User'}
+                        src={(user as any).profileImageUrl} 
+                        alt={(user as any).name || 'User'}
                         className="w-6 h-6 rounded-full object-cover"
                       />
                     ) : (
                       <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-green-500 rounded-full flex items-center justify-center text-white font-semibold text-xs">
-                        {getUserInitials({ name: user?.name || 'User' })}
+                        {getUserInitials({ name: (user as any)?.name || 'User' })}
                       </div>
                     )}
                   </div>

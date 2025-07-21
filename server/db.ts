@@ -4,15 +4,13 @@ import { drizzle as drizzleNode } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import * as schema from "@shared/schema";
 
-// Load environment variables in development
-if (process.env.NODE_ENV !== 'production') {
-  try {
-    // Load dotenv synchronously for reliable .env loading
-    require('dotenv').config();
-    console.log("✅ Environment variables loaded from .env file");
-  } catch (error) {
-    console.log("⚠️  dotenv not available, using process.env directly");
-  }
+// Load environment variables early and reliably
+try {
+  // Load dotenv synchronously for reliable .env loading
+  require('dotenv').config();
+  console.log("✅ Environment variables loaded from .env file");
+} catch (error) {
+  console.log("⚠️  dotenv not available, using process.env directly");
 }
 
 // Check and construct DATABASE_URL if needed
