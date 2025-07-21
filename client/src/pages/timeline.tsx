@@ -97,80 +97,38 @@ export default function TimelinePage() {
   const [showReactionModal, setShowReactionModal] = useState<Record<string, boolean>>({});
   const [commentTexts, setCommentTexts] = useState<Record<string, string>>({});
 
-  // Lazy loading states
-  const [visibleItems, setVisibleItems] = useState<Set<string>>(new Set());
-  const observerRef = useRef<IntersectionObserver | null>(null);
+  // Lazy loading states - simpler approach showing N items at a time
+  const [displayedItemCount, setDisplayedItemCount] = useState(3);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
 
   // Fetch timeline data
-  const { data: timelineData = [], isLoading } = useQuery({
+  const { data: timelineData = [], isLoading } = useQuery<TimelineItem[]>({
     queryKey: ['/api/timeline'],
     enabled: !!user?.id,
   });
 
   // Fetch teams data untuk filtering
-  const { data: teams = [] } = useQuery({
+  const { data: teams = [] } = useQuery<any[]>({
     queryKey: ['/api/teams'],
     enabled: !!user?.id,
   });
 
-  const { data: teamMembers = [] } = useQuery({
+  const { data: teamMembers = [] } = useQuery<any[]>({
     queryKey: ['/api/teams', teamFilter, 'members'],
     enabled: !!user?.id && teamFilter !== 'all',
   });
 
   // Fetch timeline reactions
-  const { data: timelineReactions = {} } = useQuery({
+  const { data: timelineReactions = {} } = useQuery<Record<string, any>>({
     queryKey: ['/api/timeline/reactions'],
     enabled: !!user?.id,
   });
 
   // Fetch timeline comments
-  const { data: timelineComments = {} } = useQuery({
+  const { data: timelineComments = {} } = useQuery<Record<string, any>>({
     queryKey: ['/api/timeline/comments'],
     enabled: !!user?.id,
   });
-
-  // Lazy loading observer callback
-  const observeItem = useCallback((element: HTMLElement, itemId: string) => {
-    if (!observerRef.current) {
-      observerRef.current = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              const itemId = entry.target.getAttribute('data-item-id');
-              if (itemId) {
-                setVisibleItems(prev => new Set([...prev, itemId]));
-              }
-            }
-          });
-        },
-        {
-          rootMargin: '100px 0px',
-          threshold: 0.1
-        }
-      );
-    }
-
-    element.setAttribute('data-item-id', itemId);
-    observerRef.current.observe(element);
-  }, []);
-
-  // Cleanup observer
-  useEffect(() => {
-    return () => {
-      if (observerRef.current) {
-        observerRef.current.disconnect();
-      }
-    };
-  }, []);
-
-  // Initialize visible items for first few items
-  useEffect(() => {
-    if (timelineData.length > 0) {
-      const initialVisible = new Set(timelineData.slice(0, 3).map(item => item.id));
-      setVisibleItems(initialVisible);
-    }
-  }, [timelineData]);
 
   // Filter timeline data
   const filteredData = useMemo(() => {
@@ -186,7 +144,7 @@ export default function TimelinePage() {
 
       // Team Filter
       if (teamFilter !== 'all') {
-        const memberIds = teamMembers.map((member: any) => member.userId);
+        const memberIds = (teamMembers || []).map((member: any) => member.userId);
         if (!memberIds.includes(item.userId)) return false;
       }
 
@@ -246,10 +204,7 @@ export default function TimelinePage() {
   // Mutations for comments and reactions
   const addCommentMutation = useMutation({
     mutationFn: ({ itemId, content }: { itemId: string; content: string }) =>
-      apiRequest(`/api/timeline/${itemId}/comments`, {
-        method: 'POST',
-        body: JSON.stringify({ content }),
-      }),
+      apiRequest(`/api/timeline/${itemId}/comments`, 'POST', { content }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/timeline/comments'] });
     },
@@ -279,46 +234,39 @@ export default function TimelinePage() {
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
-  // TimelineCard component with lazy loading
+  // Intersection Observer for loading more items (after filteredData is defined)
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && displayedItemCount < filteredData.length) {
+          console.log('🔄 Loading more items. Current:', displayedItemCount, 'Total:', filteredData.length);
+          setDisplayedItemCount(prev => Math.min(prev + 3, filteredData.length));
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (loadMoreRef.current && displayedItemCount < filteredData.length) {
+      observer.observe(loadMoreRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [displayedItemCount, filteredData.length]);
+
+  // Reset display count when filters change
+  useEffect(() => {
+    setDisplayedItemCount(3);
+    console.log('🔄 Filter changed, resetting to show 3 items');
+  }, [activityTypeFilter, userFilter, teamFilter, dateRangeFilter, contentTypeFilter]);
+
+  // TimelineCard component - simplified without complex lazy loading
   function TimelineCard({ 
     item, 
-    index, 
-    isVisible, 
-    onObserve
-  }: any) {
-    const cardRef = useRef<HTMLDivElement>(null);
-    
-    // Initialize observer when component mounts
-    useEffect(() => {
-      if (cardRef.current && !isVisible) {
-        onObserve(cardRef.current, item.id);
-      }
-    }, [item.id, isVisible, onObserve]);
-
-    // Show skeleton placeholder untuk item yang belum visible
-    if (!isVisible) {
-      return (
-        <div 
-          ref={cardRef}
-          className="w-full bg-gray-100 shadow-sm border border-gray-200 rounded-lg overflow-hidden animate-pulse"
-          style={{ height: '200px' }}
-        >
-          <div className="p-4 space-y-3">
-            <div className="flex items-start space-x-3">
-              <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
-              <div className="flex-1 space-y-2">
-                <div className="h-4 bg-gray-300 rounded w-1/4"></div>
-                <div className="h-3 bg-gray-300 rounded w-3/4"></div>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <div className="h-3 bg-gray-300 rounded w-full"></div>
-              <div className="h-3 bg-gray-300 rounded w-2/3"></div>
-            </div>
-          </div>
-        </div>
-      );
-    }
+    index
+  }: {
+    item: TimelineItem;
+    index: number;
+  }) {
 
     return (
       <Card className="w-full bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden">
@@ -560,7 +508,7 @@ export default function TimelinePage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Semua Tim</SelectItem>
-                    {teams.map((team: any) => (
+                    {(teams || []).map((team: any) => (
                       <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>
                     ))}
                   </SelectContent>
@@ -601,17 +549,29 @@ export default function TimelinePage() {
 
         {/* Main Content */}
         <div className="flex-1 min-w-0">
-          {timelineData.length > 0 ? (
+          {timelineData && timelineData.length > 0 ? (
             <div className="space-y-3 md:space-y-4">
-              {filteredData.map((item, index) => (
-                <TimelineCard 
-                  key={item.id} 
-                  item={item} 
-                  index={index}
-                  isVisible={visibleItems.has(item.id)}
-                  onObserve={observeItem}
-                />
+              {/* Debug info */}
+              <div className="bg-yellow-50 border border-yellow-200 rounded p-2 text-xs">
+                Total items: {timelineData.length} | Filtered: {filteredData.length} | Showing: {Math.min(displayedItemCount, filteredData.length)}
+              </div>
+              
+              {/* Show only the first N items */}
+              {filteredData.slice(0, displayedItemCount).map((item: TimelineItem, index: number) => (
+                <TimelineCard key={item.id} item={item} index={index} />
               ))}
+              
+              {/* Load more trigger */}
+              {displayedItemCount < filteredData.length && (
+                <div 
+                  ref={loadMoreRef}
+                  className="flex justify-center py-4"
+                >
+                  <div className="animate-pulse text-sm text-gray-500">
+                    Memuat lebih banyak...
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 text-center py-8 md:py-12 px-4">
