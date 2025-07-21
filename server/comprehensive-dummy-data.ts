@@ -10,20 +10,32 @@ export async function createComprehensiveDummyData(userId: string, organizationI
       throw new Error("User not found");
     }
 
-    // Get existing monthly cycle
+    // Get existing monthly cycle for this organization
     const existingCycles = await storage.getCycles();
-    const monthlyCycle = existingCycles.find(cycle => cycle.type === "monthly");
+    const monthlyCycle = existingCycles.find(cycle => 
+      cycle.type === "monthly" && cycle.organizationId === organizationId
+    );
     
     if (!monthlyCycle) {
-      throw new Error("No monthly cycle found. Please create a monthly cycle first.");
+      throw new Error("No monthly cycle found for this organization. Please create a monthly cycle first.");
     }
 
-    // Get existing teams
+    // Get existing teams for this organization  
     const teams = await storage.getTeams();
-    const companyTeam = teams.find(team => team.name.toLowerCase().includes("company") || team.name.toLowerCase().includes("perusahaan"));
-    const marketingTeam = teams.find(team => team.name.toLowerCase().includes("marketing"));
-    const salesTeam = teams.find(team => team.name.toLowerCase().includes("sales"));
-    const operationTeam = teams.find(team => team.name.toLowerCase().includes("operation") || team.name.toLowerCase().includes("operasi"));
+    const organizationTeams = teams.filter(team => team.organizationId === organizationId);
+    const companyTeam = organizationTeams.find(team => team.name.toLowerCase().includes("company") || team.name.toLowerCase().includes("perusahaan"));
+    const marketingTeam = organizationTeams.find(team => team.name.toLowerCase().includes("marketing"));
+    const salesTeam = organizationTeams.find(team => team.name.toLowerCase().includes("sales"));
+    const operationTeam = organizationTeams.find(team => team.name.toLowerCase().includes("operation") || team.name.toLowerCase().includes("operasi"));
+
+    console.log("🏢 Found teams for organization:", {
+      organizationId,
+      totalTeams: organizationTeams.length,
+      companyTeam: companyTeam?.name,
+      marketingTeam: marketingTeam?.name,
+      salesTeam: salesTeam?.name,
+      operationTeam: operationTeam?.name
+    });
 
     console.log("📊 Creating comprehensive goals structure...");
 
