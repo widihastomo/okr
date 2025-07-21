@@ -485,7 +485,7 @@ export function DailyUpdateSimple() {
           onClick={handleOpenDialog}
         >
           <Zap className="mr-2 h-4 w-4" />
-          Update Harian Instan
+          Cek-in
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-5xl w-[95vw] max-h-[90vh] overflow-y-auto sm:w-full">
