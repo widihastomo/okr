@@ -102,7 +102,7 @@ export default function TimelinePage() {
   const [currentReactionsTimelineId, setCurrentReactionsTimelineId] = useState<string | null>(null);
   const [selectedReactionTab, setSelectedReactionTab] = useState('all');
   const [commentTexts, setCommentTexts] = useState<Record<string, string>>({});
-  const [focusedTextarea, setFocusedTextarea] = useState<string | null>(null);
+  const commentTextRefs = useRef<Record<string, HTMLTextAreaElement | null>>({});
 
   // Lazy loading states - simpler approach showing N items at a time
   const [displayedItemCount, setDisplayedItemCount] = useState(3);
@@ -276,14 +276,11 @@ export default function TimelinePage() {
     },
   });
 
-  const handleAddComment = useCallback((itemId: string) => {
-    const content = commentTexts[itemId]?.trim();
-    if (content) {
-      addCommentMutation.mutate({ itemId, content });
-      setCommentTexts(prev => ({ ...prev, [itemId]: '' }));
-      setFocusedTextarea(null);
+  const handleAddComment = useCallback((itemId: string, content: string) => {
+    if (content?.trim()) {
+      addCommentMutation.mutate({ itemId, content: content.trim() });
     }
-  }, [commentTexts, addCommentMutation]);
+  }, [addCommentMutation]);
 
   const handleCommentChange = useCallback((itemId: string, value: string) => {
     setCommentTexts(prev => ({ ...prev, [itemId]: value }));
@@ -332,27 +329,34 @@ export default function TimelinePage() {
     }
   }, [activityTypeFilter, userFilter, teamFilter, dateRangeFilter, contentTypeFilter, displayedItemCount]);
 
-  // Memoized Comment Input Component to prevent re-render focus loss
+  // Uncontrolled Comment Input Component to prevent re-render focus loss
   const CommentInput = memo(({ 
     itemId, 
-    value, 
-    onChange, 
     onSubmit, 
     disabled 
   }: {
     itemId: string;
-    value: string;
-    onChange: (value: string) => void;
-    onSubmit: () => void;
+    onSubmit: (content: string) => void;
     disabled: boolean;
   }) => {
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+    const handleSubmit = () => {
+      const content = textareaRef.current?.value?.trim();
+      if (content) {
+        onSubmit(content);
+        if (textareaRef.current) {
+          textareaRef.current.value = '';
+        }
+      }
+    };
+
     return (
       <div className="flex-1 flex space-x-2 relative z-10">
         <textarea
+          ref={textareaRef}
           id={`comment-${itemId}`}
           placeholder="Tulis komentar..."
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
           className="flex-1 min-h-[40px] text-sm px-3 py-2 border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white relative z-10"
           rows={1}
           style={{ 
@@ -363,21 +367,20 @@ export default function TimelinePage() {
           onKeyDown={(e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
               e.preventDefault();
-              onSubmit();
+              handleSubmit();
             }
           }}
           onClick={(e) => {
             e.stopPropagation();
-            e.currentTarget.focus();
           }}
         />
         <Button
           size="sm"
           onClick={(e) => {
             e.stopPropagation();
-            onSubmit();
+            handleSubmit();
           }}
-          disabled={!value.trim() || disabled}
+          disabled={disabled}
           className="px-3 relative z-10"
         >
           <Send className="w-3 h-3" />
@@ -722,9 +725,7 @@ export default function TimelinePage() {
                   </div>
                   <CommentInput
                     itemId={item.id}
-                    value={commentTexts[item.id] || ''}
-                    onChange={(value) => handleCommentChange(item.id, value)}
-                    onSubmit={() => handleAddComment(item.id)}
+                    onSubmit={(content) => handleAddComment(item.id, content)}
                     disabled={addCommentMutation.isPending}
                   />
                 </div>
