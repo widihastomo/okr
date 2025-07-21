@@ -396,6 +396,16 @@ export DATABASE_URL="postgresql://..." && npm run dev
 
 ## Changelog
 ```
+- July 21, 2025. **TOUR RESTART FUNCTIONALITY COMPLETED** - Successfully implemented comprehensive tour restart system for web pages:
+  * CREATED: TourRestartButton component with multiple variants (default, outline, ghost) and sizes
+  * IMPLEMENTED: FloatingTourRestartButton positioned at bottom-left corner of all pages (fixed bottom-4 left-4)
+  * CREATED: CompactTourRestartButton for integration in Help menu and sidebar
+  * ENHANCED: Event system with 'startTourDirect' custom event for direct tour restart communication
+  * INTEGRATED: Tour restart functionality in Help page with orange-themed highlight section
+  * FIXED: Database organization_id error in updateUserOnboardingProgress by retrieving user's organizationId
+  * ADDED: Global floating restart button in App.tsx for easy tour access from any page
+  * STYLED: Professional orange-themed buttons with toast notifications and proper hover effects
+  * RESULT: Users can restart tour from Help page or floating button, tour begins from step 0 with hamburger menu highlight
 - July 21, 2025. **INVITATION CODE VALIDATION SYSTEM COMPLETED** - Successfully implemented real-time invitation code validation with database integration:
   * CREATED: API endpoint `/api/referral-codes/validate-registration` for validation during registration (no auth required)
   * IMPLEMENTED: Real-time validation with 800ms debounce to prevent excessive API calls
