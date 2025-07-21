@@ -1215,7 +1215,7 @@ export default function TimelinePage() {
 
             {/* Comments Section */}
             {showComments[item.id] && (
-              <div className="px-3 md:px-4 pb-3 space-y-2">
+              <div className="px-3 md:px-4 pb-3 space-y-2" data-comment-section={item.id}>
                 {/* Existing Comments */}
                 {timelineComments[item.id]?.map((comment: any) => (
                   <div key={comment.id} className="flex space-x-2 text-xs md:text-sm">
@@ -1246,14 +1246,41 @@ export default function TimelinePage() {
                                   e.preventDefault();
                                   e.stopPropagation();
                                   
-                                  const timelineEditor = document.getElementById(`comment-${item.id}`) as HTMLTextAreaElement;
+                                  console.log('🔥 Mention clicked:', mentionName);
+                                  console.log('🔍 Looking for element ID:', `comment-${item.id}`);
+                                  
+                                  // Try multiple selectors to find the comment input
+                                  let timelineEditor = document.getElementById(`comment-${item.id}`) as HTMLTextAreaElement;
+                                  
+                                  if (!timelineEditor) {
+                                    console.log('❌ Element with ID not found, trying alternative selectors...');
+                                    
+                                    // Try to find textarea in the comment section
+                                    const commentSection = document.querySelector(`[data-comment-section="${item.id}"]`);
+                                    if (commentSection) {
+                                      timelineEditor = commentSection.querySelector('textarea') as HTMLTextAreaElement;
+                                      console.log('🎯 Found textarea in comment section:', !!timelineEditor);
+                                    }
+                                    
+                                    // If still not found, try any textarea near this timeline item
+                                    if (!timelineEditor) {
+                                      const allTextareas = document.querySelectorAll('textarea');
+                                      console.log('📝 All textareas found:', allTextareas.length);
+                                      // Use the last textarea (likely the most recent comment box)
+                                      timelineEditor = allTextareas[allTextareas.length - 1] as HTMLTextAreaElement;
+                                    }
+                                  }
                                   
                                   if (timelineEditor) {
+                                    console.log('✅ Found comment editor, current value:', timelineEditor.value);
+                                    
                                     const currentContent = timelineEditor.value;
                                     const newContent = currentContent ? `${currentContent} @${mentionName} ` : `@${mentionName} `;
                                     
                                     timelineEditor.value = newContent;
                                     timelineEditor.focus();
+                                    
+                                    console.log('✅ Updated content to:', newContent);
                                     
                                     // Trigger input event for React to update state
                                     const inputEvent = new Event('input', { bubbles: true });
@@ -1263,6 +1290,8 @@ export default function TimelinePage() {
                                     setTimeout(() => {
                                       timelineEditor.setSelectionRange(newContent.length, newContent.length);
                                     }, 10);
+                                  } else {
+                                    console.log('❌ Could not find any comment editor');
                                   }
                                 }}
                               >
