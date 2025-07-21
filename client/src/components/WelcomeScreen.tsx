@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -40,6 +40,19 @@ export default function WelcomeScreen({
   onStartTour,
 }: WelcomeScreenProps) {
   const { toast } = useToast();
+  const startTourButtonRef = useRef<HTMLButtonElement>(null);
+
+  // Focus on "Mulai Tour" button when modal opens
+  useEffect(() => {
+    if (isOpen && startTourButtonRef.current) {
+      // Small delay to ensure modal is fully rendered
+      const timer = setTimeout(() => {
+        startTourButtonRef.current?.focus();
+      }, 100);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
 
   const updateOnboardingProgress = async (step: string) => {
     try {
@@ -225,6 +238,7 @@ export default function WelcomeScreen({
               Lewati Tour
             </Button>
             <Button
+              ref={startTourButtonRef}
               onClick={handleStartTour}
               className="flex-1 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
             >
