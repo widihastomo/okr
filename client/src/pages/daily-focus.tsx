@@ -126,6 +126,7 @@ import TaskModal from "@/components/task-modal";
 import InitiativeFormModal from "@/components/initiative-form-modal";
 import TourStartButton from "@/components/tour-start-button";
 import { CompanyDetailsModal } from "@/components/CompanyDetailsModal";
+import WelcomeScreen from "@/components/WelcomeScreen";
 
 // Icon mapping for mission cards
 const iconMapping = {
@@ -896,17 +897,19 @@ export default function DailyFocusPage() {
     const welcomeShown = localStorage.getItem("welcome-screen-shown");
     const onboardingCompleted = localStorage.getItem("onboarding-completed");
     
-    // TEMPORARY: Force show company details modal for testing
-    console.log("🔍 Company details check:", { companyDetailsCompleted, onboardingCompleted });
-    setShowCompanyDetailsModal(true);
+    console.log("🔍 Company details check:", { companyDetailsCompleted, onboardingCompleted, welcomeShown });
+    
+    // TEMPORARY: Reset welcome screen flag for testing and force show
+    localStorage.removeItem("welcome-screen-shown");
     
     // For new users who completed registration
     if (onboardingCompleted === "true") {
       if (!companyDetailsCompleted) {
         // Show company details modal first
         setShowCompanyDetailsModal(true);
-      } else if (!welcomeShown) {
+      } else if (companyDetailsCompleted === "true") {
         // If company details done, show welcome screen
+        console.log("✅ Triggering welcome screen display");
         setShowWelcomeScreen(true);
       }
     }
@@ -923,6 +926,13 @@ export default function DailyFocusPage() {
     localStorage.setItem("welcome-screen-shown", "true");
   };
 
+  const handleStartTour = () => {
+    setShowWelcomeScreen(false);
+    localStorage.setItem("welcome-screen-shown", "true");
+    // TODO: Implement tour start functionality
+    console.log("Starting tour...");
+  };
+
   // Early return check - must be AFTER all hooks are called
   if (!userId) {
     return (
@@ -932,49 +942,7 @@ export default function DailyFocusPage() {
     );
   }
 
-  // Welcome Screen Dialog for new users
-  if (showWelcomeScreen) {
-    return (
-      <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 text-center">
-          <div className="mb-6">
-            <div className="w-16 h-16 bg-gradient-to-r from-orange-500 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Sparkles className="h-8 w-8 text-white" />
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              Selamat Datang di Refokus!
-            </h2>
-            <p className="text-gray-600">
-              Ubah tujuan menjadi aksi nyata yang terukur. Mari mulai perjalanan produktivitas Anda bersama kami.
-            </p>
-          </div>
-          
-          <div className="space-y-3 mb-6">
-            <div className="flex items-center gap-3 text-left">
-              <Target className="h-5 w-5 text-orange-500 flex-shrink-0" />
-              <span className="text-sm text-gray-700">Buat tujuan yang jelas dan terukur</span>
-            </div>
-            <div className="flex items-center gap-3 text-left">
-              <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
-              <span className="text-sm text-gray-700">Pantau progress secara real-time</span>
-            </div>
-            <div className="flex items-center gap-3 text-left">
-              <Users className="h-5 w-5 text-blue-500 flex-shrink-0" />
-              <span className="text-sm text-gray-700">Kolaborasi tim yang efektif</span>
-            </div>
-          </div>
-          
-          <Button
-            onClick={handleCloseWelcomeScreen}
-            className="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white font-medium h-11"
-          >
-            <ArrowRight className="h-4 w-4 mr-2" />
-            Mulai Sekarang
-          </Button>
-        </div>
-      </div>
-    );
-  }
+
 
   // Apply user filter to tasks and key results
   const filteredTasks =
@@ -3964,6 +3932,13 @@ export default function DailyFocusPage() {
       <CompanyDetailsModal
         open={showCompanyDetailsModal}
         onComplete={handleCompanyDetailsComplete}
+      />
+
+      {/* Welcome Screen Modal for new users */}
+      <WelcomeScreen
+        isOpen={showWelcomeScreen}
+        onClose={handleCloseWelcomeScreen}
+        onStartTour={handleStartTour}
       />
       
     </div>
