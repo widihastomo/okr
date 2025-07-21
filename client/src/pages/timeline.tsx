@@ -1245,15 +1245,11 @@ export default function TimelinePage() {
                                   e.preventDefault();
                                   e.stopPropagation();
                                   
-                                  console.log('🎯 Mention clicked:', mentionName, 'for item:', item.id);
-                                  
                                   const timelineEditor = document.getElementById(`comment-${item.id}`) as HTMLTextAreaElement;
-                                  console.log('📝 Found editor:', timelineEditor);
                                   
                                   if (timelineEditor) {
                                     const currentContent = timelineEditor.value;
                                     const newContent = currentContent ? `${currentContent} @${mentionName} ` : `@${mentionName} `;
-                                    console.log('📄 Content update:', currentContent, '→', newContent);
                                     
                                     timelineEditor.value = newContent;
                                     timelineEditor.focus();
@@ -1266,8 +1262,6 @@ export default function TimelinePage() {
                                     setTimeout(() => {
                                       timelineEditor.setSelectionRange(newContent.length, newContent.length);
                                     }, 10);
-                                  } else {
-                                    console.error('❌ Editor not found for ID:', `comment-${item.id}`);
                                   }
                                 }}
                               >

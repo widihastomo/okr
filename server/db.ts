@@ -7,9 +7,8 @@ import * as schema from "@shared/schema";
 // Load environment variables in development
 if (process.env.NODE_ENV !== 'production') {
   try {
-    // Use dynamic import for dotenv in ES modules
-    const { config } = await import('dotenv');
-    config();
+    // Load dotenv synchronously for reliable .env loading
+    require('dotenv').config();
     console.log("✅ Environment variables loaded from .env file");
   } catch (error) {
     console.log("⚠️  dotenv not available, using process.env directly");
@@ -67,8 +66,7 @@ if (DB_CONNECTION_TYPE === 'node-postgres') {
     idleTimeoutMillis: 30000, // Close idle connections after 30 seconds
     connectionTimeoutMillis: 10000, // Increased timeout for production
     ssl: DATABASE_URL.includes('sslmode=require') ? { 
-      rejectUnauthorized: false,
-      require: true 
+      rejectUnauthorized: false
     } : false,
   });
 
@@ -106,13 +104,13 @@ export async function testDatabaseConnection() {
     return true;
   } catch (error) {
     console.error("❌ Database connection failed:");
-    console.error("Error name:", error.name);
-    console.error("Error message:", error.message);
+    console.error("Error name:", error instanceof Error ? error.name : 'Unknown');
+    console.error("Error message:", error instanceof Error ? error.message : String(error));
     console.error("Connection type:", DB_CONNECTION_TYPE);
     console.error("NODE_ENV:", process.env.NODE_ENV);
     
-    if (error.code) {
-      console.error("Error code:", error.code);
+    if (error instanceof Error && 'code' in error) {
+      console.error("Error code:", (error as any).code);
     }
     
     // Production troubleshooting hints
