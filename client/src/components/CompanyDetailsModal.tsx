@@ -143,7 +143,7 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
       console.log("🏢 Submitting company details:", formData);
       
       // Save company details to user profile
-      const response = await apiRequest("/api/auth/update-company-details", "POST", formData);
+      const response = await apiRequest("POST", "/api/auth/update-company-details", formData);
       console.log("✅ Company details saved successfully:", response);
 
       // Mark company details as completed
