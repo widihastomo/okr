@@ -37,6 +37,7 @@ import AchievementsPage from "@/pages/achievements";
 import DailyFocusPage from "@/pages/daily-focus";
 import TasksPage from "@/pages/tasks";
 import TimelinePage from "@/pages/timeline";
+import HelpPage from "@/pages/help";
 
 import OrganizationSettings from "@/pages/organization-settings";
 import SystemAdmin from "@/pages/system-admin";
@@ -253,6 +254,7 @@ function Router() {
               <Route path="/achievements" component={AchievementsPage} />
 
               <Route path="/analytics" component={AnalyticsPage} />
+              <Route path="/help" component={HelpPage} />
 
               <Route path="/upgrade-package" component={UpgradePackage} />
 
