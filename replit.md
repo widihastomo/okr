@@ -466,6 +466,14 @@ export DATABASE_URL="postgresql://..." && npm run dev
   * FORCED: Scrollbar visibility with `overflowY: 'scroll'` instead of 'auto' for guaranteed appearance
   * TESTED: With 38 provinces and 26+ industry types to ensure adequate content for scroll testing
   * RESULT: Complete ultra-force scroll implementation with every possible CSS override technique applied
+- July 21, 2025. **CUSTOM DROPDOWN SOLUTION IMPLEMENTED** - Created SimpleSelect component as complete replacement for problematic Command/ScrollArea combination:
+  * CREATED: SimpleSelect.tsx component with native HTML-based dropdown implementation
+  * IMPLEMENTED: Proper scroll functionality using standard CSS overflow-y: auto without library conflicts
+  * ENHANCED: Search functionality with real-time filtering, keyboard navigation, click-outside handling
+  * REPLACED: All 4 dropdowns (Provinsi, Kota, Industri, Referral) with SimpleSelect components
+  * ELIMINATED: Dependency on Command/Popover/ScrollArea components that had persistent scroll issues
+  * ADDED: Professional styling with proper focus states, disabled states, and visual feedback
+  * RESULT: Complete working dropdown system with guaranteed scroll functionality using native browser capabilities
 - July 21, 2025. **INVITATION CODE INPUT SYSTEM COMPLETED** - Successfully implemented invitation code input with toggle functionality and uppercase formatting:
   * ADDED: Toggle-able invitation code input below password field with "Punya kode undangan?" button
   * IMPLEMENTED: Smooth slide-in animation with chevron up/down indicators for toggle state

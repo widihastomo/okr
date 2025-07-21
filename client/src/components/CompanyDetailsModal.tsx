@@ -20,10 +20,7 @@ import {
 import { Building2, MapPin, Briefcase, Users, Search, Check, ChevronsUpDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { SimpleSelect } from "@/components/SimpleSelect";
 
 interface CompanyDetailsModalProps {
   open: boolean;
@@ -43,10 +40,7 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
   });
 
   // State untuk mengontrol combobox open/close
-  const [openProvince, setOpenProvince] = useState(false);
-  const [openCity, setOpenCity] = useState(false);
-  const [openIndustry, setOpenIndustry] = useState(false);
-  const [openReferral, setOpenReferral] = useState(false);
+
 
   const provinces = [
     "Aceh", "Sumatera Utara", "Sumatera Barat", "Riau", "Kepulauan Riau", "Jambi",
@@ -181,97 +175,27 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="province">Provinsi *</Label>
-              <Popover open={openProvince} onOpenChange={setOpenProvince}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    role="combobox"
-                    aria-expanded={openProvince}
-                    className="w-full justify-between"
-                  >
-                    {formData.province || "Pilih provinsi..."}
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-full p-0">
-                  <Command>
-                    <CommandInput placeholder="Cari provinsi..." />
-                    <ScrollArea className="h-[200px]">
-                      <CommandList>
-                        <CommandEmpty>Provinsi tidak ditemukan.</CommandEmpty>
-                        <CommandGroup>
-                          {provinces.map((province) => (
-                            <CommandItem
-                              key={province}
-                              value={province}
-                              onSelect={(currentValue) => {
-                                handleInputChange("province", currentValue === formData.province ? "" : currentValue);
-                                setOpenProvince(false);
-                              }}
-                            >
-                              <Check
-                                className={cn(
-                                  "mr-2 h-4 w-4",
-                                  formData.province === province ? "opacity-100" : "opacity-0"
-                                )}
-                              />
-                              {province}
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </ScrollArea>
-                  </Command>
-                </PopoverContent>
-              </Popover>
+              <SimpleSelect
+                options={provinces.map(p => ({ value: p, label: p }))}
+                value={formData.province}
+                placeholder="Pilih provinsi..."
+                searchPlaceholder="Cari provinsi..."
+                emptyMessage="Provinsi tidak ditemukan."
+                onSelect={(value) => handleInputChange("province", value)}
+              />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="city">Kota *</Label>
-              <Popover open={openCity} onOpenChange={setOpenCity}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    role="combobox"
-                    aria-expanded={openCity}
-                    disabled={!formData.province}
-                    className="w-full justify-between"
-                  >
-                    {formData.city || (formData.province ? "Pilih kota..." : "Pilih provinsi dulu")}
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-full p-0">
-                  <Command>
-                    <CommandInput placeholder="Cari kota..." />
-                    <ScrollArea className="h-[200px]">
-                      <CommandList>
-                        <CommandEmpty>Kota tidak ditemukan.</CommandEmpty>
-                        <CommandGroup>
-                          {getAvailableCities().map((city) => (
-                            <CommandItem
-                              key={city}
-                              value={city}
-                              onSelect={(currentValue) => {
-                                handleInputChange("city", currentValue === formData.city ? "" : currentValue);
-                                setOpenCity(false);
-                              }}
-                            >
-                              <Check
-                                className={cn(
-                                  "mr-2 h-4 w-4",
-                                  formData.city === city ? "opacity-100" : "opacity-0"
-                                )}
-                              />
-                              {city}
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </ScrollArea>
-                  </Command>
-                </PopoverContent>
-              </Popover>
+              <SimpleSelect
+                options={getAvailableCities().map(c => ({ value: c, label: c }))}
+                value={formData.city}
+                placeholder={formData.province ? "Pilih kota..." : "Pilih provinsi dulu"}
+                searchPlaceholder="Cari kota..."
+                emptyMessage="Kota tidak ditemukan."
+                disabled={!formData.province}
+                onSelect={(value) => handleInputChange("city", value)}
+              />
             </div>
           </div>
 
@@ -281,49 +205,14 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
               <Briefcase className="h-4 w-4" />
               Jenis Industri *
             </Label>
-            <Popover open={openIndustry} onOpenChange={setOpenIndustry}>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  role="combobox"
-                  aria-expanded={openIndustry}
-                  className="w-full justify-between"
-                >
-                  {formData.industryType || "Pilih jenis industri..."}
-                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-full p-0">
-                <Command>
-                  <CommandInput placeholder="Cari industri..." />
-                  <ScrollArea className="h-[200px]">
-                    <CommandList>
-                      <CommandEmpty>Industri tidak ditemukan.</CommandEmpty>
-                      <CommandGroup>
-                        {industryTypes.map((industry) => (
-                          <CommandItem
-                            key={industry}
-                            value={industry}
-                            onSelect={(currentValue) => {
-                              handleInputChange("industryType", currentValue === formData.industryType ? "" : currentValue);
-                              setOpenIndustry(false);
-                            }}
-                          >
-                            <Check
-                              className={cn(
-                                "mr-2 h-4 w-4",
-                                formData.industryType === industry ? "opacity-100" : "opacity-0"
-                              )}
-                            />
-                            {industry}
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </ScrollArea>
-                </Command>
-              </PopoverContent>
-            </Popover>
+            <SimpleSelect
+              options={industryTypes.map(i => ({ value: i, label: i }))}
+              value={formData.industryType}
+              placeholder="Pilih jenis industri..."
+              searchPlaceholder="Cari industri..."
+              emptyMessage="Industri tidak ditemukan."
+              onSelect={(value) => handleInputChange("industryType", value)}
+            />
           </div>
 
           {/* Position */}
@@ -346,49 +235,14 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
               <Search className="h-4 w-4" />
               Tahu Refokus dari mana? *
             </Label>
-            <Popover open={openReferral} onOpenChange={setOpenReferral}>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  role="combobox"
-                  aria-expanded={openReferral}
-                  className="w-full justify-between"
-                >
-                  {formData.referralSource || "Pilih sumber referral..."}
-                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-full p-0">
-                <Command>
-                  <CommandInput placeholder="Cari sumber referral..." />
-                  <ScrollArea className="h-[200px]">
-                    <CommandList>
-                      <CommandEmpty>Sumber referral tidak ditemukan.</CommandEmpty>
-                      <CommandGroup>
-                        {referralSources.map((source) => (
-                          <CommandItem
-                            key={source}
-                            value={source}
-                            onSelect={(currentValue) => {
-                              handleInputChange("referralSource", currentValue === formData.referralSource ? "" : currentValue);
-                              setOpenReferral(false);
-                            }}
-                          >
-                            <Check
-                              className={cn(
-                                "mr-2 h-4 w-4",
-                                formData.referralSource === source ? "opacity-100" : "opacity-0"
-                              )}
-                            />
-                            {source}
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </ScrollArea>
-                </Command>
-              </PopoverContent>
-            </Popover>
+            <SimpleSelect
+              options={referralSources.map(s => ({ value: s, label: s }))}
+              value={formData.referralSource}
+              placeholder="Pilih sumber referral..."
+              searchPlaceholder="Cari sumber referral..."
+              emptyMessage="Sumber referral tidak ditemukan."
+              onSelect={(value) => handleInputChange("referralSource", value)}
+            />
           </div>
 
           {/* Submit Button */}
