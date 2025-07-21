@@ -19,7 +19,10 @@ import {
   Building,
   Phone,
   ArrowRight,
-  Loader2
+  Loader2,
+  ChevronDown,
+  ChevronUp,
+  Gift
 } from "lucide-react";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 // Button will be replaced with Button
@@ -44,6 +47,7 @@ const registerSchema = z.object({
     .regex(/^(\+62|62|0)8[1-9][0-9]{6,10}$/, "Format nomor handphone Indonesia tidak valid. Contoh: 08123456789, +628123456789, atau 628123456789"),
   email: z.string().email("Format email tidak valid"),
   password: z.string().min(6, "Password minimal 6 karakter"),
+  invitationCode: z.string().optional(),
 });
 
 const forgotPasswordSchema = z.object({
@@ -81,6 +85,7 @@ interface AuthFlowProps {
 export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowProps) {
   const [currentStep, setCurrentStep] = useState<AuthFlowStep>(initialStep);
   const [showPassword, setShowPassword] = useState(false);
+  const [showInvitationCode, setShowInvitationCode] = useState(false);
   const [verificationEmail, setVerificationEmail] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
@@ -97,7 +102,7 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
 
   const registerForm = useForm<RegisterData>({
     resolver: zodResolver(registerSchema),
-    defaultValues: { name: "", businessName: "", whatsappNumber: "", email: "", password: "" },
+    defaultValues: { name: "", businessName: "", whatsappNumber: "", email: "", password: "", invitationCode: "" },
   });
 
   const forgotPasswordForm = useForm<ForgotPasswordData>({
@@ -626,6 +631,41 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                 </div>
                 {registerForm.formState.errors.password && (
                   <p className="text-sm text-red-600">{registerForm.formState.errors.password.message}</p>
+                )}
+              </div>
+
+              {/* Invitation Code Toggle */}
+              <div className="space-y-2">
+                <button
+                  type="button"
+                  onClick={() => setShowInvitationCode(!showInvitationCode)}
+                  className="flex items-center justify-between w-full text-left text-sm text-gray-600 hover:text-orange-600 transition-colors duration-200"
+                >
+                  <span>Punya kode undangan?</span>
+                  {showInvitationCode ? (
+                    <ChevronUp className="w-4 h-4" />
+                  ) : (
+                    <ChevronDown className="w-4 h-4" />
+                  )}
+                </button>
+                
+                {showInvitationCode && (
+                  <div className="space-y-2 animate-in slide-in-from-top-2 duration-200">
+                    <Label htmlFor="invitationCode">Kode Undangan (Opsional)</Label>
+                    <div className="relative">
+                      <Gift className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                      <Input
+                        id="invitationCode"
+                        type="text"
+                        placeholder="Masukkan kode undangan"
+                        {...registerForm.register("invitationCode")}
+                        className="pl-10 h-11 border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all duration-200"
+                      />
+                    </div>
+                    {registerForm.formState.errors.invitationCode && (
+                      <p className="text-sm text-red-600">{registerForm.formState.errors.invitationCode.message}</p>
+                    )}
+                  </div>
                 )}
               </div>
 
