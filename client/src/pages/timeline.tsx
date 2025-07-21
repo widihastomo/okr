@@ -105,9 +105,35 @@ export default function TimelinePage() {
   const [commentTexts, setCommentTexts] = useState<Record<string, string>>({});
   const commentTextRefs = useRef<Record<string, HTMLTextAreaElement | null>>({});
   
-  // Scroll preservation untuk mengatasi scroll ke atas saat engagement button diklik
+  // Scroll preservation untuk mengatasi scroll ke atas saat engagement button diklik - menggunakan window scroll
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const preservedScrollRef = useRef<number>(0);
+
+  // Helper functions for scroll preservation
+  const saveScrollPosition = useCallback(() => {
+    // Try both container and window scroll
+    if (scrollContainerRef.current) {
+      preservedScrollRef.current = scrollContainerRef.current.scrollTop;
+    } else {
+      preservedScrollRef.current = window.pageYOffset || document.documentElement.scrollTop;
+    }
+    console.log('💾 Saved scroll position:', preservedScrollRef.current);
+  }, []);
+
+  const restoreScrollPosition = useCallback(() => {
+    setTimeout(() => {
+      const savedPosition = preservedScrollRef.current;
+      if (savedPosition > 0) {
+        if (scrollContainerRef.current) {
+          scrollContainerRef.current.scrollTop = savedPosition;
+          console.log('↩️ Restored container scroll to:', savedPosition);
+        } else {
+          window.scrollTo(0, savedPosition);
+          console.log('↩️ Restored window scroll to:', savedPosition);
+        }
+      }
+    }, 100); // Increased delay to 100ms
+  }, []);
 
   // Lazy loading states - simpler approach showing N items at a time
   const [displayedItemCount, setDisplayedItemCount] = useState(3);
@@ -224,6 +250,7 @@ export default function TimelinePage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/timeline/comments'] });
+      restoreScrollPosition(); // Restore scroll after comment added
       toast({
         title: "Komentar berhasil ditambahkan",
         variant: "default",
@@ -254,6 +281,7 @@ export default function TimelinePage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/timeline/reactions'] });
+      restoreScrollPosition(); // Restore scroll after reaction added
     },
     onError: (error) => {
       toast({
@@ -269,35 +297,18 @@ export default function TimelinePage() {
   };
 
   const toggleComments = useCallback((itemId: string) => {
-    // Simpan scroll position sebelum state change
-    if (scrollContainerRef.current) {
-      preservedScrollRef.current = scrollContainerRef.current.scrollTop;
-    }
+    saveScrollPosition();
     setShowComments(prev => ({ ...prev, [itemId]: !prev[itemId] }));
-  }, []);
+    restoreScrollPosition();
+  }, [saveScrollPosition, restoreScrollPosition]);
 
   const toggleReaction = useCallback((itemId: string) => {
-    // Simpan scroll position sebelum mutation
-    if (scrollContainerRef.current) {
-      preservedScrollRef.current = scrollContainerRef.current.scrollTop;
-    }
+    saveScrollPosition();
     // Toggle like reaction
     addReactionMutation.mutate({ itemId, emoji: '❤️' });
-  }, [addReactionMutation]);
+  }, [addReactionMutation, saveScrollPosition]);
 
-  // Restore scroll position setelah data change
-  useEffect(() => {
-    if (preservedScrollRef.current > 0 && scrollContainerRef.current) {
-      const timeoutId = setTimeout(() => {
-        if (scrollContainerRef.current) {
-          scrollContainerRef.current.scrollTop = preservedScrollRef.current;
-          preservedScrollRef.current = 0; // Reset
-        }
-      }, 50); // Small delay untuk memastikan DOM sudah update
-
-      return () => clearTimeout(timeoutId);
-    }
-  }, [timelineReactions, timelineComments]); // Monitor data changes
+  // Old useEffect removed - now using helper functions for scroll preservation
 
   const openReactionsModal = (timelineId: string) => {
     setCurrentReactionsTimelineId(timelineId);
@@ -314,15 +325,17 @@ export default function TimelinePage() {
 
   const handleAddComment = useCallback((itemId: string, content: string) => {
     if (content?.trim()) {
+      saveScrollPosition();
       addCommentMutation.mutate({ itemId, content: content.trim() });
     }
-  }, [addCommentMutation]);
+  }, [addCommentMutation, saveScrollPosition]);
 
   const handleCommentChange = useCallback((itemId: string, value: string) => {
     setCommentTexts(prev => ({ ...prev, [itemId]: value }));
   }, []);
 
   const handleReaction = (itemId: string, emoji: string) => {
+    saveScrollPosition();
     addReactionMutation.mutate({ itemId, emoji });
     setShowReactionPicker(prev => ({ ...prev, [itemId]: false }));
   };
