@@ -14,6 +14,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import {
   Compass,
   Target,
@@ -37,6 +39,39 @@ export default function WelcomeScreen({
   onClose,
   onStartTour,
 }: WelcomeScreenProps) {
+  const { toast } = useToast();
+
+  const updateOnboardingProgress = async (step: string) => {
+    try {
+      await apiRequest('/api/auth/update-onboarding-progress', {
+        method: 'POST',
+        body: JSON.stringify({ step }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      console.log(`✅ Onboarding progress updated: ${step}`);
+    } catch (error) {
+      console.error('Failed to update onboarding progress:', error);
+    }
+  };
+
+  const handleStartTour = async () => {
+    // Mark missions completed when user starts the tour
+    await updateOnboardingProgress('missions_completed');
+    onStartTour();
+  };
+
+  const handleSkipTour = async () => {
+    // Mark missions completed even if user skips tour
+    await updateOnboardingProgress('missions_completed');
+    toast({
+      title: "Welcome mission selesai!",
+      description: "Anda dapat memulai menggunakan platform sekarang.",
+    });
+    onClose();
+  };
+
   const features = [
     {
       icon: <Target className="h-5 w-5 text-orange-500" />,
@@ -135,11 +170,11 @@ export default function WelcomeScreen({
 
           {/* Action Buttons */}
           <div className="flex gap-3 pt-4">
-            <Button variant="outline" onClick={onClose} className="flex-1">
+            <Button variant="outline" onClick={handleSkipTour} className="flex-1">
               Lewati Tour
             </Button>
             <Button
-              onClick={onStartTour}
+              onClick={handleStartTour}
               className="flex-1 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
             >
               <Play className="h-4 w-4 mr-2" />

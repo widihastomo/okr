@@ -275,6 +275,13 @@ export const users = pgTable("users", {
   invitationAcceptedAt: timestamp("invitation_accepted_at"),
   // Referral code fields
   invitationCode: varchar("invitation_code", { length: 50 }), // Store the referral code used during registration
+  // Onboarding progress tracking flags
+  onboardingRegistered: boolean("onboarding_registered").default(false).notNull(), // Step 1: User has registered
+  onboardingEmailConfirmed: boolean("onboarding_email_confirmed").default(false).notNull(), // Step 2: Email verified
+  onboardingCompanyDetailsCompleted: boolean("onboarding_company_details_completed").default(false).notNull(), // Step 3: Company info filled
+  onboardingMissionsCompleted: boolean("onboarding_missions_completed").default(false).notNull(), // Step 4: Mission/tour completed
+  onboardingPackageUpgraded: boolean("onboarding_package_upgraded").default(false).notNull(), // Step 5: Package upgrade completed
+  onboardingCompletedAt: timestamp("onboarding_completed_at"), // Timestamp when full onboarding is completed
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

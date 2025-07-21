@@ -288,6 +288,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .set({ ownerId: userId })
         .where(eq(organizations.id, organizationId));
       
+      // Mark user as registered in onboarding progress
+      await storage.updateUserOnboardingProgress(newUser.id, 'registered');
+      
       console.log("Created organization with owner:", { organizationId, userId });
 
       // Update referral code usage count if valid invitation code was used
@@ -473,6 +476,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         verificationCodeExpiry: null,
         updatedAt: new Date(),
       });
+      
+      // Mark email confirmation completed in onboarding progress
+      await storage.updateUserOnboardingProgress(user.id, 'email_confirmed');
       
       res.json({
         message: "Email berhasil diverifikasi! Akun Anda sudah aktif.",
@@ -675,6 +681,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
+      // Update onboarding progress - mark company details as completed
+      await storage.updateUserOnboardingProgress(user.id, 'company_details_completed');
+      
       res.json({
         message: "Company details berhasil disimpan",
         success: true,
@@ -746,6 +755,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Reset password error:", error);
       res.status(500).json({ 
         message: "Gagal reset password. Silakan coba lagi." 
+      });
+    }
+  });
+
+  // Update onboarding progress endpoint
+  app.post("/api/auth/update-onboarding-progress", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as User;
+      const { step } = req.body;
+      
+      if (!step || !['registered', 'email_confirmed', 'company_details_completed', 'missions_completed', 'package_upgraded'].includes(step)) {
+        return res.status(400).json({ 
+          message: "Step onboarding tidak valid" 
+        });
+      }
+      
+      console.log(`📋 Updating onboarding progress for user ${user.id}: ${step}`);
+      
+      const updatedUser = await storage.updateUserOnboardingProgress(user.id, step);
+      
+      res.json({
+        message: `Onboarding step '${step}' berhasil dicatat`,
+        success: true,
+        onboardingProgress: {
+          registered: updatedUser?.onboardingRegistered,
+          emailConfirmed: updatedUser?.onboardingEmailConfirmed,
+          companyDetailsCompleted: updatedUser?.onboardingCompanyDetailsCompleted,
+          missionsCompleted: updatedUser?.onboardingMissionsCompleted,
+          packageUpgraded: updatedUser?.onboardingPackageUpgraded,
+          completedAt: updatedUser?.onboardingCompletedAt,
+        }
+      });
+      
+    } catch (error) {
+      console.error("Update onboarding progress error:", error);
+      res.status(500).json({ 
+        message: "Gagal mengupdate progress onboarding" 
+      });
+    }
+  });
+
+  // Get onboarding progress endpoint
+  app.get("/api/auth/onboarding-progress", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as User;
+      
+      const userData = await storage.getUser(user.id);
+      if (!userData) {
+        return res.status(404).json({ message: "User tidak ditemukan" });
+      }
+      
+      res.json({
+        onboardingProgress: {
+          registered: userData.onboardingRegistered,
+          emailConfirmed: userData.onboardingEmailConfirmed,
+          companyDetailsCompleted: userData.onboardingCompanyDetailsCompleted,
+          missionsCompleted: userData.onboardingMissionsCompleted,
+          packageUpgraded: userData.onboardingPackageUpgraded,
+          completedAt: userData.onboardingCompletedAt,
+        }
+      });
+      
+    } catch (error) {
+      console.error("Get onboarding progress error:", error);
+      res.status(500).json({ 
+        message: "Gagal mengambil progress onboarding" 
       });
     }
   });

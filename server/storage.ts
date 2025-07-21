@@ -71,6 +71,7 @@ export interface IStorage {
   updateUser(id: string, user: Partial<UpsertUser>): Promise<User | undefined>;
   updateUserReminderConfig(userId: string, config: any): Promise<void>;
   updateUserProfileImage(userId: string, profileImageUrl: string | null): Promise<User | undefined>;
+  updateUserOnboardingProgress(userId: string, step: 'registered' | 'email_confirmed' | 'company_details_completed' | 'missions_completed' | 'package_upgraded'): Promise<User | undefined>;
   deleteUser(id: string): Promise<boolean>;
   
   // Organizations
@@ -383,6 +384,36 @@ export class DatabaseStorage implements IStorage {
     const [user] = await db
       .update(users)
       .set({ profileImageUrl, updatedAt: new Date() })
+      .where(eq(users.id, userId))
+      .returning();
+    return user;
+  }
+
+  async updateUserOnboardingProgress(userId: string, step: 'registered' | 'email_confirmed' | 'company_details_completed' | 'missions_completed' | 'package_upgraded'): Promise<User | undefined> {
+    const updateData: any = { updatedAt: new Date() };
+    
+    switch (step) {
+      case 'registered':
+        updateData.onboardingRegistered = true;
+        break;
+      case 'email_confirmed':
+        updateData.onboardingEmailConfirmed = true;
+        break;
+      case 'company_details_completed':
+        updateData.onboardingCompanyDetailsCompleted = true;
+        break;
+      case 'missions_completed':
+        updateData.onboardingMissionsCompleted = true;
+        break;
+      case 'package_upgraded':
+        updateData.onboardingPackageUpgraded = true;
+        updateData.onboardingCompletedAt = new Date();
+        break;
+    }
+
+    const [user] = await db
+      .update(users)
+      .set(updateData)
       .where(eq(users.id, userId))
       .returning();
     return user;

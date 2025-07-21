@@ -1184,6 +1184,28 @@ export default function DailyFocusPage() {
             >
               Welcome Screen
             </button>
+            <button
+              onClick={async (e) => {
+                e.preventDefault();
+                try {
+                  await apiRequest('/api/auth/update-onboarding-progress', {
+                    method: 'POST',
+                    body: JSON.stringify({ step: 'package_upgraded' }),
+                    headers: { 'Content-Type': 'application/json' },
+                  });
+                  toast({
+                    title: "Package upgrade progress updated!",
+                    description: "Onboarding step package_upgraded berhasil dicatat.",
+                  });
+                } catch (error) {
+                  console.error('Failed to update package upgrade:', error);
+                }
+              }}
+              className="bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded-md text-sm font-medium transition-colors cursor-pointer border-0 outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+              type="button"
+            >
+              Test Package Upgrade
+            </button>
             <div className="hidden sm:flex items-center gap-2 text-sm text-gray-500">
               <Calendar className="h-4 w-4" />
               <span>
