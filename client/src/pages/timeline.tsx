@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
+import { useState, useMemo, useEffect, useRef, useCallback, memo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
 import { Link } from 'wouter';
@@ -323,11 +323,68 @@ export default function TimelinePage() {
     return () => observer.disconnect();
   }, [displayedItemCount, filteredData.length]);
 
-  // Reset display count when filters change
+  // Reset display count when filters change - optimized to prevent unnecessary re-renders
   useEffect(() => {
-    setDisplayedItemCount(3);
-    console.log('🔄 Filter changed, resetting to show 3 items');
-  }, [activityTypeFilter, userFilter, teamFilter, dateRangeFilter, contentTypeFilter]);
+    // Only reset if we're actually showing filtered content
+    if (displayedItemCount > 3) {
+      setDisplayedItemCount(3);
+      console.log('🔄 Filter changed, resetting to show 3 items');
+    }
+  }, [activityTypeFilter, userFilter, teamFilter, dateRangeFilter, contentTypeFilter, displayedItemCount]);
+
+  // Memoized Comment Input Component to prevent re-render focus loss
+  const CommentInput = memo(({ 
+    itemId, 
+    value, 
+    onChange, 
+    onSubmit, 
+    disabled 
+  }: {
+    itemId: string;
+    value: string;
+    onChange: (value: string) => void;
+    onSubmit: () => void;
+    disabled: boolean;
+  }) => {
+    return (
+      <div className="flex-1 flex space-x-2 relative z-10">
+        <textarea
+          id={`comment-${itemId}`}
+          placeholder="Tulis komentar..."
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="flex-1 min-h-[40px] text-sm px-3 py-2 border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white relative z-10"
+          rows={1}
+          style={{ 
+            pointerEvents: 'auto',
+            position: 'relative',
+            zIndex: 10
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              onSubmit();
+            }
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+            e.currentTarget.focus();
+          }}
+        />
+        <Button
+          size="sm"
+          onClick={(e) => {
+            e.stopPropagation();
+            onSubmit();
+          }}
+          disabled={!value.trim() || disabled}
+          className="px-3 relative z-10"
+        >
+          <Send className="w-3 h-3" />
+        </Button>
+      </div>
+    );
+  });
 
   // TimelineCard component - simplified without complex lazy loading
   function TimelineCard({ 
@@ -663,45 +720,13 @@ export default function TimelinePage() {
                       </div>
                     )}
                   </div>
-                  <div className="flex-1 flex space-x-2 relative z-10">
-                    <textarea
-                      id={`comment-${item.id}`}
-                      placeholder="Tulis komentar..."
-                      value={commentTexts[item.id] || ''}
-                      onChange={(e) => handleCommentChange(item.id, e.target.value)}
-                      className="flex-1 min-h-[40px] text-sm px-3 py-2 border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white relative z-10"
-                      rows={1}
-                      style={{ 
-                        pointerEvents: 'auto',
-                        position: 'relative',
-                        zIndex: 10
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && !e.shiftKey) {
-                          e.preventDefault();
-                          handleAddComment(item.id);
-                        }
-                      }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        e.currentTarget.focus();
-                        setFocusedTextarea(item.id);
-                      }}
-                      onFocus={() => setFocusedTextarea(item.id)}
-                      onBlur={() => setFocusedTextarea(null)}
-                    />
-                    <Button
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleAddComment(item.id);
-                      }}
-                      disabled={!commentTexts[item.id]?.trim() || addCommentMutation.isPending}
-                      className="px-3 relative z-10"
-                    >
-                      <Send className="w-3 h-3" />
-                    </Button>
-                  </div>
+                  <CommentInput
+                    itemId={item.id}
+                    value={commentTexts[item.id] || ''}
+                    onChange={(value) => handleCommentChange(item.id, value)}
+                    onSubmit={() => handleAddComment(item.id)}
+                    disabled={addCommentMutation.isPending}
+                  />
                 </div>
               </div>
             )}
