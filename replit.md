@@ -341,6 +341,15 @@ The system includes comprehensive database connection troubleshooting tools:
 
 ## Changelog
 ```
+- July 21, 2025. **TIMELINE EXPANDABLE DETAIL ENHANCEMENT COMPLETED** - Successfully enhanced expandable detail functionality with specific task/KR/metric names and status transitions:
+  * ENHANCED: Task detail parsing to show specific task names with status transitions (e.g., "Task A (Belum Mulai → Selesai)")
+  * ENHANCED: Key Result detail parsing to show KR names with value transitions (e.g., "KR Name (old_value → new_value)")
+  * ENHANCED: Success Metrics detail parsing to show metric names with value transitions
+  * ENHANCED: Deliverables detail parsing to show deliverable names with completion status changes
+  * IMPROVED: Visual layout with bullet points, proper spacing, and status translation to Indonesian
+  * IMPLEMENTED: Fallback parsing for legacy summary formats to maintain backward compatibility
+  * ADDED: Status mapping for proper Indonesian translation (belum_mulai → "Belum Mulai", completed → "Selesai", etc.)
+  * RESULT: Timeline expandable details now show specific item names with clear before/after status/value changes instead of generic summaries
 - July 21, 2025. **TIMELINE PROGRESS BAR IMPLEMENTED** - Successfully added visual progress bar component to timeline check-in entries:
   * ADDED: Progress bar visualization for key result check-ins showing percentage completion
   * ENHANCED: Calculates progress percentage from current value vs target value with proper number parsing

@@ -648,10 +648,39 @@ export default function TimelinePage() {
                         <div>
                           <div className="flex items-center gap-2 mb-2">
                             <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                            <span className="font-semibold text-sm text-blue-800">Tugas yang Diselesaikan:</span>
+                            <span className="font-semibold text-sm text-blue-800">Tugas yang Diupdate:</span>
                           </div>
-                          <div className="text-sm text-gray-700 pl-4">
-                            {item.tasksSummary}
+                          <div className="text-sm text-gray-700 pl-4 space-y-1">
+                            {item.tasksSummary.split(', ').map((task, index) => {
+                              // Parse format: "Task Name (status_lama -> status_baru)"
+                              const match = task.match(/^(.+?)\s*\((.+?)\s*->\s*(.+?)\)$/);
+                              if (match) {
+                                const [, taskName, oldStatus, newStatus] = match;
+                                const statusMap: Record<string, string> = {
+                                  'belum_mulai': 'Belum Mulai',
+                                  'in_progress': 'Sedang Berjalan',
+                                  'completed': 'Selesai',
+                                  'cancelled': 'Dibatalkan'
+                                };
+                                return (
+                                  <div key={index} className="flex items-center gap-2">
+                                    <span className="text-xs">•</span>
+                                    <span className="font-medium">{taskName.trim()}</span>
+                                    <span className="text-xs text-gray-500">
+                                      ({statusMap[oldStatus.trim()] || oldStatus.trim()} → {statusMap[newStatus.trim()] || newStatus.trim()})
+                                    </span>
+                                  </div>
+                                );
+                              } else {
+                                // Fallback untuk format lama
+                                return (
+                                  <div key={index} className="flex items-center gap-2">
+                                    <span className="text-xs">•</span>
+                                    <span>{task.trim()}</span>
+                                  </div>
+                                );
+                              }
+                            })}
                           </div>
                         </div>
                       )}
@@ -663,8 +692,30 @@ export default function TimelinePage() {
                             <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
                             <span className="font-semibold text-sm text-purple-800">Key Result yang Diupdate:</span>
                           </div>
-                          <div className="text-sm text-gray-700 pl-4">
-                            {item.keyResultsSummary}
+                          <div className="text-sm text-gray-700 pl-4 space-y-1">
+                            {item.keyResultsSummary.split(', ').map((keyResult, index) => {
+                              // Parse format: "KR Name (old_value -> new_value unit)" 
+                              const match = keyResult.match(/^(.+?)\s*\((.+?)\s*->\s*(.+?)\)$/);
+                              if (match) {
+                                const [, krName, oldValue, newValue] = match;
+                                return (
+                                  <div key={index} className="flex items-center gap-2">
+                                    <span className="text-xs">•</span>
+                                    <span className="font-medium">{krName.trim()}</span>
+                                    <span className="text-xs text-gray-500">
+                                      ({oldValue.trim()} → {newValue.trim()})
+                                    </span>
+                                  </div>
+                                );
+                              } else {
+                                return (
+                                  <div key={index} className="flex items-center gap-2">
+                                    <span className="text-xs">•</span>
+                                    <span>{keyResult.trim()}</span>
+                                  </div>
+                                );
+                              }
+                            })}
                           </div>
                         </div>
                       )}
@@ -676,8 +727,30 @@ export default function TimelinePage() {
                             <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
                             <span className="font-semibold text-sm text-orange-800">Metrik Sukses yang Diupdate:</span>
                           </div>
-                          <div className="text-sm text-gray-700 pl-4">
-                            {item.successMetricsSummary}
+                          <div className="text-sm text-gray-700 pl-4 space-y-1">
+                            {item.successMetricsSummary.split(', ').map((metric, index) => {
+                              // Parse format: "Metric Name (old_value -> new_value unit)"
+                              const match = metric.match(/^(.+?)\s*\((.+?)\s*->\s*(.+?)\)$/);
+                              if (match) {
+                                const [, metricName, oldValue, newValue] = match;
+                                return (
+                                  <div key={index} className="flex items-center gap-2">
+                                    <span className="text-xs">•</span>
+                                    <span className="font-medium">{metricName.trim()}</span>
+                                    <span className="text-xs text-gray-500">
+                                      ({oldValue.trim()} → {newValue.trim()})
+                                    </span>
+                                  </div>
+                                );
+                              } else {
+                                return (
+                                  <div key={index} className="flex items-center gap-2">
+                                    <span className="text-xs">•</span>
+                                    <span>{metric.trim()}</span>
+                                  </div>
+                                );
+                              }
+                            })}
                           </div>
                         </div>
                       )}
@@ -689,8 +762,36 @@ export default function TimelinePage() {
                             <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
                             <span className="font-semibold text-sm text-indigo-800">Output yang Diselesaikan:</span>
                           </div>
-                          <div className="text-sm text-gray-700 pl-4">
-                            {item.deliverablesSummary}
+                          <div className="text-sm text-gray-700 pl-4 space-y-1">
+                            {item.deliverablesSummary.split(', ').map((deliverable, index) => {
+                              // Parse format: "Deliverable Name (belum -> selesai)" atau format lain
+                              const match = deliverable.match(/^(.+?)\s*\((.+?)\s*->\s*(.+?)\)$/);
+                              if (match) {
+                                const [, deliverableName, oldStatus, newStatus] = match;
+                                const statusMap: Record<string, string> = {
+                                  'belum': 'Belum Selesai',
+                                  'selesai': 'Selesai',
+                                  'false': 'Belum Selesai',
+                                  'true': 'Selesai'
+                                };
+                                return (
+                                  <div key={index} className="flex items-center gap-2">
+                                    <span className="text-xs">•</span>
+                                    <span className="font-medium">{deliverableName.trim()}</span>
+                                    <span className="text-xs text-gray-500">
+                                      ({statusMap[oldStatus.trim()] || oldStatus.trim()} → {statusMap[newStatus.trim()] || newStatus.trim()})
+                                    </span>
+                                  </div>
+                                );
+                              } else {
+                                return (
+                                  <div key={index} className="flex items-center gap-2">
+                                    <span className="text-xs">•</span>
+                                    <span>{deliverable.trim()}</span>
+                                  </div>
+                                );
+                              }
+                            })}
                           </div>
                         </div>
                       )}
