@@ -100,6 +100,7 @@ export default function TimelinePage() {
   const [showReactionPicker, setShowReactionPicker] = useState<Record<string, boolean>>({});
   const [showReactionModal, setShowReactionModal] = useState<Record<string, boolean>>({});
   const [currentReactionsTimelineId, setCurrentReactionsTimelineId] = useState<string | null>(null);
+  const [selectedReactionTab, setSelectedReactionTab] = useState('all');
   const [commentTexts, setCommentTexts] = useState<Record<string, string>>({});
 
   // Lazy loading states - simpler approach showing N items at a time
@@ -214,6 +215,7 @@ export default function TimelinePage() {
 
   const openReactionsModal = (timelineId: string) => {
     setCurrentReactionsTimelineId(timelineId);
+    setSelectedReactionTab('all'); // Reset tab selection
     setShowReactionModal(prev => ({ ...prev, [timelineId]: true }));
   };
 
@@ -849,54 +851,109 @@ export default function TimelinePage() {
       </div>
 
       {/* Reactions Modal */}
-      {currentReactionsTimelineId && (
-        <Dialog 
-          open={showReactionModal[currentReactionsTimelineId] || false} 
-          onOpenChange={(open) => !open && closeReactionsModal(currentReactionsTimelineId)}
-        >
-          <DialogContent className="max-w-md">
-            <DialogHeader>
-              <DialogTitle>Reaksi</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-3 max-h-80 overflow-y-auto">
-              {detailedReactions.length > 0 ? (
-                <div className="space-y-2">
-                  {detailedReactions.map((reaction) => (
-                    <div key={reaction.id} className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50">
-                      <div className="flex-shrink-0">
-                        {reaction.user?.profileImageUrl ? (
-                          <img 
-                            src={reaction.user.profileImageUrl} 
-                            alt={reaction.user.name}
-                            className="w-8 h-8 rounded-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-green-500 rounded-full flex items-center justify-center text-white font-semibold text-xs">
-                            {getUserInitials({ name: reaction.user?.name || 'User' })}
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <div className="font-medium text-sm text-gray-900">{reaction.user?.name}</div>
-                        <div className="text-xs text-gray-500">
-                          {format(new Date(reaction.createdAt), "MMM dd, HH:mm")}
-                        </div>
-                      </div>
-                      <div className="text-lg">
-                        {reaction.emoji}
-                      </div>
-                    </div>
+      {currentReactionsTimelineId && (() => {
+        // Group reactions by emoji
+        const reactionGroups = detailedReactions.reduce((groups, reaction) => {
+          const emoji = reaction.emoji;
+          if (!groups[emoji]) {
+            groups[emoji] = [];
+          }
+          groups[emoji].push(reaction);
+          return groups;
+        }, {} as Record<string, typeof detailedReactions>);
+
+        const emojiTabs = Object.keys(reactionGroups);
+        const totalCount = detailedReactions.length;
+
+        return (
+          <Dialog 
+            open={showReactionModal[currentReactionsTimelineId] || false} 
+            onOpenChange={(open) => !open && closeReactionsModal(currentReactionsTimelineId)}
+          >
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle>Reaksi</DialogTitle>
+              </DialogHeader>
+              
+              {/* Reaction Tabs */}
+              {Object.keys(reactionGroups).length > 0 && (
+                <div className="flex space-x-1 border-b border-gray-200 mb-3">
+                  {/* All tab */}
+                  <button
+                    onClick={() => setSelectedReactionTab('all')}
+                    className={`flex items-center space-x-1 px-3 py-2 text-sm font-medium rounded-t-lg border-b-2 transition-colors ${
+                      selectedReactionTab === 'all' 
+                        ? 'border-blue-500 text-blue-600 bg-blue-50' 
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    <span>All</span>
+                    <span>{totalCount}</span>
+                  </button>
+                  
+                  {/* Individual emoji tabs */}
+                  {emojiTabs.map((emoji) => (
+                    <button
+                      key={emoji}
+                      onClick={() => setSelectedReactionTab(emoji)}
+                      className={`flex items-center space-x-1 px-3 py-2 text-sm font-medium rounded-t-lg border-b-2 transition-colors ${
+                        selectedReactionTab === emoji 
+                          ? 'border-blue-500 text-blue-600 bg-blue-50' 
+                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                      }`}
+                    >
+                      <span>{emoji}</span>
+                      <span>{reactionGroups[emoji].length}</span>
+                    </button>
                   ))}
                 </div>
-              ) : (
-                <div className="text-center py-6">
-                  <div className="text-gray-500 text-sm">Belum ada reaksi</div>
-                </div>
               )}
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
+
+              {/* Reaction List */}
+              <div className="space-y-3 max-h-80 overflow-y-auto">
+                {(() => {
+                  const reactionsToShow = selectedReactionTab === 'all' ? detailedReactions : reactionGroups[selectedReactionTab] || [];
+                  
+                  return reactionsToShow.length > 0 ? (
+                    <div className="space-y-2">
+                      {reactionsToShow.map((reaction) => (
+                        <div key={reaction.id} className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50">
+                          <div className="flex-shrink-0">
+                            {reaction.user?.profileImageUrl ? (
+                              <img 
+                                src={reaction.user.profileImageUrl} 
+                                alt={reaction.user.name}
+                                className="w-8 h-8 rounded-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-green-500 rounded-full flex items-center justify-center text-white font-semibold text-xs">
+                                {getUserInitials({ name: reaction.user?.name || 'User' })}
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex-1">
+                            <div className="font-medium text-sm text-gray-900">{reaction.user?.name}</div>
+                            <div className="text-xs text-gray-500">
+                              {format(new Date(reaction.createdAt), "MMM dd, HH:mm")}
+                            </div>
+                          </div>
+                          <div className="text-lg">
+                            {reaction.emoji}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-6">
+                      <div className="text-gray-500 text-sm">Belum ada reaksi</div>
+                    </div>
+                  );
+                })()}
+              </div>
+            </DialogContent>
+          </Dialog>
+        );
+      })()}
     </div>
   );
 }
