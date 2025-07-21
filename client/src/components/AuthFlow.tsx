@@ -659,7 +659,8 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                         type="text"
                         placeholder="Masukkan kode undangan"
                         {...registerForm.register("invitationCode")}
-                        className="pl-10 h-11 border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all duration-200"
+                        className="pl-10 h-11 border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all duration-200 uppercase"
+                        style={{ textTransform: 'uppercase' }}
                       />
                     </div>
                     {registerForm.formState.errors.invitationCode && (

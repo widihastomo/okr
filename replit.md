@@ -396,6 +396,13 @@ export DATABASE_URL="postgresql://..." && npm run dev
 
 ## Changelog
 ```
+- July 21, 2025. **INVITATION CODE INPUT SYSTEM COMPLETED** - Successfully implemented invitation code input with toggle functionality and uppercase formatting:
+  * ADDED: Toggle-able invitation code input below password field with "Punya kode undangan?" button
+  * IMPLEMENTED: Smooth slide-in animation with chevron up/down indicators for toggle state
+  * ENHANCED: Gift icon and uppercase text formatting for professional appearance
+  * INTEGRATED: Optional invitation code field in registration schema with proper validation
+  * STYLED: Consistent orange-themed focus states and smooth transitions
+  * RESULT: Users can optionally enter invitation codes during registration with uppercase automatic formatting
 - July 21, 2025. **COMPANY DETAILS COLLECTION SYSTEM COMPLETED** - Successfully implemented comprehensive company details collection before welcome screen:
   * CREATED: CompanyDetailsModal.tsx with 6 required fields (company address, province, city, industry type, position, referral source)
   * ADDED: Database schema updates for users table with company details fields (company_address, province, city, industry_type, position, referral_source)
