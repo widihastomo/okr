@@ -1,120 +1,80 @@
-# Setup OKR Management System - Local Development
+# Setup Local Development
 
-## Prerequisites
+## Quick Fix untuk DATABASE_URL Error
 
-1. **Node.js (versi 18 atau 20)**
-   - Download dari [nodejs.org](https://nodejs.org)
-   - Verifikasi: `node --version` dan `npm --version`
+### Option 1: Gunakan Database Neon (Recommended)
+1. Copy file `.env` dari Replit ke project local Anda
+2. Pastikan file `.env` ada di root folder project (sama level dengan package.json)
+3. Isi DATABASE_URL dengan connection string berikut:
 
-2. **PostgreSQL Database**
-   - Download dari [postgresql.org](https://postgresql.org)
-   - Atau gunakan Docker: `docker run --name postgres -e POSTGRES_PASSWORD=password -p 5432:5432 -d postgres`
-
-## Installation Steps
-
-### 1. Setup Project
 ```bash
-# Clone atau download project
-git clone [repository-url]
-cd okr-management-system
+# Copy file .env dari Replit atau buat file .env baru dengan content:
+DATABASE_URL=postgresql://neondb_owner:npg_YuHkG0BUSgb3@ep-super-fog-a69ws4u6.us-west-2.aws.neon.tech/neondb?sslmode=require
+DB_CONNECTION_TYPE=neon
+NODE_ENV=development
+SESSION_SECRET=your_session_secret_here_local
+PORT=5000
+```
 
+### Option 2: Setup PostgreSQL Local
+Jika ingin menggunakan database local:
+
+1. Install PostgreSQL di Mac:
+```bash
+brew install postgresql
+brew services start postgresql
+```
+
+2. Buat database local:
+```bash
+createdb okr_local
+```
+
+3. Update .env:
+```bash
+DATABASE_URL=postgresql://username:password@localhost:5432/okr_local
+DB_CONNECTION_TYPE=node-postgres
+```
+
+### Troubleshooting
+
+#### Jika masih error "DATABASE_URL not found":
+1. Pastikan file .env ada di root folder project
+2. Restart terminal dan npm run dev
+3. Check apakah dotenv ter-install: `npm list dotenv`
+
+#### Debug Steps:
+1. Run aplikasi dan lihat output console
+2. Akan muncul debug info seperti:
+   ```
+   🔍 Environment Debug Info:
+   - NODE_ENV: development
+   - DATABASE_URL exists: true/false
+   - Current working directory: /path/to/project
+   ```
+
+3. Jika DATABASE_URL exists: false, berarti .env tidak ter-load
+
+## Quick Commands
+
+```bash
 # Install dependencies
 npm install
-```
 
-### 2. Database Setup
-```sql
--- Buka psql atau pgAdmin dan jalankan:
-CREATE DATABASE okr_management;
-CREATE USER okr_user WITH PASSWORD 'okr_password';
-GRANT ALL PRIVILEGES ON DATABASE okr_management TO okr_user;
-```
-
-### 3. Environment Configuration
-Buat file `.env` di root project:
-```env
-NODE_ENV=development
-DATABASE_URL=postgresql://okr_user:okr_password@localhost:5432/okr_management
-PORT=3000
-SESSION_SECRET=your-secret-key-here
-```
-
-**Penting:** Ganti `okr_user`, `okr_password`, dan `your-secret-key-here` sesuai konfigurasi Anda.
-
-### 4. Database Schema
-```bash
-# Push schema ke database
+# Setup database (if using local PostgreSQL)
 npm run db:push
-```
 
-### 5. Start Application
-```bash
-# Development mode
+# Start development server
 npm run dev
-
-# Production mode
-npm run build
-npm start
 ```
 
-## Access Application
+## Verification
 
-- **URL:** http://localhost:3000
-- **Default Admin Login:**
-  - Email: `admin@example.com`
-  - Password: `password123`
-
-## Troubleshooting
-
-### Error "DATABASE_URL must be set"
-- Pastikan file `.env` ada di root folder
-- Periksa format DATABASE_URL sudah benar
-- Restart aplikasi setelah mengubah .env
-
-### Error Database Connection
-- Pastikan PostgreSQL running: `systemctl status postgresql` (Linux) atau cek Services (Windows)
-- Test koneksi: `psql -h localhost -U okr_user -d okr_management`
-- Periksa firewall tidak memblokir port 5432
-
-### Port Already in Use
-- Default port sekarang 3000, jika masih conflict ubah PORT di file .env ke port lain (contoh: 8000)
-- Atau stop aplikasi yang menggunakan port tersebut
-
-### Permission Denied
-```bash
-# Fix npm permissions (Linux/Mac)
-sudo chown -R $(whoami) ~/.npm
+Server berhasil jika muncul log:
 ```
-
-## Production Deployment
-
-Untuk deployment production:
-```bash
-# Build aplikasi
-npm run build
-
-# Set environment
-export NODE_ENV=production
-export DATABASE_URL=postgresql://user:pass@host:port/db
-
-# Start server
-npm start
+✅ Database connection successful (Neon)
+✅ Server started successfully
+🌐 Environment: development
+🚀 Server listening on host: 0.0.0.0
+📡 Port: 5000
 ```
-
-## Features Available
-
-- ✅ User Management & Authentication
-- ✅ OKR Creation & Tracking
-- ✅ Progress Monitoring with Charts
-- ✅ Team Collaboration
-- ✅ Initiative & Task Management
-- ✅ Automatic Status Calculations
-- ✅ Cycle Management (Monthly/Quarterly/Annual)
-
-## Support
-
-Jika mengalami masalah, periksa:
-1. Console browser untuk error JavaScript
-2. Terminal/command prompt untuk error server
-3. Database logs untuk error koneksi
-4. File .env format dan nilai yang benar

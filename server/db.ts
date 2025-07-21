@@ -9,8 +9,12 @@ try {
   // Check if dotenv is available before requiring
   const dotenv = require('dotenv');
   if (dotenv && typeof dotenv.config === 'function') {
-    dotenv.config();
-    console.log("✅ Environment variables loaded from .env file via dotenv");
+    const result = dotenv.config();
+    if (result.error) {
+      console.log("⚠️  dotenv config failed:", result.error.message);
+    } else {
+      console.log("✅ Environment variables loaded from .env file via dotenv");
+    }
   } else {
     console.log("⚠️  dotenv config method not available, using process.env directly");
   }
@@ -21,6 +25,17 @@ try {
   } else {
     console.log("✅ Using existing environment variables");
   }
+}
+
+// Debug environment variables for local development
+console.log("🔍 Environment Debug Info:");
+console.log("- NODE_ENV:", process.env.NODE_ENV);
+console.log("- DATABASE_URL exists:", !!process.env.DATABASE_URL);
+console.log("- Current working directory:", process.cwd());
+if (process.env.DATABASE_URL) {
+  const dbUrl = process.env.DATABASE_URL;
+  const maskedUrl = dbUrl.replace(/:\/\/[^:]+:[^@]+@/, '://***:***@');
+  console.log("- DATABASE_URL format:", maskedUrl);
 }
 
 // Check and construct DATABASE_URL if needed
