@@ -33,6 +33,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useLocation } from "wouter";
 import WelcomeScreen from "./WelcomeScreen";
+import TourCompletionModal from "./TourCompletionModal";
 
 interface TourStep {
   id: string;
@@ -377,6 +378,7 @@ export default function TourSystem() {
   const [waitingForClick, setWaitingForClick] = useState(false);
   const [location, setLocation] = useLocation();
   const [showWelcomeScreen, setShowWelcomeScreen] = useState(false);
+  const [showCompletionModal, setShowCompletionModal] = useState(false);
 
   const totalSteps = TOUR_STEPS.length;
 
@@ -443,6 +445,9 @@ export default function TourSystem() {
     setIsVisible(false);
     localStorage.setItem("tour-completed", "true");
     cleanupHighlights();
+    
+    // Show completion modal with celebration
+    setShowCompletionModal(true);
   };
 
   console.log("TourSystemNew state:", { isActive, currentStep, totalSteps });
@@ -963,6 +968,13 @@ export default function TourSystem() {
         isOpen={showWelcomeScreen}
         onClose={handleWelcomeScreenClose}
         onStartTour={handleStartTourFromWelcome}
+      />
+
+      {/* Tour Completion Modal */}
+      <TourCompletionModal
+        isOpen={showCompletionModal}
+        onClose={() => setShowCompletionModal(false)}
+        isSkipped={false}
       />
     </>
   );

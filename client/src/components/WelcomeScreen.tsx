@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -27,6 +27,7 @@ import {
   Sparkles,
   Play,
 } from "lucide-react";
+import TourCompletionModal from "./TourCompletionModal";
 
 interface WelcomeScreenProps {
   isOpen: boolean;
@@ -41,6 +42,8 @@ export default function WelcomeScreen({
 }: WelcomeScreenProps) {
   const { toast } = useToast();
   const startTourButtonRef = useRef<HTMLButtonElement>(null);
+  const [showCompletionModal, setShowCompletionModal] = useState(false);
+  const [isSkipped, setIsSkipped] = useState(false);
 
   // Focus on "Mulai Tour" button when modal opens
   useEffect(() => {
@@ -119,20 +122,19 @@ export default function WelcomeScreen({
       
       // Mark missions completed even if user skips tour
       await updateOnboardingProgress('missions_completed');
-      toast({
-        title: "Welcome mission selesai!",
-        description: "Anda dapat memulai menggunakan platform sekarang.",
-      });
+      
+      // Close welcome screen and show completion modal
       onClose();
+      setIsSkipped(true);
+      setShowCompletionModal(true);
+      
     } catch (error) {
       console.error('Failed to update tour completed status:', error);
       // Still proceed with closing even if API call fails
       await updateOnboardingProgress('missions_completed');
-      toast({
-        title: "Welcome mission selesai!",
-        description: "Anda dapat memulai menggunakan platform sekarang.",
-      });
       onClose();
+      setIsSkipped(true);
+      setShowCompletionModal(true);
     }
   };
 
@@ -171,6 +173,7 @@ export default function WelcomeScreen({
   ];
 
   return (
+    <>
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
@@ -248,17 +251,21 @@ export default function WelcomeScreen({
           </div>
 
           {/* Tour Info */}
-          <div className="text-center text-xs text-gray-500 border-t pt-4 space-y-2">
+          <div className="text-center text-xs text-gray-500 border-t pt-4">
             <p>
               Tour interaktif ini akan memandu Anda melalui 10 fitur utama
               platform (~5 menit)
-            </p>
-            <p className="text-orange-600 font-medium">
-              💡 Anda dapat mengulangi tour kapan saja melalui menu "Bantuan" di sidebar
             </p>
           </div>
         </div>
       </DialogContent>
     </Dialog>
+
+    <TourCompletionModal
+      isOpen={showCompletionModal}
+      onClose={() => setShowCompletionModal(false)}
+      isSkipped={isSkipped}
+    />
+    </>
   );
 }
