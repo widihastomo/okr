@@ -6,11 +6,21 @@ import * as schema from "@shared/schema";
 
 // Load environment variables early and reliably
 try {
-  // Load dotenv synchronously for reliable .env loading
-  require('dotenv').config();
-  console.log("✅ Environment variables loaded from .env file");
+  // Check if dotenv is available before requiring
+  const dotenv = require('dotenv');
+  if (dotenv && typeof dotenv.config === 'function') {
+    dotenv.config();
+    console.log("✅ Environment variables loaded from .env file via dotenv");
+  } else {
+    console.log("⚠️  dotenv config method not available, using process.env directly");
+  }
 } catch (error) {
-  console.log("⚠️  dotenv not available, using process.env directly");
+  // Only log warning if it's actually an import error
+  if (error.code === 'MODULE_NOT_FOUND') {
+    console.log("⚠️  dotenv package not found, using process.env directly");
+  } else {
+    console.log("✅ Using existing environment variables");
+  }
 }
 
 // Check and construct DATABASE_URL if needed

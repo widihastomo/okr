@@ -364,6 +364,13 @@ The system includes comprehensive database connection troubleshooting tools:
   * ADDED: Debugging logs showing element discovery, content updates, and cursor positioning
   * ENHANCED: Event handling with preventDefault and stopPropagation for reliable click detection
   * RESULT: Complete debugging system ready to identify why click-to-mention is not working properly
+- July 21, 2025. **DOTENV LOADING WARNING FIXED** - Successfully resolved dotenv loading warning in local development:
+  * FIXED: Enhanced dotenv loading logic with proper error checking in db.ts
+  * RESOLVED: Warning "dotenv not available, using process.env directly" no longer appears
+  * IMPROVED: Better error handling that only logs meaningful warnings for actual module errors
+  * ENHANCED: Environment variable loading now shows "Using existing environment variables" message
+  * VERIFIED: Server startup clean without false warnings about dotenv availability
+  * RESULT: Clean development environment startup without confusing dotenv warnings
 - July 21, 2025. **TIMELINE REACTION SCROLL PRESERVATION FIXED** - Successfully resolved auto-scroll issue when clicking reaction buttons:
   * FIXED: Enhanced scroll preservation for all reaction-related interactions (emoji picker, like button, reaction selection)
   * IMPROVED: Added delayed scroll restoration (50-100ms) to account for DOM updates after mutations
