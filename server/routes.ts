@@ -4726,6 +4726,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get detailed reactions for a specific timeline item
+  app.get("/api/timeline/:timelineId/detailed-reactions", requireAuth, async (req, res) => {
+    try {
+      const { timelineId } = req.params;
+      const user = req.user as User;
+      const reactions = await storage.getTimelineReactions(timelineId);
+      
+      // Filter by organization for security
+      const filteredReactions = reactions.filter(reaction => reaction.organizationId === user.organizationId);
+      
+      res.json(filteredReactions);
+    } catch (error) {
+      console.error("Error fetching detailed reactions:", error);
+      res.status(500).json({ message: "Failed to fetch detailed reactions" });
+    }
+  });
+
   app.post("/api/timeline/:checkInId/reactions", requireAuth, async (req, res) => {
     try {
       const user = req.user as User;

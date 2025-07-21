@@ -5,6 +5,7 @@ import { Link } from 'wouter';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { 
@@ -98,6 +99,7 @@ export default function TimelinePage() {
   const [showComments, setShowComments] = useState<Record<string, boolean>>({});
   const [showReactionPicker, setShowReactionPicker] = useState<Record<string, boolean>>({});
   const [showReactionModal, setShowReactionModal] = useState<Record<string, boolean>>({});
+  const [currentReactionsTimelineId, setCurrentReactionsTimelineId] = useState<string | null>(null);
   const [commentTexts, setCommentTexts] = useState<Record<string, string>>({});
 
   // Lazy loading states - simpler approach showing N items at a time
@@ -131,6 +133,12 @@ export default function TimelinePage() {
   const { data: timelineComments = {} } = useQuery<Record<string, { id: string; content: string; createdAt: string; user: { name: string; profileImageUrl?: string; }; }[]>>({
     queryKey: ['/api/timeline/comments'],
     enabled: !!user?.id,
+  });
+
+  // Fetch detailed reactions for a specific timeline item (for modal)
+  const { data: detailedReactions = [] } = useQuery<{ id: string; emoji: string; user: { name: string; profileImageUrl?: string; }; createdAt: string; }[]>({
+    queryKey: ['/api/timeline', currentReactionsTimelineId, 'detailed-reactions'],
+    enabled: !!currentReactionsTimelineId && !!user?.id,
   });
 
   // Filter timeline data
@@ -202,6 +210,16 @@ export default function TimelinePage() {
   const toggleReaction = (itemId: string) => {
     // Toggle like reaction
     addReactionMutation.mutate({ itemId, emoji: '❤️' });
+  };
+
+  const openReactionsModal = (timelineId: string) => {
+    setCurrentReactionsTimelineId(timelineId);
+    setShowReactionModal(prev => ({ ...prev, [timelineId]: true }));
+  };
+
+  const closeReactionsModal = (timelineId: string) => {
+    setCurrentReactionsTimelineId(null);
+    setShowReactionModal(prev => ({ ...prev, [timelineId]: false }));
   };
 
   // Mutations for comments and reactions
@@ -460,7 +478,10 @@ export default function TimelinePage() {
                             })}
                         </div>
                         {/* Total reaction count */}
-                        <span className="text-gray-600 hover:underline cursor-pointer">
+                        <span 
+                          className="text-gray-600 hover:underline cursor-pointer"
+                          onClick={() => openReactionsModal(item.id)}
+                        >
                           {Object.values(timelineReactions[item.id] || {}).reduce((sum, count) => sum + count, 0)} orang
                         </span>
                       </div>
@@ -826,6 +847,56 @@ export default function TimelinePage() {
           </div>
         </div>
       </div>
+
+      {/* Reactions Modal */}
+      {currentReactionsTimelineId && (
+        <Dialog 
+          open={showReactionModal[currentReactionsTimelineId] || false} 
+          onOpenChange={(open) => !open && closeReactionsModal(currentReactionsTimelineId)}
+        >
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Reaksi</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-3 max-h-80 overflow-y-auto">
+              {detailedReactions.length > 0 ? (
+                <div className="space-y-2">
+                  {detailedReactions.map((reaction) => (
+                    <div key={reaction.id} className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50">
+                      <div className="flex-shrink-0">
+                        {reaction.user?.profileImageUrl ? (
+                          <img 
+                            src={reaction.user.profileImageUrl} 
+                            alt={reaction.user.name}
+                            className="w-8 h-8 rounded-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-green-500 rounded-full flex items-center justify-center text-white font-semibold text-xs">
+                            {getUserInitials({ name: reaction.user?.name || 'User' })}
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <div className="font-medium text-sm text-gray-900">{reaction.user?.name}</div>
+                        <div className="text-xs text-gray-500">
+                          {format(new Date(reaction.createdAt), "MMM dd, HH:mm")}
+                        </div>
+                      </div>
+                      <div className="text-lg">
+                        {reaction.emoji}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-6">
+                  <div className="text-gray-500 text-sm">Belum ada reaksi</div>
+                </div>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }
