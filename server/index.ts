@@ -190,8 +190,12 @@ const config = getConfig();
   });
 
   // 3. Static files and SPA routing (lowest priority)
+  console.log(`🔍 Environment check: isDevelopment = ${config.isDevelopment}, NODE_ENV = ${process.env.NODE_ENV}`);
+  
   if (config.isDevelopment) {
+    console.log("🚀 Setting up Vite development server...");
     await setupVite(app, server);
+    console.log("✅ Vite development server configured");
   } else {
     // Production: Enhanced static file serving with proper fallbacks
     const path = await import("path");
