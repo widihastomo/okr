@@ -1,68 +1,66 @@
 #!/usr/bin/env node
 
-// Local development startup script with proper environment loading
-import { config } from 'dotenv';
-import { resolve } from 'path';
-import { existsSync } from 'fs';
-import { spawn } from 'child_process';
+// Local development startup script with enhanced environment loading
+const { spawn } = require('child_process');
+const fs = require('fs');
+const path = require('path');
 
-// Load .env file explicitly
-const envPath = resolve(process.cwd(), '.env');
-if (existsSync(envPath)) {
-  config({ path: envPath });
-  console.log('✅ Environment file loaded from .env');
-} else {
-  console.log('⚠️  No .env file found, using system environment variables');
+console.log('🚀 Starting local development server...');
+
+// Check if .env file exists
+const envPath = path.join(process.cwd(), '.env');
+const envLocalPath = path.join(process.cwd(), '.env.local');
+
+if (!fs.existsSync(envPath)) {
+  console.log('❌ .env file not found in project root');
+  
+  if (fs.existsSync(envLocalPath)) {
+    console.log('🔧 Found .env.local, copying to .env...');
+    fs.copyFileSync(envLocalPath, envPath);
+    console.log('✅ .env file created from .env.local');
+  } else {
+    console.log('❌ No .env or .env.local file found');
+    console.log('💡 Please create .env file with DATABASE_URL');
+    process.exit(1);
+  }
 }
 
-// Validate required environment variables
-const requiredVars = ['DATABASE_URL'];
-const missing = requiredVars.filter(key => !process.env[key]);
-
-if (missing.length > 0) {
-  console.error('❌ Missing required environment variables:');
-  missing.forEach(key => console.error(`   - ${key}`));
-  console.log('\n📝 Create a .env file with:');
-  console.log('DATABASE_URL=postgresql://username:password@localhost:5432/okr_management');
-  console.log('NODE_ENV=development');
-  console.log('PORT=3000');
+// Verify .env content
+const envContent = fs.readFileSync(envPath, 'utf8');
+if (!envContent.includes('DATABASE_URL')) {
+  console.log('❌ DATABASE_URL not found in .env file');
+  console.log('💡 Please add DATABASE_URL to your .env file');
   process.exit(1);
 }
 
-// Show current configuration
-console.log('🚀 Starting OKR Management System...');
-console.log('📋 Configuration:');
-console.log(`   NODE_ENV: ${process.env.NODE_ENV || 'development'}`);
-console.log(`   PORT: ${process.env.PORT || '3000'}`);
-console.log(`   DATABASE: ${process.env.DATABASE_URL ? '✅ Set' : '❌ Missing'}`);
+console.log('✅ Environment file validated');
 
-// Start the application
-const server = spawn('npx', ['tsx', 'server/index.ts'], {
+// Force load environment variables
+require('dotenv').config({ path: envPath });
+
+// Verify DATABASE_URL is loaded
+if (!process.env.DATABASE_URL) {
+  console.log('❌ DATABASE_URL still not loaded after dotenv.config()');
+  process.exit(1);
+}
+
+console.log('✅ DATABASE_URL loaded successfully');
+
+// Start the development server
+const child = spawn('npm', ['run', 'dev'], {
   stdio: 'inherit',
   env: {
     ...process.env,
-    NODE_ENV: process.env.NODE_ENV || 'development',
-    PORT: process.env.PORT || '3000'
+    NODE_ENV: 'development'
   }
 });
 
-server.on('error', (err) => {
-  console.error('❌ Failed to start server:', err.message);
+child.on('error', (error) => {
+  console.error('❌ Failed to start development server:', error);
   process.exit(1);
 });
 
-server.on('close', (code) => {
-  console.log(`Server process exited with code ${code}`);
+child.on('close', (code) => {
+  console.log(`\n🏁 Development server exited with code ${code}`);
   process.exit(code);
-});
-
-// Handle shutdown signals
-process.on('SIGTERM', () => {
-  console.log('🔄 SIGTERM received, shutting down gracefully');
-  server.kill('SIGTERM');
-});
-
-process.on('SIGINT', () => {
-  console.log('🔄 SIGINT received, shutting down gracefully');
-  server.kill('SIGINT');
 });
