@@ -425,6 +425,58 @@ export default function TimelinePage() {
           
           {/* Social Engagement Section */}
           <div className="border-t border-gray-100">
+            {/* Reactions Summary Bar */}
+            {(timelineReactions[item.id] && Object.keys(timelineReactions[item.id]).length > 0) || (timelineComments[item.id] && timelineComments[item.id].length > 0) ? (
+              <div className="px-3 md:px-4 py-2 border-b border-gray-50">
+                <div className="flex items-center justify-between text-sm text-gray-600">
+                  {/* Left side - Reactions */}
+                  <div className="flex items-center space-x-2">
+                    {timelineReactions[item.id] && Object.keys(timelineReactions[item.id]).length > 0 && (
+                      <div className="flex items-center space-x-1">
+                        {/* Show top 3 emoji reactions */}
+                        <div className="flex -space-x-1">
+                          {Object.entries(timelineReactions[item.id] || {})
+                            .sort(([,a], [,b]) => b - a)
+                            .slice(0, 3)
+                            .map(([emoji]) => {
+                              // Get background color based on emoji
+                              const getEmojiBackground = (emoji: string) => {
+                                switch(emoji) {
+                                  case '👍': return 'bg-blue-500';
+                                  case '❤️': return 'bg-red-500';
+                                  case '😂': return 'bg-yellow-400';
+                                  case '😮': return 'bg-orange-400';
+                                  case '😢': return 'bg-blue-400';
+                                  case '😡': return 'bg-red-600';
+                                  default: return 'bg-gray-400';
+                                }
+                              };
+                              
+                              return (
+                                <div key={emoji} className={`w-5 h-5 ${getEmojiBackground(emoji)} rounded-full flex items-center justify-center text-xs border-2 border-white shadow-sm`}>
+                                  <span className="text-white text-[10px]">{emoji}</span>
+                                </div>
+                              );
+                            })}
+                        </div>
+                        {/* Total reaction count */}
+                        <span className="text-gray-600 hover:underline cursor-pointer">
+                          {Object.values(timelineReactions[item.id] || {}).reduce((sum, count) => sum + count, 0)} orang
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Right side - Comments count */}
+                  {timelineComments[item.id] && timelineComments[item.id].length > 0 && (
+                    <span className="text-gray-500 hover:underline cursor-pointer">
+                      {timelineComments[item.id]?.length || 0} komentar
+                    </span>
+                  )}
+                </div>
+              </div>
+            ) : null}
+            
             {/* Engagement buttons */}
             <div className="px-3 md:px-4 py-2 flex items-center justify-between">
               <div className="flex items-center space-x-4 md:space-x-6">
