@@ -631,10 +631,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/auth/update-company-details", requireAuth, async (req, res) => {
     try {
       const user = req.user as User;
-      const { companyAddress, province, city, industryType, position, referralSource } = req.body;
+      const { companyName, companyAddress, province, city, industryType, position, referralSource } = req.body;
       
       // Validate required fields
-      if (!companyAddress || !province || !city || !industryType || !position || !referralSource) {
+      if (!companyName || !companyAddress || !province || !city || !industryType || !position || !referralSource) {
         return res.status(400).json({ 
           message: "Semua field company details harus diisi" 
         });
@@ -650,6 +650,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         referralSource,
         updatedAt: new Date(),
       });
+
+      // Update organization name if companyName is provided
+      if (companyName && user.organizationId) {
+        await storage.updateOrganization(user.organizationId, {
+          name: companyName,
+          updatedAt: new Date(),
+        });
+      }
       
       res.json({
         message: "Company details berhasil disimpan",

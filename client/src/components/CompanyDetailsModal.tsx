@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,6 +21,7 @@ import { Building2, MapPin, Briefcase, Users, Search, Check, ChevronsUpDown } fr
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { SimpleSelect } from "@/components/SimpleSelect";
+import { useQuery } from "@tanstack/react-query";
 
 interface CompanyDetailsModalProps {
   open: boolean;
@@ -31,6 +32,7 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
+    companyName: "",
     companyAddress: "",
     province: "",
     city: "",
@@ -38,6 +40,30 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
     position: "",
     referralSource: "",
   });
+
+  // Fetch user data with organization info
+  const { data: userData } = useQuery({
+    queryKey: ['/api/my-organization-with-role'],
+    enabled: open,
+  });
+
+  // Auto-fill company name and existing company details when modal opens
+  useEffect(() => {
+    if (userData && open) {
+      const org = userData as any;
+      setFormData(prev => ({
+        ...prev,
+        companyName: org.organization?.name || "",
+        // Pre-fill other fields if they exist in user data
+        companyAddress: org.user?.companyAddress || "",
+        province: org.user?.province || "",
+        city: org.user?.city || "",
+        industryType: org.user?.industryType || "",
+        position: org.user?.position || "",
+        referralSource: org.user?.referralSource || "",
+      }));
+    }
+  }, [userData, open]);
 
   // State untuk mengontrol combobox open/close
 
@@ -102,7 +128,7 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
 
   const handleSubmit = async () => {
     // Validate required fields
-    if (!formData.companyAddress || !formData.province || !formData.city || 
+    if (!formData.companyName || !formData.companyAddress || !formData.province || !formData.city || 
         !formData.industryType || !formData.position || !formData.referralSource) {
       toast({
         title: "Data tidak lengkap",
@@ -156,6 +182,22 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
         </DialogHeader>
 
         <div className="space-y-6 py-4">
+          {/* Company Name */}
+          <div className="space-y-2">
+            <Label htmlFor="companyName" className="flex items-center gap-2">
+              <Building2 className="h-4 w-4" />
+              Nama Perusahaan *
+            </Label>
+            <Input
+              id="companyName"
+              placeholder="Masukkan nama perusahaan..."
+              value={formData.companyName}
+              onChange={(e) => handleInputChange("companyName", e.target.value)}
+              className="bg-gray-50 border-gray-300"
+            />
+            <p className="text-sm text-gray-600">Otomatis terisi dari data registrasi</p>
+          </div>
+
           {/* Company Address */}
           <div className="space-y-2">
             <Label htmlFor="companyAddress" className="flex items-center gap-2">
