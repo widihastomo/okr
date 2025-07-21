@@ -104,8 +104,8 @@ export default function TimelinePage() {
   const [commentTexts, setCommentTexts] = useState<Record<string, string>>({});
   const [isReactionMutating, setIsReactionMutating] = useState(false);
 
-  // Lazy loading states - simpler approach showing N items at a time
-  const [displayedItemCount, setDisplayedItemCount] = useState(3);
+  // Lazy loading states - TEMPORARILY DISABLED, showing all items
+  const [displayedItemCount, setDisplayedItemCount] = useState(999);
   const loadMoreRef = useRef<HTMLDivElement>(null);
   const scrollPositionRef = useRef<number>(0);
 
@@ -312,32 +312,32 @@ export default function TimelinePage() {
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
-  // Intersection Observer for loading more items (after filteredData is defined)
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && displayedItemCount < filteredData.length) {
-          console.log('🔄 Loading more items. Current:', displayedItemCount, 'Total:', filteredData.length);
-          setDisplayedItemCount(prev => Math.min(prev + 3, filteredData.length));
-        }
-      },
-      { threshold: 0.1 }
-    );
+  // Intersection Observer for loading more items (TEMPORARILY DISABLED FOR TESTING)
+  // useEffect(() => {
+  //   const observer = new IntersectionObserver(
+  //     (entries) => {
+  //       if (entries[0].isIntersecting && displayedItemCount < filteredData.length) {
+  //         console.log('🔄 Loading more items. Current:', displayedItemCount, 'Total:', filteredData.length);
+  //         setDisplayedItemCount(prev => Math.min(prev + 3, filteredData.length));
+  //       }
+  //     },
+  //     { threshold: 0.1 }
+  //   );
 
-    if (loadMoreRef.current && displayedItemCount < filteredData.length) {
-      observer.observe(loadMoreRef.current);
-    }
+  //   if (loadMoreRef.current && displayedItemCount < filteredData.length) {
+  //     observer.observe(loadMoreRef.current);
+  //   }
 
-    return () => observer.disconnect();
-  }, [displayedItemCount, filteredData.length]);
+  //   return () => observer.disconnect();
+  // }, [displayedItemCount, filteredData.length]);
 
-  // Reset display count when filters change (but not during reaction mutations)
-  useEffect(() => {
-    if (!isReactionMutating) {
-      setDisplayedItemCount(3);
-      // console.log('🔄 Filter changed, resetting to show 3 items');
-    }
-  }, [activityTypeFilter, userFilter, teamFilter, dateRangeFilter, contentTypeFilter, isReactionMutating]);
+  // Reset display count when filters change (TEMPORARILY DISABLED FOR TESTING)
+  // useEffect(() => {
+  //   if (!isReactionMutating) {
+  //     setDisplayedItemCount(3);
+  //     // console.log('🔄 Filter changed, resetting to show 3 items');
+  //   }
+  // }, [activityTypeFilter, userFilter, teamFilter, dateRangeFilter, contentTypeFilter, isReactionMutating]);
 
   // TimelineCard component - simplified without complex lazy loading
   function TimelineCard({ 
