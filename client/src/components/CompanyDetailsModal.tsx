@@ -23,6 +23,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface CompanyDetailsModalProps {
   open: boolean;
@@ -192,32 +193,34 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-full p-0 popover-content-limit">
-                  <Command className="max-h-[300px]">
+                <PopoverContent className="w-full p-0">
+                  <Command>
                     <CommandInput placeholder="Cari provinsi..." />
-                    <CommandList className="ultra-force-scroll" style={{ maxHeight: '200px', height: '200px', overflowY: 'scroll' }}>
-                      <CommandEmpty>Provinsi tidak ditemukan.</CommandEmpty>
-                      <CommandGroup>
-                        {provinces.map((province) => (
-                          <CommandItem
-                            key={province}
-                            value={province}
-                            onSelect={(currentValue) => {
-                              handleInputChange("province", currentValue === formData.province ? "" : currentValue);
-                              setOpenProvince(false);
-                            }}
-                          >
-                            <Check
-                              className={cn(
-                                "mr-2 h-4 w-4",
-                                formData.province === province ? "opacity-100" : "opacity-0"
-                              )}
-                            />
-                            {province}
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
+                    <ScrollArea className="h-[200px]">
+                      <CommandList>
+                        <CommandEmpty>Provinsi tidak ditemukan.</CommandEmpty>
+                        <CommandGroup>
+                          {provinces.map((province) => (
+                            <CommandItem
+                              key={province}
+                              value={province}
+                              onSelect={(currentValue) => {
+                                handleInputChange("province", currentValue === formData.province ? "" : currentValue);
+                                setOpenProvince(false);
+                              }}
+                            >
+                              <Check
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  formData.province === province ? "opacity-100" : "opacity-0"
+                                )}
+                              />
+                              {province}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </ScrollArea>
                   </Command>
                 </PopoverContent>
               </Popover>
@@ -238,32 +241,34 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-full p-0 popover-content-limit">
-                  <Command className="max-h-[300px]">
+                <PopoverContent className="w-full p-0">
+                  <Command>
                     <CommandInput placeholder="Cari kota..." />
-                    <CommandList className="ultra-force-scroll" style={{ maxHeight: '200px', height: '200px', overflowY: 'scroll' }}>
-                      <CommandEmpty>Kota tidak ditemukan.</CommandEmpty>
-                      <CommandGroup>
-                        {getAvailableCities().map((city) => (
-                          <CommandItem
-                            key={city}
-                            value={city}
-                            onSelect={(currentValue) => {
-                              handleInputChange("city", currentValue === formData.city ? "" : currentValue);
-                              setOpenCity(false);
-                            }}
-                          >
-                            <Check
-                              className={cn(
-                                "mr-2 h-4 w-4",
-                                formData.city === city ? "opacity-100" : "opacity-0"
-                              )}
-                            />
-                            {city}
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
+                    <ScrollArea className="h-[200px]">
+                      <CommandList>
+                        <CommandEmpty>Kota tidak ditemukan.</CommandEmpty>
+                        <CommandGroup>
+                          {getAvailableCities().map((city) => (
+                            <CommandItem
+                              key={city}
+                              value={city}
+                              onSelect={(currentValue) => {
+                                handleInputChange("city", currentValue === formData.city ? "" : currentValue);
+                                setOpenCity(false);
+                              }}
+                            >
+                              <Check
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  formData.city === city ? "opacity-100" : "opacity-0"
+                                )}
+                              />
+                              {city}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </ScrollArea>
                   </Command>
                 </PopoverContent>
               </Popover>
@@ -288,32 +293,34 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-full p-0 popover-content-limit">
-                <Command className="max-h-[300px]">
+              <PopoverContent className="w-full p-0">
+                <Command>
                   <CommandInput placeholder="Cari industri..." />
-                  <CommandList className="ultra-force-scroll" style={{ maxHeight: '200px', height: '200px', overflowY: 'scroll' }}>
-                    <CommandEmpty>Industri tidak ditemukan.</CommandEmpty>
-                    <CommandGroup>
-                      {industryTypes.map((industry) => (
-                        <CommandItem
-                          key={industry}
-                          value={industry}
-                          onSelect={(currentValue) => {
-                            handleInputChange("industryType", currentValue === formData.industryType ? "" : currentValue);
-                            setOpenIndustry(false);
-                          }}
-                        >
-                          <Check
-                            className={cn(
-                              "mr-2 h-4 w-4",
-                              formData.industryType === industry ? "opacity-100" : "opacity-0"
-                            )}
-                          />
-                          {industry}
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </CommandList>
+                  <ScrollArea className="h-[200px]">
+                    <CommandList>
+                      <CommandEmpty>Industri tidak ditemukan.</CommandEmpty>
+                      <CommandGroup>
+                        {industryTypes.map((industry) => (
+                          <CommandItem
+                            key={industry}
+                            value={industry}
+                            onSelect={(currentValue) => {
+                              handleInputChange("industryType", currentValue === formData.industryType ? "" : currentValue);
+                              setOpenIndustry(false);
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                formData.industryType === industry ? "opacity-100" : "opacity-0"
+                              )}
+                            />
+                            {industry}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </ScrollArea>
                 </Command>
               </PopoverContent>
             </Popover>
@@ -351,32 +358,34 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-full p-0 popover-content-limit">
-                <Command className="max-h-[300px]">
+              <PopoverContent className="w-full p-0">
+                <Command>
                   <CommandInput placeholder="Cari sumber referral..." />
-                  <CommandList className="ultra-force-scroll" style={{ maxHeight: '200px', height: '200px', overflowY: 'scroll' }}>
-                    <CommandEmpty>Sumber referral tidak ditemukan.</CommandEmpty>
-                    <CommandGroup>
-                      {referralSources.map((source) => (
-                        <CommandItem
-                          key={source}
-                          value={source}
-                          onSelect={(currentValue) => {
-                            handleInputChange("referralSource", currentValue === formData.referralSource ? "" : currentValue);
-                            setOpenReferral(false);
-                          }}
-                        >
-                          <Check
-                            className={cn(
-                              "mr-2 h-4 w-4",
-                              formData.referralSource === source ? "opacity-100" : "opacity-0"
-                            )}
-                          />
-                          {source}
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </CommandList>
+                  <ScrollArea className="h-[200px]">
+                    <CommandList>
+                      <CommandEmpty>Sumber referral tidak ditemukan.</CommandEmpty>
+                      <CommandGroup>
+                        {referralSources.map((source) => (
+                          <CommandItem
+                            key={source}
+                            value={source}
+                            onSelect={(currentValue) => {
+                              handleInputChange("referralSource", currentValue === formData.referralSource ? "" : currentValue);
+                              setOpenReferral(false);
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                formData.referralSource === source ? "opacity-100" : "opacity-0"
+                              )}
+                            />
+                            {source}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </ScrollArea>
                 </Command>
               </PopoverContent>
             </Popover>
