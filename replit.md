@@ -400,11 +400,13 @@ export DATABASE_URL="postgresql://..." && npm run dev
   * ENHANCED: "Mulai Tour" button now calls /api/tour/start to update tour_started status in database
   * ENHANCED: "Lewati Tour" button now calls /api/tour/complete to mark tour as completed when skipped
   * ADDED: Auto focus on "Mulai Tour" button when modal opens with 100ms delay for proper rendering
-  * ADDED: Pulse animation (animate-pulse) on "Mulai Tour" button to draw user attention
+  * ADDED: Tour system pulse animation (tour-mobile-pulse) matching tour highlight elements for visual consistency
+  * ADDED: Informational message about tour restart availability through Help menu in sidebar
   * ADDED: Proper error handling for API calls with fallback behavior to ensure UI continues working
   * ADDED: Console logging for debugging API call success/failure
   * INTEGRATED: Both buttons maintain existing functionality while adding database tracking
   * ENHANCED: Keyboard navigation support - users can press Enter to start tour immediately
+  * ENHANCED: User guidance with orange-colored hint about tour accessibility through Help menu
   * RESULT: Complete tour tracking system with enhanced UX where users are guided and tracked whether they start or skip tour
 - July 21, 2025. **INVITATION CODE STORAGE BUG FIXED** - Successfully resolved invitation code not being saved during registration:
   * FIXED: Added missing `referralCodes` import to server/routes.ts to resolve ReferenceError during validation

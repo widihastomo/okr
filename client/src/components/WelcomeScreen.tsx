@@ -248,9 +248,14 @@ export default function WelcomeScreen({
           </div>
 
           {/* Tour Info */}
-          <div className="text-center text-xs text-gray-500 border-t pt-4">
-            Tour interaktif ini akan memandu Anda melalui 10 fitur utama
-            platform (~5 menit)
+          <div className="text-center text-xs text-gray-500 border-t pt-4 space-y-2">
+            <p>
+              Tour interaktif ini akan memandu Anda melalui 10 fitur utama
+              platform (~5 menit)
+            </p>
+            <p className="text-orange-600 font-medium">
+              💡 Anda dapat mengulangi tour kapan saja melalui menu "Bantuan" di sidebar
+            </p>
           </div>
         </div>
       </DialogContent>
