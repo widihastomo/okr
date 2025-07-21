@@ -62,9 +62,30 @@ export default function WelcomeScreen({
   };
 
   const handleStartTour = async () => {
-    // Mark missions completed when user starts the tour
-    await updateOnboardingProgress('missions_completed');
-    onStartTour();
+    try {
+      // Update tour started status in database
+      const response = await fetch('/api/tour/start', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      console.log('✅ Tour started status updated in database');
+      
+      // Mark missions completed when user starts the tour
+      await updateOnboardingProgress('missions_completed');
+      onStartTour();
+    } catch (error) {
+      console.error('Failed to update tour started status:', error);
+      // Still proceed with tour even if API call fails
+      await updateOnboardingProgress('missions_completed');
+      onStartTour();
+    }
   };
 
   const handleSkipTour = async () => {
