@@ -383,22 +383,7 @@ export default function TimelinePage() {
                 )}
               </div>
 
-              {/* Activity Type Filter */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Tipe Aktivitas
-                </label>
-                <Select value={activityTypeFilter} onValueChange={setActivityTypeFilter}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Pilih tipe aktivitas" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Semua Aktivitas</SelectItem>
-                    <SelectItem value="check_in">Check-in</SelectItem>
-                    <SelectItem value="daily_update">Update Harian</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              
 
               {/* User Filter */}
               <div>
