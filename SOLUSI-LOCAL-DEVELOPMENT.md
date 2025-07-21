@@ -73,6 +73,18 @@ node debug-local-env.cjs
 node start-local.cjs
 ```
 
+### **Step 4: Debug API-Only Mode Issue**
+```bash
+# Untuk menganalisis masalah frontend tidak tampil
+node debug-vite-issue.cjs
+```
+
+### **Step 5: Force Frontend Mode**
+```bash
+# Memaksa server untuk menjalankan frontend mode
+node force-frontend-mode.cjs
+```
+
 ## 🔧 Manual Solutions
 
 ### **Solution A: Environment Variable Export**
