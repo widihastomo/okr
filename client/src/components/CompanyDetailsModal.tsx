@@ -195,7 +195,7 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
                 <PopoverContent className="w-full p-0">
                   <Command>
                     <CommandInput placeholder="Cari provinsi..." />
-                    <CommandList>
+                    <CommandList className="max-h-[200px] overflow-y-auto">
                       <CommandEmpty>Provinsi tidak ditemukan.</CommandEmpty>
                       <CommandGroup>
                         {provinces.map((province) => (
@@ -241,7 +241,7 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
                 <PopoverContent className="w-full p-0">
                   <Command>
                     <CommandInput placeholder="Cari kota..." />
-                    <CommandList>
+                    <CommandList className="max-h-[200px] overflow-y-auto">
                       <CommandEmpty>Kota tidak ditemukan.</CommandEmpty>
                       <CommandGroup>
                         {getAvailableCities().map((city) => (
@@ -291,7 +291,7 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
               <PopoverContent className="w-full p-0">
                 <Command>
                   <CommandInput placeholder="Cari industri..." />
-                  <CommandList>
+                  <CommandList className="max-h-[200px] overflow-y-auto">
                     <CommandEmpty>Industri tidak ditemukan.</CommandEmpty>
                     <CommandGroup>
                       {industryTypes.map((industry) => (
@@ -354,7 +354,7 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
               <PopoverContent className="w-full p-0">
                 <Command>
                   <CommandInput placeholder="Cari sumber referral..." />
-                  <CommandList>
+                  <CommandList className="max-h-[200px] overflow-y-auto">
                     <CommandEmpty>Sumber referral tidak ditemukan.</CommandEmpty>
                     <CommandGroup>
                       {referralSources.map((source) => (

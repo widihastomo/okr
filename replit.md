@@ -445,6 +445,12 @@ export DATABASE_URL="postgresql://..." && npm run dev
   * IMPROVED: Better user experience with "tidak ditemukan" empty states for each dropdown
   * INTEGRATED: Proper state management with individual open/close states for each combobox
   * RESULT: Complete searchable interface for all selection fields with professional UX design
+- July 21, 2025. **SEARCHABLE DROPDOWN SCROLL FIX** - Successfully fixed scroll functionality for all searchable dropdowns:
+  * FIXED: Added max-h-[200px] overflow-y-auto to all CommandList components for proper scrolling
+  * ENHANCED: All searchable dropdowns (Provinsi, Kota, Jenis Industri, Sumber Referral) now support vertical scrolling
+  * IMPROVED: Long lists no longer get cut off and users can scroll through all available options
+  * STANDARDIZED: Consistent 200px maximum height across all dropdown menus
+  * RESULT: Complete scrollable interface for all searchable select boxes with proper overflow handling
 - July 21, 2025. **INVITATION CODE INPUT SYSTEM COMPLETED** - Successfully implemented invitation code input with toggle functionality and uppercase formatting:
   * ADDED: Toggle-able invitation code input below password field with "Punya kode undangan?" button
   * IMPLEMENTED: Smooth slide-in animation with chevron up/down indicators for toggle state
