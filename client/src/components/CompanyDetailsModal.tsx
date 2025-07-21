@@ -239,9 +239,6 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
             >
               {isSubmitting ? "Menyimpan..." : "Simpan & Lanjutkan"}
             </Button>
-            <p className="text-xs text-gray-500 mt-2 text-center">
-              Form ini wajib diselesaikan untuk melanjutkan ke aplikasi
-            </p>
           </div>
         </div>
       </DialogContent>
