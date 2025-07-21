@@ -162,7 +162,6 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
         toast({
           title: "Selamat datang!",
           description: `Data perusahaan tersimpan dan struktur organisasi untuk ${formData.companyName} telah disiapkan`,
-          variant: "default",
         });
       } catch (dummyDataError) {
         console.error("⚠️ Error generating dummy data:", dummyDataError);
@@ -170,7 +169,6 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
         toast({
           title: "Data berhasil disimpan",
           description: "Informasi perusahaan telah tersimpan",
-          variant: "default",
         });
       }
 
