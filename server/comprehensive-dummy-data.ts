@@ -31,11 +31,57 @@ export async function createComprehensiveDummyData(userId: string, organizationI
     console.log("🏢 Found teams for organization:", {
       organizationId,
       totalTeams: organizationTeams.length,
+      allTeamNames: organizationTeams.map(t => t.name),
       companyTeam: companyTeam?.name,
       marketingTeam: marketingTeam?.name,
       salesTeam: salesTeam?.name,
       operationTeam: operationTeam?.name
     });
+
+    // If no teams found, create basic teams
+    if (organizationTeams.length === 0) {
+      console.log("🔧 No teams found, creating basic teams...");
+      
+      const companyTeamCreated = await storage.createTeam({
+        name: "Company Team",
+        description: "Tim utama perusahaan",
+        organizationId: organizationId,
+        ownerId: userId,
+        createdBy: userId
+      });
+
+      const marketingTeamCreated = await storage.createTeam({
+        name: "Marketing Team", 
+        description: "Tim marketing dan branding",
+        organizationId: organizationId,
+        ownerId: userId,
+        createdBy: userId
+      });
+
+      const salesTeamCreated = await storage.createTeam({
+        name: "Sales Team",
+        description: "Tim penjualan dan customer acquisition", 
+        organizationId: organizationId,
+        ownerId: userId,
+        createdBy: userId
+      });
+
+      const operationTeamCreated = await storage.createTeam({
+        name: "Operation Team",
+        description: "Tim operasional dan proses bisnis",
+        organizationId: organizationId, 
+        ownerId: userId,
+        createdBy: userId
+      });
+
+      // Update team references
+      Object.assign(companyTeam, companyTeamCreated);
+      Object.assign(marketingTeam, marketingTeamCreated);
+      Object.assign(salesTeam, salesTeamCreated);
+      Object.assign(operationTeam, operationTeamCreated);
+      
+      console.log("✅ Basic teams created successfully");
+    }
 
     console.log("📊 Creating comprehensive goals structure...");
 
