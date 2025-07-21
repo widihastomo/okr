@@ -130,6 +130,51 @@
   border-radius: 8px !important;
 }
 
+/* Tour pulse for expanded sidebar on all devices */
+button[data-tour].tour-mobile-pulse,
+[data-tour] > button.tour-mobile-pulse,
+li [data-tour] button.tour-mobile-pulse {
+  animation: mobileTourPulse 1.2s infinite !important;
+  border: 2px solid rgba(249, 115, 22, 0.5) !important;
+  border-radius: 8px !important;
+  position: relative !important;
+  z-index: 1001 !important;
+}
+
+/* Force tour pulse on any button with data-tour attribute when highlighted */
+*[data-tour].tour-mobile-pulse > button,
+*[data-tour] > button.tour-mobile-pulse,
+button[data-tour].tour-mobile-pulse {
+  animation: mobileTourPulse 1.2s infinite !important;
+  border: 2px solid rgba(249, 115, 22, 0.5) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.2) !important;
+}
+
+/* Universal tour pulse - targets any element with tour class regardless of structure */
+.tour-mobile-pulse,
+.tour-mobile-pulse button,
+.tour-mobile-pulse > button,
+*[data-tour].tour-mobile-pulse,
+*[class*="tour-mobile-pulse"] {
+  animation: mobileTourPulse 1.2s infinite !important;
+  border: 2px solid rgba(249, 115, 22, 0.5) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.2) !important;
+  position: relative !important;
+  z-index: 1001 !important;
+}
+
+/* Specific targeting for sidebar menu items */
+nav button[data-tour].tour-mobile-pulse,
+ul li button[data-tour].tour-mobile-pulse,
+.sidebar button[data-tour].tour-mobile-pulse {
+  animation: mobileTourPulse 1.2s infinite !important;
+  border: 2px solid rgba(249, 115, 22, 0.5) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.2) !important;
+}
+
 /* Click Required Indication */
 .tour-click-required {
   position: relative;
