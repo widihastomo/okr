@@ -2,6 +2,39 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Force Dropdown Scroll with High Priority */
+[cmdk-list] {
+  max-height: 200px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+/* Additional force for command list items */
+.dropdown-scroll-force {
+  max-height: 200px !important;
+  min-height: 100px !important;
+  height: 200px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  display: block !important;
+}
+
+/* Popover content height limit */
+.popover-content-limit {
+  max-height: 300px !important;
+  overflow: hidden !important;
+}
+
+/* Ultra force scroll for dropdowns */
+.ultra-force-scroll {
+  max-height: 200px !important;
+  height: 200px !important;
+  overflow-y: scroll !important;
+  overflow-x: hidden !important;
+  display: block !important;
+  box-sizing: border-box !important;
+}
+
 /* Line Clamp Utilities */
 .line-clamp-3 {
   display: -webkit-box;
