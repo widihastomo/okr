@@ -110,35 +110,24 @@
 /* Tour pulse for mobile sidebar elements */
 .tour-mobile-pulse {
   animation: mobileTourPulse 1.2s infinite !important;
-  border: 2px solid rgba(249, 115, 22, 0.8) !important;
+  border: 2px solid rgba(249, 115, 22, 0.5) !important;
   border-radius: 8px !important;
-  box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.3) !important;
 }
 
-/* Enhanced mobile tour pulse for sidebar elements */
-@media (max-width: 1024px) {
-  .tour-highlight[data-tour] button {
-    animation: mobileTourPulse 1.2s infinite !important;
-    border: 2px solid rgba(249, 115, 22, 0.8) !important;
-    border-radius: 8px !important;
-    position: relative !important;
-    z-index: 1001 !important;
-  }
+/* Enhanced tour highlighting for menu items in sidebar */
+[data-tour] button.tour-mobile-pulse {
+  animation: mobileTourPulse 1.2s infinite !important;
+  border: 2px solid rgba(249, 115, 22, 0.5) !important;
+  border-radius: 8px !important;
+  position: relative !important;
+  z-index: 1001 !important;
+}
 
-  /* Target nested menu items in mobile collapsed state */
-  .lg\\:hidden .tour-highlight[data-tour] button {
-    animation: mobileTourPulse 1.2s infinite !important;
-    border: 2px solid rgba(249, 115, 22, 0.8) !important;
-    border-radius: 8px !important;
-    box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.3) !important;
-  }
-
-  /* Ensure button inside Link also gets pulse */
-  .tour-highlight[data-tour] a button {
-    animation: mobileTourPulse 1.2s infinite !important;
-    border: 2px solid rgba(249, 115, 22, 0.8) !important;
-    border-radius: 8px !important;
-  }
+/* Ensure pulse works on nested mobile elements */
+.lg\\:hidden [data-tour] button.tour-mobile-pulse {
+  animation: mobileTourPulse 1.2s infinite !important;
+  border: 2px solid rgba(249, 115, 22, 0.5) !important;
+  border-radius: 8px !important;
 }
 
 /* Click Required Indication */

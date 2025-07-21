@@ -344,11 +344,9 @@ The system includes comprehensive database connection troubleshooting tools:
 - July 20, 2025. **MOBILE SIDEBAR MENU BUG FIXED** - Successfully resolved menu visibility issue and tour pulse animation:
   * FIXED: Menu items now display correctly on mobile when sidebar is in collapsed state
   * ENHANCED: Mobile menu rendering logic improved with separate desktop tooltip and mobile menu versions
-  * RESTORED: Mobile tour pulse animation functionality with enhanced CSS targeting using media queries
-  * ADDED: Enhanced TourSystemNew.tsx highlighting logic with tour-mobile-pulse class application
-  * IMPROVED: CSS selector targeting for nested button elements in mobile collapsed sidebar state
-  * ENHANCED: Stronger visual feedback with box-shadow and improved border styling for mobile tour elements
-  * RESULT: Complete mobile sidebar functionality with working menu items and fully restored tour pulse animations
+  * RESTORED: Mobile tour pulse animation functionality with enhanced CSS targeting
+  * ADDED: Additional CSS classes for tour-mobile-pulse to ensure visibility in nested mobile elements
+  * RESULT: Complete mobile sidebar functionality with working menu items and tour animations
 - July 20, 2025. **TIMELINE KEY RESULT NAVIGATION LINKS IMPLEMENTED** - Successfully added clickable navigation links to key result details using wouter router:
   * ADDED: Clickable links on key result names in timeline check-in entries that navigate to `/key-results/{keyResultId}` using wouter Link component
   * ENHANCED: Timeline entries now provide direct navigation to detailed key result pages for better user experience
