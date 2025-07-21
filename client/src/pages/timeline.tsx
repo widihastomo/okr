@@ -102,6 +102,7 @@ export default function TimelinePage() {
   const [currentReactionsTimelineId, setCurrentReactionsTimelineId] = useState<string | null>(null);
   const [selectedReactionTab, setSelectedReactionTab] = useState('all');
   const [commentTexts, setCommentTexts] = useState<Record<string, string>>({});
+  const [focusedTextarea, setFocusedTextarea] = useState<string | null>(null);
 
   // Lazy loading states - simpler approach showing N items at a time
   const [displayedItemCount, setDisplayedItemCount] = useState(3);
@@ -275,13 +276,18 @@ export default function TimelinePage() {
     },
   });
 
-  const handleAddComment = (itemId: string) => {
+  const handleAddComment = useCallback((itemId: string) => {
     const content = commentTexts[itemId]?.trim();
     if (content) {
       addCommentMutation.mutate({ itemId, content });
       setCommentTexts(prev => ({ ...prev, [itemId]: '' }));
+      setFocusedTextarea(null);
     }
-  };
+  }, [commentTexts, addCommentMutation]);
+
+  const handleCommentChange = useCallback((itemId: string, value: string) => {
+    setCommentTexts(prev => ({ ...prev, [itemId]: value }));
+  }, []);
 
   const handleReaction = (itemId: string, emoji: string) => {
     addReactionMutation.mutate({ itemId, emoji });
@@ -662,9 +668,7 @@ export default function TimelinePage() {
                       id={`comment-${item.id}`}
                       placeholder="Tulis komentar..."
                       value={commentTexts[item.id] || ''}
-                      onChange={(e) => {
-                        setCommentTexts(prev => ({ ...prev, [item.id]: e.target.value }));
-                      }}
+                      onChange={(e) => handleCommentChange(item.id, e.target.value)}
                       className="flex-1 min-h-[40px] text-sm px-3 py-2 border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white relative z-10"
                       rows={1}
                       style={{ 
@@ -681,7 +685,10 @@ export default function TimelinePage() {
                       onClick={(e) => {
                         e.stopPropagation();
                         e.currentTarget.focus();
+                        setFocusedTextarea(item.id);
                       }}
+                      onFocus={() => setFocusedTextarea(item.id)}
+                      onBlur={() => setFocusedTextarea(null)}
                     />
                     <Button
                       size="sm"
