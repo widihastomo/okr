@@ -12,7 +12,6 @@ import ClientSidebar from "@/components/client-sidebar";
 import SystemAdminSidebar from "@/components/system-admin-sidebar";
 import { NotificationProvider } from "@/components/notifications/notification-provider";
 import TourSystemNew from "@/components/TourSystemNew";
-import { FloatingHelpButton } from "@/components/floating-help-button";
 
 import Dashboard from "@/pages/dashboard";
 
@@ -319,7 +318,6 @@ function Router() {
         </div>
       </div>
       <TourSystemNew />
-      <FloatingHelpButton />
     </NotificationProvider>
   );
 }

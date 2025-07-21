@@ -238,7 +238,7 @@ export default function Sidebar({
       <TooltipProvider>
         <div
           className={cn(
-            "fixed left-0 top-16 h-[calc(100vh-4rem)] bg-white border-r border-gray-200 transition-all duration-300 ease-in-out z-30",
+            "fixed left-0 top-16 h-[calc(100vh-4rem)] bg-white border-r border-gray-200 transition-all duration-300 ease-in-out z-30 flex flex-col",
             // Mobile: slide in/out
             "lg:translate-x-0", // Desktop: always visible
             isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
@@ -321,7 +321,80 @@ export default function Sidebar({
             </ul>
           </nav>
 
-
+          {/* Help section - always at bottom */}
+          <div className="border-t border-gray-200 p-2 mt-auto">
+            {isCollapsed ? (
+              <>
+                {/* Desktop: tooltip version when collapsed */}
+                <div className="lg:block hidden">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Link href="/help">
+                        <button
+                          className={cn(
+                            "flex items-center justify-center px-4 py-3 rounded-lg text-sm font-medium transition-colors w-full",
+                            location === "/help"
+                              ? "bg-gradient-to-r from-orange-600 to-orange-500 text-white"
+                              : "text-gray-700 hover:bg-gray-100",
+                          )}
+                          onClick={() => {
+                            if (window.innerWidth < 1024) {
+                              onClose?.();
+                            }
+                          }}
+                        >
+                          <HelpCircle className="w-5 h-5" />
+                        </button>
+                      </Link>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">
+                      <p>Help</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+                {/* Mobile: always show expanded help */}
+                <div className="lg:hidden">
+                  <Link href="/help">
+                    <button
+                      className={cn(
+                        "flex items-center space-x-4 px-4 py-3 rounded-lg text-sm font-medium transition-colors w-full text-left",
+                        location === "/help"
+                          ? "bg-gradient-to-r from-orange-600 to-orange-500 text-white"
+                          : "text-gray-700 hover:bg-gray-100",
+                      )}
+                      onClick={() => {
+                        if (window.innerWidth < 1024) {
+                          onClose?.();
+                        }
+                      }}
+                    >
+                      <HelpCircle className="w-5 h-5" />
+                      <span>Help</span>
+                    </button>
+                  </Link>
+                </div>
+              </>
+            ) : (
+              <Link href="/help">
+                <button
+                  className={cn(
+                    "flex items-center space-x-4 px-4 py-3 rounded-lg text-sm font-medium transition-colors w-full text-left",
+                    location === "/help"
+                      ? "bg-gradient-to-r from-orange-600 to-orange-500 text-white"
+                      : "text-gray-700 hover:bg-gray-100",
+                  )}
+                  onClick={() => {
+                    if (window.innerWidth < 1024) {
+                      onClose?.();
+                    }
+                  }}
+                >
+                  <HelpCircle className="w-5 h-5" />
+                  <span>Help</span>
+                </button>
+              </Link>
+            )}
+          </div>
 
           {/* Profile section at bottom */}
           <div className="border-t border-gray-200 p-2">

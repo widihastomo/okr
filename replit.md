@@ -396,15 +396,15 @@ export DATABASE_URL="postgresql://..." && npm run dev
 
 ## Changelog
 ```
-- July 21, 2025. **FLOATING HELP MENU IMPLEMENTATION COMPLETED** - Successfully moved Help menu from sidebar to floating button in bottom-left corner:
-  * CREATED: FloatingHelpButton component positioned at bottom-left corner (fixed bottom-4 left-4) with circular design
-  * REMOVED: Help menu from client-sidebar.tsx to eliminate sidebar clutter
-  * IMPLEMENTED: Professional floating button with orange gradient when active, white with border when inactive
-  * ENHANCED: Tooltip showing "Help & Support" on hover for better user experience
-  * STYLED: Circular floating button (w-14 h-14) with shadow effects and smooth transitions
-  * INTEGRATED: Global floating Help button in App.tsx accessible from all pages
-  * MAINTAINED: Proper routing to /help page with active state indication
-  * RESULT: Help menu now easily accessible from bottom-left corner without cluttering sidebar navigation
+- July 21, 2025. **HELP MENU POSITIONED AT SIDEBAR BOTTOM COMPLETED** - Successfully repositioned Help menu to always stay at bottom of sidebar:
+  * ADDED: Help menu back to client-sidebar.tsx with fixed bottom positioning using mt-auto class
+  * ENHANCED: Sidebar structure with flex flex-col layout to enable proper bottom positioning
+  * POSITIONED: Help section always appears at bottom of sidebar before Profile section
+  * MAINTAINED: All responsive behavior (collapsed/expanded states, mobile/desktop handling)
+  * STYLED: Consistent orange gradient when active, gray hover states when inactive
+  * INTEGRATED: Proper tooltip support for collapsed sidebar state showing "Help" text
+  * PRESERVED: Mobile sidebar functionality and proper click handling for navigation
+  * RESULT: Help menu permanently positioned at sidebar bottom for easy access without floating elements
 - July 21, 2025. **INVITATION CODE VALIDATION SYSTEM COMPLETED** - Successfully implemented real-time invitation code validation with database integration:
   * CREATED: API endpoint `/api/referral-codes/validate-registration` for validation during registration (no auth required)
   * IMPLEMENTED: Real-time validation with 800ms debounce to prevent excessive API calls
