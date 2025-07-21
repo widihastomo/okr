@@ -896,23 +896,34 @@ export default function DailyFocusPage() {
     const companyDetailsCompleted = localStorage.getItem("company-details-completed");
     const welcomeShown = localStorage.getItem("welcome-screen-shown");
     const onboardingCompleted = localStorage.getItem("onboarding-completed");
+    const tourStarted = localStorage.getItem("tour-started");
+    const tourCompleted = localStorage.getItem("tour-completed");
     
-    console.log("🔍 Company details check:", { companyDetailsCompleted, onboardingCompleted, welcomeShown });
-    
-    // TEMPORARY: Reset welcome screen flag for testing and force show
-    localStorage.removeItem("welcome-screen-shown");
+    console.log("🔍 Company details check:", { companyDetailsCompleted, onboardingCompleted, welcomeShown, tourStarted, tourCompleted });
     
     // For new users who completed registration
     if (onboardingCompleted === "true") {
       if (!companyDetailsCompleted) {
         // Show company details modal first
         setShowCompanyDetailsModal(true);
-      } else if (companyDetailsCompleted === "true") {
-        // If company details done, show welcome screen
+      } else if (companyDetailsCompleted === "true" && welcomeShown !== "true" && tourStarted !== "true" && tourCompleted !== "true") {
+        // Only show welcome screen if user hasn't seen it AND hasn't started/completed tour
         console.log("✅ Triggering welcome screen display");
         setShowWelcomeScreen(true);
       }
     }
+
+    // Listen for manual welcome screen trigger
+    const handleShowWelcomeScreen = () => {
+      console.log("🎉 Manual welcome screen triggered");
+      setShowWelcomeScreen(true);
+    };
+
+    window.addEventListener('showWelcomeScreen', handleShowWelcomeScreen);
+    
+    return () => {
+      window.removeEventListener('showWelcomeScreen', handleShowWelcomeScreen);
+    };
   }, []);
 
   const handleCompanyDetailsComplete = () => {

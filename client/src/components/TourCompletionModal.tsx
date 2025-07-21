@@ -42,7 +42,7 @@ export default function TourCompletionModal({
 
   const title = isSkipped ? "Siap Memulai!" : "Selamat! Tour Selesai!";
   const subtitle = isSkipped 
-    ? "Anda siap untuk memulai perjalanan OKR" 
+    ? "Anda siap untuk memulai perjalanan baru" 
     : "Anda telah menguasai dasar-dasar platform";
 
   return (
@@ -91,7 +91,7 @@ export default function TourCompletionModal({
           <div className="bg-gradient-to-r from-orange-50 to-yellow-50 p-4 rounded-lg space-y-3">
             <div className="flex items-center gap-3 text-sm">
               <Target className="h-5 w-5 text-orange-500" />
-              <span>Buat objektif yang jelas dan terukur</span>
+              <span>Buat Goal / Strategi yang jelas dan terukur</span>
             </div>
             <div className="flex items-center gap-3 text-sm">
               <Sparkles className="h-5 w-5 text-yellow-500" />
