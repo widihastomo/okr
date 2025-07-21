@@ -484,7 +484,17 @@ export default function TourSystem() {
 
   // Listen for start tour event
   useEffect(() => {
-    const handleStartTour = () => {
+    const handleStartTour = (event: any) => {
+      // If event comes from welcome screen, start tour directly
+      if (event?.detail?.fromWelcomeScreen) {
+        setIsActive(true);
+        setCurrentStep(0);
+        setIsVisible(true);
+        localStorage.removeItem("tour-completed");
+        console.log("🚀 Tour started from welcome screen");
+        return;
+      }
+      
       // Check if onboarding is completed first
       const onboardingCompleted =
         localStorage.getItem("onboarding-completed") === "true";

@@ -929,7 +929,13 @@ export default function DailyFocusPage() {
   const handleStartTour = () => {
     setShowWelcomeScreen(false);
     localStorage.setItem("welcome-screen-shown", "true");
-    // TODO: Implement tour start functionality
+    
+    // Dispatch custom event to start tour
+    const startTourEvent = new CustomEvent('startTour', {
+      detail: { fromWelcomeScreen: true }
+    });
+    window.dispatchEvent(startTourEvent);
+    
     console.log("Starting tour...");
   };
 

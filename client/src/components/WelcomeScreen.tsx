@@ -43,13 +43,18 @@ export default function WelcomeScreen({
 
   const updateOnboardingProgress = async (step: string) => {
     try {
-      await apiRequest('/api/auth/update-onboarding-progress', {
+      const response = await fetch('/api/auth/update-onboarding-progress', {
         method: 'POST',
         body: JSON.stringify({ step }),
         headers: {
           'Content-Type': 'application/json',
         },
       });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       console.log(`✅ Onboarding progress updated: ${step}`);
     } catch (error) {
       console.error('Failed to update onboarding progress:', error);
