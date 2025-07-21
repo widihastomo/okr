@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { Switch } from '@/components/ui/switch';
 import { 
   Filter, 
   X, 
@@ -103,9 +104,10 @@ export default function TimelinePage() {
   const [selectedReactionTab, setSelectedReactionTab] = useState('all');
   const [commentTexts, setCommentTexts] = useState<Record<string, string>>({});
   const [isReactionMutating, setIsReactionMutating] = useState(false);
+  const [autoScrollPrevention, setAutoScrollPrevention] = useState(true);
 
-  // Lazy loading states - TEMPORARILY DISABLED, showing all items
-  const [displayedItemCount, setDisplayedItemCount] = useState(999);
+  // Lazy loading states - controlled by auto-scroll prevention setting
+  const [displayedItemCount, setDisplayedItemCount] = useState(3);
   const loadMoreRef = useRef<HTMLDivElement>(null);
   const scrollPositionRef = useRef<number>(0);
 
@@ -243,11 +245,15 @@ export default function TimelinePage() {
       return response.json();
     },
     onSuccess: () => {
-      // TEMPORARILY DISABLE QUERY INVALIDATION FOR TESTING  
-      // queryClient.invalidateQueries({ 
-      //   queryKey: ['/api/timeline/comments'],
-      //   refetchType: 'active'
-      // });
+      if (autoScrollPrevention) {
+        // When auto-scroll prevention is enabled, don't invalidate queries
+      } else {
+        // Normal behavior with query invalidation
+        queryClient.invalidateQueries({ 
+          queryKey: ['/api/timeline/comments'],
+          refetchType: 'active'
+        });
+      }
     },
   });
 
@@ -271,19 +277,23 @@ export default function TimelinePage() {
       scrollPositionRef.current = window.scrollY;
     },
     onSuccess: () => {
-      // TEMPORARILY DISABLE QUERY INVALIDATION FOR TESTING
-      // queryClient.invalidateQueries({ 
-      //   queryKey: ['/api/timeline/reactions'],
-      //   refetchType: 'active'
-      // });
-      setTimeout(() => {
-        setIsReactionMutating(false);
-        // Restore scroll position if it changed significantly
-        if (scrollPositionRef.current && Math.abs(window.scrollY - scrollPositionRef.current) > 100) {
-          window.scrollTo(0, scrollPositionRef.current);
-        }
-        scrollPositionRef.current = 0;
-      }, 100);
+      if (autoScrollPrevention) {
+        // When auto-scroll prevention is enabled, don't invalidate queries to prevent re-renders
+        setTimeout(() => {
+          setIsReactionMutating(false);
+          scrollPositionRef.current = 0;
+        }, 100);
+      } else {
+        // Normal behavior with query invalidation
+        queryClient.invalidateQueries({ 
+          queryKey: ['/api/timeline/reactions'],
+          refetchType: 'active'
+        });
+        setTimeout(() => {
+          setIsReactionMutating(false);
+          scrollPositionRef.current = 0;
+        }, 100);
+      }
     },
     onError: () => {
       setIsReactionMutating(false);
@@ -300,7 +310,6 @@ export default function TimelinePage() {
   };
 
   const handleReaction = (itemId: string, emoji: string) => {
-    console.log('🎯 Handle reaction called:', { itemId, emoji, scrollY: window.scrollY });
     addReactionMutation.mutate({ itemId, emoji });
     setShowReactionPicker(prev => ({ ...prev, [itemId]: false }));
   };
@@ -315,32 +324,43 @@ export default function TimelinePage() {
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
-  // Intersection Observer for loading more items (TEMPORARILY DISABLED FOR TESTING)
-  // useEffect(() => {
-  //   const observer = new IntersectionObserver(
-  //     (entries) => {
-  //       if (entries[0].isIntersecting && displayedItemCount < filteredData.length) {
-  //         console.log('🔄 Loading more items. Current:', displayedItemCount, 'Total:', filteredData.length);
-  //         setDisplayedItemCount(prev => Math.min(prev + 3, filteredData.length));
-  //       }
-  //     },
-  //     { threshold: 0.1 }
-  //   );
+  // Intersection Observer for loading more items (controlled by auto-scroll prevention setting)
+  useEffect(() => {
+    if (autoScrollPrevention) return; // Skip lazy loading when auto-scroll prevention is enabled
+    
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && displayedItemCount < filteredData.length) {
+          setDisplayedItemCount(prev => Math.min(prev + 3, filteredData.length));
+        }
+      },
+      { threshold: 0.1 }
+    );
 
-  //   if (loadMoreRef.current && displayedItemCount < filteredData.length) {
-  //     observer.observe(loadMoreRef.current);
-  //   }
+    if (loadMoreRef.current && displayedItemCount < filteredData.length) {
+      observer.observe(loadMoreRef.current);
+    }
 
-  //   return () => observer.disconnect();
-  // }, [displayedItemCount, filteredData.length]);
+    return () => observer.disconnect();
+  }, [displayedItemCount, filteredData.length, autoScrollPrevention]);
 
-  // Reset display count when filters change (TEMPORARILY DISABLED FOR TESTING)
-  // useEffect(() => {
-  //   if (!isReactionMutating) {
-  //     setDisplayedItemCount(3);
-  //     // console.log('🔄 Filter changed, resetting to show 3 items');
-  //   }
-  // }, [activityTypeFilter, userFilter, teamFilter, dateRangeFilter, contentTypeFilter, isReactionMutating]);
+  // Reset display count when filters change
+  useEffect(() => {
+    if (!isReactionMutating && !autoScrollPrevention) {
+      setDisplayedItemCount(3);
+    }
+  }, [activityTypeFilter, userFilter, teamFilter, dateRangeFilter, contentTypeFilter, isReactionMutating, autoScrollPrevention]);
+
+  // Handle auto-scroll prevention setting changes
+  useEffect(() => {
+    if (autoScrollPrevention) {
+      // When auto-scroll prevention is enabled, show all items at once
+      setDisplayedItemCount(filteredData.length || 999);
+    } else {
+      // When disabled, reset to lazy loading (show 3 items)
+      setDisplayedItemCount(3);
+    }
+  }, [autoScrollPrevention, filteredData.length]);
 
   // TimelineCard component - simplified without complex lazy loading
   function TimelineCard({ 
@@ -861,6 +881,24 @@ export default function TimelinePage() {
                 </Select>
               </div>
 
+              {/* Auto-scroll Prevention Toggle */}
+              <div className="border-t border-gray-200 pt-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">
+                      Cegah Auto-scroll
+                    </label>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Mencegah halaman scroll otomatis saat berinteraksi
+                    </p>
+                  </div>
+                  <Switch
+                    checked={autoScrollPrevention}
+                    onCheckedChange={setAutoScrollPrevention}
+                  />
+                </div>
+              </div>
+
               {/* Clear Filters */}
               <Button
                 variant="outline"
@@ -881,7 +919,7 @@ export default function TimelinePage() {
               <div className="space-y-3 md:space-y-4">
                 {/* Debug info */}
                 <div className="bg-yellow-50 border border-yellow-200 rounded p-2 text-xs">
-                  Total items: {timelineData.length} | Filtered: {filteredData.length} | Showing: {Math.min(displayedItemCount, filteredData.length)}
+                  Total items: {timelineData.length} | Filtered: {filteredData.length} | Showing: {Math.min(displayedItemCount, filteredData.length)} | Auto-scroll Prevention: {autoScrollPrevention ? 'ON' : 'OFF'}
                 </div>
                 
                 {/* Show only the first N items */}
