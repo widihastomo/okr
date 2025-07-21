@@ -81,6 +81,7 @@ export interface IStorage {
   
   // Organizations
   getOrganization(id: string): Promise<Organization | undefined>;
+  updateOrganization(id: string, updates: any): Promise<any>;
   
   // Subscription Plans
   getSubscriptionPlan(id: string): Promise<any>;
