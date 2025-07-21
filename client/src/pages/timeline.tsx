@@ -279,10 +279,12 @@ export default function TimelinePage() {
     onSuccess: () => {
       if (autoScrollPrevention) {
         // When auto-scroll prevention is enabled, don't invalidate queries to prevent re-renders
-        setTimeout(() => {
-          setIsReactionMutating(false);
-          scrollPositionRef.current = 0;
-        }, 100);
+        const currentScroll = window.scrollY;
+        setIsReactionMutating(false);
+        // Force maintain scroll position
+        requestAnimationFrame(() => {
+          window.scrollTo(0, currentScroll);
+        });
       } else {
         // Normal behavior with query invalidation
         queryClient.invalidateQueries({ 
@@ -310,8 +312,25 @@ export default function TimelinePage() {
   };
 
   const handleReaction = (itemId: string, emoji: string) => {
-    addReactionMutation.mutate({ itemId, emoji });
-    setShowReactionPicker(prev => ({ ...prev, [itemId]: false }));
+    if (autoScrollPrevention) {
+      // Capture current scroll position
+      const currentScroll = window.scrollY;
+      
+      // Close reaction picker
+      setShowReactionPicker(prev => ({ ...prev, [itemId]: false }));
+      
+      // Add reaction
+      addReactionMutation.mutate({ itemId, emoji });
+      
+      // Force scroll position to stay the same
+      requestAnimationFrame(() => {
+        window.scrollTo(0, currentScroll);
+      });
+    } else {
+      // Normal behavior
+      addReactionMutation.mutate({ itemId, emoji });
+      setShowReactionPicker(prev => ({ ...prev, [itemId]: false }));
+    }
   };
 
   // Close reaction picker when clicking outside
@@ -361,6 +380,26 @@ export default function TimelinePage() {
       setDisplayedItemCount(3);
     }
   }, [autoScrollPrevention, filteredData.length]);
+
+  // Prevent scroll during reactions when auto-scroll prevention is ON
+  useEffect(() => {
+    if (autoScrollPrevention && isReactionMutating) {
+      const preventScroll = (e: Event) => {
+        e.preventDefault();
+        e.stopPropagation();
+      };
+      
+      window.addEventListener('scroll', preventScroll, { passive: false });
+      window.addEventListener('wheel', preventScroll, { passive: false });
+      window.addEventListener('touchmove', preventScroll, { passive: false });
+      
+      return () => {
+        window.removeEventListener('scroll', preventScroll);
+        window.removeEventListener('wheel', preventScroll);
+        window.removeEventListener('touchmove', preventScroll);
+      };
+    }
+  }, [autoScrollPrevention, isReactionMutating]);
 
   // TimelineCard component - simplified without complex lazy loading
   function TimelineCard({ 
