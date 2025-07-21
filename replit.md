@@ -451,6 +451,13 @@ export DATABASE_URL="postgresql://..." && npm run dev
   * IMPROVED: Long lists no longer get cut off and users can scroll through all available options
   * STANDARDIZED: Consistent 200px maximum height across all dropdown menus
   * RESULT: Complete scrollable interface for all searchable select boxes with proper overflow handling
+- July 21, 2025. **SEARCHABLE DROPDOWN SCROLL FORCED WITH INLINE STYLES** - Successfully implemented forced scroll using inline styles to override CSS conflicts:
+  * IMPLEMENTED: Inline styles `style={{ maxHeight: '200px', overflowY: 'auto' }}` on all CommandList components
+  * ENHANCED: Added max-h-[300px] to PopoverContent and Command wrapper components for container constraints
+  * FORCED: Scroll functionality with highest CSS specificity using inline styles instead of CSS classes
+  * APPLIED: Same styling approach to all 4 dropdowns (Provinsi, Kota, Jenis Industri, Sumber Referral)
+  * RESOLVED: CSS conflicts that were preventing scroll functionality in searchable dropdowns
+  * RESULT: Guaranteed scroll functionality with inline styles having higher precedence than any CSS class conflicts
 - July 21, 2025. **INVITATION CODE INPUT SYSTEM COMPLETED** - Successfully implemented invitation code input with toggle functionality and uppercase formatting:
   * ADDED: Toggle-able invitation code input below password field with "Punya kode undangan?" button
   * IMPLEMENTED: Smooth slide-in animation with chevron up/down indicators for toggle state

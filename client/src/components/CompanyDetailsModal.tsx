@@ -192,10 +192,10 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-full p-0">
-                  <Command>
+                <PopoverContent className="w-full p-0 max-h-[300px]">
+                  <Command className="max-h-[300px]">
                     <CommandInput placeholder="Cari provinsi..." />
-                    <CommandList className="max-h-[200px] overflow-y-auto">
+                    <CommandList style={{ maxHeight: '200px', overflowY: 'auto' }}>
                       <CommandEmpty>Provinsi tidak ditemukan.</CommandEmpty>
                       <CommandGroup>
                         {provinces.map((province) => (
@@ -238,10 +238,10 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-full p-0">
-                  <Command>
+                <PopoverContent className="w-full p-0 max-h-[300px]">
+                  <Command className="max-h-[300px]">
                     <CommandInput placeholder="Cari kota..." />
-                    <CommandList className="max-h-[200px] overflow-y-auto">
+                    <CommandList style={{ maxHeight: '200px', overflowY: 'auto' }}>
                       <CommandEmpty>Kota tidak ditemukan.</CommandEmpty>
                       <CommandGroup>
                         {getAvailableCities().map((city) => (
@@ -288,10 +288,10 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-full p-0">
-                <Command>
+              <PopoverContent className="w-full p-0 max-h-[300px]">
+                <Command className="max-h-[300px]">
                   <CommandInput placeholder="Cari industri..." />
-                  <CommandList className="max-h-[200px] overflow-y-auto">
+                  <CommandList style={{ maxHeight: '200px', overflowY: 'auto' }}>
                     <CommandEmpty>Industri tidak ditemukan.</CommandEmpty>
                     <CommandGroup>
                       {industryTypes.map((industry) => (
@@ -351,10 +351,10 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-full p-0">
-                <Command>
+              <PopoverContent className="w-full p-0 max-h-[300px]">
+                <Command className="max-h-[300px]">
                   <CommandInput placeholder="Cari sumber referral..." />
-                  <CommandList className="max-h-[200px] overflow-y-auto">
+                  <CommandList style={{ maxHeight: '200px', overflowY: 'auto' }}>
                     <CommandEmpty>Sumber referral tidak ditemukan.</CommandEmpty>
                     <CommandGroup>
                       {referralSources.map((source) => (
