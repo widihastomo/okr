@@ -235,13 +235,13 @@ export default function TimelinePage() {
 
   // Mutations for comments and reactions
   const addCommentMutation = useMutation({
-    mutationFn: async ({ itemId, content }: { itemId: string; content: string }) => {
+    mutationFn: async ({ itemId, content, mentionedUsers }: { itemId: string; content: string; mentionedUsers?: string[] }) => {
       const response = await fetch(`/api/timeline/${itemId}/comments`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ content }),
+        body: JSON.stringify({ content, mentionedUsers: mentionedUsers || [] }),
       });
       if (!response.ok) {
         throw new Error('Failed to add comment');
@@ -348,10 +348,10 @@ export default function TimelinePage() {
 
 
 
-  const handleAddComment = useCallback((itemId: string, content: string) => {
+  const handleAddComment = useCallback((itemId: string, content: string, mentionedUsers: string[] = []) => {
     if (content?.trim()) {
       saveScrollPosition();
-      addCommentMutation.mutate({ itemId, content: content.trim() });
+      addCommentMutation.mutate({ itemId, content: content.trim(), mentionedUsers });
     }
   }, [addCommentMutation, saveScrollPosition]);
 
@@ -409,52 +409,185 @@ export default function TimelinePage() {
     console.log('🔄 Filter changed, resetting to show 3 items');
   }, [activityTypeFilter, userFilter, teamFilter, dateRangeFilter, contentTypeFilter]);
 
-  // Persistent Comment Input Component with stable state
-  const CommentInput = memo(({ 
+  // Timeline Comment Editor with mention functionality
+  const TimelineCommentEditor = memo(({ 
     itemId, 
     onSubmit, 
     disabled 
   }: {
     itemId: string;
-    onSubmit: (content: string) => void;
+    onSubmit: (content: string, mentionedUsers: string[]) => void;
     disabled: boolean;
   }) => {
-    const [localValue, setLocalValue] = useState('');
+    const [content, setContent] = useState('');
+    const [mentionedUsers, setMentionedUsers] = useState<string[]>([]);
+    const [showMentionSuggestions, setShowMentionSuggestions] = useState(false);
+    const [mentionQuery, setMentionQuery] = useState("");
+    const [cursorPosition, setCursorPosition] = useState(0);
+    const editorRef = useRef<HTMLTextAreaElement>(null);
+
+    // Fetch users for mention suggestions
+    const { data: users = [] } = useQuery<User[]>({
+      queryKey: ['/api/users'],
+    });
+
+    const handleContentChange = useCallback((value: string) => {
+      setContent(value);
+      
+      // Get cursor position from the textarea
+      const textarea = editorRef.current;
+      if (!textarea) return;
+      
+      const currentCursorPosition = textarea.selectionStart;
+      
+      // Check for @ mentions - only at current cursor position
+      const textBeforeCursor = value.substring(0, currentCursorPosition);
+      const atIndex = textBeforeCursor.lastIndexOf("@");
+      
+      if (atIndex !== -1) {
+        const afterAt = textBeforeCursor.substring(atIndex + 1);
+        const hasSpaceInQuery = afterAt.includes(" ");
+        
+        if (!hasSpaceInQuery && afterAt.length <= 20) { // Reasonable query length limit
+          setMentionQuery(afterAt);
+          setShowMentionSuggestions(true);
+          setCursorPosition(atIndex);
+        } else {
+          setShowMentionSuggestions(false);
+        }
+      } else {
+        setShowMentionSuggestions(false);
+      }
+    }, []);
+
+    const handleMentionSelect = useCallback((user: User) => {
+      const beforeMention = content.substring(0, cursorPosition);
+      const afterMention = content.substring(cursorPosition + mentionQuery.length + 1);
+      const userName = user.name || user.email?.split('@')[0] || 'User';
+      const newContent = `${beforeMention}@${userName} ${afterMention}`;
+      
+      setContent(newContent);
+      setMentionedUsers(prev => [...prev, user.id]);
+      setShowMentionSuggestions(false);
+      setMentionQuery("");
+      
+      // Update textarea and set cursor position after the mention
+      if (editorRef.current) {
+        const newCursorPosition = cursorPosition + userName.length + 2; // +2 for @ and space
+        setTimeout(() => {
+          if (editorRef.current) {
+            editorRef.current.focus();
+            editorRef.current.setSelectionRange(newCursorPosition, newCursorPosition);
+          }
+        }, 0);
+      }
+    }, [content, cursorPosition, mentionQuery]);
+
+    const filteredUsers = users.filter(user => {
+      if (!mentionQuery) return true;
+      const userName = user.name || user.email?.split('@')[0] || '';
+      return userName.toLowerCase().includes(mentionQuery.toLowerCase()) ||
+             (user.email && user.email.toLowerCase().includes(mentionQuery.toLowerCase()));
+    });
+
+    // Close mention dropdown when clicking outside
+    useEffect(() => {
+      const handleClickOutside = (event: MouseEvent) => {
+        if (editorRef.current && !editorRef.current.contains(event.target as Node)) {
+          setShowMentionSuggestions(false);
+        }
+      };
+
+      if (showMentionSuggestions) {
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+      }
+    }, [showMentionSuggestions]);
+
+    // Handle keyboard navigation in mention suggestions
+    const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+      if (showMentionSuggestions && filteredUsers.length > 0) {
+        if (e.key === 'Escape') {
+          setShowMentionSuggestions(false);
+          e.preventDefault();
+        }
+      }
+      
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        handleSubmit();
+      }
+    }, [showMentionSuggestions, filteredUsers]);
 
     const handleSubmit = () => {
-      const content = localValue.trim();
-      if (content) {
-        onSubmit(content);
-        setLocalValue('');
+      const trimmedContent = content.trim();
+      if (trimmedContent) {
+        onSubmit(trimmedContent, mentionedUsers);
+        setContent('');
+        setMentionedUsers([]);
+        setShowMentionSuggestions(false);
+        setMentionQuery('');
       }
+    };
+
+    const renderCommentContent = (content: string) => {
+      return content.replace(/@(\w+)/g, '<span class="text-blue-600 font-medium">@$1</span>');
     };
 
     return (
       <div className="flex-1 flex space-x-2 relative z-10">
-        <textarea
-          id={`comment-${itemId}`}
-          placeholder="Tulis komentar..."
-          value={localValue}
-          onChange={(e) => setLocalValue(e.target.value)}
-          className="flex-1 min-h-[40px] text-sm px-3 py-2 border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white relative z-10"
-          rows={1}
-          style={{ 
-            pointerEvents: 'auto',
-            position: 'relative',
-            zIndex: 10
-          }}
-
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
-        />
+        <div className="flex-1 relative">
+          <textarea
+            ref={editorRef}
+            id={`comment-${itemId}`}
+            placeholder="Tulis komentar... (gunakan @nama untuk mention)"
+            value={content}
+            onChange={(e) => handleContentChange(e.target.value)}
+            onKeyDown={handleKeyDown}
+            className="w-full min-h-[40px] text-sm px-3 py-2 border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white relative z-10"
+            rows={1}
+            style={{ 
+              pointerEvents: 'auto',
+              position: 'relative',
+              zIndex: 10
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+          />
+          
+          {/* Mention Suggestions Dropdown */}
+          {showMentionSuggestions && filteredUsers.length > 0 && (
+            <div className="absolute bottom-full left-0 right-0 mb-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-40 overflow-y-auto z-50">
+              {filteredUsers.slice(0, 5).map((user) => (
+                <button
+                  key={user.id}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleMentionSelect(user);
+                  }}
+                  className="w-full px-3 py-2 text-left hover:bg-gray-100 flex items-center space-x-2 text-sm"
+                >
+                  <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-medium">
+                    {(user.name || user.email?.split('@')[0] || 'U').charAt(0).toUpperCase()}
+                  </div>
+                  <div>
+                    <div className="font-medium">{user.name || user.email?.split('@')[0] || 'User'}</div>
+                    <div className="text-xs text-gray-500">{user.email}</div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+        
         <Button
           size="sm"
           onClick={(e) => {
             e.stopPropagation();
             handleSubmit();
           }}
-          disabled={!localValue.trim() || disabled}
+          disabled={!content.trim() || disabled}
           className="px-3 relative z-10"
         >
           <Send className="w-3 h-3" />
@@ -1105,9 +1238,9 @@ export default function TimelinePage() {
                       </div>
                     )}
                   </div>
-                  <CommentInput
+                  <TimelineCommentEditor
                     itemId={item.id}
-                    onSubmit={(content) => handleAddComment(item.id, content)}
+                    onSubmit={(content, mentionedUsers) => handleAddComment(item.id, content, mentionedUsers)}
                     disabled={addCommentMutation.isPending}
                   />
                 </div>
