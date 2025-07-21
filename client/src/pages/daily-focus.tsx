@@ -896,6 +896,10 @@ export default function DailyFocusPage() {
     const welcomeShown = localStorage.getItem("welcome-screen-shown");
     const onboardingCompleted = localStorage.getItem("onboarding-completed");
     
+    // TEMPORARY: Force show company details modal for testing
+    console.log("🔍 Company details check:", { companyDetailsCompleted, onboardingCompleted });
+    setShowCompanyDetailsModal(true);
+    
     // For new users who completed registration
     if (onboardingCompleted === "true") {
       if (!companyDetailsCompleted) {

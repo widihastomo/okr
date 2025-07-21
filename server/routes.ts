@@ -633,8 +633,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = req.user as User;
       const { companyName, companyAddress, province, city, industryType, position, referralSource } = req.body;
       
+      console.log("🏢 Company details update request:", {
+        userId: user.id,
+        email: user.email,
+        organizationId: user.organizationId,
+        formData: { companyName, companyAddress, province, city, industryType, position, referralSource }
+      });
+      
       // Validate required fields
       if (!companyName || !companyAddress || !province || !city || !industryType || !position || !referralSource) {
+        console.log("❌ Validation failed - missing fields:", {
+          companyName: !!companyName,
+          companyAddress: !!companyAddress,
+          province: !!province,
+          city: !!city,
+          industryType: !!industryType,
+          position: !!position,
+          referralSource: !!referralSource
+        });
         return res.status(400).json({ 
           message: "Semua field company details harus diisi" 
         });
