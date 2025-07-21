@@ -12,7 +12,7 @@ import ClientSidebar from "@/components/client-sidebar";
 import SystemAdminSidebar from "@/components/system-admin-sidebar";
 import { NotificationProvider } from "@/components/notifications/notification-provider";
 import TourSystemNew from "@/components/TourSystemNew";
-import { FloatingTourRestartButton } from "@/components/tour-restart-button";
+import { FloatingHelpButton } from "@/components/floating-help-button";
 
 import Dashboard from "@/pages/dashboard";
 
@@ -319,7 +319,7 @@ function Router() {
         </div>
       </div>
       <TourSystemNew />
-      <FloatingTourRestartButton />
+      <FloatingHelpButton />
     </NotificationProvider>
   );
 }
