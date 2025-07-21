@@ -396,6 +396,15 @@ export DATABASE_URL="postgresql://..." && npm run dev
 
 ## Changelog
 ```
+- July 21, 2025. **COMPANY DETAILS COLLECTION SYSTEM COMPLETED** - Successfully implemented comprehensive company details collection before welcome screen:
+  * CREATED: CompanyDetailsModal.tsx with 6 required fields (company address, province, city, industry type, position, referral source)
+  * ADDED: Database schema updates for users table with company details fields (company_address, province, city, industry_type, position, referral_source)
+  * IMPLEMENTED: API endpoint /api/auth/update-company-details for saving company information
+  * INTEGRATED: Company details modal appears after email verification before welcome screen
+  * ENHANCED: Form validation with comprehensive Indonesian province list and industry types
+  * CREATED: User flow: Registration → Email Verification → Company Details Form → Welcome Screen → Daily Focus
+  * ADDED: LocalStorage tracking for company details completion status
+  * RESULT: New users must complete company profile before accessing main application
 - July 21, 2025. **NEW USER ONBOARDING FLOW MODIFICATION COMPLETED** - Successfully modified user registration and onboarding flow to skip onboarding page for new users:
   * MODIFIED: Email verification in AuthFlow.tsx now directly redirects new users to index page after verification instead of onboarding page
   * UPDATED: App.tsx routing logic to check onboarding completion status and only redirect users who started but didn't complete onboarding

@@ -575,6 +575,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
+
+  // Update company details endpoint
+  app.post("/api/auth/update-company-details", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as User;
+      const { companyAddress, province, city, industryType, position, referralSource } = req.body;
+      
+      // Validate required fields
+      if (!companyAddress || !province || !city || !industryType || !position || !referralSource) {
+        return res.status(400).json({ 
+          message: "Semua field company details harus diisi" 
+        });
+      }
+      
+      // Update user with company details
+      await storage.updateUser(user.id, {
+        companyAddress,
+        province, 
+        city,
+        industryType,
+        position,
+        referralSource,
+        updatedAt: new Date(),
+      });
+      
+      res.json({
+        message: "Company details berhasil disimpan",
+        success: true,
+      });
+      
+    } catch (error) {
+      console.error("Update company details error:", error);
+      res.status(500).json({ 
+        message: "Gagal menyimpan company details. Silakan coba lagi." 
+      });
+    }
+  });
   
   // Reset Password endpoint
   app.post("/api/auth/reset-password", async (req, res) => {

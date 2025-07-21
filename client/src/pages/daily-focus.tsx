@@ -125,6 +125,7 @@ import GoalFormModal from "@/components/goal-form-modal";
 import TaskModal from "@/components/task-modal";
 import InitiativeFormModal from "@/components/initiative-form-modal";
 import TourStartButton from "@/components/tour-start-button";
+import { CompanyDetailsModal } from "@/components/CompanyDetailsModal";
 
 // Icon mapping for mission cards
 const iconMapping = {
@@ -885,19 +886,33 @@ export default function DailyFocusPage() {
       .length;
   };
 
-  // Check for welcome screen for new users
+  // Check for company details and welcome screen for new users
+  const [showCompanyDetailsModal, setShowCompanyDetailsModal] = useState(false);
   const [showWelcomeScreen, setShowWelcomeScreen] = useState(false);
   
   useEffect(() => {
-    // Show welcome screen if user just registered and hasn't seen it yet
+    // Check if user needs to fill company details
+    const companyDetailsCompleted = localStorage.getItem("company-details-completed");
     const welcomeShown = localStorage.getItem("welcome-screen-shown");
     const onboardingCompleted = localStorage.getItem("onboarding-completed");
     
-    // Show welcome screen if onboarding was completed (new user) but welcome screen hasn't been shown
-    if (onboardingCompleted === "true" && !welcomeShown) {
-      setShowWelcomeScreen(true);
+    // For new users who completed registration
+    if (onboardingCompleted === "true") {
+      if (!companyDetailsCompleted) {
+        // Show company details modal first
+        setShowCompanyDetailsModal(true);
+      } else if (!welcomeShown) {
+        // If company details done, show welcome screen
+        setShowWelcomeScreen(true);
+      }
     }
   }, []);
+
+  const handleCompanyDetailsComplete = () => {
+    setShowCompanyDetailsModal(false);
+    // After company details, show welcome screen
+    setShowWelcomeScreen(true);
+  };
 
   const handleCloseWelcomeScreen = () => {
     setShowWelcomeScreen(false);
@@ -3939,6 +3954,12 @@ export default function DailyFocusPage() {
           queryClient.invalidateQueries({ queryKey: ['/api/objectives'] });
           queryClient.invalidateQueries({ queryKey: ['/api/okrs'] });
         }}
+      />
+
+      {/* Company Details Modal for new users */}
+      <CompanyDetailsModal
+        open={showCompanyDetailsModal}
+        onComplete={handleCompanyDetailsComplete}
       />
       
     </div>

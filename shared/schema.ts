@@ -257,6 +257,13 @@ export const users = pgTable("users", {
   verificationCode: varchar("verification_code", { length: 10 }), // Email verification code
   verificationCodeExpiry: timestamp("verification_code_expiry"), // Expiry time for verification code
   isEmailVerified: boolean("is_email_verified").default(false).notNull(), // Track email verification status
+  // Company details fields
+  companyAddress: text("company_address"),
+  province: text("province"),
+  city: text("city"),
+  industryType: text("industry_type"),
+  position: text("position"),
+  referralSource: text("referral_source"),
   reminderConfig: jsonb("reminder_config"), // Store reminder settings for check-in notifications
   lastLoginAt: timestamp("last_login_at"),
   invitedBy: uuid("invited_by").references(() => users.id),
