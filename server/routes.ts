@@ -2954,28 +2954,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Emoji is required" });
       }
 
-      // Check if user already has ANY reaction on this timeline item
+      // Allow user to have both 1 like (👍) and 1 other reaction
       const existingReactions = await storage.getTimelineReactions(timelineId);
-      const userExistingReaction = existingReactions.find(r => r.createdBy === user.id);
+      const userExistingReactions = existingReactions.filter(r => r.createdBy === user.id);
       
-      if (userExistingReaction) {
-        if (userExistingReaction.emoji === emoji) {
-          // Same emoji - remove it (toggle off)
-          await storage.deleteTimelineReaction(userExistingReaction.id);
-          res.json({ message: "Reaction removed", action: "removed" });
-        } else {
-          // Different emoji - replace the old one
-          await storage.deleteTimelineReaction(userExistingReaction.id);
-          const reaction = await storage.createTimelineReaction({
-            timelineItemId: timelineId,
-            createdBy: user.id,
-            organizationId: user.organizationId,
-            emoji
-          });
-          res.status(201).json({ message: "Reaction updated", action: "updated", reaction });
+      const isLike = emoji === '👍';
+      const existingLike = userExistingReactions.find(r => r.emoji === '👍');
+      const existingOtherReaction = userExistingReactions.find(r => r.emoji !== '👍');
+      
+      if (isLike) {
+        // Handling like reaction
+        if (existingLike) {
+          if (existingLike.emoji === emoji) {
+            // Same like - remove it (toggle off)
+            await storage.deleteTimelineReaction(existingLike.id);
+            res.json({ message: "Like removed", action: "removed" });
+            return;
+          }
         }
+        // Add new like
+        const reaction = await storage.createTimelineReaction({
+          timelineItemId: timelineId,
+          createdBy: user.id,
+          organizationId: user.organizationId,
+          emoji
+        });
+        res.status(201).json({ message: "Like added", action: "added", reaction });
       } else {
-        // No existing reaction - add new one
+        // Handling other reaction (not like)
+        if (existingOtherReaction) {
+          if (existingOtherReaction.emoji === emoji) {
+            // Same emoji - remove it (toggle off)
+            await storage.deleteTimelineReaction(existingOtherReaction.id);
+            res.json({ message: "Reaction removed", action: "removed" });
+            return;
+          } else {
+            // Different emoji - replace the old one
+            await storage.deleteTimelineReaction(existingOtherReaction.id);
+          }
+        }
+        // Add new reaction
         const reaction = await storage.createTimelineReaction({
           timelineItemId: timelineId,
           createdBy: user.id,
