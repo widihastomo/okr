@@ -89,13 +89,38 @@ export default function WelcomeScreen({
   };
 
   const handleSkipTour = async () => {
-    // Mark missions completed even if user skips tour
-    await updateOnboardingProgress('missions_completed');
-    toast({
-      title: "Welcome mission selesai!",
-      description: "Anda dapat memulai menggunakan platform sekarang.",
-    });
-    onClose();
+    try {
+      // Update tour completed status in database when user skips tour
+      const response = await fetch('/api/tour/complete', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      console.log('✅ Tour completed status updated in database (skipped)');
+      
+      // Mark missions completed even if user skips tour
+      await updateOnboardingProgress('missions_completed');
+      toast({
+        title: "Welcome mission selesai!",
+        description: "Anda dapat memulai menggunakan platform sekarang.",
+      });
+      onClose();
+    } catch (error) {
+      console.error('Failed to update tour completed status:', error);
+      // Still proceed with closing even if API call fails
+      await updateOnboardingProgress('missions_completed');
+      toast({
+        title: "Welcome mission selesai!",
+        description: "Anda dapat memulai menggunakan platform sekarang.",
+      });
+      onClose();
+    }
   };
 
   const features = [
