@@ -396,6 +396,12 @@ export DATABASE_URL="postgresql://..." && npm run dev
 
 ## Changelog
 ```
+- July 21, 2025. **PERSISTENT BROWSER CACHE ISSUE IDENTIFIED** - Frontend React app berjalan dengan benar (console logs menunjukkan data initiatives, authentication, Vite connection), namun browser menampilkan cached API-only page:
+  * CONFIRMED: Server melayani Vite development dengan benar (curl test menunjukkan Vite client)
+  * CONFIRMED: React app berfungsi (webview console logs menunjukkan initiatives data, user authentication, component rendering)
+  * ROOT CAUSE: Browser cache menyimpan versi lama API-only page dan tidak refresh meskipun server sudah benar
+  * SOLUSI: Browser cache clearing mandatory (F12 > right-click refresh > "Empty Cache and Hard Reload")
+  * ALTERNATIVE: Incognito/private browsing mode akan menampilkan frontend dengan benar
 - July 21, 2025. **FRONTEND API-ONLY MODE COMPLETELY FIXED** - Successfully resolved critical frontend serving issue and ES module compatibility:
   * FIXED: ES module top-level await error in server/index.ts and server/db.ts
   * RESTORED: Vite development server now properly serves React frontend instead of API-only mode
