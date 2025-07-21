@@ -138,7 +138,7 @@ export default function TimelinePage() {
 
   // Fetch detailed reactions for a specific timeline item (for modal)
   const { data: detailedReactions = [], isLoading: isLoadingDetailedReactions } = useQuery<{ id: string; emoji: string; user: { name: string; profileImageUrl?: string; }; createdAt: string; }[]>({
-    queryKey: ['/api/timeline', currentReactionsTimelineId, 'detailed-reactions'],
+    queryKey: [`/api/timeline/${currentReactionsTimelineId}/detailed-reactions`],
     enabled: !!currentReactionsTimelineId && !!user?.id,
     staleTime: 0,
   });
