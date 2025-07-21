@@ -426,6 +426,37 @@ export default function TimelinePage() {
     const [cursorPosition, setCursorPosition] = useState(0);
     const editorRef = useRef<HTMLTextAreaElement>(null);
 
+    // Add mention to editor when mention is clicked
+    const addMentionToEditor = useCallback((mentionName: string) => {
+      const currentContent = content;
+      const newContent = currentContent ? `${currentContent} @${mentionName} ` : `@${mentionName} `;
+      setContent(newContent);
+      
+      // Focus the editor
+      if (editorRef.current) {
+        editorRef.current.focus();
+        setTimeout(() => {
+          if (editorRef.current) {
+            const newPosition = newContent.length;
+            editorRef.current.setSelectionRange(newPosition, newPosition);
+          }
+        }, 0);
+      }
+    }, [content]);
+
+    // Expose function globally for mention click handling
+    useEffect(() => {
+      (window as any).handleMentionClick = (mentionName: string, timelineItemId: string) => {
+        if (timelineItemId === itemId) {
+          addMentionToEditor(mentionName);
+        }
+      };
+
+      return () => {
+        delete (window as any).handleMentionClick;
+      };
+    }, [itemId, addMentionToEditor]);
+
     // Fetch users for mention suggestions
     const { data: users = [] } = useQuery<User[]>({
       queryKey: ['/api/users'],
@@ -1218,7 +1249,7 @@ export default function TimelinePage() {
                       <div 
                         className="text-gray-700"
                         dangerouslySetInnerHTML={{
-                          __html: comment.content.replace(/@(\w+)/g, '<span class="text-blue-600 font-medium">@$1</span>')
+                          __html: comment.content.replace(/@(\w+)/g, '<span class="text-blue-600 font-medium cursor-pointer hover:text-blue-800 hover:underline" onclick="window.handleMentionClick(\'$1\', \'${item.id}\')">@$1</span>')
                         }}
                       />
                       <div className="text-gray-500 text-xs mt-1">
