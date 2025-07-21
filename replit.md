@@ -427,6 +427,8 @@ export DATABASE_URL="postgresql://..." && npm run dev
   * ADDED: Visual indicator text explaining form must be completed
   * SECURED: Users cannot skip company details collection process
   * RESULT: Company details form is now truly mandatory and cannot be bypassed
+  * REMOVED: Close button (X) from dialog header using CSS selector [&>button]:hidden
+  * ENHANCED: Form is completely non-dismissible with no exit options except completion
 - July 21, 2025. **INVITATION CODE INPUT SYSTEM COMPLETED** - Successfully implemented invitation code input with toggle functionality and uppercase formatting:
   * ADDED: Toggle-able invitation code input below password field with "Punya kode undangan?" button
   * IMPLEMENTED: Smooth slide-in animation with chevron up/down indicators for toggle state
