@@ -27,6 +27,9 @@ import { Leaderboard } from '@/components/gamification/leaderboard';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 
+// Constants
+const REACTION_EMOJIS = ['👍', '❤️', '😂', '😮', '😢', '😡'];
+
 interface TimelineItem {
   id: string;
   userId: string;
@@ -108,24 +111,24 @@ export default function TimelinePage() {
   });
 
   // Fetch teams data untuk filtering
-  const { data: teams = [] } = useQuery<any[]>({
+  const { data: teams = [] } = useQuery<{ id: string; name: string; }[]>({
     queryKey: ['/api/teams'],
     enabled: !!user?.id,
   });
 
-  const { data: teamMembers = [] } = useQuery<any[]>({
+  const { data: teamMembers = [] } = useQuery<{ id: string; userId: string; }[]>({
     queryKey: ['/api/teams', teamFilter, 'members'],
     enabled: !!user?.id && teamFilter !== 'all',
   });
 
   // Fetch timeline reactions
-  const { data: timelineReactions = {} } = useQuery<Record<string, any>>({
+  const { data: timelineReactions = {} } = useQuery<Record<string, { count: number; userReacted: boolean; }>>({
     queryKey: ['/api/timeline/reactions'],
     enabled: !!user?.id,
   });
 
   // Fetch timeline comments
-  const { data: timelineComments = {} } = useQuery<Record<string, any>>({
+  const { data: timelineComments = {} } = useQuery<Record<string, { id: string; content: string; createdAt: string; user: { name: string; profileImageUrl?: string; }; }[]>>({
     queryKey: ['/api/timeline/comments'],
     enabled: !!user?.id,
   });
@@ -197,8 +200,8 @@ export default function TimelinePage() {
   };
 
   const toggleReaction = (itemId: string) => {
-    // Handle reaction toggle logic here
-    console.log('Toggle reaction for:', itemId);
+    // Toggle like reaction
+    addReactionMutation.mutate({ itemId, emoji: '❤️' });
   };
 
   // Mutations for comments and reactions
@@ -207,6 +210,14 @@ export default function TimelinePage() {
       apiRequest(`/api/timeline/${itemId}/comments`, 'POST', { content }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/timeline/comments'] });
+    },
+  });
+
+  const addReactionMutation = useMutation({
+    mutationFn: ({ itemId, emoji }: { itemId: string; emoji: string }) =>
+      apiRequest(`/api/timeline/${itemId}/reactions`, 'POST', { emoji }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/timeline/reactions'] });
     },
   });
 
@@ -219,8 +230,7 @@ export default function TimelinePage() {
   };
 
   const handleReaction = (itemId: string, emoji: string) => {
-    // Handle reaction logic here
-    console.log('Handle reaction:', itemId, emoji);
+    addReactionMutation.mutate({ itemId, emoji });
     setShowReactionPicker(prev => ({ ...prev, [itemId]: false }));
   };
 
@@ -390,6 +400,147 @@ export default function TimelinePage() {
               )}
             </div>
           </div>
+          
+          {/* Social Engagement Section */}
+          <div className="border-t border-gray-100">
+            {/* Engagement buttons */}
+            <div className="px-3 md:px-4 py-2 flex items-center justify-between">
+              <div className="flex items-center space-x-4 md:space-x-6">
+                {/* Like Button */}
+                <button
+                  onClick={() => toggleReaction(item.id)}
+                  className="flex items-center space-x-1 text-gray-500 hover:text-red-500 transition-colors"
+                >
+                  <Heart className={`w-4 h-4 ${timelineReactions[item.id]?.userReacted ? 'fill-red-500 text-red-500' : ''}`} />
+                  <span className="text-xs md:text-sm">
+                    {timelineReactions[item.id]?.count || 0}
+                  </span>
+                  <span className="text-xs hidden sm:inline">Suka</span>
+                </button>
+                
+                {/* Comment Button */}
+                <button
+                  onClick={() => toggleComments(item.id)}
+                  className="flex items-center space-x-1 text-gray-500 hover:text-blue-500 transition-colors"
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  <span className="text-xs md:text-sm">
+                    {timelineComments[item.id]?.length || 0}
+                  </span>
+                  <span className="text-xs hidden sm:inline">Komentar</span>
+                </button>
+                
+                {/* Share Button */}
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(`${window.location.origin}/timeline#${item.id}`);
+                    toast({ title: "Link disalin", description: "Link timeline telah disalin ke clipboard" });
+                  }}
+                  className="flex items-center space-x-1 text-gray-500 hover:text-green-500 transition-colors"
+                >
+                  <Share2 className="w-4 h-4" />
+                  <span className="text-xs hidden sm:inline">Bagikan</span>
+                </button>
+              </div>
+              
+              {/* Reaction Picker */}
+              <div className="relative">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowReactionPicker(prev => ({ ...prev, [item.id]: !prev[item.id] }));
+                  }}
+                  className="text-gray-500 hover:text-yellow-500 transition-colors"
+                >
+                  <Smile className="w-4 h-4" />
+                </button>
+                
+                {showReactionPicker[item.id] && (
+                  <div 
+                    className="absolute right-0 bottom-8 bg-white border border-gray-200 rounded-lg shadow-lg p-2 z-10"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="flex space-x-1">
+                      {REACTION_EMOJIS.map((emoji) => (
+                        <button
+                          key={emoji}
+                          onClick={() => handleReaction(item.id, emoji)}
+                          className="hover:bg-gray-100 rounded p-1 text-lg"
+                        >
+                          {emoji}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            {/* Comments Section */}
+            {showComments[item.id] && (
+              <div className="px-3 md:px-4 pb-3 space-y-2">
+                {/* Existing Comments */}
+                {timelineComments[item.id]?.map((comment: any) => (
+                  <div key={comment.id} className="flex space-x-2 text-xs md:text-sm">
+                    <div className="flex-shrink-0">
+                      {comment.user?.profileImageUrl ? (
+                        <img 
+                          src={comment.user.profileImageUrl} 
+                          alt={comment.user.name}
+                          className="w-6 h-6 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-green-500 rounded-full flex items-center justify-center text-white font-semibold text-xs">
+                          {getUserInitials({ name: comment.user?.name || 'User' })}
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 bg-gray-50 rounded-lg p-2">
+                      <div className="font-semibold text-gray-900">{comment.user?.name}</div>
+                      <div className="text-gray-700">{comment.content}</div>
+                      <div className="text-gray-500 text-xs mt-1">
+                        {format(new Date(comment.createdAt), "MMM dd, HH:mm")}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                
+                {/* Add Comment */}
+                <div className="flex space-x-2 mt-3">
+                  <div className="flex-shrink-0">
+                    {user?.profileImageUrl ? (
+                      <img 
+                        src={user.profileImageUrl} 
+                        alt={user.name || 'User'}
+                        className="w-6 h-6 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-green-500 rounded-full flex items-center justify-center text-white font-semibold text-xs">
+                        {getUserInitials({ name: user?.name || 'User' })}
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex-1 flex space-x-2">
+                    <Textarea
+                      placeholder="Tulis komentar..."
+                      value={commentTexts[item.id] || ''}
+                      onChange={(e) => setCommentTexts(prev => ({ ...prev, [item.id]: e.target.value }))}
+                      className="flex-1 min-h-[32px] text-xs md:text-sm"
+                      rows={1}
+                    />
+                    <Button
+                      size="sm"
+                      onClick={() => handleAddComment(item.id)}
+                      disabled={!commentTexts[item.id]?.trim() || addCommentMutation.isPending}
+                      className="px-3"
+                    >
+                      <Send className="w-3 h-3" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </CardContent>
       </Card>
     );
@@ -509,7 +660,7 @@ export default function TimelinePage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Semua Tim</SelectItem>
-                    {(teams || []).map((team: any) => (
+                    {(teams || []).map((team) => (
                       <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>
                     ))}
                   </SelectContent>
