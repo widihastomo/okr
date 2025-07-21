@@ -910,19 +910,22 @@ export default function DailyFocusPage() {
     // Check if user has complete company details from database
     let hasCompleteCompanyDetails = false;
     if (currentUserData?.user) {
-      const user = currentUserData.user;
+      const user = currentUserData.user as any;
       hasCompleteCompanyDetails = !!(user.company_address && user.province && user.city);
       console.log("🏢 Database company details check:", { 
         company_address: user.company_address, 
         province: user.province, 
         city: user.city,
-        hasCompleteCompanyDetails
+        hasCompleteCompanyDetails,
+        currentUserData: currentUserData
       });
+    } else {
+      console.log("❌ No currentUserData.user found:", currentUserData);
     }
     
     // Show company details modal if any required field is missing from database
     if (currentUserData && !hasCompleteCompanyDetails) {
-      console.log("📝 Showing company details modal - missing required fields");
+      console.log("📝 Showing company details modal - missing required fields, showCompanyDetailsModal:", showCompanyDetailsModal);
       setShowCompanyDetailsModal(true);
       return;
     }
