@@ -660,34 +660,28 @@ export default function TimelinePage() {
                         {/* Total reaction count */}
                         <span 
                           id={`reaction-count-${item.id}`}
-                          className="text-gray-600 hover:underline cursor-pointer relative group"
+                          className="text-gray-600 hover:underline cursor-pointer"
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
                             
-                            if (!autoScrollPrevention) {
-                              // Only open modal if auto-scroll prevention is OFF
+                            if (autoScrollPrevention) {
+                              // Preserve scroll position when auto-scroll prevention is ON
+                              const scrollY = window.scrollY;
+                              const scrollX = window.scrollX;
+                              
+                              openReactionsModal(item.id);
+                              
+                              // Restore scroll position immediately after
+                              requestAnimationFrame(() => {
+                                window.scrollTo(scrollX, scrollY);
+                              });
+                            } else {
                               openReactionsModal(item.id);
                             }
                           }}
-                          title={autoScrollPrevention ? "Auto-scroll prevention aktif - modal dinonaktifkan" : ""}
                         >
                           {Object.values(timelineReactions[item.id] || {}).reduce((sum, count) => sum + count, 0)} orang
-                          
-                          {/* Show inline reactions when auto-scroll prevention is ON */}
-                          {autoScrollPrevention && (
-                            <div className="absolute bottom-full left-0 mb-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg p-3 z-20 hidden group-hover:block">
-                              <div className="text-sm font-semibold mb-2">Reaksi:</div>
-                              <div className="space-y-1 max-h-40 overflow-y-auto">
-                                {Object.entries(timelineReactions[item.id] || {}).map(([emoji, count]) => (
-                                  <div key={emoji} className="flex items-center justify-between">
-                                    <span className="text-lg">{emoji}</span>
-                                    <span className="text-gray-600">{count} orang</span>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
                         </span>
                       </div>
                     )}
@@ -727,12 +721,23 @@ export default function TimelinePage() {
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    if (!autoScrollPrevention) {
+                    
+                    if (autoScrollPrevention) {
+                      // Preserve scroll position when auto-scroll prevention is ON
+                      const scrollY = window.scrollY;
+                      const scrollX = window.scrollX;
+                      
+                      toggleComments(item.id);
+                      
+                      // Restore scroll position immediately after
+                      requestAnimationFrame(() => {
+                        window.scrollTo(scrollX, scrollY);
+                      });
+                    } else {
                       toggleComments(item.id);
                     }
                   }}
-                  className={`flex items-center space-x-1 ${autoScrollPrevention ? 'text-gray-300 cursor-not-allowed' : 'text-gray-500 hover:text-blue-500'} transition-colors`}
-                  title={autoScrollPrevention ? "Komentar dinonaktifkan saat auto-scroll prevention ON" : ""}
+                  className="flex items-center space-x-1 text-gray-500 hover:text-blue-500 transition-colors"
                 >
                   <MessageCircle className="w-4 h-4" />
                   <span className="text-xs md:text-sm">
@@ -762,17 +767,28 @@ export default function TimelinePage() {
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    if (!autoScrollPrevention) {
+                    
+                    if (autoScrollPrevention) {
+                      // Preserve scroll position when auto-scroll prevention is ON
+                      const scrollY = window.scrollY;
+                      const scrollX = window.scrollX;
+                      
+                      setShowReactionPicker(prev => ({ ...prev, [item.id]: !prev[item.id] }));
+                      
+                      // Restore scroll position immediately after
+                      requestAnimationFrame(() => {
+                        window.scrollTo(scrollX, scrollY);
+                      });
+                    } else {
                       setShowReactionPicker(prev => ({ ...prev, [item.id]: !prev[item.id] }));
                     }
                   }}
-                  className={`${autoScrollPrevention ? 'text-gray-300 cursor-not-allowed' : 'text-gray-500 hover:text-yellow-500'} transition-colors`}
-                  title={autoScrollPrevention ? "Reaction picker dinonaktifkan saat auto-scroll prevention ON" : ""}
+                  className="text-gray-500 hover:text-yellow-500 transition-colors"
                 >
                   <Smile className="w-4 h-4" />
                 </button>
                 
-                {showReactionPicker[item.id] && !autoScrollPrevention && (
+                {showReactionPicker[item.id] && (
                   <div 
                     className="reaction-picker absolute right-0 bottom-8 bg-white border border-gray-200 rounded-lg shadow-lg p-2 z-10"
                     onClick={(e) => e.stopPropagation()}
@@ -798,7 +814,7 @@ export default function TimelinePage() {
             </div>
             
             {/* Comments Section */}
-            {showComments[item.id] && !autoScrollPrevention && (
+            {showComments[item.id] && (
               <div className="px-3 md:px-4 pb-3 space-y-2">
                 {/* Existing Comments */}
                 {timelineComments[item.id]?.map((comment: any) => (
