@@ -316,69 +316,106 @@ const config = getConfig();
     });
   });
 
-  server.listen(config.port, "0.0.0.0", async () => {
-    console.log(`✅ Server started successfully`);
-    console.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`🚀 Server listening on host: 0.0.0.0`);
-    console.log(`📡 Port: ${config.port}`);
-    console.log(`🔗 Health check: http://localhost:${config.port}/health`);
-    
-    // Additional access information for troubleshooting
-    if (process.env.REPLIT_DOMAINS) {
-      console.log(`🌍 External URL: https://${process.env.REPLIT_DOMAINS.split(',')[0]}`);
-    }
-    console.log(`📋 Server ready for connections on all interfaces (0.0.0.0:${config.port})`);
-    
-    log(`serving on port ${config.port}`);
-    
-    // Safe database initialization after server is running
-    try {
-      console.log("Testing database connection...");
-      const dbConnected = await testDatabaseConnection();
+  // Enhanced server startup with port conflict handling
+  const startServer = (port: number) => {
+    return new Promise((resolve, reject) => {
+      const serverInstance = server.listen(port, "0.0.0.0", async () => {
+        console.log(`✅ Server started successfully`);
+        console.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
+        console.log(`🚀 Server listening on host: 0.0.0.0`);
+        console.log(`📡 Port: ${port}`);
+        console.log(`🔗 Health check: http://localhost:${port}/health`);
+        resolve(serverInstance);
+      });
       
-      if (dbConnected) {
-        // Run build seeder first (essential data)
-        console.log("🌱 Running build seeder for development...");
-        const { runBuildSeeder } = await import("./build-seeder");
-        await runBuildSeeder();
-        
-        // Skip RLS setup in development to avoid pool conflicts
-        if (process.env.NODE_ENV === 'production') {
-          try {
-            console.log("Setting up Row Level Security (RLS)...");
-            await setupRLS();
-          } catch (rlsError) {
-            console.warn("⚠️ RLS setup failed, continuing without RLS:", rlsError.message);
-            // Continue without RLS - application-level security is still active
-          }
+      serverInstance.on('error', (error: any) => {
+        if (error.code === 'EADDRINUSE') {
+          console.log(`⚠️  Port ${port} is busy, trying next port...`);
+          reject(error);
         } else {
-          console.log("ℹ️ Skipping RLS setup in development (application-level security active)");
+          console.error(`❌ Server error:`, error);
+          reject(error);
         }
-        
-        try {
-          console.log("Populating PostgreSQL database with sample data...");
-          await populateDatabase();
-        } catch (populateError) {
-          console.log("Database already populated, skipping initialization");
-        }
-        
-        try {
-          console.log("Populating SaaS subscription data...");
-          await populateSaaSData();
-        } catch (saasError) {
-          console.log("SaaS data already exists, skipping...");
-        }
-        
-        console.log("Database initialized successfully");
-      } else {
-        console.error("Database connection failed - server will continue without database");
-      }
+      });
+    });
+  };
+
+  let serverInstance;
+  let currentPort = config.port;
+  
+  for (let attempts = 0; attempts < 10; attempts++) {
+    try {
+      serverInstance = await startServer(currentPort);
+      break;
     } catch (error: any) {
-      console.log("Database already populated, skipping initialization");
-      // Don't let database errors crash the server
-      console.error("Database initialization error:", error?.message || error);
+      if (error.code === 'EADDRINUSE') {
+        currentPort++;
+        console.log(`🔄 Trying port ${currentPort}...`);
+      } else {
+        throw error;
+      }
     }
-  });
+  }
+  
+  if (!serverInstance) {
+    throw new Error('Unable to find available port after 10 attempts');
+  }
+  
+  // Additional access information for troubleshooting
+  if (process.env.REPLIT_DOMAINS) {
+    console.log(`🌍 External URL: https://${process.env.REPLIT_DOMAINS.split(',')[0]}`);
+  }
+  console.log(`📋 Server ready for connections on all interfaces (0.0.0.0:${currentPort})`);
+  
+  log(`serving on port ${currentPort}`);
+  
+  // Safe database initialization after server is running
+  try {
+    console.log("Testing database connection...");
+    const dbConnected = await testDatabaseConnection();
+    
+    if (dbConnected) {
+      // Run build seeder first (essential data)
+      console.log("🌱 Running build seeder for development...");
+      const { runBuildSeeder } = await import("./build-seeder");
+      await runBuildSeeder();
+      
+      // Skip RLS setup in development to avoid pool conflicts
+      if (process.env.NODE_ENV === 'production') {
+        try {
+          console.log("Setting up Row Level Security (RLS)...");
+          await setupRLS();
+        } catch (rlsError: any) {
+          console.warn("⚠️ RLS setup failed, continuing without RLS:", rlsError?.message || rlsError);
+          // Continue without RLS - application-level security is still active
+        }
+      } else {
+        console.log("ℹ️ Skipping RLS setup in development (application-level security active)");
+      }
+      
+      try {
+        console.log("Populating PostgreSQL database with sample data...");
+        await populateDatabase();
+      } catch (populateError) {
+        console.log("Database already populated, skipping initialization");
+      }
+      
+      try {
+        console.log("Populating SaaS subscription data...");
+        await populateSaaSData();
+      } catch (saasError) {
+        console.log("SaaS data already exists, skipping...");
+      }
+      
+      console.log("Database initialized successfully");
+    } else {
+      console.error("Database connection failed - server will continue without database");
+    }
+  } catch (error: any) {
+    console.log("Database already populated, skipping initialization");
+    // Don't let database errors crash the server
+    console.error("Database initialization error:", error?.message || error);
+  }
 
   // Keep the process alive by preventing exit
   process.stdin.resume();
