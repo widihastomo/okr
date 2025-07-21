@@ -351,7 +351,9 @@ export default function TimelinePage() {
 
 
 
-
+  const toggleDetails = (itemId: string) => {
+    setExpandedDetails(prev => ({ ...prev, [itemId]: !prev[itemId] }));
+  };
 
   // Close reaction picker when clicking outside
   useEffect(() => {
