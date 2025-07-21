@@ -6,53 +6,79 @@ import * as schema from "@shared/schema";
 import fs from 'fs';
 import path from 'path';
 
-// Load environment variables early and reliably
+// Load environment variables early and reliably - Enhanced for Mac local development
 try {
-  // Force reload environment variables from .env file
+  // Import dotenv first
   const dotenv = require('dotenv');
-  if (dotenv && typeof dotenv.config === 'function') {
-    // Try multiple .env file locations for local development
-    const envPaths = [
-      path.join(process.cwd(), '.env'),
-      path.join(process.cwd(), '.env.local'),
-      path.join(__dirname, '..', '.env'),
-    ];
-    
-    let loaded = false;
-    for (const envPath of envPaths) {
-      if (fs.existsSync(envPath)) {
-        console.log(`🔍 Trying to load .env from: ${envPath}`);
-        const result = dotenv.config({ path: envPath });
-        if (!result.error) {
-          console.log(`✅ Environment variables loaded from: ${envPath}`);
-          loaded = true;
-          break;
+  
+  // Force override = true to reload variables even if they exist
+  const envPaths = [
+    path.join(process.cwd(), '.env'),
+    path.join(process.cwd(), '.env.local'),
+    path.join(__dirname, '..', '.env'),
+  ];
+  
+  console.log("🔧 Enhanced dotenv loading for Mac development...");
+  
+  let loaded = false;
+  for (const envPath of envPaths) {
+    if (fs.existsSync(envPath)) {
+      console.log(`🔍 Found .env file at: ${envPath}`);
+      
+      // Force load with override = true
+      const result = dotenv.config({ 
+        path: envPath, 
+        override: true  // Force override existing variables
+      });
+      
+      if (!result.error) {
+        console.log(`✅ Successfully loaded environment from: ${envPath}`);
+        
+        // Verify DATABASE_URL was loaded
+        if (process.env.DATABASE_URL) {
+          console.log("✅ DATABASE_URL confirmed loaded from .env file");
         } else {
-          console.log(`⚠️  Failed to load from ${envPath}:`, result.error.message);
+          console.log("⚠️  DATABASE_URL still not found after loading .env");
         }
+        
+        loaded = true;
+        break;
+      } else {
+        console.log(`❌ Failed to load from ${envPath}:`, result.error.message);
       }
+    } else {
+      console.log(`❌ .env file not found at: ${envPath}`);
     }
-    
-    if (!loaded) {
-      console.log("⚠️  No .env file could be loaded, using process.env directly");
-    }
-  } else {
-    console.log("⚠️  dotenv config method not available, using process.env directly");
   }
+  
+  if (!loaded) {
+    console.log("⚠️  No .env file could be loaded successfully");
+  }
+  
 } catch (error) {
-  // Only log warning if it's actually an import error
-  if (error.code === 'MODULE_NOT_FOUND') {
-    console.log("⚠️  dotenv package not found, using process.env directly");
-  } else {
-    console.log("✅ Using existing environment variables");
-  }
+  console.log("❌ Error during dotenv loading:", (error as Error).message);
+  console.log("📋 Fallback: Using existing process.env variables");
 }
 
-// Debug environment variables for local development
-console.log("🔍 Environment Debug Info:");
+// Enhanced debugging for Mac local development
+console.log("🔍 Enhanced Environment Debug Info:");
 console.log("- NODE_ENV:", process.env.NODE_ENV);
 console.log("- DATABASE_URL exists:", !!process.env.DATABASE_URL);
+console.log("- DATABASE_URL preview:", process.env.DATABASE_URL ? process.env.DATABASE_URL.substring(0, 30) + "..." : "NOT FOUND");
 console.log("- Current working directory:", process.cwd());
+console.log("- __dirname:", __dirname);
+console.log("- DB_CONNECTION_TYPE:", process.env.DB_CONNECTION_TYPE);
+
+// Additional debug: Show all environment variables that start with DATABASE or PG
+console.log("🔍 Database-related environment variables:");
+Object.keys(process.env).forEach(key => {
+  if (key.startsWith('DATABASE') || key.startsWith('PG')) {
+    const value = process.env[key];
+    const maskedValue = key.includes('PASSWORD') || key.includes('URL') ? 
+      (value ? value.substring(0, 10) + "..." : "undefined") : value;
+    console.log(`- ${key}: ${maskedValue}`);
+  }
+});
 console.log("- .env file check - looking for:", `${process.cwd()}/.env`);
 
 // Check if .env file exists
@@ -80,7 +106,7 @@ if (process.env.DATABASE_URL) {
         }
       });
     } catch (error) {
-      console.log("❌ Tidak bisa membaca file .env:", error.message);
+      console.log("❌ Tidak bisa membaca file .env:", (error as Error).message);
     }
   } else {
     console.log("❌ File .env tidak ditemukan di:", envPath);
