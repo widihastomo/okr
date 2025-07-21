@@ -341,6 +341,15 @@ The system includes comprehensive database connection troubleshooting tools:
 
 ## Changelog
 ```
+- July 21, 2025. **TIMELINE MENTION FUNCTIONALITY COMPLETED** - Successfully implemented comprehensive mention system for timeline comments:
+  * ADDED: TimelineCommentEditor component with mention functionality (@user) using @ symbol detection
+  * IMPLEMENTED: User search dropdown with keyboard navigation (Enter, Escape) when typing @ mentions
+  * ADDED: Blue highlighting for mentions in comment display with hover effects for clickability
+  * IMPLEMENTED: Click-to-mention functionality - clicking mentions populates comment input field
+  * ENHANCED: Direct DOM manipulation for reliable mention insertion with auto-focus and cursor positioning
+  * INTEGRATED: Backend API support for mentionedUsers parameter with proper data structure
+  * ADDED: Event listeners for React state synchronization with DOM changes
+  * RESULT: Complete mention system matching task detail page functionality with click interaction support
 - July 21, 2025. **TIMELINE REACTION SCROLL PRESERVATION FIXED** - Successfully resolved auto-scroll issue when clicking reaction buttons:
   * FIXED: Enhanced scroll preservation for all reaction-related interactions (emoji picker, like button, reaction selection)
   * IMPROVED: Added delayed scroll restoration (50-100ms) to account for DOM updates after mutations
