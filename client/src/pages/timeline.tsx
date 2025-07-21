@@ -137,9 +137,10 @@ export default function TimelinePage() {
   });
 
   // Fetch detailed reactions for a specific timeline item (for modal)
-  const { data: detailedReactions = [] } = useQuery<{ id: string; emoji: string; user: { name: string; profileImageUrl?: string; }; createdAt: string; }[]>({
+  const { data: detailedReactions = [], isLoading: isLoadingDetailedReactions } = useQuery<{ id: string; emoji: string; user: { name: string; profileImageUrl?: string; }; createdAt: string; }[]>({
     queryKey: ['/api/timeline', currentReactionsTimelineId, 'detailed-reactions'],
     enabled: !!currentReactionsTimelineId && !!user?.id,
+    staleTime: 0,
   });
 
   // Filter timeline data
@@ -852,18 +853,25 @@ export default function TimelinePage() {
 
       {/* Reactions Modal */}
       {currentReactionsTimelineId && (() => {
+        console.log('Modal rendering for timeline ID:', currentReactionsTimelineId);
+        console.log('Detailed reactions data:', detailedReactions);
+        console.log('Is loading detailed reactions:', isLoadingDetailedReactions);
+        
         // Group reactions by emoji
-        const reactionGroups = detailedReactions.reduce((groups, reaction) => {
+        const reactionGroups = (detailedReactions as any[]).reduce((groups: Record<string, any[]>, reaction: any) => {
           const emoji = reaction.emoji;
           if (!groups[emoji]) {
             groups[emoji] = [];
           }
           groups[emoji].push(reaction);
           return groups;
-        }, {} as Record<string, typeof detailedReactions>);
+        }, {} as Record<string, any[]>);
 
         const emojiTabs = Object.keys(reactionGroups);
-        const totalCount = detailedReactions.length;
+        const totalCount = (detailedReactions as any[]).length;
+        
+        console.log('Reaction groups:', reactionGroups);
+        console.log('Total count:', totalCount);
 
         return (
           <Dialog 
@@ -916,7 +924,7 @@ export default function TimelinePage() {
                   
                   return reactionsToShow.length > 0 ? (
                     <div className="space-y-2">
-                      {reactionsToShow.map((reaction) => (
+                      {(reactionsToShow as any[]).map((reaction: any) => (
                         <div key={reaction.id} className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50">
                           <div className="flex-shrink-0">
                             {reaction.user?.profileImageUrl ? (
