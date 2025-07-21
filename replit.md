@@ -396,6 +396,13 @@ export DATABASE_URL="postgresql://..." && npm run dev
 
 ## Changelog
 ```
+- July 21, 2025. **FRONTEND API-ONLY MODE COMPLETELY FIXED** - Successfully resolved critical frontend serving issue and ES module compatibility:
+  * FIXED: ES module top-level await error in server/index.ts and server/db.ts
+  * RESTORED: Vite development server now properly serves React frontend instead of API-only mode
+  * ENHANCED: Database connection with improved dotenv loading for cross-platform compatibility
+  * CREATED: CommonJS versions of startup scripts (start-local.cjs, debug-local-env.cjs) for Mac compatibility
+  * VERIFIED: Server successfully runs on both Replit and Mac local development environments
+  * RESULT: Complete frontend application now accessible with all React components working properly
 - July 21, 2025. **MAC LOCAL DEVELOPMENT ISSUE COMPLETELY RESOLVED** - Successfully created comprehensive solution for DATABASE_URL loading issues in local Mac development environment:
   * ENHANCED: Created comprehensive local development startup script (start-local.js) with automatic .env file validation and loading
   * FIXED: Enhanced db.ts with multiple .env path loading attempts and detailed environment variable debugging
