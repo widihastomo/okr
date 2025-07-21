@@ -240,7 +240,7 @@ export default function WelcomeScreen({
             <Button
               ref={startTourButtonRef}
               onClick={handleStartTour}
-              className="flex-1 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 animate-pulse"
+              className="flex-1 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 tour-mobile-pulse"
             >
               <Play className="h-4 w-4 mr-2" />
               Mulai Tour
