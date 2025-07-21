@@ -273,6 +273,8 @@ export const users = pgTable("users", {
   invitationStatus: text("invitation_status").notNull().default("registered"), // "pending", "accepted", "expired", "cancelled", "registered"
   invitationExpiresAt: timestamp("invitation_expires_at"),
   invitationAcceptedAt: timestamp("invitation_accepted_at"),
+  // Referral code fields
+  invitationCode: varchar("invitation_code", { length: 50 }), // Store the referral code used during registration
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

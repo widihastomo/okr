@@ -117,7 +117,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      const { name, businessName, whatsappNumber, email, password } = req.body;
+      const { name, businessName, whatsappNumber, email, password, invitationCode } = req.body;
       
       // Validate required fields with specific error messages
       if (!name) {
@@ -232,6 +232,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create organization first without owner
       const newOrganization = await db.insert(organizations).values(orgValues).returning();
       
+      // Validate invitation code if provided
+      let validatedInvitationCode = null;
+      if (invitationCode && invitationCode.trim()) {
+        try {
+          console.log(`🎟️ Validating invitation code: ${invitationCode}`);
+          const [referralCode] = await db.select()
+            .from(referralCodes)
+            .where(
+              and(
+                eq(referralCodes.code, invitationCode.toUpperCase()),
+                eq(referralCodes.isActive, true)
+              )
+            )
+            .limit(1);
+
+          if (referralCode) {
+            // Check expiry
+            if (referralCode.expiresAt && new Date() > referralCode.expiresAt) {
+              console.log(`❌ Invitation code ${invitationCode} has expired`);
+            } else if (referralCode.maxUses && referralCode.currentUses >= referralCode.maxUses) {
+              console.log(`❌ Invitation code ${invitationCode} has reached maximum uses`);
+            } else {
+              validatedInvitationCode = invitationCode.toUpperCase();
+              console.log(`✅ Invitation code ${invitationCode} is valid`);
+            }
+          } else {
+            console.log(`❌ Invitation code ${invitationCode} not found`);
+          }
+        } catch (error) {
+          console.error("Error validating invitation code during registration:", error);
+        }
+      }
+
       // Create user
       const userId = crypto.randomUUID();
       const newUser = await storage.createUser({
@@ -245,6 +278,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         phone: whatsappNumber,
         verificationCode: verificationCode,
         verificationCodeExpiry: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
+        invitationCode: validatedInvitationCode, // Store validated invitation code
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -255,6 +289,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .where(eq(organizations.id, organizationId));
       
       console.log("Created organization with owner:", { organizationId, userId });
+
+      // Update referral code usage count if valid invitation code was used
+      if (validatedInvitationCode) {
+        try {
+          console.log(`🎟️ Incrementing usage count for invitation code: ${validatedInvitationCode}`);
+          await db.update(referralCodes)
+            .set({ 
+              currentUses: sql`current_uses + 1`,
+              updatedAt: new Date() 
+            })
+            .where(eq(referralCodes.code, validatedInvitationCode));
+          console.log(`✅ Updated usage count for invitation code: ${validatedInvitationCode}`);
+        } catch (error) {
+          console.error("Error updating referral code usage count:", error);
+          // Don't fail registration if counter update fails
+        }
+      }
       
       // Create trial subscription for new organization
       try {
