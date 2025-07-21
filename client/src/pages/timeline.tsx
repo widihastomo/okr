@@ -86,6 +86,7 @@ export default function TimelinePage() {
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [activityTypeFilter, setActivityTypeFilter] = useState('all');
   const [userFilter, setUserFilter] = useState('all');
+  const [teamFilter, setTeamFilter] = useState('all');
   const [dateRangeFilter, setDateRangeFilter] = useState('all');
   const [contentTypeFilter, setContentTypeFilter] = useState('all');
   
@@ -101,6 +102,11 @@ export default function TimelinePage() {
   // Fetch timeline data
   const { data: timelineData = [], isLoading } = useQuery<TimelineItem[]>({
     queryKey: ['/api/timeline'],
+  });
+
+  // Fetch teams data for filter
+  const { data: teamsData = [] } = useQuery<any[]>({
+    queryKey: ['/api/teams'],
   });
 
   // Fetch comments for timeline items
@@ -194,10 +200,63 @@ export default function TimelinePage() {
     handleReaction(timelineItemId, '❤️');
   };
 
+  // Get team members for filtering
+  const teamMembers = useMemo(() => {
+    const members = new Map();
+    teamsData.forEach((team: any) => {
+      if (team.members) {
+        team.members.forEach((member: any) => {
+          if (member.user) {
+            members.set(member.user.id, {
+              ...member.user,
+              teamId: team.id,
+              teamName: team.name
+            });
+          }
+        });
+      }
+    });
+    return members;
+  }, [teamsData]);
+
   // Filter data based on current filters
   const filteredData = useMemo(() => {
     return timelineData.filter((item) => {
-      if (userFilter !== 'all' && userFilter !== 'current' && item.userId !== userFilter) return false;
+      // Activity type filter
+      if (activityTypeFilter !== 'all') {
+        if (activityTypeFilter === 'check_in' && item.type !== 'check_in') return false;
+        if (activityTypeFilter === 'daily_update' && item.type !== 'daily_update' && item.type !== undefined) return false;
+      }
+
+      // User filter
+      if (userFilter !== 'all') {
+        if (userFilter === 'current' && item.userId !== user?.id) return false;
+        if (userFilter !== 'current' && item.userId !== userFilter) return false;
+      }
+      
+      // Team filter
+      if (teamFilter !== 'all') {
+        const userTeamInfo = teamMembers.get(item.userId);
+        if (!userTeamInfo || userTeamInfo.teamId !== teamFilter) return false;
+      }
+
+      // Content type filter
+      if (contentTypeFilter !== 'all') {
+        switch (contentTypeFilter) {
+          case 'tasks':
+            if (!item.tasksSummary && item.tasksUpdated === 0) return false;
+            break;
+          case 'key_results':
+            if (!item.keyResultsSummary && item.keyResultsUpdated === 0 && item.type !== 'check_in') return false;
+            break;
+          case 'metrics':
+            if (!item.successMetricsSummary && item.successMetricsUpdated === 0) return false;
+            break;
+          case 'deliverables':
+            if (!item.deliverablesSummary && item.deliverablesUpdated === 0) return false;
+            break;
+        }
+      }
       
       // Date range filtering
       if (dateRangeFilter !== 'all') {
@@ -222,16 +281,17 @@ export default function TimelinePage() {
       
       return true;
     });
-  }, [timelineData, activityTypeFilter, userFilter, dateRangeFilter, contentTypeFilter]);
+  }, [timelineData, activityTypeFilter, userFilter, teamFilter, dateRangeFilter, contentTypeFilter, teamMembers, user?.id]);
 
   const clearAllFilters = () => {
     setActivityTypeFilter('all');
     setUserFilter('all');
+    setTeamFilter('all');
     setDateRangeFilter('all');
     setContentTypeFilter('all');
   };
 
-  const isDefaultFilter = activityTypeFilter === 'all' && userFilter === 'all' && 
+  const isDefaultFilter = activityTypeFilter === 'all' && userFilter === 'all' && teamFilter === 'all' && 
     dateRangeFilter === 'all' && contentTypeFilter === 'all';
 
 
@@ -352,6 +412,31 @@ export default function TimelinePage() {
                   <SelectContent>
                     <SelectItem value="all">Semua Pengguna</SelectItem>
                     <SelectItem value="current">Pengguna Saat Ini</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Team Filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Filter Berdasarkan Tim
+                </label>
+                <Select value={teamFilter} onValueChange={setTeamFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Pilih tim" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Semua Tim</SelectItem>
+                    {teamsData.map((team: any) => (
+                      <SelectItem key={team.id} value={team.id}>
+                        {team.name}
+                        {team.members && (
+                          <span className="text-xs text-gray-500 ml-1">
+                            ({team.members.length} anggota)
+                          </span>
+                        )}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
