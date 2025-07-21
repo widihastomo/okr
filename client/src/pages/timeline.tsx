@@ -102,10 +102,12 @@ export default function TimelinePage() {
   const [currentReactionsTimelineId, setCurrentReactionsTimelineId] = useState<string | null>(null);
   const [selectedReactionTab, setSelectedReactionTab] = useState('all');
   const [commentTexts, setCommentTexts] = useState<Record<string, string>>({});
+  const [isReactionMutating, setIsReactionMutating] = useState(false);
 
   // Lazy loading states - simpler approach showing N items at a time
   const [displayedItemCount, setDisplayedItemCount] = useState(3);
   const loadMoreRef = useRef<HTMLDivElement>(null);
+  const scrollPositionRef = useRef<number>(0);
 
   // Fetch timeline data
   const { data: timelineData = [], isLoading } = useQuery<TimelineItem[]>({
@@ -240,21 +242,11 @@ export default function TimelinePage() {
       }
       return response.json();
     },
-    onMutate: () => {
-      // Store current scroll position before mutation
-      const currentScrollY = window.scrollY;
-      sessionStorage.setItem('timeline-scroll-position', currentScrollY.toString());
-    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/timeline/comments'] });
-      // Restore scroll position after mutation
-      setTimeout(() => {
-        const savedScrollY = sessionStorage.getItem('timeline-scroll-position');
-        if (savedScrollY) {
-          window.scrollTo(0, parseInt(savedScrollY));
-          sessionStorage.removeItem('timeline-scroll-position');
-        }
-      }, 50);
+      queryClient.invalidateQueries({ 
+        queryKey: ['/api/timeline/comments'],
+        refetchType: 'active'
+      });
     },
   });
 
@@ -273,20 +265,27 @@ export default function TimelinePage() {
       return response.json();
     },
     onMutate: () => {
-      // Store current scroll position before mutation
-      const currentScrollY = window.scrollY;
-      sessionStorage.setItem('timeline-scroll-position', currentScrollY.toString());
+      setIsReactionMutating(true);
+      // Store scroll position as backup
+      scrollPositionRef.current = window.scrollY;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/timeline/reactions'] });
-      // Restore scroll position after mutation
+      queryClient.invalidateQueries({ 
+        queryKey: ['/api/timeline/reactions'],
+        refetchType: 'active'
+      });
       setTimeout(() => {
-        const savedScrollY = sessionStorage.getItem('timeline-scroll-position');
-        if (savedScrollY) {
-          window.scrollTo(0, parseInt(savedScrollY));
-          sessionStorage.removeItem('timeline-scroll-position');
+        setIsReactionMutating(false);
+        // Restore scroll position if it changed significantly
+        if (scrollPositionRef.current && Math.abs(window.scrollY - scrollPositionRef.current) > 100) {
+          window.scrollTo(0, scrollPositionRef.current);
         }
-      }, 50);
+        scrollPositionRef.current = 0;
+      }, 100);
+    },
+    onError: () => {
+      setIsReactionMutating(false);
+      scrollPositionRef.current = 0;
     },
   });
 
@@ -332,11 +331,13 @@ export default function TimelinePage() {
     return () => observer.disconnect();
   }, [displayedItemCount, filteredData.length]);
 
-  // Reset display count when filters change
+  // Reset display count when filters change (but not during reaction mutations)
   useEffect(() => {
-    setDisplayedItemCount(3);
-    console.log('🔄 Filter changed, resetting to show 3 items');
-  }, [activityTypeFilter, userFilter, teamFilter, dateRangeFilter, contentTypeFilter]);
+    if (!isReactionMutating) {
+      setDisplayedItemCount(3);
+      // console.log('🔄 Filter changed, resetting to show 3 items');
+    }
+  }, [activityTypeFilter, userFilter, teamFilter, dateRangeFilter, contentTypeFilter, isReactionMutating]);
 
   // TimelineCard component - simplified without complex lazy loading
   function TimelineCard({ 
