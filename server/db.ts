@@ -3,6 +3,8 @@ import { drizzle as drizzleNeon } from 'drizzle-orm/neon-http';
 import { drizzle as drizzleNode } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import * as schema from "@shared/schema";
+import fs from 'fs';
+import path from 'path';
 
 // Load environment variables early and reliably
 try {
@@ -32,10 +34,23 @@ console.log("🔍 Environment Debug Info:");
 console.log("- NODE_ENV:", process.env.NODE_ENV);
 console.log("- DATABASE_URL exists:", !!process.env.DATABASE_URL);
 console.log("- Current working directory:", process.cwd());
+console.log("- .env file check - looking for:", `${process.cwd()}/.env`);
+
+// Check if .env file exists
+const envPath = path.join(process.cwd(), '.env');
+const envExists = fs.existsSync(envPath);
+console.log("- .env file exists:", envExists);
+
 if (process.env.DATABASE_URL) {
   const dbUrl = process.env.DATABASE_URL;
   const maskedUrl = dbUrl.replace(/:\/\/[^:]+:[^@]+@/, '://***:***@');
   console.log("- DATABASE_URL format:", maskedUrl);
+} else {
+  console.log("❌ DATABASE_URL tidak ditemukan di environment variables!");
+  if (!envExists) {
+    console.log("❌ File .env tidak ditemukan di:", envPath);
+    console.log("💡 Solusi: Copy content dari .env.local ke .env di root folder project");
+  }
 }
 
 // Check and construct DATABASE_URL if needed
