@@ -63,8 +63,37 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
     "Partnership/Kemitraan", "Cold Email/Sales", "Lainnya"
   ];
 
+  // Data kota per provinsi (sample utama)
+  const citiesByProvince: Record<string, string[]> = {
+    "DKI Jakarta": ["Jakarta Barat", "Jakarta Pusat", "Jakarta Selatan", "Jakarta Timur", "Jakarta Utara", "Kepulauan Seribu"],
+    "Jawa Barat": ["Bandung", "Bekasi", "Bogor", "Cirebon", "Depok", "Sukabumi", "Tasikmalaya", "Karawang", "Purwakarta", "Subang"],
+    "Jawa Tengah": ["Semarang", "Surakarta", "Yogyakarta", "Magelang", "Salatiga", "Pekalongan", "Tegal", "Kudus", "Purwokerto"],
+    "Jawa Timur": ["Surabaya", "Malang", "Kediri", "Blitar", "Madiun", "Pasuruan", "Probolinggo", "Mojokerto", "Batu", "Sidoarjo"],
+    "Banten": ["Tangerang", "Tangerang Selatan", "Serang", "Cilegon", "Lebak", "Pandeglang"],
+    "Bali": ["Denpasar", "Badung", "Gianyar", "Tabanan", "Klungkung", "Bangli", "Karangasem", "Buleleng", "Jembrana"],
+    "Sumatera Utara": ["Medan", "Binjai", "Tebing Tinggi", "Pematang Siantar", "Tanjung Balai", "Sibolga", "Padang Sidempuan"],
+    "Sumatera Barat": ["Padang", "Bukittinggi", "Padang Panjang", "Payakumbuh", "Sawahlunto", "Solok", "Pariaman"],
+    "Sumatera Selatan": ["Palembang", "Prabumulih", "Pagar Alam", "Lubuk Linggau", "Lahat", "Muara Enim"],
+    "Lampung": ["Bandar Lampung", "Metro", "Lampung Selatan", "Lampung Tengah", "Lampung Utara", "Lampung Timur"],
+    "Kalimantan Timur": ["Samarinda", "Balikpapan", "Bontang", "Kutai Kartanegara", "Berau", "Kutai Barat"],
+    "Kalimantan Selatan": ["Banjarmasin", "Banjarbaru", "Kotabaru", "Banjar", "Barito Kuala", "Tapin"],
+    "Sulawesi Selatan": ["Makassar", "Palopo", "Parepare", "Gowa", "Takalar", "Jeneponto", "Bantaeng"],
+    "Papua": ["Jayapura", "Sorong", "Merauke", "Nabire", "Timika", "Biak", "Wamena"]
+  };
+
+  // Mendapatkan daftar kota berdasarkan provinsi yang dipilih
+  const getAvailableCities = () => {
+    if (!formData.province) return [];
+    return citiesByProvince[formData.province] || [];
+  };
+
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    if (field === "province") {
+      // Reset kota ketika provinsi berubah
+      setFormData(prev => ({ ...prev, [field]: value, city: "" }));
+    } else {
+      setFormData(prev => ({ ...prev, [field]: value }));
+    }
   };
 
   const handleSubmit = async () => {
@@ -161,12 +190,22 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
 
             <div className="space-y-2">
               <Label htmlFor="city">Kota *</Label>
-              <Input
-                id="city"
-                placeholder="Masukkan nama kota"
+              <Select
                 value={formData.city}
-                onChange={(e) => handleInputChange("city", e.target.value)}
-              />
+                onValueChange={(value) => handleInputChange("city", value)}
+                disabled={!formData.province}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={formData.province ? "Pilih kota" : "Pilih provinsi dulu"} />
+                </SelectTrigger>
+                <SelectContent className="max-h-[200px]">
+                  {getAvailableCities().map((city) => (
+                    <SelectItem key={city} value={city}>
+                      {city}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
