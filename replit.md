@@ -341,6 +341,13 @@ The system includes comprehensive database connection troubleshooting tools:
 
 ## Changelog
 ```
+- July 21, 2025. **TIMELINE REACTION SCROLL PRESERVATION FIXED** - Successfully resolved auto-scroll issue when clicking reaction buttons:
+  * FIXED: Enhanced scroll preservation for all reaction-related interactions (emoji picker, like button, reaction selection)
+  * IMPROVED: Added delayed scroll restoration (50-100ms) to account for DOM updates after mutations
+  * ENHANCED: Made all reaction functions use useCallback with proper scroll preservation dependencies
+  * ADDED: stopPropagation to all reaction button clicks to prevent unwanted event bubbling
+  * OPTIMIZED: Scroll position now maintained when opening/closing reaction picker modal
+  * RESULT: Timeline no longer auto-scrolls to top when users interact with reactions, maintaining user's current position
 - July 21, 2025. **TIMELINE EXPANDABLE DETAIL ENHANCEMENT COMPLETED** - Successfully enhanced expandable detail functionality with specific task/KR/metric names and status transitions:
   * ENHANCED: Task detail parsing to show specific task names with status transitions (e.g., "Task A (Belum Mulai → Selesai)")
   * ENHANCED: Key Result detail parsing to show KR names with value transitions (e.g., "KR Name (old_value → new_value)")

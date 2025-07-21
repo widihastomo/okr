@@ -281,7 +281,10 @@ export default function TimelinePage() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['/api/timeline/reactions'] });
-      restoreScrollPosition(); // Restore scroll after reaction added
+      // Add delay to ensure scroll position is maintained after DOM updates
+      setTimeout(() => {
+        restoreScrollPosition();
+      }, 100);
       
       // Show appropriate toast based on action
       if (data.action === 'added') {
@@ -330,11 +333,13 @@ export default function TimelinePage() {
 
   // Old useEffect removed - now using helper functions for scroll preservation
 
-  const openReactionsModal = (timelineId: string) => {
+  const openReactionsModal = useCallback((timelineId: string) => {
+    saveScrollPosition();
     setCurrentReactionsTimelineId(timelineId);
     setSelectedReactionTab('all'); // Reset tab selection
     setShowReactionModal(prev => ({ ...prev, [timelineId]: true }));
-  };
+    setTimeout(() => restoreScrollPosition(), 50);
+  }, [saveScrollPosition, restoreScrollPosition]);
 
   const closeReactionsModal = (timelineId: string) => {
     setCurrentReactionsTimelineId(null);
@@ -354,11 +359,13 @@ export default function TimelinePage() {
     setCommentTexts(prev => ({ ...prev, [itemId]: value }));
   }, []);
 
-  const handleReaction = (itemId: string, emoji: string) => {
+  const handleReaction = useCallback((itemId: string, emoji: string) => {
     saveScrollPosition();
     addReactionMutation.mutate({ itemId, emoji });
     setShowReactionPicker(prev => ({ ...prev, [itemId]: false }));
-  };
+    // Give a small delay to ensure scroll position is maintained
+    setTimeout(() => restoreScrollPosition(), 50);
+  }, [addReactionMutation, saveScrollPosition, restoreScrollPosition]);
 
   // Close reaction picker when clicking outside
   useEffect(() => {
@@ -943,7 +950,10 @@ export default function TimelinePage() {
               <div className="flex items-center space-x-4 md:space-x-6">
                 {/* Like Button */}
                 <button
-                  onClick={() => toggleReaction(item.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleReaction(item.id);
+                  }}
                   disabled={addReactionMutation.isPending}
                   className={`flex items-center space-x-1 transition-all duration-200 ${
                     getUserHasLiked(item.id)
@@ -1008,6 +1018,7 @@ export default function TimelinePage() {
                     e.stopPropagation();
                     saveScrollPosition();
                     setShowReactionPicker(prev => ({ ...prev, [item.id]: !prev[item.id] }));
+                    setTimeout(() => restoreScrollPosition(), 50);
                   }}
                   className={`transition-colors ${
                     showReactionPicker[item.id]
