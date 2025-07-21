@@ -419,7 +419,26 @@ export default function TourSystem() {
     cleanupHighlights();
   };
 
-  const completeTour = () => {
+  const completeTour = async () => {
+    try {
+      // Call API to mark tour as completed
+      const response = await fetch('/api/tour/complete', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include'
+      });
+      
+      if (response.ok) {
+        console.log("✅ Tour marked as completed in database");
+      } else {
+        console.warn("⚠️ Failed to mark tour as completed in database");
+      }
+    } catch (error) {
+      console.warn("⚠️ Error marking tour as completed:", error);
+    }
+
     setIsActive(false);
     setIsVisible(false);
     localStorage.setItem("tour-completed", "true");
@@ -484,7 +503,26 @@ export default function TourSystem() {
 
   // Listen for start tour event
   useEffect(() => {
-    const handleStartTour = (event: any) => {
+    const handleStartTour = async (event: any) => {
+      try {
+        // Call API to mark tour as started
+        const response = await fetch('/api/tour/start', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include'
+        });
+        
+        if (response.ok) {
+          console.log("✅ Tour marked as started in database");
+        } else {
+          console.warn("⚠️ Failed to mark tour as started in database");
+        }
+      } catch (error) {
+        console.warn("⚠️ Error marking tour as started:", error);
+      }
+
       // If event comes from welcome screen, start tour directly
       if (event?.detail?.fromWelcomeScreen) {
         setIsActive(true);

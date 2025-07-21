@@ -11213,6 +11213,69 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Tour tracking endpoints
+  app.post("/api/tour/start", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      
+      // Mark tour as started
+      const updatedUser = await storage.markTourStarted(currentUser.id);
+      
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      res.json({ 
+        message: "Tour started successfully",
+        tourStarted: updatedUser.tourStarted,
+        tourStartedAt: updatedUser.tourStartedAt
+      });
+    } catch (error: any) {
+      console.error("Error starting tour:", error);
+      res.status(500).json({ message: "Failed to start tour" });
+    }
+  });
+
+  app.post("/api/tour/complete", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      
+      // Mark tour as completed
+      const updatedUser = await storage.markTourCompleted(currentUser.id);
+      
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      res.json({ 
+        message: "Tour completed successfully",
+        tourCompleted: updatedUser.tourCompleted,
+        tourCompletedAt: updatedUser.tourCompletedAt
+      });
+    } catch (error: any) {
+      console.error("Error completing tour:", error);
+      res.status(500).json({ message: "Failed to complete tour" });
+    }
+  });
+
+  app.get("/api/tour/status", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      
+      // Get tour status
+      const tourStatus = await storage.getTourStatus(currentUser.id);
+      
+      if (!tourStatus) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      res.json(tourStatus);
+    } catch (error: any) {
+      console.error("Error fetching tour status:", error);
+      res.status(500).json({ message: "Failed to fetch tour status" });
+    }
+  });
+
   app.post("/api/onboarding/complete-tour", requireAuth, async (req, res) => {
     try {
       const currentUser = req.user as User;

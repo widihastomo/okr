@@ -74,6 +74,11 @@ export interface IStorage {
   updateUserOnboardingProgress(userId: string, step: 'registered' | 'email_confirmed' | 'company_details_completed' | 'missions_completed' | 'package_upgraded'): Promise<User | undefined>;
   deleteUser(id: string): Promise<boolean>;
   
+  // Tour tracking
+  markTourStarted(userId: string): Promise<User | undefined>;
+  markTourCompleted(userId: string): Promise<User | undefined>;
+  getTourStatus(userId: string): Promise<{ tourStarted: boolean; tourCompleted: boolean; tourStartedAt?: Date; tourCompletedAt?: Date } | undefined>;
+  
   // Organizations
   getOrganization(id: string): Promise<Organization | undefined>;
   
@@ -417,6 +422,54 @@ export class DatabaseStorage implements IStorage {
       .where(eq(users.id, userId))
       .returning();
     return user;
+  }
+
+  // Tour tracking methods
+  async markTourStarted(userId: string): Promise<User | undefined> {
+    const [user] = await db
+      .update(users)
+      .set({ 
+        tourStarted: true, 
+        tourStartedAt: new Date(),
+        updatedAt: new Date() 
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    return user;
+  }
+
+  async markTourCompleted(userId: string): Promise<User | undefined> {
+    const [user] = await db
+      .update(users)
+      .set({ 
+        tourCompleted: true, 
+        tourCompletedAt: new Date(),
+        updatedAt: new Date() 
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    return user;
+  }
+
+  async getTourStatus(userId: string): Promise<{ tourStarted: boolean; tourCompleted: boolean; tourStartedAt?: Date; tourCompletedAt?: Date } | undefined> {
+    const [user] = await db
+      .select({
+        tourStarted: users.tourStarted,
+        tourCompleted: users.tourCompleted,
+        tourStartedAt: users.tourStartedAt,
+        tourCompletedAt: users.tourCompletedAt
+      })
+      .from(users)
+      .where(eq(users.id, userId));
+    
+    if (!user) return undefined;
+    
+    return {
+      tourStarted: user.tourStarted,
+      tourCompleted: user.tourCompleted,
+      tourStartedAt: user.tourStartedAt || undefined,
+      tourCompletedAt: user.tourCompletedAt || undefined
+    };
   }
 
   async getReminderSettings(userId: string): Promise<any> {

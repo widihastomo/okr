@@ -282,6 +282,11 @@ export const users = pgTable("users", {
   onboardingMissionsCompleted: boolean("onboarding_missions_completed").default(false).notNull(), // Step 4: Mission/tour completed
   onboardingPackageUpgraded: boolean("onboarding_package_upgraded").default(false).notNull(), // Step 5: Package upgrade completed
   onboardingCompletedAt: timestamp("onboarding_completed_at"), // Timestamp when full onboarding is completed
+  // Tour tracking flags
+  tourStarted: boolean("tour_started").default(false).notNull(), // Track if user has started the guided tour
+  tourStartedAt: timestamp("tour_started_at"), // Timestamp when tour was first started
+  tourCompleted: boolean("tour_completed").default(false).notNull(), // Track if user has completed the guided tour
+  tourCompletedAt: timestamp("tour_completed_at"), // Timestamp when tour was completed
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
