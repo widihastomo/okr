@@ -1233,30 +1233,51 @@ export default function TimelinePage() {
                     </div>
                     <div className="flex-1 bg-gray-50 rounded-lg p-2">
                       <div className="font-semibold text-gray-900">{comment.user?.name}</div>
-                      <div 
-                        className="text-gray-700"
-                        onClick={(e) => {
-                          // Handle mention clicks
-                          if (e.target instanceof HTMLElement && e.target.dataset.mention) {
-                            const mentionName = e.target.dataset.mention;
-                            const timelineEditor = document.getElementById(`comment-${item.id}`) as HTMLTextAreaElement;
-                            if (timelineEditor) {
-                              const currentContent = timelineEditor.value;
-                              const newContent = currentContent ? `${currentContent} @${mentionName} ` : `@${mentionName} `;
-                              timelineEditor.value = newContent;
-                              timelineEditor.focus();
-                              timelineEditor.dispatchEvent(new Event('input', { bubbles: true }));
-                              // Set cursor position to end
-                              setTimeout(() => {
-                                timelineEditor.setSelectionRange(newContent.length, newContent.length);
-                              }, 0);
-                            }
+                      <div className="text-gray-700">
+                        {comment.content.split(/(@\w+)/g).map((part: string, index: number) => {
+                          if (part.startsWith('@')) {
+                            const mentionName = part.substring(1);
+                            return (
+                              <span
+                                key={index}
+                                className="text-blue-600 font-medium cursor-pointer hover:text-blue-800 hover:underline"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  
+                                  console.log('🎯 Mention clicked:', mentionName, 'for item:', item.id);
+                                  
+                                  const timelineEditor = document.getElementById(`comment-${item.id}`) as HTMLTextAreaElement;
+                                  console.log('📝 Found editor:', timelineEditor);
+                                  
+                                  if (timelineEditor) {
+                                    const currentContent = timelineEditor.value;
+                                    const newContent = currentContent ? `${currentContent} @${mentionName} ` : `@${mentionName} `;
+                                    console.log('📄 Content update:', currentContent, '→', newContent);
+                                    
+                                    timelineEditor.value = newContent;
+                                    timelineEditor.focus();
+                                    
+                                    // Trigger input event for React to update state
+                                    const inputEvent = new Event('input', { bubbles: true });
+                                    timelineEditor.dispatchEvent(inputEvent);
+                                    
+                                    // Set cursor position to end
+                                    setTimeout(() => {
+                                      timelineEditor.setSelectionRange(newContent.length, newContent.length);
+                                    }, 10);
+                                  } else {
+                                    console.error('❌ Editor not found for ID:', `comment-${item.id}`);
+                                  }
+                                }}
+                              >
+                                {part}
+                              </span>
+                            );
                           }
-                        }}
-                        dangerouslySetInnerHTML={{
-                          __html: comment.content.replace(/@(\w+)/g, '<span class="text-blue-600 font-medium cursor-pointer hover:text-blue-800 hover:underline" data-mention="$1">@$1</span>')
-                        }}
-                      />
+                          return <span key={index}>{part}</span>;
+                        })}
+                      </div>
                       <div className="text-gray-500 text-xs mt-1">
                         {format(new Date(comment.createdAt), "MMM dd, HH:mm")}
                       </div>
