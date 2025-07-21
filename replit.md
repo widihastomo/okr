@@ -396,13 +396,16 @@ export DATABASE_URL="postgresql://..." && npm run dev
 
 ## Changelog
 ```
-- July 21, 2025. **WELCOME SCREEN TOUR TRACKING INTEGRATION COMPLETED** - Successfully integrated tour status tracking into WelcomeScreen buttons:
+- July 21, 2025. **WELCOME SCREEN UX ENHANCEMENTS COMPLETED** - Successfully enhanced WelcomeScreen with improved user experience features:
   * ENHANCED: "Mulai Tour" button now calls /api/tour/start to update tour_started status in database
   * ENHANCED: "Lewati Tour" button now calls /api/tour/complete to mark tour as completed when skipped
+  * ADDED: Auto focus on "Mulai Tour" button when modal opens with 100ms delay for proper rendering
+  * ADDED: Pulse animation (animate-pulse) on "Mulai Tour" button to draw user attention
   * ADDED: Proper error handling for API calls with fallback behavior to ensure UI continues working
   * ADDED: Console logging for debugging API call success/failure
   * INTEGRATED: Both buttons maintain existing functionality while adding database tracking
-  * RESULT: Complete tour tracking system where users are properly tracked whether they start or skip tour
+  * ENHANCED: Keyboard navigation support - users can press Enter to start tour immediately
+  * RESULT: Complete tour tracking system with enhanced UX where users are guided and tracked whether they start or skip tour
 - July 21, 2025. **INVITATION CODE STORAGE BUG FIXED** - Successfully resolved invitation code not being saved during registration:
   * FIXED: Added missing `referralCodes` import to server/routes.ts to resolve ReferenceError during validation
   * ENHANCED: Invitation code validation now works properly during registration process
