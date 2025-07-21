@@ -165,6 +165,29 @@ button[data-tour].tour-mobile-pulse {
   z-index: 1001 !important;
 }
 
+/* Force pulse animation on expanded sidebar menu items */
+[data-sidebar="sidebar"].translate-x-0 [data-tour].tour-mobile-pulse,
+[data-sidebar="sidebar"].translate-x-0 [data-tour].tour-mobile-pulse button,
+[data-sidebar="sidebar"] [data-tour].tour-mobile-pulse {
+  animation: mobileTourPulse 1.2s infinite !important;
+  border: 2px solid rgba(249, 115, 22, 0.5) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.2) !important;
+  background-color: rgba(249, 115, 22, 0.1) !important;
+}
+
+/* Additional CSS targeting for tour mobile pulse in any context */
+li[data-tour].tour-mobile-pulse,
+li[data-tour] button.tour-mobile-pulse,
+.sidebar li[data-tour].tour-mobile-pulse,
+nav li[data-tour].tour-mobile-pulse {
+  animation: mobileTourPulse 1.2s infinite !important;
+  border: 2px solid rgba(249, 115, 22, 0.5) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.2) !important;
+  background-color: rgba(249, 115, 22, 0.1) !important;
+}
+
 /* Specific targeting for sidebar menu items */
 nav button[data-tour].tour-mobile-pulse,
 ul li button[data-tour].tour-mobile-pulse,

@@ -592,12 +592,18 @@ export default function TourSystem() {
             const updatedElement = document.querySelector(currentStepData.selector);
             if (updatedElement) {
               // Remove any existing highlights first
-              document.querySelectorAll(".tour-highlight").forEach((el) => {
-                el.classList.remove("tour-highlight");
-                el.classList.remove("tour-click-required");
+              document.querySelectorAll(".tour-highlight, .tour-mobile-pulse").forEach((el) => {
+                el.classList.remove("tour-highlight", "tour-click-required", "tour-mobile-pulse");
               });
-              // Then highlight the current element
-              updatedElement.classList.add("tour-highlight");
+              // Then highlight the current element with mobile pulse
+              updatedElement.classList.add("tour-highlight", "tour-mobile-pulse");
+              
+              // Also add pulse to button inside if it exists
+              const button = updatedElement.querySelector("button");
+              if (button) {
+                button.classList.add("tour-mobile-pulse");
+              }
+              
               console.log(`Mobile: Re-highlighted menu item ${currentStepData.id} after sidebar expansion`);
             }
           }, 200);
@@ -616,18 +622,33 @@ export default function TourSystem() {
     }
 
     if (element) {
-      // For mobile menu items, skip normal highlighting as it's handled by sidebar expansion logic
+      // For mobile menu items, we still need to add highlights but handle them differently
       if (isMobile() && isMenuStep(currentStepData.id)) {
-        console.log(`Mobile: Skipping normal highlight for menu item ${currentStepData.id} - handled by sidebar expansion`);
+        console.log(`Mobile: Adding pulse to menu item ${currentStepData.id} in expanded sidebar`);
+        
+        // Make sure to add pulse to the menu item even in mobile
+        element.classList.add("tour-highlight", "tour-mobile-pulse");
+        const button = element.querySelector("button");
+        if (button) {
+          button.classList.add("tour-mobile-pulse");
+        }
       } else {
         // Remove existing highlights and click handlers
-        document.querySelectorAll(".tour-highlight").forEach((el) => {
-          el.classList.remove("tour-highlight");
-          el.classList.remove("tour-click-required");
+        document.querySelectorAll(".tour-highlight, .tour-mobile-pulse").forEach((el) => {
+          el.classList.remove("tour-highlight", "tour-click-required", "tour-mobile-pulse");
         });
 
         // Add highlight to current element
         element.classList.add("tour-highlight");
+        
+        // Add mobile pulse for better visibility on mobile
+        if (isMobile()) {
+          element.classList.add("tour-mobile-pulse");
+          const button = element.querySelector("button");
+          if (button) {
+            button.classList.add("tour-mobile-pulse");
+          }
+        }
       }
 
       // If this step requires a click, add click handler
@@ -635,7 +656,7 @@ export default function TourSystem() {
         setWaitingForClick(true);
 
         // Add click event listener
-        const handleClick = (e) => {
+        const handleClick = (e: Event) => {
           // Don't prevent default for certain interactive elements - let them work normally
           if (currentStepData.selector === '[data-tour="goals-expand-card"]' || 
               currentStepData.selector === '[data-tour="goals-hierarchy-view"]' ||
@@ -752,9 +773,8 @@ export default function TourSystem() {
   };
 
   const cleanupHighlights = () => {
-    document.querySelectorAll(".tour-highlight").forEach((el) => {
-      el.classList.remove("tour-highlight");
-      el.classList.remove("tour-click-required");
+    document.querySelectorAll(".tour-highlight, .tour-mobile-pulse").forEach((el) => {
+      el.classList.remove("tour-highlight", "tour-click-required", "tour-mobile-pulse");
     });
   };
 
