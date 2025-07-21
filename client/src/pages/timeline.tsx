@@ -305,13 +305,15 @@ export default function TimelinePage() {
     },
   });
 
-  const toggleDetails = (itemId: string) => {
-    setExpandedDetails(prev => ({ ...prev, [itemId]: !prev[itemId] }));
-  };
-
   const toggleComments = useCallback((itemId: string) => {
     saveScrollPosition();
     setShowComments(prev => ({ ...prev, [itemId]: !prev[itemId] }));
+    restoreScrollPosition();
+  }, [saveScrollPosition, restoreScrollPosition]);
+
+  const toggleDetails = useCallback((itemId: string) => {
+    saveScrollPosition();
+    setExpandedDetails(prev => ({ ...prev, [itemId]: !prev[itemId] }));
     restoreScrollPosition();
   }, [saveScrollPosition, restoreScrollPosition]);
 
@@ -594,26 +596,131 @@ export default function TimelinePage() {
             <div className="space-y-2">
               {/* Summary Statistics - Hide for check_in items */}
               {item.type !== 'check_in' && (
-                <div className="flex items-center gap-1 md:gap-2 flex-wrap">
-                  {(item.tasksUpdated + item.tasksCompleted) > 0 && (
-                    <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-800">
-                      📋 {item.tasksUpdated + item.tasksCompleted} tugas
-                    </Badge>
-                  )}
-                  {item.keyResultsUpdated > 0 && (
-                    <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-800">
-                      🎯 {item.keyResultsUpdated} target
-                    </Badge>
-                  )}
-                  {item.successMetricsUpdated > 0 && (
-                    <Badge variant="secondary" className="text-xs bg-orange-100 text-orange-800">
-                      📊 {item.successMetricsUpdated} metrik
-                    </Badge>
-                  )}
-                  {item.deliverablesUpdated > 0 && (
-                    <Badge variant="secondary" className="text-xs bg-indigo-100 text-indigo-800">
-                      📦 {item.deliverablesUpdated} output
-                    </Badge>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-1 md:gap-2 flex-wrap">
+                      {(item.tasksUpdated + item.tasksCompleted) > 0 && (
+                        <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-800">
+                          📋 {item.tasksUpdated + item.tasksCompleted} tugas
+                        </Badge>
+                      )}
+                      {item.keyResultsUpdated > 0 && (
+                        <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-800">
+                          🎯 {item.keyResultsUpdated} target
+                        </Badge>
+                      )}
+                      {item.successMetricsUpdated > 0 && (
+                        <Badge variant="secondary" className="text-xs bg-orange-100 text-orange-800">
+                          📊 {item.successMetricsUpdated} metrik
+                        </Badge>
+                      )}
+                      {item.deliverablesUpdated > 0 && (
+                        <Badge variant="secondary" className="text-xs bg-indigo-100 text-indigo-800">
+                          📦 {item.deliverablesUpdated} output
+                        </Badge>
+                      )}
+                    </div>
+                    
+                    {/* Detail Toggle Button */}
+                    {((item.tasksUpdated + item.tasksCompleted) > 0 || 
+                      item.keyResultsUpdated > 0 || 
+                      item.successMetricsUpdated > 0 || 
+                      item.deliverablesUpdated > 0 ||
+                      item.whatWorkedWell ||
+                      item.challenges) && (
+                      <button
+                        onClick={() => toggleDetails(item.id)}
+                        className="flex items-center space-x-1 text-xs text-blue-600 hover:text-blue-800 transition-colors px-2 py-1 rounded hover:bg-blue-50"
+                      >
+                        <span>{expandedDetails[item.id] ? 'Sembunyikan' : 'Lihat Detail'}</span>
+                        <ChevronDown className={`w-3 h-3 transition-transform ${
+                          expandedDetails[item.id] ? 'rotate-180' : ''
+                        }`} />
+                      </button>
+                    )}
+                  </div>
+                  
+                  {/* Expandable Detail Section */}
+                  {expandedDetails[item.id] && (
+                    <div className="mt-3 p-3 bg-gray-50 rounded-lg border border-gray-200 space-y-3">
+                      {/* Tasks Detail */}
+                      {(item.tasksUpdated + item.tasksCompleted) > 0 && item.tasksSummary && (
+                        <div>
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                            <span className="font-semibold text-sm text-blue-800">Tugas yang Diselesaikan:</span>
+                          </div>
+                          <div className="text-sm text-gray-700 pl-4">
+                            {item.tasksSummary}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Key Results Detail */}
+                      {item.keyResultsUpdated > 0 && item.keyResultsSummary && (
+                        <div>
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                            <span className="font-semibold text-sm text-purple-800">Key Result yang Diupdate:</span>
+                          </div>
+                          <div className="text-sm text-gray-700 pl-4">
+                            {item.keyResultsSummary}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Success Metrics Detail */}
+                      {item.successMetricsUpdated > 0 && item.successMetricsSummary && (
+                        <div>
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                            <span className="font-semibold text-sm text-orange-800">Metrik Sukses yang Diupdate:</span>
+                          </div>
+                          <div className="text-sm text-gray-700 pl-4">
+                            {item.successMetricsSummary}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Deliverables Detail */}
+                      {item.deliverablesUpdated > 0 && item.deliverablesSummary && (
+                        <div>
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
+                            <span className="font-semibold text-sm text-indigo-800">Output yang Diselesaikan:</span>
+                          </div>
+                          <div className="text-sm text-gray-700 pl-4">
+                            {item.deliverablesSummary}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* What Worked Well */}
+                      {item.whatWorkedWell && (
+                        <div>
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                            <span className="font-semibold text-sm text-green-800">Yang Berjalan Baik:</span>
+                          </div>
+                          <div className="text-sm text-gray-700 pl-4">
+                            {item.whatWorkedWell}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Challenges */}
+                      {item.challenges && (
+                        <div>
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                            <span className="font-semibold text-sm text-red-800">Tantangan:</span>
+                          </div>
+                          <div className="text-sm text-gray-700 pl-4">
+                            {item.challenges}
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   )}
                 </div>
               )}
