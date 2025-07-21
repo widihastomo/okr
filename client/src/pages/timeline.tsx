@@ -657,27 +657,40 @@ export default function TimelinePage() {
                       </div>
                     )}
                   </div>
-                  <div className="flex-1 flex space-x-2">
+                  <div className="flex-1 flex space-x-2 relative z-10">
                     <textarea
+                      id={`comment-${item.id}`}
                       placeholder="Tulis komentar..."
                       value={commentTexts[item.id] || ''}
                       onChange={(e) => {
                         setCommentTexts(prev => ({ ...prev, [item.id]: e.target.value }));
                       }}
-                      className="flex-1 min-h-[32px] text-xs md:text-sm px-3 py-2 border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="flex-1 min-h-[40px] text-sm px-3 py-2 border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white relative z-10"
                       rows={1}
+                      style={{ 
+                        pointerEvents: 'auto',
+                        position: 'relative',
+                        zIndex: 10
+                      }}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' && !e.shiftKey) {
                           e.preventDefault();
                           handleAddComment(item.id);
                         }
                       }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        e.currentTarget.focus();
+                      }}
                     />
                     <Button
                       size="sm"
-                      onClick={() => handleAddComment(item.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleAddComment(item.id);
+                      }}
                       disabled={!commentTexts[item.id]?.trim() || addCommentMutation.isPending}
-                      className="px-3"
+                      className="px-3 relative z-10"
                     >
                       <Send className="w-3 h-3" />
                     </Button>
