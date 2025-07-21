@@ -11,8 +11,8 @@ Error: DATABASE_URL must be set or PG variables must be available. Did you forge
 
 ### **1. Enhanced Startup Script (Recommended)**
 ```bash
-# Gunakan script startup yang telah diperbaiki
-node start-local.js
+# Gunakan script startup yang telah diperbaiki (CommonJS version)
+node start-local.cjs
 ```
 
 **Features:**
@@ -23,8 +23,8 @@ node start-local.js
 
 ### **2. Debug Environment Issues**
 ```bash
-# Jalankan debugging tool
-node debug-local-env.js
+# Jalankan debugging tool (CommonJS version)
+node debug-local-env.cjs
 ```
 
 **Akan mengecek:**
@@ -53,12 +53,12 @@ head -5 .env
 
 ### **Step 2: Run Debug Tool**
 ```bash
-node debug-local-env.js
+node debug-local-env.cjs
 ```
 
 ### **Step 3: Use Enhanced Startup**
 ```bash
-node start-local.js
+node start-local.cjs
 ```
 
 ## 🔧 Manual Solutions
