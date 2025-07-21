@@ -2,19 +2,25 @@ import { useState, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { 
-  Mail, 
-  Lock, 
-  Eye, 
-  EyeOff, 
-  ArrowLeft, 
-  RefreshCw, 
-  CheckCircle, 
+import {
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+  ArrowLeft,
+  RefreshCw,
+  CheckCircle,
   User,
   Building,
   Phone,
@@ -23,9 +29,13 @@ import {
   ChevronDown,
   ChevronUp,
   Gift,
-  XCircle
+  XCircle,
 } from "lucide-react";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
 // Button will be replaced with Button
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useMutation } from "@tanstack/react-query";
@@ -42,10 +52,14 @@ const loginSchema = z.object({
 const registerSchema = z.object({
   name: z.string().min(2, "Nama minimal 2 karakter"),
   businessName: z.string().min(2, "Nama bisnis minimal 2 karakter"),
-  whatsappNumber: z.string()
+  whatsappNumber: z
+    .string()
     .min(10, "Nomor WhatsApp minimal 10 digit")
     .max(15, "Nomor WhatsApp maksimal 15 digit")
-    .regex(/^(\+62|62|0)8[1-9][0-9]{6,10}$/, "Format nomor handphone Indonesia tidak valid. Contoh: 08123456789, +628123456789, atau 628123456789"),
+    .regex(
+      /^(\+62|62|0)8[1-9][0-9]{6,10}$/,
+      "Format nomor handphone Indonesia tidak valid. Contoh: 08123456789, +628123456789, atau 628123456789",
+    ),
   email: z.string().email("Format email tidak valid"),
   password: z.string().min(6, "Password minimal 6 karakter"),
   invitationCode: z.string().optional(),
@@ -55,24 +69,26 @@ const forgotPasswordSchema = z.object({
   email: z.string().email("Format email tidak valid"),
 });
 
-const resetPasswordSchema = z.object({
-  code: z.string().min(6, "Kode verifikasi harus 6 digit"),
-  newPassword: z.string().min(6, "Password minimal 6 karakter"),
-  confirmPassword: z.string().min(6, "Password minimal 6 karakter"),
-}).refine((data) => data.newPassword === data.confirmPassword, {
-  message: "Password tidak cocok",
-  path: ["confirmPassword"],
-});
+const resetPasswordSchema = z
+  .object({
+    code: z.string().min(6, "Kode verifikasi harus 6 digit"),
+    newPassword: z.string().min(6, "Password minimal 6 karakter"),
+    confirmPassword: z.string().min(6, "Password minimal 6 karakter"),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Password tidak cocok",
+    path: ["confirmPassword"],
+  });
 
 type LoginData = z.infer<typeof loginSchema>;
 type RegisterData = z.infer<typeof registerSchema>;
 type ForgotPasswordData = z.infer<typeof forgotPasswordSchema>;
 type ResetPasswordData = z.infer<typeof resetPasswordSchema>;
 
-export type AuthFlowStep = 
-  | "login" 
-  | "register" 
-  | "email-verification" 
+export type AuthFlowStep =
+  | "login"
+  | "register"
+  | "email-verification"
   | "verification-success"
   | "forgot-password"
   | "reset-password"
@@ -83,7 +99,10 @@ interface AuthFlowProps {
   onSuccess?: () => void;
 }
 
-export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowProps) {
+export default function AuthFlow({
+  initialStep = "login",
+  onSuccess,
+}: AuthFlowProps) {
   const [currentStep, setCurrentStep] = useState<AuthFlowStep>(initialStep);
   const [showPassword, setShowPassword] = useState(false);
   const [showInvitationCode, setShowInvitationCode] = useState(false);
@@ -93,9 +112,9 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
   const [isResendingCode, setIsResendingCode] = useState(false);
   const [resetCode, setResetCode] = useState("");
   const [invitationValidation, setInvitationValidation] = useState<{
-    status: 'idle' | 'validating' | 'valid' | 'invalid';
+    status: "idle" | "validating" | "valid" | "invalid";
     message: string;
-  }>({ status: 'idle', message: '' });
+  }>({ status: "idle", message: "" });
   const { toast } = useToast();
   const [, navigate] = useLocation();
 
@@ -107,7 +126,14 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
 
   const registerForm = useForm<RegisterData>({
     resolver: zodResolver(registerSchema),
-    defaultValues: { name: "", businessName: "", whatsappNumber: "", email: "", password: "", invitationCode: "" },
+    defaultValues: {
+      name: "",
+      businessName: "",
+      whatsappNumber: "",
+      email: "",
+      password: "",
+      invitationCode: "",
+    },
   });
 
   const forgotPasswordForm = useForm<ForgotPasswordData>({
@@ -123,43 +149,50 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
   // Debounced invitation code validation
   const validateInvitationCode = useCallback(async (code: string) => {
     if (!code || code.length < 3) {
-      setInvitationValidation({ status: 'idle', message: '' });
+      setInvitationValidation({ status: "idle", message: "" });
       return;
     }
 
-    setInvitationValidation({ status: 'validating', message: 'Memvalidasi kode...' });
+    setInvitationValidation({
+      status: "validating",
+      message: "Memvalidasi kode...",
+    });
 
     try {
-      const response = await apiRequest("POST", "/api/referral-codes/validate-registration", {
-        code: code.toUpperCase()
-      });
-      
+      const response = await apiRequest(
+        "POST",
+        "/api/referral-codes/validate-registration",
+        {
+          code: code.toUpperCase(),
+        },
+      );
+
       if (!response.ok) {
         const error = await response.json();
-        setInvitationValidation({ 
-          status: 'invalid', 
-          message: error.message || 'Kode undangan tidak valid' 
+        setInvitationValidation({
+          status: "invalid",
+          message: error.message || "Kode undangan tidak valid",
         });
         return;
       }
 
       const result = await response.json();
-      
+
       if (result.valid) {
-        setInvitationValidation({ 
-          status: 'valid', 
-          message: result.message || 'Kode undangan valid' 
+        setInvitationValidation({
+          status: "valid",
+          message: result.message || "Kode undangan valid",
         });
       } else {
-        setInvitationValidation({ 
-          status: 'invalid', 
-          message: result.message || 'Kode undangan tidak valid' 
+        setInvitationValidation({
+          status: "invalid",
+          message: result.message || "Kode undangan tidak valid",
         });
       }
     } catch (error) {
-      setInvitationValidation({ 
-        status: 'invalid', 
-        message: 'Gagal memvalidasi kode undangan' 
+      setInvitationValidation({
+        status: "invalid",
+        message: "Gagal memvalidasi kode undangan",
       });
     }
   }, []);
@@ -168,7 +201,7 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
   useEffect(() => {
     const invitationCode = registerForm.watch("invitationCode");
     if (!showInvitationCode || !invitationCode) {
-      setInvitationValidation({ status: 'idle', message: '' });
+      setInvitationValidation({ status: "idle", message: "" });
       return;
     }
 
@@ -177,7 +210,11 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
     }, 800); // 800ms debounce
 
     return () => clearTimeout(timer);
-  }, [registerForm.watch("invitationCode"), showInvitationCode, validateInvitationCode]);
+  }, [
+    registerForm.watch("invitationCode"),
+    showInvitationCode,
+    validateInvitationCode,
+  ]);
 
   // Login mutation
   const loginMutation = useMutation({
@@ -192,39 +229,43 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
     onSuccess: async (data) => {
       // Clear logout flag on successful login
       localStorage.removeItem("isLoggedOut");
-      
+
       // Invalidate auth cache to force refresh with new user data
       await queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
-      
+
       // Start prefetching data in background for faster page loads
       prefetchAuthData();
-      
+
       toast({
         title: "Login berhasil",
         description: "Selamat datang!",
         variant: "success",
       });
-      
+
       // Immediate redirect to "/" for fastest user experience
       // Onboarding check will happen in App.tsx after redirect
       navigate("/");
-      
+
       // Call onSuccess callback if provided
       if (onSuccess) onSuccess();
     },
     onError: (error: Error) => {
-      if (error.message.includes("EMAIL_NOT_VERIFIED") || error.message.includes("Email belum diverifikasi")) {
+      if (
+        error.message.includes("EMAIL_NOT_VERIFIED") ||
+        error.message.includes("Email belum diverifikasi")
+      ) {
         const email = loginForm.getValues("email");
         setVerificationEmail(email);
         setCurrentStep("email-verification");
         toast({
           title: "Email belum diverifikasi",
-          description: "Silakan masukkan kode verifikasi yang dikirim ke email Anda",
+          description:
+            "Silakan masukkan kode verifikasi yang dikirim ke email Anda",
           variant: "destructive",
         });
         return;
       }
-      
+
       toast({
         title: "Login gagal",
         description: error.message,
@@ -265,7 +306,11 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
   // Forgot password mutation
   const forgotPasswordMutation = useMutation({
     mutationFn: async (data: ForgotPasswordData) => {
-      const response = await apiRequest("POST", "/api/auth/forgot-password", data);
+      const response = await apiRequest(
+        "POST",
+        "/api/auth/forgot-password",
+        data,
+      );
       if (!response.ok) {
         const error = await response.json();
         throw new Error(error.message || "Gagal mengirim kode reset");
@@ -339,25 +384,25 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
         email: verificationEmail,
         code: verificationCode,
       });
-      
+
       if (response.ok) {
         // Clear logout flag and invalidate auth cache
         localStorage.removeItem("isLoggedOut");
         await queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
-        
+
         // Set flags for new user flow - skip onboarding and show welcome screen
         localStorage.setItem("onboarding-completed", "true");
         localStorage.removeItem("welcome-screen-shown");
-        
+
         toast({
           title: "Email berhasil diverifikasi",
           description: "Akun Anda sudah aktif! Selamat datang di Refokus",
           variant: "success",
         });
-        
+
         // Redirect directly to index page - welcome screen will show automatically
         navigate("/");
-        
+
         // Call onSuccess callback if provided
         if (onSuccess) onSuccess();
       } else {
@@ -385,10 +430,14 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
 
     setIsResendingCode(true);
     try {
-      const response = await apiRequest("POST", "/api/auth/resend-verification", {
-        email: verificationEmail,
-      });
-      
+      const response = await apiRequest(
+        "POST",
+        "/api/auth/resend-verification",
+        {
+          email: verificationEmail,
+        },
+      );
+
       if (response.ok) {
         toast({
           title: "Kode baru dikirim",
@@ -500,9 +549,11 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
     let backStep: AuthFlowStep = "login";
     if (currentStep === "register") backStep = "login";
     else if (currentStep === "email-verification") {
-      backStep = verificationEmail === loginForm.getValues("email") ? "login" : "register";
-    }
-    else if (currentStep === "forgot-password") backStep = "login";
+      backStep =
+        verificationEmail === loginForm.getValues("email")
+          ? "login"
+          : "register";
+    } else if (currentStep === "forgot-password") backStep = "login";
     else if (currentStep === "reset-password") backStep = "forgot-password";
 
     return (
@@ -522,7 +573,10 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
       case "login":
         return (
           <div className="space-y-6">
-            <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-4">
+            <form
+              onSubmit={loginForm.handleSubmit(handleLogin)}
+              className="space-y-4"
+            >
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <div className="relative">
@@ -536,7 +590,9 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                   />
                 </div>
                 {loginForm.formState.errors.email && (
-                  <p className="text-sm text-red-600">{loginForm.formState.errors.email.message}</p>
+                  <p className="text-sm text-red-600">
+                    {loginForm.formState.errors.email.message}
+                  </p>
                 )}
               </div>
 
@@ -556,11 +612,17 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                   >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    {showPassword ? (
+                      <EyeOff className="w-5 h-5" />
+                    ) : (
+                      <Eye className="w-5 h-5" />
+                    )}
                   </button>
                 </div>
                 {loginForm.formState.errors.password && (
-                  <p className="text-sm text-red-600">{loginForm.formState.errors.password.message}</p>
+                  <p className="text-sm text-red-600">
+                    {loginForm.formState.errors.password.message}
+                  </p>
                 )}
               </div>
 
@@ -592,14 +654,16 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
               >
                 Lupa Password?
               </Button>
-              
+
               <div className="border-t border-gray-200 pt-3">
                 <p className="text-sm text-gray-600 mb-2">Belum punya akun?</p>
                 <Button
                   variant="outline"
                   onClick={() => navigateToStep("register")}
                   className="text-orange-600 hover:text-orange-700 border-orange-300 hover:border-orange-400"
-                >Daftar Sekarang</Button>
+                >
+                  Daftar Sekarang
+                </Button>
               </div>
             </div>
           </div>
@@ -608,7 +672,10 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
       case "register":
         return (
           <div className="space-y-6">
-            <form onSubmit={registerForm.handleSubmit(handleRegister)} className="space-y-4">
+            <form
+              onSubmit={registerForm.handleSubmit(handleRegister)}
+              className="space-y-4"
+            >
               <div className="space-y-2">
                 <Label htmlFor="name">Nama Lengkap</Label>
                 <div className="relative">
@@ -621,7 +688,9 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                   />
                 </div>
                 {registerForm.formState.errors.name && (
-                  <p className="text-sm text-red-600">{registerForm.formState.errors.name.message}</p>
+                  <p className="text-sm text-red-600">
+                    {registerForm.formState.errors.name.message}
+                  </p>
                 )}
               </div>
 
@@ -637,7 +706,9 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                   />
                 </div>
                 {registerForm.formState.errors.businessName && (
-                  <p className="text-sm text-red-600">{registerForm.formState.errors.businessName.message}</p>
+                  <p className="text-sm text-red-600">
+                    {registerForm.formState.errors.businessName.message}
+                  </p>
                 )}
               </div>
 
@@ -653,7 +724,9 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                   />
                 </div>
                 {registerForm.formState.errors.whatsappNumber && (
-                  <p className="text-sm text-red-600">{registerForm.formState.errors.whatsappNumber.message}</p>
+                  <p className="text-sm text-red-600">
+                    {registerForm.formState.errors.whatsappNumber.message}
+                  </p>
                 )}
               </div>
 
@@ -670,7 +743,9 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                   />
                 </div>
                 {registerForm.formState.errors.email && (
-                  <p className="text-sm text-red-600">{registerForm.formState.errors.email.message}</p>
+                  <p className="text-sm text-red-600">
+                    {registerForm.formState.errors.email.message}
+                  </p>
                 )}
               </div>
 
@@ -690,11 +765,17 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                   >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    {showPassword ? (
+                      <EyeOff className="w-5 h-5" />
+                    ) : (
+                      <Eye className="w-5 h-5" />
+                    )}
                   </button>
                 </div>
                 {registerForm.formState.errors.password && (
-                  <p className="text-sm text-red-600">{registerForm.formState.errors.password.message}</p>
+                  <p className="text-sm text-red-600">
+                    {registerForm.formState.errors.password.message}
+                  </p>
                 )}
               </div>
 
@@ -712,10 +793,12 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                     <ChevronDown className="w-4 h-4" />
                   )}
                 </button>
-                
+
                 {showInvitationCode && (
                   <div className="space-y-2 animate-in slide-in-from-top-2 duration-200">
-                    <Label htmlFor="invitationCode">Kode Undangan (Opsional)</Label>
+                    <Label htmlFor="invitationCode">
+                      Kode Undangan (Opsional)
+                    </Label>
                     <div className="relative">
                       <Gift className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                       <Input
@@ -724,52 +807,57 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                         placeholder="Masukkan kode undangan"
                         {...registerForm.register("invitationCode")}
                         className={`pl-10 pr-10 h-11 transition-all duration-200 uppercase ${
-                          invitationValidation.status === 'valid' 
-                            ? 'border-green-500 focus:border-green-500 focus:ring-2 focus:ring-green-200' 
-                            : invitationValidation.status === 'invalid'
-                            ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-200'
-                            : 'border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200'
+                          invitationValidation.status === "valid"
+                            ? "border-green-500 focus:border-green-500 focus:ring-2 focus:ring-green-200"
+                            : invitationValidation.status === "invalid"
+                              ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-200"
+                              : "border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200"
                         }`}
-                        style={{ textTransform: 'uppercase' }}
+                        style={{ textTransform: "uppercase" }}
                       />
                       {/* Validation indicator */}
                       <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        {invitationValidation.status === 'validating' && (
+                        {invitationValidation.status === "validating" && (
                           <Loader2 className="w-4 h-4 animate-spin text-orange-500" />
                         )}
-                        {invitationValidation.status === 'valid' && (
+                        {invitationValidation.status === "valid" && (
                           <CheckCircle className="w-4 h-4 text-green-500" />
                         )}
-                        {invitationValidation.status === 'invalid' && (
+                        {invitationValidation.status === "invalid" && (
                           <XCircle className="w-4 h-4 text-red-500" />
                         )}
                       </div>
                     </div>
-                    
+
                     {/* Validation message */}
-                    {invitationValidation.status !== 'idle' && invitationValidation.message && (
-                      <div className={`flex items-center gap-2 text-sm ${
-                        invitationValidation.status === 'valid' 
-                          ? 'text-green-600' 
-                          : invitationValidation.status === 'invalid'
-                          ? 'text-red-600'
-                          : 'text-orange-600'
-                      }`}>
-                        {invitationValidation.status === 'validating' && (
-                          <Loader2 className="w-3 h-3 animate-spin" />
-                        )}
-                        {invitationValidation.status === 'valid' && (
-                          <CheckCircle className="w-3 h-3" />
-                        )}
-                        {invitationValidation.status === 'invalid' && (
-                          <XCircle className="w-3 h-3" />
-                        )}
-                        <span>{invitationValidation.message}</span>
-                      </div>
-                    )}
-                    
+                    {invitationValidation.status !== "idle" &&
+                      invitationValidation.message && (
+                        <div
+                          className={`flex items-center gap-2 text-sm ${
+                            invitationValidation.status === "valid"
+                              ? "text-green-600"
+                              : invitationValidation.status === "invalid"
+                                ? "text-red-600"
+                                : "text-orange-600"
+                          }`}
+                        >
+                          {invitationValidation.status === "validating" && (
+                            <Loader2 className="w-3 h-3 animate-spin" />
+                          )}
+                          {invitationValidation.status === "valid" && (
+                            <CheckCircle className="w-3 h-3" />
+                          )}
+                          {invitationValidation.status === "invalid" && (
+                            <XCircle className="w-3 h-3" />
+                          )}
+                          <span>{invitationValidation.message}</span>
+                        </div>
+                      )}
+
                     {registerForm.formState.errors.invitationCode && (
-                      <p className="text-sm text-red-600">{registerForm.formState.errors.invitationCode.message}</p>
+                      <p className="text-sm text-red-600">
+                        {registerForm.formState.errors.invitationCode.message}
+                      </p>
                     )}
                   </div>
                 )}
@@ -778,13 +866,14 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
               {/* Terms of Service */}
               <div className="pt-2 pb-3">
                 <p className="text-xs text-gray-600 text-center leading-relaxed">
-                  Dengan klik tombol daftar, saya telah membaca dan menyetujui serta tunduk kepada{" "}
+                  Dengan klik tombol daftar, saya telah membaca dan menyetujui
+                  serta tunduk kepada{" "}
                   <button
                     type="button"
                     onClick={() => window.open("/terms-of-service", "_blank")}
                     className="text-blue-600 hover:text-blue-800 underline font-medium"
                   >
-                    Ketentuan Layanan Kledo
+                    Ketentuan Layanan Refokus
                   </button>
                 </p>
               </div>
@@ -809,7 +898,7 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                 </Button>
               </div>
             </form>
-            
+
             {renderBackButton()}
           </div>
         );
@@ -822,11 +911,16 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
               <p className="text-sm text-gray-700 mb-2 text-center">
                 Kode verifikasi telah dikirim ke:
               </p>
-              <p className="font-semibold text-orange-600 text-center">{verificationEmail}</p>
+              <p className="font-semibold text-orange-600 text-center">
+                {verificationEmail}
+              </p>
             </div>
-            
+
             <div className="space-y-4">
-              <Label htmlFor="verificationCode" className="text-sm font-medium text-gray-700 block text-center">
+              <Label
+                htmlFor="verificationCode"
+                className="text-sm font-medium text-gray-700 block text-center"
+              >
                 Masukkan Kode Verifikasi (6 digit)
               </Label>
               <div className="flex justify-center">
@@ -846,7 +940,7 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                 </InputOTP>
               </div>
             </div>
-            
+
             <Button
               onClick={handleEmailVerification}
               disabled={isVerifying || verificationCode.length !== 6}
@@ -864,7 +958,7 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                 </>
               )}
             </Button>
-            
+
             <div className="text-center">
               <p className="text-sm text-gray-600 mb-3">Tidak menerima kode?</p>
               <Button
@@ -886,7 +980,7 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                 )}
               </Button>
             </div>
-            
+
             {renderBackButton()}
           </div>
         );
@@ -897,14 +991,15 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
             <div className="mx-auto w-16 h-16 bg-gradient-to-r from-green-600 to-green-500 rounded-full flex items-center justify-center mb-4">
               <CheckCircle className="h-8 w-8 text-white" />
             </div>
-            
+
             <div className="space-y-2">
               <h3 className="text-lg font-semibold text-green-600">Selamat!</h3>
               <p className="text-gray-600">
-                Email Anda telah berhasil diverifikasi. Akun Anda sudah aktif dan siap digunakan.
+                Email Anda telah berhasil diverifikasi. Akun Anda sudah aktif
+                dan siap digunakan.
               </p>
             </div>
-            
+
             <Button
               onClick={() => {
                 // This case should not happen since verification now redirects directly
@@ -928,8 +1023,11 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                 Masukkan email Anda untuk mendapatkan kode reset password
               </p>
             </div>
-            
-            <form onSubmit={forgotPasswordForm.handleSubmit(handleForgotPassword)} className="space-y-4">
+
+            <form
+              onSubmit={forgotPasswordForm.handleSubmit(handleForgotPassword)}
+              className="space-y-4"
+            >
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <div className="relative">
@@ -943,7 +1041,9 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                   />
                 </div>
                 {forgotPasswordForm.formState.errors.email && (
-                  <p className="text-sm text-red-600">{forgotPasswordForm.formState.errors.email.message}</p>
+                  <p className="text-sm text-red-600">
+                    {forgotPasswordForm.formState.errors.email.message}
+                  </p>
                 )}
               </div>
 
@@ -962,7 +1062,7 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                 )}
               </Button>
             </form>
-            
+
             {renderBackButton()}
           </div>
         );
@@ -975,10 +1075,15 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
               <p className="text-sm text-gray-700 mb-2 text-center">
                 Kode reset telah dikirim ke:
               </p>
-              <p className="font-semibold text-blue-600 text-center">{verificationEmail}</p>
+              <p className="font-semibold text-blue-600 text-center">
+                {verificationEmail}
+              </p>
             </div>
-            
-            <form onSubmit={resetPasswordForm.handleSubmit(handleResetPassword)} className="space-y-4">
+
+            <form
+              onSubmit={resetPasswordForm.handleSubmit(handleResetPassword)}
+              className="space-y-4"
+            >
               <div className="space-y-2">
                 <Label htmlFor="code">Kode Verifikasi</Label>
                 <Input
@@ -988,7 +1093,9 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                   className="h-11 border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all duration-200"
                 />
                 {resetPasswordForm.formState.errors.code && (
-                  <p className="text-sm text-red-600">{resetPasswordForm.formState.errors.code.message}</p>
+                  <p className="text-sm text-red-600">
+                    {resetPasswordForm.formState.errors.code.message}
+                  </p>
                 )}
               </div>
 
@@ -1008,11 +1115,17 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                   >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    {showPassword ? (
+                      <EyeOff className="w-5 h-5" />
+                    ) : (
+                      <Eye className="w-5 h-5" />
+                    )}
                   </button>
                 </div>
                 {resetPasswordForm.formState.errors.newPassword && (
-                  <p className="text-sm text-red-600">{resetPasswordForm.formState.errors.newPassword.message}</p>
+                  <p className="text-sm text-red-600">
+                    {resetPasswordForm.formState.errors.newPassword.message}
+                  </p>
                 )}
               </div>
 
@@ -1029,7 +1142,9 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                   />
                 </div>
                 {resetPasswordForm.formState.errors.confirmPassword && (
-                  <p className="text-sm text-red-600">{resetPasswordForm.formState.errors.confirmPassword.message}</p>
+                  <p className="text-sm text-red-600">
+                    {resetPasswordForm.formState.errors.confirmPassword.message}
+                  </p>
                 )}
               </div>
 
@@ -1048,7 +1163,7 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                 )}
               </Button>
             </form>
-            
+
             {renderBackButton()}
           </div>
         );
@@ -1059,14 +1174,17 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
             <div className="mx-auto w-16 h-16 bg-gradient-to-r from-orange-600 to-orange-500 rounded-full flex items-center justify-center mb-4">
               <CheckCircle className="h-8 w-8 text-white" />
             </div>
-            
+
             <div className="space-y-2">
-              <h3 className="text-lg font-semibold text-orange-600">Password Berhasil Direset!</h3>
+              <h3 className="text-lg font-semibold text-orange-600">
+                Password Berhasil Direset!
+              </h3>
               <p className="text-gray-600">
-                Password Anda telah berhasil direset. Silakan login dengan password baru Anda.
+                Password Anda telah berhasil direset. Silakan login dengan
+                password baru Anda.
               </p>
             </div>
-            
+
             <Button
               onClick={() => navigateToStep("login")}
               className="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white font-medium h-11"
@@ -1084,18 +1202,16 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50 flex items-center justify-center p-4">
-      
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
-          <img 
-            src={refokusLogo} 
-            alt="Refokus Logo" 
+          <img
+            src={refokusLogo}
+            alt="Refokus Logo"
             className="h-12 w-auto mx-auto"
           />
         </div>
-        
+
         <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-sm">
-          
           <CardHeader className="text-center pb-8 pt-8">
             <CardTitle className="text-2xl font-bold text-gray-900">
               {stepConfig.title}
@@ -1104,9 +1220,7 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
               {stepConfig.description}
             </CardDescription>
           </CardHeader>
-          <CardContent className="px-8 pb-8">
-            {renderStepContent()}
-          </CardContent>
+          <CardContent className="px-8 pb-8">{renderStepContent()}</CardContent>
         </Card>
       </div>
     </div>
