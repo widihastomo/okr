@@ -337,7 +337,7 @@ export default function TimelinePage() {
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
-  // Intersection Observer for loading more items (after filteredData is defined)
+  // Intersection Observer for loading more items - simplified to prevent loops
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -349,21 +349,25 @@ export default function TimelinePage() {
       { threshold: 0.1 }
     );
 
-    if (loadMoreRef.current && displayedItemCount < filteredData.length) {
-      observer.observe(loadMoreRef.current);
+    const currentRef = loadMoreRef.current;
+    if (currentRef && displayedItemCount < filteredData.length) {
+      observer.observe(currentRef);
     }
 
-    return () => observer.disconnect();
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef);
+      }
+      observer.disconnect();
+    };
   }, [displayedItemCount, filteredData.length]);
 
   // Reset display count when filters change - optimized to prevent unnecessary re-renders
   useEffect(() => {
-    // Only reset if we're actually showing filtered content
-    if (displayedItemCount > 3) {
-      setDisplayedItemCount(3);
-      console.log('🔄 Filter changed, resetting to show 3 items');
-    }
-  }, [activityTypeFilter, userFilter, teamFilter, dateRangeFilter, contentTypeFilter, displayedItemCount]);
+    // Always reset to 3 when filters change
+    setDisplayedItemCount(3);
+    console.log('🔄 Filter changed, resetting to show 3 items');
+  }, [activityTypeFilter, userFilter, teamFilter, dateRangeFilter, contentTypeFilter]);
 
   // Persistent Comment Input Component with stable state
   const CommentInput = memo(({ 
