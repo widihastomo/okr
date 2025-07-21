@@ -876,7 +876,7 @@ export default function TimelinePage() {
               </DialogHeader>
               
               {/* Reaction Tabs */}
-              {Object.keys(reactionGroups).length > 0 && (
+              {totalCount > 0 && (
                 <div className="flex space-x-1 border-b border-gray-200 mb-3">
                   {/* All tab */}
                   <button
@@ -887,7 +887,7 @@ export default function TimelinePage() {
                         : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                     }`}
                   >
-                    <span>All</span>
+                    <span>👍</span>
                     <span>{totalCount}</span>
                   </button>
                   

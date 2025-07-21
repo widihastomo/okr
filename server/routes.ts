@@ -2908,6 +2908,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get detailed reactions for a specific timeline item
+  app.get('/api/timeline/:timelineId/detailed-reactions', requireAuth, async (req, res) => {
+    try {
+      const user = req.user as User;
+      const { timelineId } = req.params;
+      
+      if (!user?.organizationId) {
+        return res.status(401).json({ message: "User organization not found" });
+      }
+      
+      const reactions = await storage.getTimelineReactions(timelineId);
+      
+      // Transform data to include user information
+      const detailedReactions = reactions.map(reaction => ({
+        id: reaction.id,
+        emoji: reaction.emoji,
+        createdAt: reaction.createdAt,
+        user: {
+          id: reaction.createdBy,
+          name: reaction.userName || 'Unknown User',
+          profileImageUrl: reaction.userProfileImageUrl || null
+        }
+      }));
+      
+      res.json(detailedReactions);
+    } catch (error) {
+      console.error("Error fetching detailed timeline reactions:", error);
+      res.status(500).json({ message: "Failed to fetch detailed timeline reactions" });
+    }
+  });
+
   // Add reaction to timeline item
   app.post("/api/timeline/:timelineId/reactions", requireAuth, async (req, res) => {
     try {
@@ -2923,15 +2954,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Emoji is required" });
       }
 
-      // Check if user already reacted with this emoji
-      const existingReaction = await storage.getUserTimelineReaction(timelineId, user.id, emoji);
+      // Check if user already has ANY reaction on this timeline item
+      const existingReactions = await storage.getTimelineReactions(timelineId);
+      const userExistingReaction = existingReactions.find(r => r.createdBy === user.id);
       
-      if (existingReaction) {
-        // If reaction exists, remove it (toggle off)
-        await storage.deleteTimelineReaction(existingReaction.id);
-        res.json({ message: "Reaction removed", action: "removed" });
+      if (userExistingReaction) {
+        if (userExistingReaction.emoji === emoji) {
+          // Same emoji - remove it (toggle off)
+          await storage.deleteTimelineReaction(userExistingReaction.id);
+          res.json({ message: "Reaction removed", action: "removed" });
+        } else {
+          // Different emoji - replace the old one
+          await storage.deleteTimelineReaction(userExistingReaction.id);
+          const reaction = await storage.createTimelineReaction({
+            timelineItemId: timelineId,
+            createdBy: user.id,
+            organizationId: user.organizationId,
+            emoji
+          });
+          res.status(201).json({ message: "Reaction updated", action: "updated", reaction });
+        }
       } else {
-        // Add new reaction
+        // No existing reaction - add new one
         const reaction = await storage.createTimelineReaction({
           timelineItemId: timelineId,
           createdBy: user.id,
