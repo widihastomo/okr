@@ -107,14 +107,18 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
 
   return (
     <Dialog open={open} onOpenChange={() => {}}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent 
+        className="max-w-2xl max-h-[90vh] overflow-y-auto"
+        onPointerDownOutside={(e) => e.preventDefault()}
+        onEscapeKeyDown={(e) => e.preventDefault()}
+      >
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl">
             <Building2 className="h-6 w-6 text-orange-500" />
             Lengkapi Profil Perusahaan
           </DialogTitle>
           <DialogDescription>
-            Bantu kami mengenal perusahaan Anda lebih baik untuk memberikan pengalaman yang optimal
+            Lengkapi semua informasi di bawah ini untuk melanjutkan. Semua field bertanda (*) wajib diisi dan form tidak dapat ditutup sebelum diselesaikan.
           </DialogDescription>
         </DialogHeader>
 
@@ -235,6 +239,9 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
             >
               {isSubmitting ? "Menyimpan..." : "Simpan & Lanjutkan"}
             </Button>
+            <p className="text-xs text-gray-500 mt-2 text-center">
+              Form ini wajib diselesaikan untuk melanjutkan ke aplikasi
+            </p>
           </div>
         </div>
       </DialogContent>
