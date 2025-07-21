@@ -78,7 +78,7 @@ export default function TimelinePage() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  
+
   // Helper function for thousand separator formatting
   const formatWithThousandSeparator = (value: string | number) => {
     if (!value && value !== 0) return '';
@@ -86,7 +86,7 @@ export default function TimelinePage() {
     if (isNaN(numValue)) return value.toString();
     return numValue.toLocaleString('id-ID');
   };
-  
+
   // Filter states
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [activityTypeFilter, setActivityTypeFilter] = useState('all');
@@ -94,7 +94,7 @@ export default function TimelinePage() {
   const [teamFilter, setTeamFilter] = useState('all');
   const [dateRangeFilter, setDateRangeFilter] = useState('all');
   const [contentTypeFilter, setContentTypeFilter] = useState('all');
-  
+
   // UI States
   const [expandedDetails, setExpandedDetails] = useState<Record<string, boolean>>({});
   const [showComments, setShowComments] = useState<Record<string, boolean>>({});
@@ -104,7 +104,7 @@ export default function TimelinePage() {
   const [selectedReactionTab, setSelectedReactionTab] = useState('all');
   const [commentTexts, setCommentTexts] = useState<Record<string, string>>({});
   const commentTextRefs = useRef<Record<string, HTMLTextAreaElement | null>>({});
-  
+
   // Scroll preservation untuk mengatasi scroll ke atas saat engagement button diklik - menggunakan window scroll
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const preservedScrollRef = useRef<number>(0);
@@ -217,7 +217,7 @@ export default function TimelinePage() {
             break;
         }
       }
-      
+
       return true;
     });
   }, [timelineData, activityTypeFilter, userFilter, teamFilter, dateRangeFilter, contentTypeFilter, teamMembers, user?.id]);
@@ -280,12 +280,17 @@ export default function TimelinePage() {
       return response.json();
     },
     onSuccess: (data) => {
+      // First restore scroll before invalidation to prevent jump
+      restoreScrollPosition();
+
+      // Then invalidate queries with additional scroll restoration
       queryClient.invalidateQueries({ queryKey: ['/api/timeline/reactions'] });
-      // Add delay to ensure scroll position is maintained after DOM updates
+
+      // Additional scroll restoration after query invalidation
       setTimeout(() => {
         restoreScrollPosition();
-      }, 100);
-      
+      }, 300);
+
       // Show appropriate toast based on action
       if (data.action === 'added') {
         toast({
@@ -325,7 +330,7 @@ export default function TimelinePage() {
     // Toggle like reaction using heart emoji (❤️)
     addReactionMutation.mutate({ itemId, emoji: '❤️' });
   }, [addReactionMutation, saveScrollPosition]);
-  
+
   // Check if user has liked this item
   const getUserHasLiked = useCallback((itemId: string) => {
     return timelineReactions[itemId]?.['❤️'] > 0;
@@ -433,7 +438,7 @@ export default function TimelinePage() {
         const handleInputChange = () => {
           setContent(textarea.value);
         };
-        
+
         textarea.addEventListener('input', handleInputChange);
         return () => textarea.removeEventListener('input', handleInputChange);
       }
@@ -446,21 +451,21 @@ export default function TimelinePage() {
 
     const handleContentChange = useCallback((value: string) => {
       setContent(value);
-      
+
       // Get cursor position from the textarea
       const textarea = editorRef.current;
       if (!textarea) return;
-      
+
       const currentCursorPosition = textarea.selectionStart;
-      
+
       // Check for @ mentions - only at current cursor position
       const textBeforeCursor = value.substring(0, currentCursorPosition);
       const atIndex = textBeforeCursor.lastIndexOf("@");
-      
+
       if (atIndex !== -1) {
         const afterAt = textBeforeCursor.substring(atIndex + 1);
         const hasSpaceInQuery = afterAt.includes(" ");
-        
+
         if (!hasSpaceInQuery && afterAt.length <= 20) { // Reasonable query length limit
           setMentionQuery(afterAt);
           setShowMentionSuggestions(true);
@@ -478,12 +483,12 @@ export default function TimelinePage() {
       const afterMention = content.substring(cursorPosition + mentionQuery.length + 1);
       const userName = user.name || user.email?.split('@')[0] || 'User';
       const newContent = `${beforeMention}@${userName} ${afterMention}`;
-      
+
       setContent(newContent);
       setMentionedUsers(prev => [...prev, user.id]);
       setShowMentionSuggestions(false);
       setMentionQuery("");
-      
+
       // Update textarea and set cursor position after the mention
       if (editorRef.current) {
         const newCursorPosition = cursorPosition + userName.length + 2; // +2 for @ and space
@@ -525,7 +530,7 @@ export default function TimelinePage() {
           e.preventDefault();
         }
       }
-      
+
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
         handleSubmit();
@@ -568,7 +573,7 @@ export default function TimelinePage() {
               e.stopPropagation();
             }}
           />
-          
+
           {/* Mention Suggestions Dropdown */}
           {showMentionSuggestions && filteredUsers.length > 0 && (
             <div className="absolute bottom-full left-0 right-0 mb-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-40 overflow-y-auto z-50">
@@ -593,7 +598,7 @@ export default function TimelinePage() {
             </div>
           )}
         </div>
-        
+
         <Button
           size="sm"
           onClick={(e) => {
@@ -618,7 +623,7 @@ export default function TimelinePage() {
             <div className="flex items-start space-x-2 md:space-x-3">
               {/* Profile Image Skeleton */}
               <Skeleton className="w-8 h-8 rounded-full flex-shrink-0" />
-              
+
               <div className="flex-1 min-w-0 space-y-3">
                 {/* Header Skeleton */}
                 <div className="flex items-center justify-between">
@@ -628,13 +633,13 @@ export default function TimelinePage() {
                   </div>
                   <Skeleton className="h-6 w-16" />
                 </div>
-                
+
                 {/* Summary Skeleton */}
                 <div className="space-y-2">
                   <Skeleton className="h-4 w-full" />
                   <Skeleton className="h-4 w-3/4" />
                 </div>
-                
+
                 {/* Progress Bar Skeleton */}
                 <div className="space-y-2">
                   <div className="flex justify-between">
@@ -643,7 +648,7 @@ export default function TimelinePage() {
                   </div>
                   <Skeleton className="h-2 w-full rounded-full" />
                 </div>
-                
+
                 {/* Statistics Badges Skeleton */}
                 <div className="flex flex-wrap gap-1">
                   <Skeleton className="h-6 w-16 rounded-full" />
@@ -651,7 +656,7 @@ export default function TimelinePage() {
                   <Skeleton className="h-6 w-18 rounded-full" />
                   <Skeleton className="h-6 w-22 rounded-full" />
                 </div>
-                
+
                 {/* Engagement Buttons Skeleton */}
                 <div className="flex items-center justify-between pt-2 border-t border-gray-100">
                   <div className="flex items-center space-x-4">
@@ -744,7 +749,7 @@ export default function TimelinePage() {
               </div>
             </div>
           </div>
-          
+
           <div className="px-3 md:px-4 pb-3 md:pb-4">
             <div className="space-y-2">
               {/* Summary Statistics - Hide for check_in items */}
@@ -773,7 +778,7 @@ export default function TimelinePage() {
                         </Badge>
                       )}
                     </div>
-                    
+
                     {/* Detail Toggle Button */}
                     {((item.tasksUpdated + item.tasksCompleted) > 0 || 
                       item.keyResultsUpdated > 0 || 
@@ -792,7 +797,7 @@ export default function TimelinePage() {
                       </button>
                     )}
                   </div>
-                  
+
                   {/* Expandable Detail Section */}
                   {expandedDetails[item.id] && (
                     <div className="mt-3 p-3 bg-gray-50 rounded-lg border border-gray-200 space-y-3">
@@ -809,7 +814,8 @@ export default function TimelinePage() {
                               const match = task.match(/^(.+?)\s*\((.+?)\s*->\s*(.+?)\)$/);
                               if (match) {
                                 const [, taskName, oldStatus, newStatus] = match;
-                                const statusMap: Record<string, string> = {
+                                const statusMap```typescript
+: Record<string, string> = {
                                   'belum_mulai': 'Belum Mulai',
                                   'in_progress': 'Sedang Berjalan',
                                   'completed': 'Selesai',
@@ -837,7 +843,7 @@ export default function TimelinePage() {
                           </div>
                         </div>
                       )}
-                      
+
                       {/* Key Results Detail */}
                       {item.keyResultsUpdated > 0 && item.keyResultsSummary && (
                         <div>
@@ -872,7 +878,7 @@ export default function TimelinePage() {
                           </div>
                         </div>
                       )}
-                      
+
                       {/* Success Metrics Detail */}
                       {item.successMetricsUpdated > 0 && item.successMetricsSummary && (
                         <div>
@@ -907,7 +913,7 @@ export default function TimelinePage() {
                           </div>
                         </div>
                       )}
-                      
+
                       {/* Deliverables Detail */}
                       {item.deliverablesUpdated > 0 && item.deliverablesSummary && (
                         <div>
@@ -948,7 +954,7 @@ export default function TimelinePage() {
                           </div>
                         </div>
                       )}
-                      
+
                       {/* What Worked Well */}
                       {item.whatWorkedWell && (
                         <div>
@@ -961,7 +967,7 @@ export default function TimelinePage() {
                           </div>
                         </div>
                       )}
-                      
+
                       {/* Challenges */}
                       {item.challenges && (
                         <div>
@@ -978,7 +984,7 @@ export default function TimelinePage() {
                   )}
                 </div>
               )}
-              
+
               {/* Progress Information for Check-ins */}
               {item.type === 'check_in' && item.keyResultTitle && (
                 <div className="bg-purple-50 rounded-lg p-2">
@@ -994,7 +1000,7 @@ export default function TimelinePage() {
                       {formatWithThousandSeparator(item.keyResultTargetValue || '')} {item.keyResultUnit || ''}
                     </span>
                   </div>
-                  
+
                   {/* Progress Bar */}
                   {item.checkInValue && item.keyResultTargetValue && (
                     <div className="mb-2">
@@ -1002,7 +1008,7 @@ export default function TimelinePage() {
                         const currentValue = parseFloat(item.checkInValue.toString().replace(/[^\d.-]/g, ''));
                         const targetValue = parseFloat(item.keyResultTargetValue.toString().replace(/[^\d.-]/g, ''));
                         const percentage = Math.min((currentValue / targetValue) * 100, 100);
-                        
+
                         return (
                           <div className="space-y-1">
                             <div className="flex items-center justify-between">
@@ -1022,7 +1028,7 @@ export default function TimelinePage() {
                       })()}
                     </div>
                   )}
-                  
+
                   {item.checkInNotes && (
                     <div className="mt-2">
                       <div className="text-xs font-medium text-purple-800 mb-1">Catatan:</div>
@@ -1033,7 +1039,7 @@ export default function TimelinePage() {
               )}
             </div>
           </div>
-          
+
           {/* Social Engagement Section */}
           <div className="border-t border-gray-100">
             {/* Reactions Summary Bar */}
@@ -1062,7 +1068,7 @@ export default function TimelinePage() {
                                   default: return 'bg-gray-400';
                                 }
                               };
-                              
+
                               return (
                                 <div key={emoji} className={`w-5 h-5 ${getEmojiBackground(emoji)} rounded-full flex items-center justify-center text-xs border-2 border-white shadow-sm`}>
                                   <span className="text-white text-[10px]">{emoji}</span>
@@ -1080,7 +1086,7 @@ export default function TimelinePage() {
                       </div>
                     )}
                   </div>
-                  
+
                   {/* Right side - Comments count */}
                   {timelineComments[item.id] && timelineComments[item.id].length > 0 && (
                     <span className="text-gray-500 hover:underline cursor-pointer">
@@ -1090,7 +1096,7 @@ export default function TimelinePage() {
                 </div>
               </div>
             ) : null}
-            
+
             {/* Engagement buttons */}
             <div className="px-3 md:px-4 py-2 flex items-center justify-between">
               <div className="flex items-center space-x-4 md:space-x-6">
@@ -1117,7 +1123,7 @@ export default function TimelinePage() {
                   </span>
                   <span className="text-xs hidden sm:inline">Suka</span>
                 </button>
-                
+
                 {/* Comment Button */}
                 <button
                   onClick={() => toggleComments(item.id)}
@@ -1137,7 +1143,7 @@ export default function TimelinePage() {
                   </span>
                   <span className="text-xs hidden sm:inline">Komentar</span>
                 </button>
-                
+
                 {/* Share Button */}
                 <button
                   onClick={() => {
@@ -1156,7 +1162,7 @@ export default function TimelinePage() {
                   <span className="text-xs hidden sm:inline">Bagikan</span>
                 </button>
               </div>
-              
+
               {/* Reaction Picker */}
               <div className="relative">
                 <button
@@ -1174,7 +1180,7 @@ export default function TimelinePage() {
                 >
                   <Smile className="w-4 h-4" />
                 </button>
-                
+
                 {showReactionPicker[item.id] && (
                   <div 
                     className="absolute right-0 bottom-8 bg-white border border-gray-200 rounded-lg shadow-lg p-2 z-20 animate-in fade-in duration-200 scale-95 data-[state=open]:scale-100"
@@ -1206,7 +1212,7 @@ export default function TimelinePage() {
                 )}
               </div>
             </div>
-            
+
             {/* Comments Section */}
             {showComments[item.id] && (
               <div className="px-3 md:px-4 pb-3 space-y-2">
@@ -1258,7 +1264,7 @@ export default function TimelinePage() {
                     </div>
                   </div>
                 ))}
-                
+
                 {/* Add Comment */}
                 <div className="flex space-x-2 mt-3">
                   <div className="flex-shrink-0">
@@ -1454,12 +1460,12 @@ export default function TimelinePage() {
                 <div className="bg-yellow-50 border border-yellow-200 rounded p-2 text-xs">
                   Total items: {timelineData.length} | Filtered: {filteredData.length} | Showing: {Math.min(displayedItemCount, filteredData.length)}
                 </div>
-                
+
                 {/* Show only the first N items */}
                 {filteredData.slice(0, displayedItemCount).map((item: TimelineItem, index: number) => (
                   <TimelineCard key={item.id} item={item} index={index} />
                 ))}
-                
+
                 {/* Load more trigger */}
                 {displayedItemCount < filteredData.length && (
                   <div 
@@ -1488,7 +1494,7 @@ export default function TimelinePage() {
             )}
           </div>
         </div>
-        
+
         {/* Leaderboard Sidebar - Fixed positioning */}
         <div className="hidden xl:block xl:w-80 xl:flex-shrink-0">
           <div className="sticky top-0 h-screen">
@@ -1504,7 +1510,7 @@ export default function TimelinePage() {
         console.log('Modal rendering for timeline ID:', currentReactionsTimelineId);
         console.log('Detailed reactions data:', detailedReactions);
         console.log('Is loading detailed reactions:', isLoadingDetailedReactions);
-        
+
         // Group reactions by emoji
         const reactionGroups = (detailedReactions as any[]).reduce((groups: Record<string, any[]>, reaction: any) => {
           const emoji = reaction.emoji;
@@ -1517,7 +1523,7 @@ export default function TimelinePage() {
 
         const emojiTabs = Object.keys(reactionGroups);
         const totalCount = (detailedReactions as any[]).length;
-        
+
         console.log('Reaction groups:', reactionGroups);
         console.log('Total count:', totalCount);
 
@@ -1530,7 +1536,7 @@ export default function TimelinePage() {
               <DialogHeader>
                 <DialogTitle>Reaksi</DialogTitle>
               </DialogHeader>
-              
+
               {/* Reaction Tabs */}
               {totalCount > 0 && (
                 <div className="flex space-x-1 border-b border-gray-200 mb-3">
@@ -1546,7 +1552,7 @@ export default function TimelinePage() {
                     <span>Semua</span>
                     <span>{totalCount}</span>
                   </button>
-                  
+
                   {/* Individual emoji tabs */}
                   {emojiTabs.map((emoji) => (
                     <button
@@ -1569,7 +1575,7 @@ export default function TimelinePage() {
               <div className="space-y-3 max-h-80 overflow-y-auto">
                 {(() => {
                   const reactionsToShow = selectedReactionTab === 'all' ? detailedReactions : reactionGroups[selectedReactionTab] || [];
-                  
+
                   return reactionsToShow.length > 0 ? (
                     <div className="space-y-2">
                       {(reactionsToShow as any[]).map((reaction: any) => (
