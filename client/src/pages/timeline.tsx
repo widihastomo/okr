@@ -895,7 +895,7 @@ export default function TimelinePage() {
                         : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                     }`}
                   >
-                    <span>👍</span>
+                    <span>Semua</span>
                     <span>{totalCount}</span>
                   </button>
                   
