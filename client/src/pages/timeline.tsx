@@ -142,36 +142,36 @@ export default function TimelinePage() {
   // Fetch timeline data
   const { data: timelineData = [], isLoading } = useQuery<TimelineItem[]>({
     queryKey: ['/api/timeline'],
-    enabled: !!user?.id,
+    enabled: !!user,
   });
 
   // Fetch teams data untuk filtering
   const { data: teams = [] } = useQuery<{ id: string; name: string; }[]>({
     queryKey: ['/api/teams'],
-    enabled: !!user?.id,
+    enabled: !!user,
   });
 
   const { data: teamMembers = [] } = useQuery<{ id: string; userId: string; }[]>({
     queryKey: ['/api/teams', teamFilter, 'members'],
-    enabled: !!user?.id && teamFilter !== 'all',
+    enabled: !!user && teamFilter !== 'all',
   });
 
   // Fetch timeline reactions
   const { data: timelineReactions = {} } = useQuery<Record<string, Record<string, number>>>({
     queryKey: ['/api/timeline/reactions'],
-    enabled: !!user?.id,
+    enabled: !!user,
   });
 
   // Fetch timeline comments
   const { data: timelineComments = {} } = useQuery<Record<string, { id: string; content: string; createdAt: string; user: { name: string; profileImageUrl?: string; }; }[]>>({
     queryKey: ['/api/timeline/comments'],
-    enabled: !!user?.id,
+    enabled: !!user,
   });
 
   // Fetch detailed reactions for a specific timeline item (for modal)
   const { data: detailedReactions = [], isLoading: isLoadingDetailedReactions } = useQuery<{ id: string; emoji: string; user: { name: string; profileImageUrl?: string; }; createdAt: string; }[]>({
     queryKey: [`/api/timeline/${currentReactionsTimelineId}/detailed-reactions`],
-    enabled: !!currentReactionsTimelineId && !!user?.id,
+    enabled: !!currentReactionsTimelineId && !!user,
     staleTime: 0,
   });
 
@@ -185,7 +185,7 @@ export default function TimelinePage() {
       }
 
       // User Filter
-      if (userFilter === 'current' && item.userId !== user?.id) return false;
+      if (userFilter === 'current' && user && item.userId !== user.id) return false;
 
       // Team Filter
       if (teamFilter !== 'all') {
@@ -279,9 +279,22 @@ export default function TimelinePage() {
       }
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['/api/timeline/reactions'] });
       restoreScrollPosition(); // Restore scroll after reaction added
+      
+      // Show appropriate toast based on action
+      if (data.action === 'added') {
+        toast({
+          title: "Reaksi ditambahkan",
+          variant: "default",
+        });
+      } else if (data.action === 'removed') {
+        toast({
+          title: "Reaksi dihapus",
+          variant: "default",
+        });
+      }
     },
     onError: (error) => {
       toast({
@@ -304,9 +317,14 @@ export default function TimelinePage() {
 
   const toggleReaction = useCallback((itemId: string) => {
     saveScrollPosition();
-    // Toggle like reaction
+    // Toggle like reaction using heart emoji (❤️)
     addReactionMutation.mutate({ itemId, emoji: '❤️' });
   }, [addReactionMutation, saveScrollPosition]);
+  
+  // Check if user has liked this item
+  const getUserHasLiked = useCallback((itemId: string) => {
+    return timelineReactions[itemId]?.['❤️'] > 0;
+  }, [timelineReactions]);
 
   // Old useEffect removed - now using helper functions for scroll preservation
 
@@ -718,10 +736,19 @@ export default function TimelinePage() {
                 {/* Like Button */}
                 <button
                   onClick={() => toggleReaction(item.id)}
-                  className="flex items-center space-x-1 text-gray-500 hover:text-red-500 transition-colors"
+                  disabled={addReactionMutation.isPending}
+                  className={`flex items-center space-x-1 transition-all duration-200 ${
+                    getUserHasLiked(item.id)
+                      ? 'text-red-500 hover:text-red-600 scale-105' 
+                      : 'text-gray-500 hover:text-red-500 hover:scale-105'
+                  } ${addReactionMutation.isPending ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
-                  <Heart className="w-4 h-4" />
-                  <span className="text-xs md:text-sm">
+                  {getUserHasLiked(item.id) ? (
+                    <Heart className="w-4 h-4 fill-current" />
+                  ) : (
+                    <Heart className="w-4 h-4" />
+                  )}
+                  <span className="text-xs md:text-sm font-medium">
                     {timelineReactions[item.id]?.['❤️'] || 0}
                   </span>
                   <span className="text-xs hidden sm:inline">Suka</span>
@@ -730,9 +757,17 @@ export default function TimelinePage() {
                 {/* Comment Button */}
                 <button
                   onClick={() => toggleComments(item.id)}
-                  className="flex items-center space-x-1 text-gray-500 hover:text-blue-500 transition-colors"
+                  className={`flex items-center space-x-1 transition-colors ${
+                    showComments[item.id]
+                      ? 'text-blue-500 hover:text-blue-600'
+                      : 'text-gray-500 hover:text-blue-500'
+                  }`}
                 >
-                  <MessageCircle className="w-4 h-4" />
+                  {showComments[item.id] ? (
+                    <MessageCircle className="w-4 h-4 fill-current" />
+                  ) : (
+                    <MessageCircle className="w-4 h-4" />
+                  )}
                   <span className="text-xs md:text-sm">
                     {timelineComments[item.id]?.length || 0}
                   </span>
@@ -742,8 +777,14 @@ export default function TimelinePage() {
                 {/* Share Button */}
                 <button
                   onClick={() => {
+                    saveScrollPosition();
                     navigator.clipboard.writeText(`${window.location.origin}/timeline#${item.id}`);
-                    toast({ title: "Link disalin", description: "Link timeline telah disalin ke clipboard" });
+                    toast({ 
+                      title: "Link disalin", 
+                      description: "Link timeline telah disalin ke clipboard",
+                      variant: "default"
+                    });
+                    setTimeout(() => restoreScrollPosition(), 100);
                   }}
                   className="flex items-center space-x-1 text-gray-500 hover:text-green-500 transition-colors"
                 >
@@ -757,16 +798,21 @@ export default function TimelinePage() {
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
+                    saveScrollPosition();
                     setShowReactionPicker(prev => ({ ...prev, [item.id]: !prev[item.id] }));
                   }}
-                  className="text-gray-500 hover:text-yellow-500 transition-colors"
+                  className={`transition-colors ${
+                    showReactionPicker[item.id]
+                      ? 'text-yellow-500 hover:text-yellow-600'
+                      : 'text-gray-500 hover:text-yellow-500'
+                  }`}
                 >
                   <Smile className="w-4 h-4" />
                 </button>
                 
                 {showReactionPicker[item.id] && (
                   <div 
-                    className="absolute right-0 bottom-8 bg-white border border-gray-200 rounded-lg shadow-lg p-2 z-10"
+                    className="absolute right-0 bottom-8 bg-white border border-gray-200 rounded-lg shadow-lg p-2 z-20 animate-in fade-in duration-200 scale-95 data-[state=open]:scale-100"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <div className="flex space-x-1">
@@ -774,9 +820,20 @@ export default function TimelinePage() {
                         <button
                           key={emoji}
                           onClick={() => handleReaction(item.id, emoji)}
-                          className="hover:bg-gray-100 rounded p-1 text-lg"
+                          disabled={addReactionMutation.isPending}
+                          className={`hover:bg-gray-100 rounded p-1 text-lg transition-all duration-200 hover:scale-110 relative group ${
+                            addReactionMutation.isPending ? 'opacity-50 cursor-not-allowed' : ''
+                          } ${timelineReactions[item.id]?.[emoji] > 0 ? 'bg-blue-50 ring-2 ring-blue-200' : ''}`}
+                          title={`Reaksi dengan ${emoji} (${timelineReactions[item.id]?.[emoji] || 0})`}
                         >
-                          {emoji}
+                          <span className="relative flex items-center justify-center">
+                            {emoji}
+                            {timelineReactions[item.id]?.[emoji] > 0 && (
+                              <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center shadow-sm animate-pulse">
+                                {timelineReactions[item.id][emoji]}
+                              </span>
+                            )}
+                          </span>
                         </button>
                       ))}
                     </div>
@@ -817,7 +874,7 @@ export default function TimelinePage() {
                 {/* Add Comment */}
                 <div className="flex space-x-2 mt-3">
                   <div className="flex-shrink-0">
-                    {user?.profileImageUrl ? (
+                    {user && user.profileImageUrl ? (
                       <img 
                         src={user.profileImageUrl} 
                         alt={user.name || 'User'}
