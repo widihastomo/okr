@@ -88,7 +88,7 @@ function Router() {
     queryKey: ["/api/onboarding/status"],
     enabled: isAuthenticated && !isLoading && location === "/",
     staleTime: 5 * 60 * 1000, // 5 minutes cache
-    cacheTime: 10 * 60 * 1000, // 10 minutes cache
+    gcTime: 10 * 60 * 1000, // 10 minutes cache (renamed from cacheTime in v5)
     refetchOnWindowFocus: false,
     refetchOnMount: false,
   });
@@ -101,15 +101,23 @@ function Router() {
   }, [isAuthenticated]);
 
   // Handle onboarding redirect only on root path
+  // Skip onboarding redirect for new users - they get welcome screen instead
   useEffect(() => {
     if (
       isAuthenticated &&
       !isLoading &&
       location === "/" &&
       onboardingStatus &&
-      !onboardingStatus.isCompleted
+      !(onboardingStatus as any)?.isCompleted
     ) {
-      navigate("/onboarding");
+      // Check if user is completely new (no onboarding-completed flag)
+      const onboardingCompleted = localStorage.getItem("onboarding-completed") === "true";
+      
+      // Only redirect to onboarding if user has started but not completed it
+      // New users (no onboarding-completed flag) skip onboarding and get welcome screen
+      if (!onboardingCompleted && (onboardingStatus as any)?.data && (onboardingStatus as any).data.currentStep > 1) {
+        navigate("/onboarding");
+      }
     }
   }, [isAuthenticated, isLoading, location, onboardingStatus, navigate]);
 
@@ -215,7 +223,7 @@ function Router() {
               // Different padding for onboarding page and trial status
               isOnboardingPage
                 ? "pt-0 px-0"
-                : trialStatus?.isTrialActive && !(user as any)?.isSystemOwner
+                : (trialStatus as any)?.isTrialActive && !(user as any)?.isSystemOwner
                   ? "pt-[130px] sm:pt-[130px] px-3 sm:px-6" // Header (64px) + Trial Header (44px)
                   : "pt-[64px] sm:pt-[64px] px-3 sm:px-6", // Just header
             )}

@@ -272,12 +272,25 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
       });
       
       if (response.ok) {
-        setCurrentStep("verification-success");
+        // Clear logout flag and invalidate auth cache
+        localStorage.removeItem("isLoggedOut");
+        await queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+        
+        // Set flags for new user flow - skip onboarding and show welcome screen
+        localStorage.setItem("onboarding-completed", "true");
+        localStorage.removeItem("welcome-screen-shown");
+        
         toast({
           title: "Email berhasil diverifikasi",
-          description: "Akun Anda sudah aktif!",
+          description: "Akun Anda sudah aktif! Selamat datang di Refokus",
           variant: "success",
         });
+        
+        // Redirect directly to index page - welcome screen will show automatically
+        navigate("/");
+        
+        // Call onSuccess callback if provided
+        if (onSuccess) onSuccess();
       } else {
         const error = await response.json();
         toast({
@@ -733,7 +746,11 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
             </div>
             
             <Button
-              onClick={() => navigateToStep("login")}
+              onClick={() => {
+                // This case should not happen since verification now redirects directly
+                // But keeping as fallback
+                navigateToStep("login");
+              }}
               className="w-full bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white font-medium h-11"
             >
               <ArrowRight className="h-4 w-4 mr-2" />

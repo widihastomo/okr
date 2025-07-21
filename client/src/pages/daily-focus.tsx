@@ -50,6 +50,7 @@ import {
   MessageSquare,
   Info,
   HelpCircle,
+  ArrowRight,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -884,11 +885,74 @@ export default function DailyFocusPage() {
       .length;
   };
 
+  // Check for welcome screen for new users
+  const [showWelcomeScreen, setShowWelcomeScreen] = useState(false);
+  
+  useEffect(() => {
+    // Show welcome screen if user just registered and hasn't seen it yet
+    const welcomeShown = localStorage.getItem("welcome-screen-shown");
+    const onboardingCompleted = localStorage.getItem("onboarding-completed");
+    
+    // Show welcome screen if onboarding was completed (new user) but welcome screen hasn't been shown
+    if (onboardingCompleted === "true" && !welcomeShown) {
+      setShowWelcomeScreen(true);
+    }
+  }, []);
+
+  const handleCloseWelcomeScreen = () => {
+    setShowWelcomeScreen(false);
+    localStorage.setItem("welcome-screen-shown", "true");
+  };
+
   // Early return check - must be AFTER all hooks are called
   if (!userId) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <Skeleton />
+      </div>
+    );
+  }
+
+  // Welcome Screen Dialog for new users
+  if (showWelcomeScreen) {
+    return (
+      <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 text-center">
+          <div className="mb-6">
+            <div className="w-16 h-16 bg-gradient-to-r from-orange-500 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Sparkles className="h-8 w-8 text-white" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              Selamat Datang di Refokus!
+            </h2>
+            <p className="text-gray-600">
+              Ubah tujuan menjadi aksi nyata yang terukur. Mari mulai perjalanan produktivitas Anda bersama kami.
+            </p>
+          </div>
+          
+          <div className="space-y-3 mb-6">
+            <div className="flex items-center gap-3 text-left">
+              <Target className="h-5 w-5 text-orange-500 flex-shrink-0" />
+              <span className="text-sm text-gray-700">Buat tujuan yang jelas dan terukur</span>
+            </div>
+            <div className="flex items-center gap-3 text-left">
+              <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
+              <span className="text-sm text-gray-700">Pantau progress secara real-time</span>
+            </div>
+            <div className="flex items-center gap-3 text-left">
+              <Users className="h-5 w-5 text-blue-500 flex-shrink-0" />
+              <span className="text-sm text-gray-700">Kolaborasi tim yang efektif</span>
+            </div>
+          </div>
+          
+          <Button
+            onClick={handleCloseWelcomeScreen}
+            className="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white font-medium h-11"
+          >
+            <ArrowRight className="h-4 w-4 mr-2" />
+            Mulai Sekarang
+          </Button>
+        </div>
       </div>
     );
   }

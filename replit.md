@@ -396,6 +396,19 @@ export DATABASE_URL="postgresql://..." && npm run dev
 
 ## Changelog
 ```
+- July 21, 2025. **NEW USER ONBOARDING FLOW MODIFICATION COMPLETED** - Successfully modified user registration and onboarding flow to skip onboarding page for new users:
+  * MODIFIED: Email verification in AuthFlow.tsx now directly redirects new users to index page after verification instead of onboarding page
+  * UPDATED: App.tsx routing logic to check onboarding completion status and only redirect users who started but didn't complete onboarding
+  * IMPLEMENTED: Welcome screen modal in daily-focus.tsx that displays for new users with professional branding and feature highlights
+  * ENHANCED: Welcome screen shows key benefits (clear goals, real-time progress, team collaboration) with orange gradient theme
+  * ADDED: LocalStorage flags for onboarding completion tracking and welcome screen display management
+  * STREAMLINED: New user flow now goes: Registration → Email Verification → Index Page (with Welcome Screen) → Normal App Usage
+  * PRESERVED: Onboarding page still exists and can be accessed manually, but new users skip it by default
+  * RESULT: New users get immediate access to main application with friendly welcome screen instead of lengthy onboarding process
+- July 21, 2025. **WHATSAPP FORMAT DESCRIPTION REMOVED** - Successfully removed format description text from registration form per user request:
+  * REMOVED: "Format yang didukung: 08123456789, +628123456789, atau 628123456789" text below WhatsApp number input
+  * SIMPLIFIED: Form now only shows error messages when validation fails, without instructional text
+  * RESULT: Cleaner registration form interface without potentially confusing format instructions
 - July 21, 2025. **PERSISTENT BROWSER CACHE ISSUE IDENTIFIED** - Frontend React app berjalan dengan benar (console logs menunjukkan data initiatives, authentication, Vite connection), namun browser menampilkan cached API-only page:
   * CONFIRMED: Server melayani Vite development dengan benar (curl test menunjukkan Vite client)
   * CONFIRMED: React app berfungsi (webview console logs menunjukkan initiatives data, user authentication, component rendering)
