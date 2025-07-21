@@ -403,9 +403,9 @@ export default function TimelinePage() {
   }
 
   return (
-    <>
-      {/* Page Header */}
-      <div className="mb-4 md:mb-6 bg-white rounded-lg shadow-sm p-3 md:p-4">
+    <div className="h-screen flex flex-col overflow-hidden">
+      {/* Page Header - Fixed */}
+      <div className="flex-shrink-0 mb-4 md:mb-6 bg-white rounded-lg shadow-sm p-3 md:p-4">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-2">
           <h1 className="text-xl md:text-2xl font-bold text-gray-900 flex items-center gap-2">
             <TimelineIcon className="w-6 h-6 md:w-8 md:h-8" />
@@ -432,11 +432,12 @@ export default function TimelinePage() {
         </p>
       </div>
 
-      <div className="flex gap-4 lg:gap-6">
-        {/* Filter Sidebar */}
+      {/* Main Layout Container - Flex and scrollable */}
+      <div className="flex-1 flex gap-4 lg:gap-6 min-h-0">
+        {/* Filter Sidebar - Fixed positioning */}
         <div className={`${showMobileFilters ? 'fixed inset-0 z-50 bg-white' : 'hidden'} lg:block lg:w-72 lg:flex-shrink-0`}>
-          <div className="h-full bg-white border border-gray-200 rounded-lg overflow-y-auto"
-               style={{ height: showMobileFilters ? '100vh' : 'auto' }}>
+          <div className="h-full bg-white border border-gray-200 rounded-lg overflow-y-auto lg:sticky lg:top-0"
+               style={{ height: showMobileFilters ? '100vh' : 'calc(100vh - 120px)' }}>
             {/* Mobile header */}
             <div className="lg:hidden flex items-center justify-between p-3 md:p-4 border-b border-gray-200">
               <h2 className="text-lg font-semibold text-gray-900">Filter Timeline</h2>
@@ -547,55 +548,59 @@ export default function TimelinePage() {
           </div>
         </div>
 
-        {/* Main Content */}
-        <div className="flex-1 min-w-0">
-          {timelineData && timelineData.length > 0 ? (
-            <div className="space-y-3 md:space-y-4">
-              {/* Debug info */}
-              <div className="bg-yellow-50 border border-yellow-200 rounded p-2 text-xs">
-                Total items: {timelineData.length} | Filtered: {filteredData.length} | Showing: {Math.min(displayedItemCount, filteredData.length)}
-              </div>
-              
-              {/* Show only the first N items */}
-              {filteredData.slice(0, displayedItemCount).map((item: TimelineItem, index: number) => (
-                <TimelineCard key={item.id} item={item} index={index} />
-              ))}
-              
-              {/* Load more trigger */}
-              {displayedItemCount < filteredData.length && (
-                <div 
-                  ref={loadMoreRef}
-                  className="flex justify-center py-4"
-                >
-                  <div className="animate-pulse text-sm text-gray-500">
-                    Memuat lebih banyak...
-                  </div>
+        {/* Main Content - Scrollable */}
+        <div className="flex-1 min-w-0 overflow-y-auto">
+          <div className="pr-2"> {/* Add padding for scrollbar */}
+            {timelineData && timelineData.length > 0 ? (
+              <div className="space-y-3 md:space-y-4">
+                {/* Debug info */}
+                <div className="bg-yellow-50 border border-yellow-200 rounded p-2 text-xs">
+                  Total items: {timelineData.length} | Filtered: {filteredData.length} | Showing: {Math.min(displayedItemCount, filteredData.length)}
                 </div>
-              )}
-            </div>
-          ) : (
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 text-center py-8 md:py-12 px-4">
-              <TimelineIcon className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-3 md:mb-4 text-gray-400" />
-              <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-2">
-                Belum ada activity yang ditampilkan
-              </h3>
-              <p className="text-gray-600 mb-3 md:mb-4 text-sm md:text-base">
-                Timeline akan menampilkan update harian dan progress check-in dari tim Anda
-              </p>
-              <div className="text-xs md:text-sm text-gray-500">
-                Mulai dengan melakukan cek-in atau update harian untuk melihat activity feed
+                
+                {/* Show only the first N items */}
+                {filteredData.slice(0, displayedItemCount).map((item: TimelineItem, index: number) => (
+                  <TimelineCard key={item.id} item={item} index={index} />
+                ))}
+                
+                {/* Load more trigger */}
+                {displayedItemCount < filteredData.length && (
+                  <div 
+                    ref={loadMoreRef}
+                    className="flex justify-center py-4"
+                  >
+                    <div className="animate-pulse text-sm text-gray-500">
+                      Memuat lebih banyak...
+                    </div>
+                  </div>
+                )}
               </div>
-            </div>
-          )}
+            ) : (
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 text-center py-8 md:py-12 px-4">
+                <TimelineIcon className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-3 md:mb-4 text-gray-400" />
+                <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-2">
+                  Belum ada activity yang ditampilkan
+                </h3>
+                <p className="text-gray-600 mb-3 md:mb-4 text-sm md:text-base">
+                  Timeline akan menampilkan update harian dan progress check-in dari tim Anda
+                </p>
+                <div className="text-xs md:text-sm text-gray-500">
+                  Mulai dengan melakukan cek-in atau update harian untuk melihat activity feed
+                </div>
+              </div>
+            )}
+          </div>
         </div>
         
-        {/* Leaderboard Sidebar */}
+        {/* Leaderboard Sidebar - Fixed positioning */}
         <div className="hidden xl:block xl:w-80 xl:flex-shrink-0">
-          <div className="sticky top-6">
-            <Leaderboard limit={8} />
+          <div className="sticky top-0 h-screen">
+            <div style={{ height: 'calc(100vh - 120px)' }} className="overflow-y-auto">
+              <Leaderboard limit={8} />
+            </div>
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
