@@ -413,6 +413,12 @@ export DATABASE_URL="postgresql://..." && npm run dev
   * INTEGRATED: Complete data flow from invitation code input → validation → registration → storage → counter update
   * SECURED: Only valid, non-expired, non-maxed invitation codes are accepted and stored
   * RESULT: Complete invitation code system - users can register with codes, codes are tracked and stored properly
+- July 21, 2025. **TERMS OF SERVICE DISCLAIMER ADDED** - Successfully added terms of service acceptance notice above registration button:
+  * ADDED: Terms of service disclaimer text above "Daftar Akun" button in registration form
+  * IMPLEMENTED: Clickable "Ketentuan Layanan Kledo" link that opens in new tab
+  * STYLED: Professional disclaimer text with blue underlined link and proper spacing
+  * ENHANCED: User compliance with proper legal disclaimer before account registration
+  * RESULT: Registration form now includes required terms of service acceptance notice
 - July 21, 2025. **INVITATION CODE INPUT SYSTEM COMPLETED** - Successfully implemented invitation code input with toggle functionality and uppercase formatting:
   * ADDED: Toggle-able invitation code input below password field with "Punya kode undangan?" button
   * IMPLEMENTED: Smooth slide-in animation with chevron up/down indicators for toggle state

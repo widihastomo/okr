@@ -775,6 +775,20 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                 )}
               </div>
 
+              {/* Terms of Service */}
+              <div className="pt-2 pb-3">
+                <p className="text-xs text-gray-600 text-center leading-relaxed">
+                  Dengan klik tombol daftar, saya telah membaca dan menyetujui serta tunduk kepada{" "}
+                  <button
+                    type="button"
+                    onClick={() => window.open("/terms-of-service", "_blank")}
+                    className="text-blue-600 hover:text-blue-800 underline font-medium"
+                  >
+                    Ketentuan Layanan Kledo
+                  </button>
+                </p>
+              </div>
+
               <div className="pt-2">
                 <Button
                   type="submit"
