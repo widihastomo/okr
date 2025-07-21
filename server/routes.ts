@@ -7,7 +7,7 @@ import {
   insertTaskSchema, insertTaskCommentSchema, insertTaskAuditTrailSchema, insertInitiativeNoteSchema, insertInitiativeCommentSchema, updateKeyResultProgressSchema, createGoalFromTemplateSchema,
   insertSuccessMetricSchema, insertSuccessMetricUpdateSchema, insertDailyReflectionSchema, updateOnboardingProgressSchema,
   subscriptionPlans, organizations, organizationSubscriptions, users, dailyReflections, companyOnboardingDataSchema,
-  trialAchievements, userTrialAchievements, billingPeriods,
+  trialAchievements, userTrialAchievements, billingPeriods, referralCodes,
   applicationSettings, insertApplicationSettingSchema, updateApplicationSettingSchema,
   insertTimelineCommentSchema, insertTimelineReactionSchema,
   type User, type SubscriptionPlan, type Organization, type OrganizationSubscription, type UserOnboardingProgress, type UpdateOnboardingProgress, type CompanyOnboardingData,

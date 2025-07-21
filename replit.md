@@ -396,6 +396,19 @@ export DATABASE_URL="postgresql://..." && npm run dev
 
 ## Changelog
 ```
+- July 21, 2025. **INVITATION CODE STORAGE BUG FIXED** - Successfully resolved invitation code not being saved during registration:
+  * FIXED: Added missing `referralCodes` import to server/routes.ts to resolve ReferenceError during validation
+  * ENHANCED: Invitation code validation now works properly during registration process
+  * VERIFIED: Invitation codes are correctly saved to users.invitation_code column in database
+  * TESTED: Registration with WELCOME2025 invitation code successfully validates, saves code, and increments usage counter
+  * RESULT: Complete invitation code system now fully functional from frontend validation to database storage
+- July 21, 2025. **TOUR TRACKING DATABASE INTEGRATION COMPLETED** - Successfully implemented comprehensive backend API for user tour tracking:
+  * ADDED: Database schema for tour tracking (tour_started, tour_completed, tour_started_at, tour_completed_at) to users table
+  * IMPLEMENTED: Backend storage methods (markTourStarted, markTourCompleted, getTourStatus) in storage.ts
+  * CREATED: API endpoints (/api/tour/start, /api/tour/complete, /api/tour/status) in routes.ts with proper authentication
+  * INTEGRATED: Frontend TourSystemNew component with automatic API calls when tour starts and completes
+  * ENHANCED: Tour system now tracks user progress in database for analytics and user experience improvement
+  * RESULT: Complete tour tracking system with database persistence and API integration ready for production use
 - July 21, 2025. **HELP MENU POSITIONED AT SIDEBAR BOTTOM COMPLETED** - Successfully repositioned Help menu to always stay at bottom of sidebar:
   * ADDED: Help menu back to client-sidebar.tsx with fixed bottom positioning using mt-auto class
   * ENHANCED: Sidebar structure with flex flex-col layout to enable proper bottom positioning
