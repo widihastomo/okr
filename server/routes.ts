@@ -2908,6 +2908,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Add reaction to timeline item
+  app.post("/api/timeline/:timelineId/reactions", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as User;
+      const { timelineId } = req.params;
+      const { emoji } = req.body;
+
+      if (!user?.organizationId || !user?.id) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      if (!emoji) {
+        return res.status(400).json({ message: "Emoji is required" });
+      }
+
+      // Check if user already reacted with this emoji
+      const existingReaction = await storage.getUserTimelineReaction(timelineId, user.id, emoji);
+      
+      if (existingReaction) {
+        // If reaction exists, remove it (toggle off)
+        await storage.deleteTimelineReaction(existingReaction.id);
+        res.json({ message: "Reaction removed", action: "removed" });
+      } else {
+        // Add new reaction
+        const reaction = await storage.createTimelineReaction({
+          timelineId,
+          userId: user.id,
+          organizationId: user.organizationId,
+          emoji
+        });
+        res.status(201).json({ message: "Reaction added", action: "added", reaction });
+      }
+    } catch (error) {
+      console.error("Error handling timeline reaction:", error);
+      res.status(500).json({ message: "Failed to handle reaction" });
+    }
+  });
+
+  // Add comment to timeline item
+  app.post("/api/timeline/:timelineId/comments", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as User;
+      const { timelineId } = req.params;
+      const { content } = req.body;
+
+      if (!user?.organizationId || !user?.id) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      if (!content || !content.trim()) {
+        return res.status(400).json({ message: "Comment content is required" });
+      }
+
+      const comment = await storage.createTimelineComment({
+        timelineId,
+        userId: user.id,
+        organizationId: user.organizationId,
+        content: content.trim()
+      });
+
+      res.status(201).json(comment);
+    } catch (error) {
+      console.error("Error creating timeline comment:", error);
+      res.status(500).json({ message: "Failed to create comment" });
+    }
+  });
+
   // Create timeline update
   app.post("/api/timeline", requireAuth, async (req, res) => {
     try {

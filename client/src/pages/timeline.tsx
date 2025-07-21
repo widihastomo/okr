@@ -122,7 +122,7 @@ export default function TimelinePage() {
   });
 
   // Fetch timeline reactions
-  const { data: timelineReactions = {} } = useQuery<Record<string, { count: number; userReacted: boolean; }>>({
+  const { data: timelineReactions = {} } = useQuery<Record<string, Record<string, number>>>({
     queryKey: ['/api/timeline/reactions'],
     enabled: !!user?.id,
   });
@@ -206,16 +206,38 @@ export default function TimelinePage() {
 
   // Mutations for comments and reactions
   const addCommentMutation = useMutation({
-    mutationFn: ({ itemId, content }: { itemId: string; content: string }) =>
-      apiRequest(`/api/timeline/${itemId}/comments`, 'POST', { content }),
+    mutationFn: async ({ itemId, content }: { itemId: string; content: string }) => {
+      const response = await fetch(`/api/timeline/${itemId}/comments`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ content }),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to add comment');
+      }
+      return response.json();
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/timeline/comments'] });
     },
   });
 
   const addReactionMutation = useMutation({
-    mutationFn: ({ itemId, emoji }: { itemId: string; emoji: string }) =>
-      apiRequest(`/api/timeline/${itemId}/reactions`, 'POST', { emoji }),
+    mutationFn: async ({ itemId, emoji }: { itemId: string; emoji: string }) => {
+      const response = await fetch(`/api/timeline/${itemId}/reactions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ emoji }),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to add reaction');
+      }
+      return response.json();
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/timeline/reactions'] });
     },
@@ -411,9 +433,9 @@ export default function TimelinePage() {
                   onClick={() => toggleReaction(item.id)}
                   className="flex items-center space-x-1 text-gray-500 hover:text-red-500 transition-colors"
                 >
-                  <Heart className={`w-4 h-4 ${timelineReactions[item.id]?.userReacted ? 'fill-red-500 text-red-500' : ''}`} />
+                  <Heart className="w-4 h-4" />
                   <span className="text-xs md:text-sm">
-                    {timelineReactions[item.id]?.count || 0}
+                    {timelineReactions[item.id]?.['❤️'] || 0}
                   </span>
                   <span className="text-xs hidden sm:inline">Suka</span>
                 </button>
