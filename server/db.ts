@@ -5,60 +5,78 @@ import { Pool } from 'pg';
 import * as schema from "@shared/schema";
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+// ES Module compatibility
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Load environment variables early and reliably - Enhanced for Mac local development
-try {
-  // Import dotenv first
-  const dotenv = require('dotenv');
-  
-  // Force override = true to reload variables even if they exist
-  const envPaths = [
-    path.join(process.cwd(), '.env'),
-    path.join(process.cwd(), '.env.local'),
-    path.join(__dirname, '..', '.env'),
-  ];
-  
-  console.log("🔧 Enhanced dotenv loading for Mac development...");
-  
-  let loaded = false;
-  for (const envPath of envPaths) {
-    if (fs.existsSync(envPath)) {
-      console.log(`🔍 Found .env file at: ${envPath}`);
-      
-      // Force load with override = true
-      const result = dotenv.config({ 
-        path: envPath, 
-        override: true  // Force override existing variables
-      });
-      
-      if (!result.error) {
-        console.log(`✅ Successfully loaded environment from: ${envPath}`);
-        
-        // Verify DATABASE_URL was loaded
-        if (process.env.DATABASE_URL) {
-          console.log("✅ DATABASE_URL confirmed loaded from .env file");
-        } else {
-          console.log("⚠️  DATABASE_URL still not found after loading .env");
-        }
-        
-        loaded = true;
-        break;
-      } else {
-        console.log(`❌ Failed to load from ${envPath}:`, result.error.message);
-      }
-    } else {
-      console.log(`❌ .env file not found at: ${envPath}`);
+// Using simple approach without top-level await
+function loadEnvironmentVariables() {
+  try {
+    // Try requiring dotenv - fallback to process.env if not available
+    let config: any;
+    try {
+      // Use dynamic import for ES modules but handle it synchronously
+      config = require('dotenv').config;
+    } catch {
+      console.log("⚠️  dotenv not available via require, using process.env directly");
+      return;
     }
+    
+    // Force override = true to reload variables even if they exist
+    const envPaths = [
+      path.join(process.cwd(), '.env'),
+      path.join(process.cwd(), '.env.local'),
+      path.join(__dirname, '..', '.env'),
+    ];
+    
+    console.log("🔧 Enhanced dotenv loading for Mac development...");
+    
+    let loaded = false;
+    for (const envPath of envPaths) {
+      if (fs.existsSync(envPath)) {
+        console.log(`🔍 Found .env file at: ${envPath}`);
+        
+        // Force load with override = true
+        const result = config({ 
+          path: envPath, 
+          override: true  // Force override existing variables
+        });
+        
+        if (!result.error) {
+          console.log(`✅ Successfully loaded environment from: ${envPath}`);
+          
+          // Verify DATABASE_URL was loaded
+          if (process.env.DATABASE_URL) {
+            console.log("✅ DATABASE_URL confirmed loaded from .env file");
+          } else {
+            console.log("⚠️  DATABASE_URL still not found after loading .env");
+          }
+          
+          loaded = true;
+          break;
+        } else {
+          console.log(`❌ Failed to load from ${envPath}:`, result.error.message);
+        }
+      } else {
+        console.log(`❌ .env file not found at: ${envPath}`);
+      }
+    }
+    
+    if (!loaded) {
+      console.log("⚠️  No .env file could be loaded successfully");
+    }
+    
+  } catch (error) {
+    console.log("❌ Error during dotenv loading:", (error as Error).message);
+    console.log("📋 Fallback: Using existing process.env variables");
   }
-  
-  if (!loaded) {
-    console.log("⚠️  No .env file could be loaded successfully");
-  }
-  
-} catch (error) {
-  console.log("❌ Error during dotenv loading:", (error as Error).message);
-  console.log("📋 Fallback: Using existing process.env variables");
 }
+
+// Load environment variables immediately
+loadEnvironmentVariables();
 
 // Enhanced debugging for Mac local development
 console.log("🔍 Enhanced Environment Debug Info:");
