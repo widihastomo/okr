@@ -21,6 +21,18 @@ node start-local.cjs
 - ✅ Preview .env content untuk debugging
 - ✅ Enhanced error handling dan troubleshooting
 
+### **1B. Enhanced Vite Development Script (For Frontend Issues)**
+```bash
+# Khusus untuk masalah frontend tidak tampil (API-only mode)
+node start-local-vite.cjs
+```
+
+**Features:**
+- ✅ Enhanced Vite configuration untuk frontend serving
+- ✅ Memastikan React frontend termuat dengan benar
+- ✅ Environment setup khusus untuk development mode
+- ✅ Troubleshooting untuk API-only mode issues
+
 ### **2. Debug Environment Issues**
 ```bash
 # Jalankan debugging tool (CommonJS version)
