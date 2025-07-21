@@ -433,6 +433,34 @@ export default function TimelinePage() {
                     </span>
                   </div>
                   
+                  {/* Progress Bar */}
+                  {item.checkInValue && item.keyResultTargetValue && (
+                    <div className="mb-2">
+                      {(() => {
+                        const currentValue = parseFloat(item.checkInValue.toString().replace(/[^\d.-]/g, ''));
+                        const targetValue = parseFloat(item.keyResultTargetValue.toString().replace(/[^\d.-]/g, ''));
+                        const percentage = Math.min((currentValue / targetValue) * 100, 100);
+                        
+                        return (
+                          <div className="space-y-1">
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs text-purple-700">Progress:</span>
+                              <span className="text-xs font-medium text-purple-800">
+                                {Math.round(percentage)}%
+                              </span>
+                            </div>
+                            <div className="w-full bg-purple-200 rounded-full h-2">
+                              <div 
+                                className="bg-purple-600 h-2 rounded-full transition-all duration-300 ease-in-out"
+                                style={{ width: `${Math.min(percentage, 100)}%` }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })()}
+                    </div>
+                  )}
+                  
                   {item.checkInNotes && (
                     <div className="mt-2">
                       <div className="text-xs font-medium text-purple-800 mb-1">Catatan:</div>
