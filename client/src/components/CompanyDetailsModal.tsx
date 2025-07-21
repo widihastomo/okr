@@ -162,12 +162,11 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
               <MapPin className="h-4 w-4" />
               Alamat Perusahaan *
             </Label>
-            <Textarea
+            <Input
               id="companyAddress"
               placeholder="Masukkan alamat lengkap perusahaan..."
               value={formData.companyAddress}
               onChange={(e) => handleInputChange("companyAddress", e.target.value)}
-              className="min-h-[80px]"
             />
           </div>
 

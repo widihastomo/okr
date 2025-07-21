@@ -483,6 +483,11 @@ export DATABASE_URL="postgresql://..." && npm run dev
   * ENHANCED: Bali with proper "Kota Denpasar" and kabupaten prefixes for complete administrative coverage
   * IMPLEMENTED: Consistent naming convention using "Kota" for cities and "Kabupaten" for regencies throughout Indonesia
   * RESULT: Complete Indonesian administrative division coverage with accurate kota/kabupaten distinction for major provinces
+- July 21, 2025. **COMPANY ADDRESS INPUT SIMPLIFIED** - Changed company address field from textarea to single-line input:
+  * CONVERTED: Textarea component to Input component for company address field
+  * SIMPLIFIED: Company address now uses single-line input instead of multi-line textarea
+  * MAINTAINED: All existing functionality including validation and placeholder text
+  * RESULT: Cleaner, more compact company details form with simplified address input
 - July 21, 2025. **INVITATION CODE INPUT SYSTEM COMPLETED** - Successfully implemented invitation code input with toggle functionality and uppercase formatting:
   * ADDED: Toggle-able invitation code input below password field with "Punya kode undangan?" button
   * IMPLEMENTED: Smooth slide-in animation with chevron up/down indicators for toggle state
