@@ -240,8 +240,21 @@ export default function TimelinePage() {
       }
       return response.json();
     },
+    onMutate: () => {
+      // Store current scroll position before mutation
+      const currentScrollY = window.scrollY;
+      sessionStorage.setItem('timeline-scroll-position', currentScrollY.toString());
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/timeline/comments'] });
+      // Restore scroll position after mutation
+      setTimeout(() => {
+        const savedScrollY = sessionStorage.getItem('timeline-scroll-position');
+        if (savedScrollY) {
+          window.scrollTo(0, parseInt(savedScrollY));
+          sessionStorage.removeItem('timeline-scroll-position');
+        }
+      }, 50);
     },
   });
 
@@ -259,8 +272,21 @@ export default function TimelinePage() {
       }
       return response.json();
     },
+    onMutate: () => {
+      // Store current scroll position before mutation
+      const currentScrollY = window.scrollY;
+      sessionStorage.setItem('timeline-scroll-position', currentScrollY.toString());
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/timeline/reactions'] });
+      // Restore scroll position after mutation
+      setTimeout(() => {
+        const savedScrollY = sessionStorage.getItem('timeline-scroll-position');
+        if (savedScrollY) {
+          window.scrollTo(0, parseInt(savedScrollY));
+          sessionStorage.removeItem('timeline-scroll-position');
+        }
+      }, 50);
     },
   });
 
@@ -587,6 +613,7 @@ export default function TimelinePage() {
               <div className="relative">
                 <button
                   onClick={(e) => {
+                    e.preventDefault();
                     e.stopPropagation();
                     setShowReactionPicker(prev => ({ ...prev, [item.id]: !prev[item.id] }));
                   }}
