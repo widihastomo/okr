@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Reset User State</title>
+</head>
+<body>
+    <h1>Reset User State for Testing</h1>
+    <button onclick="resetUserState()">Reset User State</button>
+    <div id="result"></div>
+
+    <script>
+        function resetUserState() {
+            // Reset all company details and onboarding related localStorage
+            localStorage.removeItem("company-details-completed");
+            localStorage.removeItem("onboarding-completed");
+            localStorage.removeItem("welcome-shown");
+            localStorage.removeItem("tour-started");
+            localStorage.removeItem("tour-completed");
+            
+            // Reset any other tour-related state
+            localStorage.removeItem("joyride_tutorial");
+            localStorage.removeItem("user-tour-state");
+            
+            document.getElementById("result").innerHTML = "<p style='color: green;'>✅ User state reset successfully! Please refresh the main application to test from beginning.</p>";
+            
+            console.log("🔄 All localStorage flags reset:");
+            console.log("- company-details-completed: removed");
+            console.log("- onboarding-completed: removed");
+            console.log("- welcome-shown: removed");
+            console.log("- tour-started: removed");
+            console.log("- tour-completed: removed");
+        }
+    </script>
+</body>
+</html>
