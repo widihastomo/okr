@@ -243,10 +243,11 @@ export default function TimelinePage() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ 
-        queryKey: ['/api/timeline/comments'],
-        refetchType: 'active'
-      });
+      // TEMPORARILY DISABLE QUERY INVALIDATION FOR TESTING  
+      // queryClient.invalidateQueries({ 
+      //   queryKey: ['/api/timeline/comments'],
+      //   refetchType: 'active'
+      // });
     },
   });
 
@@ -270,10 +271,11 @@ export default function TimelinePage() {
       scrollPositionRef.current = window.scrollY;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ 
-        queryKey: ['/api/timeline/reactions'],
-        refetchType: 'active'
-      });
+      // TEMPORARILY DISABLE QUERY INVALIDATION FOR TESTING
+      // queryClient.invalidateQueries({ 
+      //   queryKey: ['/api/timeline/reactions'],
+      //   refetchType: 'active'
+      // });
       setTimeout(() => {
         setIsReactionMutating(false);
         // Restore scroll position if it changed significantly
@@ -298,6 +300,7 @@ export default function TimelinePage() {
   };
 
   const handleReaction = (itemId: string, emoji: string) => {
+    console.log('🎯 Handle reaction called:', { itemId, emoji, scrollY: window.scrollY });
     addReactionMutation.mutate({ itemId, emoji });
     setShowReactionPicker(prev => ({ ...prev, [itemId]: false }));
   };
