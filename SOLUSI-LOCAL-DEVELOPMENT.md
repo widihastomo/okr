@@ -85,6 +85,18 @@ node debug-vite-issue.cjs
 node force-frontend-mode.cjs
 ```
 
+### **Step 6: Check Frontend Access (RECOMMENDED)**
+```bash
+# Check apakah masalah ada di server atau browser
+node check-frontend-access.cjs
+```
+
+**Script ini akan:**
+- ✅ Verify apakah server sudah melayani Vite frontend dengan benar
+- ✅ Detect apakah masalah ada di browser cache
+- ✅ Berikan instruksi troubleshooting yang tepat
+- ✅ Buka browser otomatis untuk testing
+
 ## 🔧 Manual Solutions
 
 ### **Solution A: Environment Variable Export**
