@@ -573,9 +573,6 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                 {registerForm.formState.errors.whatsappNumber && (
                   <p className="text-sm text-red-600">{registerForm.formState.errors.whatsappNumber.message}</p>
                 )}
-                {!registerForm.formState.errors.whatsappNumber && (
-                  <p className="text-xs text-gray-500">Format yang didukung: 08123456789, +628123456789, atau 628123456789</p>
-                )}
               </div>
 
               <div className="space-y-2">
