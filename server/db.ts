@@ -8,14 +8,33 @@ import path from 'path';
 
 // Load environment variables early and reliably
 try {
-  // Check if dotenv is available before requiring
+  // Force reload environment variables from .env file
   const dotenv = require('dotenv');
   if (dotenv && typeof dotenv.config === 'function') {
-    const result = dotenv.config();
-    if (result.error) {
-      console.log("⚠️  dotenv config failed:", result.error.message);
-    } else {
-      console.log("✅ Environment variables loaded from .env file via dotenv");
+    // Try multiple .env file locations for local development
+    const envPaths = [
+      path.join(process.cwd(), '.env'),
+      path.join(process.cwd(), '.env.local'),
+      path.join(__dirname, '..', '.env'),
+    ];
+    
+    let loaded = false;
+    for (const envPath of envPaths) {
+      if (fs.existsSync(envPath)) {
+        console.log(`🔍 Trying to load .env from: ${envPath}`);
+        const result = dotenv.config({ path: envPath });
+        if (!result.error) {
+          console.log(`✅ Environment variables loaded from: ${envPath}`);
+          loaded = true;
+          break;
+        } else {
+          console.log(`⚠️  Failed to load from ${envPath}:`, result.error.message);
+        }
+      }
+    }
+    
+    if (!loaded) {
+      console.log("⚠️  No .env file could be loaded, using process.env directly");
     }
   } else {
     console.log("⚠️  dotenv config method not available, using process.env directly");
@@ -47,7 +66,23 @@ if (process.env.DATABASE_URL) {
   console.log("- DATABASE_URL format:", maskedUrl);
 } else {
   console.log("❌ DATABASE_URL tidak ditemukan di environment variables!");
-  if (!envExists) {
+  if (envExists) {
+    console.log("🔍 File .env ditemukan, cek content:");
+    try {
+      const envContent = fs.readFileSync(envPath, 'utf8');
+      const lines = envContent.split('\n').slice(0, 5); // Show first 5 lines
+      console.log("📄 .env content preview:");
+      lines.forEach((line, index) => {
+        if (line.trim()) {
+          const maskedLine = line.includes('DATABASE_URL') ? 
+            line.replace(/postgresql:\/\/[^:]+:[^@]+@/, 'postgresql://***:***@') : line;
+          console.log(`  ${index + 1}: ${maskedLine}`);
+        }
+      });
+    } catch (error) {
+      console.log("❌ Tidak bisa membaca file .env:", error.message);
+    }
+  } else {
     console.log("❌ File .env tidak ditemukan di:", envPath);
     console.log("💡 Solusi: Copy content dari .env.local ke .env di root folder project");
   }
