@@ -32,6 +32,7 @@ export async function createComprehensiveDummyData(userId: string, organizationI
       title: "Meningkatkan Pendapatan Perusahaan 35% - Contoh",
       description: "Mencapai target pertumbuhan pendapatan yang ambisius melalui ekspansi pasar dan peningkatan efisiensi operasional",
       cycleId: monthlyCycle.id,
+      organizationId: organizationId,
       owner: companyTeam?.name || "Company Team",
       ownerType: "team",
       ownerId: companyTeam?.id || userId,
@@ -44,6 +45,7 @@ export async function createComprehensiveDummyData(userId: string, organizationI
       title: "Meningkatkan Brand Awareness 50% - Contoh",
       description: "Membangun kesadaran merek yang kuat melalui kampanye digital dan content marketing yang efektif",
       cycleId: monthlyCycle.id,
+      organizationId: organizationId,
       owner: marketingTeam?.name || "Marketing Team",
       ownerType: "team", 
       ownerId: marketingTeam?.id || userId,
@@ -57,6 +59,7 @@ export async function createComprehensiveDummyData(userId: string, organizationI
       title: "Mencapai Target Penjualan 40% - Contoh",
       description: "Meningkatkan konversi penjualan melalui strategi outbound dan customer relationship yang lebih baik",
       cycleId: monthlyCycle.id,
+      organizationId: organizationId,
       owner: salesTeam?.name || "Sales Team",
       ownerType: "team",
       ownerId: salesTeam?.id || userId,
@@ -70,6 +73,7 @@ export async function createComprehensiveDummyData(userId: string, organizationI
       title: "Optimalisasi Efisiensi Operasional 25% - Contoh",
       description: "Meningkatkan produktivitas dan mengurangi waste melalui digitalisasi proses bisnis",
       cycleId: monthlyCycle.id,
+      organizationId: organizationId,
       owner: operationTeam?.name || "Operation Team",
       ownerType: "team",
       ownerId: operationTeam?.id || userId,
@@ -83,6 +87,7 @@ export async function createComprehensiveDummyData(userId: string, organizationI
       title: "Pengembangan Skill Leadership 100% - Contoh",
       description: "Meningkatkan kemampuan kepemimpinan melalui training dan praktik langsung dalam manajemen tim",
       cycleId: monthlyCycle.id,
+      organizationId: organizationId,
       owner: currentUser.name || "Personal",
       ownerType: "user",
       ownerId: userId,
@@ -94,6 +99,7 @@ export async function createComprehensiveDummyData(userId: string, organizationI
     // Create Key Results for Marketing Goal
     const marketingKR1 = await storage.createKeyResult({
       objectiveId: marketingGoal.id,
+      organizationId: organizationId,
       title: "Meningkatkan Social Media Followers",
       description: "Target followers Instagram dan LinkedIn",
       currentValue: "2500",
@@ -107,6 +113,7 @@ export async function createComprehensiveDummyData(userId: string, organizationI
 
     const marketingKR2 = await storage.createKeyResult({
       objectiveId: marketingGoal.id,
+      organizationId: organizationId,
       title: "Website Traffic Growth",
       description: "Meningkatkan kunjungan website bulanan",
       currentValue: "12000",
@@ -121,6 +128,7 @@ export async function createComprehensiveDummyData(userId: string, organizationI
     // Create Key Results for Sales Goal
     const salesKR1 = await storage.createKeyResult({
       objectiveId: salesGoal.id,
+      organizationId: organizationId,
       title: "New Customer Acquisition",
       description: "Menambah jumlah customer baru",
       currentValue: "45",
@@ -134,6 +142,7 @@ export async function createComprehensiveDummyData(userId: string, organizationI
 
     const salesKR2 = await storage.createKeyResult({
       objectiveId: salesGoal.id,
+      organizationId: organizationId,
       title: "Sales Conversion Rate",
       description: "Meningkatkan tingkat konversi penjualan",
       currentValue: "15",
@@ -148,6 +157,7 @@ export async function createComprehensiveDummyData(userId: string, organizationI
     // Create Key Results for Operation Goal
     const operationKR1 = await storage.createKeyResult({
       objectiveId: operationGoal.id,
+      organizationId: organizationId,
       title: "Process Automation",
       description: "Mengotomatisasi proses manual yang repetitif",
       currentValue: "3",
@@ -161,6 +171,7 @@ export async function createComprehensiveDummyData(userId: string, organizationI
 
     const operationKR2 = await storage.createKeyResult({
       objectiveId: operationGoal.id,
+      organizationId: organizationId,
       title: "Cost Reduction",
       description: "Mengurangi biaya operasional bulanan",
       currentValue: "15",
@@ -175,6 +186,7 @@ export async function createComprehensiveDummyData(userId: string, organizationI
     // Create Key Results for Personal Goal
     const personalKR1 = await storage.createKeyResult({
       objectiveId: personalGoal.id,
+      organizationId: organizationId,
       title: "Leadership Training Hours",
       description: "Menyelesaikan training kepemimpinan",
       currentValue: "8",
@@ -191,6 +203,7 @@ export async function createComprehensiveDummyData(userId: string, organizationI
     // Create Marketing Initiative
     const marketingInitiative = await storage.createInitiative({
       keyResultId: marketingKR1.id,
+      organizationId: organizationId,
       title: "Kampanye Social Media Engagement - Contoh",
       description: "Pelaksanaan kampanye konten harian di Instagram dan LinkedIn untuk meningkatkan engagement dan followers",
       implementationPlan: "1. Buat content calendar mingguan\n2. Produksi konten visual dan video\n3. Posting konsisten 2x sehari\n4. Monitor engagement dan respond to comments\n5. Analisis performance dan optimasi strategi",
@@ -206,6 +219,7 @@ export async function createComprehensiveDummyData(userId: string, organizationI
     // Create Sales Initiative
     const salesInitiative = await storage.createInitiative({
       keyResultId: salesKR1.id,
+      organizationId: organizationId,
       title: "Program Customer Acquisition - Contoh",
       description: "Strategi komprehensif untuk mendapatkan customer baru melalui outbound sales dan referral program",
       implementationPlan: "1. Identifikasi target customer profile\n2. Buat sales script dan materials\n3. Lakukan cold calling dan email campaign\n4. Setup referral program dengan incentives\n5. Follow up leads dan convert to customers",
@@ -223,6 +237,7 @@ export async function createComprehensiveDummyData(userId: string, organizationI
     // Create Success Metrics for Marketing Initiative
     await storage.createSuccessMetric({
       initiativeId: marketingInitiative.id,
+      organizationId: organizationId,
       name: "Daily Post Consistency",
       target: "2 posts per day",
       achievement: "1.8 posts per day",
@@ -231,6 +246,7 @@ export async function createComprehensiveDummyData(userId: string, organizationI
 
     await storage.createSuccessMetric({
       initiativeId: marketingInitiative.id,
+      organizationId: organizationId,
       name: "Engagement Rate",
       target: "5% engagement rate",
       achievement: "4.2% engagement rate",
@@ -240,6 +256,7 @@ export async function createComprehensiveDummyData(userId: string, organizationI
     // Create Success Metrics for Sales Initiative
     await storage.createSuccessMetric({
       initiativeId: salesInitiative.id,
+      organizationId: organizationId,
       name: "Qualified Leads Generated",
       target: "50 qualified leads",
       achievement: "23 qualified leads",
@@ -248,6 +265,7 @@ export async function createComprehensiveDummyData(userId: string, organizationI
 
     await storage.createSuccessMetric({
       initiativeId: salesInitiative.id,
+      organizationId: organizationId,
       name: "Conversion Rate from Leads",
       target: "20% conversion rate",
       achievement: "18% conversion rate",
@@ -257,6 +275,7 @@ export async function createComprehensiveDummyData(userId: string, organizationI
     // Create DoD Items for Marketing Initiative
     await storage.createDefinitionOfDoneItem({
       initiativeId: marketingInitiative.id,
+      organizationId: organizationId,
       title: "Content calendar untuk 30 hari ke depan telah dibuat dan disetujui",
       isCompleted: true,
       completedBy: userId,
@@ -265,6 +284,7 @@ export async function createComprehensiveDummyData(userId: string, organizationI
 
     await storage.createDefinitionOfDoneItem({
       initiativeId: marketingInitiative.id,
+      organizationId: organizationId,
       title: "Brand guidelines dan visual identity telah ditetapkan",
       isCompleted: true,
       completedBy: userId,
@@ -273,6 +293,7 @@ export async function createComprehensiveDummyData(userId: string, organizationI
 
     await storage.createDefinitionOfDoneItem({
       initiativeId: marketingInitiative.id,
+      organizationId: organizationId,
       title: "Social media analytics dashboard telah setup dan monitoring aktif",
       isCompleted: false,
       createdBy: userId
@@ -281,6 +302,7 @@ export async function createComprehensiveDummyData(userId: string, organizationI
     // Create DoD Items for Sales Initiative
     await storage.createDefinitionOfDoneItem({
       initiativeId: salesInitiative.id,
+      organizationId: organizationId,
       title: "Customer persona dan target market telah didefinisikan dengan detail",
       isCompleted: true,
       completedBy: userId,
@@ -289,6 +311,7 @@ export async function createComprehensiveDummyData(userId: string, organizationI
 
     await storage.createDefinitionOfDoneItem({
       initiativeId: salesInitiative.id,
+      organizationId: organizationId,
       title: "Sales materials dan presentation deck telah disiapkan",
       isCompleted: false,
       createdBy: userId
@@ -296,6 +319,7 @@ export async function createComprehensiveDummyData(userId: string, organizationI
 
     await storage.createDefinitionOfDoneItem({
       initiativeId: salesInitiative.id,
+      organizationId: organizationId,
       title: "CRM system telah dikonfigurasi untuk lead tracking",
       isCompleted: false,
       createdBy: userId
@@ -306,6 +330,7 @@ export async function createComprehensiveDummyData(userId: string, organizationI
     // Create Tasks for Marketing Initiative
     await storage.createTask({
       initiativeId: marketingInitiative.id,
+      organizationId: organizationId,
       title: "Buat konten Instagram story harian",
       description: "Membuat dan posting Instagram story dengan konten edukatif dan engaging setiap hari",
       status: "in_progress",
@@ -318,6 +343,7 @@ export async function createComprehensiveDummyData(userId: string, organizationI
 
     await storage.createTask({
       initiativeId: marketingInitiative.id,
+      organizationId: organizationId,
       title: "Design template konten untuk LinkedIn",
       description: "Membuat template design yang konsisten untuk postingan LinkedIn",
       status: "completed",
@@ -330,6 +356,7 @@ export async function createComprehensiveDummyData(userId: string, organizationI
 
     await storage.createTask({
       initiativeId: marketingInitiative.id,
+      organizationId: organizationId,
       title: "Setup Google Analytics untuk website tracking",
       description: "Konfigurasi Google Analytics dan setup conversion tracking",
       status: "not_started",
@@ -343,6 +370,7 @@ export async function createComprehensiveDummyData(userId: string, organizationI
     // Create Tasks for Sales Initiative
     await storage.createTask({
       initiativeId: salesInitiative.id,
+      organizationId: organizationId,
       title: "Cold calling 20 prospek harian",
       description: "Melakukan cold calling kepada 20 prospek potensial setiap hari",
       status: "in_progress",
@@ -355,6 +383,7 @@ export async function createComprehensiveDummyData(userId: string, organizationI
 
     await storage.createTask({
       initiativeId: salesInitiative.id,
+      organizationId: organizationId,
       title: "Buat email sequence untuk lead nurturing",
       description: "Menulis 5 email sequence untuk nurturing leads yang belum convert",
       status: "completed",
@@ -370,6 +399,7 @@ export async function createComprehensiveDummyData(userId: string, organizationI
     // Create Check-ins for Marketing KR1
     await storage.createCheckIn({
       keyResultId: marketingKR1.id,
+      organizationId: organizationId,
       value: "2500",
       notes: "Followers bertambah 500 dalam seminggu terakhir melalui kampanye konten yang konsisten. Engagement rate juga meningkat signifikan.",
       confidence: 8,
@@ -379,6 +409,7 @@ export async function createComprehensiveDummyData(userId: string, organizationI
     // Create Check-ins for Sales KR1
     await storage.createCheckIn({
       keyResultId: salesKR1.id,
+      organizationId: organizationId,
       value: "45",
       notes: "Berhasil menambah 15 customer baru bulan ini. Strategi cold calling dan referral program mulai menunjukkan hasil positif.",
       confidence: 7,
@@ -390,6 +421,7 @@ export async function createComprehensiveDummyData(userId: string, organizationI
     // Create Timeline Entries for daily updates
     await storage.createTimelineUpdate({
       userId: userId,
+      organizationId: organizationId,
       summary: "Update harian: Progress kampanye marketing dan sales acquisition berjalan baik. Target followers Instagram tercapai 50%, customer baru bertambah 15 orang.",
       detail: JSON.stringify({
         keyResultsUpdated: [
@@ -412,6 +444,7 @@ export async function createComprehensiveDummyData(userId: string, organizationI
 
     await storage.createTimelineUpdate({
       userId: userId,
+      organizationId: organizationId,
       summary: "Check-in mingguan: Milestone penting tercapai dalam initiative marketing dan sales. DoD items mulai diselesaikan secara bertahap.",
       detail: JSON.stringify({
         deliverablesCompleted: [
