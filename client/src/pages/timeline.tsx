@@ -228,7 +228,6 @@ export default function TimelinePage() {
   // Mutations for comments and reactions
   const addCommentMutation = useMutation({
     mutationFn: async ({ itemId, content }: { itemId: string; content: string }) => {
-      console.log('Comment mutation executing:', { itemId, content });
       const response = await fetch(`/api/timeline/${itemId}/comments`, {
         method: 'POST',
         headers: {
@@ -236,18 +235,12 @@ export default function TimelinePage() {
         },
         body: JSON.stringify({ content }),
       });
-      console.log('Comment response status:', response.status);
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Comment error response:', errorText);
-        throw new Error(`Failed to add comment: ${errorText}`);
+        throw new Error('Failed to add comment');
       }
-      const result = await response.json();
-      console.log('Comment success result:', result);
-      return result;
+      return response.json();
     },
     onSuccess: () => {
-      console.log('Comment mutation success, invalidating queries');
       queryClient.invalidateQueries({ queryKey: ['/api/timeline/comments'] });
       toast({
         title: "Komentar berhasil ditambahkan",
@@ -255,7 +248,6 @@ export default function TimelinePage() {
       });
     },
     onError: (error) => {
-      console.error('Comment mutation error:', error);
       toast({
         title: "Gagal menambahkan komentar",
         description: error.message,
@@ -285,12 +277,9 @@ export default function TimelinePage() {
 
   const handleAddComment = (itemId: string) => {
     const content = commentTexts[itemId]?.trim();
-    console.log('Adding comment:', { itemId, content });
     if (content) {
       addCommentMutation.mutate({ itemId, content });
       setCommentTexts(prev => ({ ...prev, [itemId]: '' }));
-    } else {
-      console.log('No content to add comment');
     }
   };
 
@@ -669,15 +658,20 @@ export default function TimelinePage() {
                     )}
                   </div>
                   <div className="flex-1 flex space-x-2">
-                    <Textarea
+                    <textarea
                       placeholder="Tulis komentar..."
                       value={commentTexts[item.id] || ''}
                       onChange={(e) => {
-                        console.log('Textarea onChange:', { itemId: item.id, value: e.target.value });
                         setCommentTexts(prev => ({ ...prev, [item.id]: e.target.value }));
                       }}
-                      className="flex-1 min-h-[32px] text-xs md:text-sm"
+                      className="flex-1 min-h-[32px] text-xs md:text-sm px-3 py-2 border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
                       rows={1}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          handleAddComment(item.id);
+                        }
+                      }}
                     />
                     <Button
                       size="sm"
