@@ -891,8 +891,14 @@ export default function DailyFocusPage() {
   const [showCompanyDetailsModal, setShowCompanyDetailsModal] = useState(false);
   const [showWelcomeScreen, setShowWelcomeScreen] = useState(false);
   
+  // Fetch current user data to check company details completion
+  const { data: currentUserData } = useQuery({
+    queryKey: ['/api/my-organization-with-role'],
+    enabled: !!userId,
+  });
+  
   useEffect(() => {
-    // Check if user needs to fill company details
+    // Check localStorage flags
     const companyDetailsCompleted = localStorage.getItem("company-details-completed");
     const welcomeShown = localStorage.getItem("welcome-screen-shown");
     const onboardingCompleted = localStorage.getItem("onboarding-completed");
@@ -901,13 +907,35 @@ export default function DailyFocusPage() {
     
     console.log("🔍 Company details check:", { companyDetailsCompleted, onboardingCompleted, welcomeShown, tourStarted, tourCompleted });
     
-    // For new users who completed registration
-    if (onboardingCompleted === "true") {
-      if (!companyDetailsCompleted) {
-        // Show company details modal first
-        setShowCompanyDetailsModal(true);
-      } else if (companyDetailsCompleted === "true" && welcomeShown !== "true" && tourStarted !== "true" && tourCompleted !== "true") {
-        // Only show welcome screen if user hasn't seen it AND hasn't started/completed tour
+    // Check if user has complete company details from database
+    let hasCompleteCompanyDetails = false;
+    if (currentUserData?.user) {
+      const user = currentUserData.user;
+      hasCompleteCompanyDetails = !!(user.company_address && user.province && user.city);
+      console.log("🏢 Database company details check:", { 
+        company_address: user.company_address, 
+        province: user.province, 
+        city: user.city,
+        hasCompleteCompanyDetails
+      });
+    }
+    
+    // Show company details modal if any required field is missing from database
+    if (currentUserData && !hasCompleteCompanyDetails) {
+      console.log("📝 Showing company details modal - missing required fields");
+      setShowCompanyDetailsModal(true);
+      return;
+    }
+    
+    // For users with complete company details
+    if (hasCompleteCompanyDetails) {
+      // Update localStorage to reflect completion
+      if (companyDetailsCompleted !== "true") {
+        localStorage.setItem("company-details-completed", "true");
+      }
+      
+      // Show welcome screen if user hasn't seen it AND hasn't started/completed tour
+      if (welcomeShown !== "true" && tourStarted !== "true" && tourCompleted !== "true") {
         console.log("✅ Triggering welcome screen display");
         setShowWelcomeScreen(true);
       }
@@ -924,7 +952,7 @@ export default function DailyFocusPage() {
     return () => {
       window.removeEventListener('showWelcomeScreen', handleShowWelcomeScreen);
     };
-  }, []);
+  }, [currentUserData]);
 
   const handleCompanyDetailsComplete = () => {
     setShowCompanyDetailsModal(false);
