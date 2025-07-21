@@ -6,8 +6,8 @@ hidden = [".config", ".git", "generated-icon.png", "node_modules", "dist"]
 channel = "stable-24_05"
 
 [deployment]
-deploymentTarget = "cloudrun"
-build = ["sh", "-c", "node build-production-fixed.js PORT=3030"]
+deploymentTarget = "gce"
+build = ["sh", "-c", "node build-production-fixed.js"]
 run = ["sh", "-c", "NODE_ENV=production node dist/index.cjs"]
 
 [[ports]]
