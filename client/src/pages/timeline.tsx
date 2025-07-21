@@ -329,7 +329,7 @@ export default function TimelinePage() {
     }
   }, [activityTypeFilter, userFilter, teamFilter, dateRangeFilter, contentTypeFilter, displayedItemCount]);
 
-  // Uncontrolled Comment Input Component to prevent re-render focus loss
+  // Persistent Comment Input Component with stable state
   const CommentInput = memo(({ 
     itemId, 
     onSubmit, 
@@ -339,24 +339,23 @@ export default function TimelinePage() {
     onSubmit: (content: string) => void;
     disabled: boolean;
   }) => {
-    const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const [localValue, setLocalValue] = useState('');
 
     const handleSubmit = () => {
-      const content = textareaRef.current?.value?.trim();
+      const content = localValue.trim();
       if (content) {
         onSubmit(content);
-        if (textareaRef.current) {
-          textareaRef.current.value = '';
-        }
+        setLocalValue('');
       }
     };
 
     return (
       <div className="flex-1 flex space-x-2 relative z-10">
         <textarea
-          ref={textareaRef}
           id={`comment-${itemId}`}
           placeholder="Tulis komentar..."
+          value={localValue}
+          onChange={(e) => setLocalValue(e.target.value)}
           className="flex-1 min-h-[40px] text-sm px-3 py-2 border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white relative z-10"
           rows={1}
           style={{ 
@@ -380,7 +379,7 @@ export default function TimelinePage() {
             e.stopPropagation();
             handleSubmit();
           }}
-          disabled={disabled}
+          disabled={!localValue.trim() || disabled}
           className="px-3 relative z-10"
         >
           <Send className="w-3 h-3" />
