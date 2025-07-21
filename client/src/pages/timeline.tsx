@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
+import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
 import { Link } from 'wouter';
@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
 import { 
   Filter, 
   X, 
@@ -103,23 +102,15 @@ export default function TimelinePage() {
   const [currentReactionsTimelineId, setCurrentReactionsTimelineId] = useState<string | null>(null);
   const [selectedReactionTab, setSelectedReactionTab] = useState('all');
   const [commentTexts, setCommentTexts] = useState<Record<string, string>>({});
-  const [isReactionMutating, setIsReactionMutating] = useState(false);
-  const [autoScrollPrevention, setAutoScrollPrevention] = useState(true);
 
-  // Lazy loading states - controlled by auto-scroll prevention setting
+  // Lazy loading states - simpler approach showing N items at a time
   const [displayedItemCount, setDisplayedItemCount] = useState(3);
   const loadMoreRef = useRef<HTMLDivElement>(null);
-  const scrollPositionRef = useRef<number>(0);
 
   // Fetch timeline data
   const { data: timelineData = [], isLoading } = useQuery<TimelineItem[]>({
     queryKey: ['/api/timeline'],
     enabled: !!user?.id,
-    // Disable all automatic refetching when auto-scroll prevention is ON
-    refetchOnWindowFocus: !autoScrollPrevention,
-    refetchOnReconnect: !autoScrollPrevention,
-    refetchOnMount: !autoScrollPrevention,
-    staleTime: autoScrollPrevention ? Infinity : 0,
   });
 
   // Fetch teams data untuk filtering
@@ -137,22 +128,12 @@ export default function TimelinePage() {
   const { data: timelineReactions = {} } = useQuery<Record<string, Record<string, number>>>({
     queryKey: ['/api/timeline/reactions'],
     enabled: !!user?.id,
-    // Disable all automatic refetching when auto-scroll prevention is ON
-    refetchOnWindowFocus: !autoScrollPrevention,
-    refetchOnReconnect: !autoScrollPrevention,
-    refetchOnMount: !autoScrollPrevention,
-    staleTime: autoScrollPrevention ? Infinity : 0,
   });
 
   // Fetch timeline comments
   const { data: timelineComments = {} } = useQuery<Record<string, { id: string; content: string; createdAt: string; user: { name: string; profileImageUrl?: string; }; }[]>>({
     queryKey: ['/api/timeline/comments'],
     enabled: !!user?.id,
-    // Disable all automatic refetching when auto-scroll prevention is ON
-    refetchOnWindowFocus: !autoScrollPrevention,
-    refetchOnReconnect: !autoScrollPrevention,
-    refetchOnMount: !autoScrollPrevention,
-    staleTime: autoScrollPrevention ? Infinity : 0,
   });
 
   // Fetch detailed reactions for a specific timeline item (for modal)
@@ -234,23 +215,9 @@ export default function TimelinePage() {
   };
 
   const openReactionsModal = (timelineId: string) => {
-    if (autoScrollPrevention) {
-      // Capture scroll position before opening modal
-      const scrollY = window.scrollY;
-      
-      setCurrentReactionsTimelineId(timelineId);
-      setSelectedReactionTab('all'); // Reset tab selection
-      setShowReactionModal(prev => ({ ...prev, [timelineId]: true }));
-      
-      // Restore scroll position
-      requestAnimationFrame(() => {
-        window.scrollTo(0, scrollY);
-      });
-    } else {
-      setCurrentReactionsTimelineId(timelineId);
-      setSelectedReactionTab('all'); // Reset tab selection
-      setShowReactionModal(prev => ({ ...prev, [timelineId]: true }));
-    }
+    setCurrentReactionsTimelineId(timelineId);
+    setSelectedReactionTab('all'); // Reset tab selection
+    setShowReactionModal(prev => ({ ...prev, [timelineId]: true }));
   };
 
   const closeReactionsModal = (timelineId: string) => {
@@ -274,15 +241,7 @@ export default function TimelinePage() {
       return response.json();
     },
     onSuccess: () => {
-      if (autoScrollPrevention) {
-        // When auto-scroll prevention is enabled, don't invalidate queries
-      } else {
-        // Normal behavior with query invalidation
-        queryClient.invalidateQueries({ 
-          queryKey: ['/api/timeline/comments'],
-          refetchType: 'active'
-        });
-      }
+      queryClient.invalidateQueries({ queryKey: ['/api/timeline/comments'] });
     },
   });
 
@@ -300,60 +259,8 @@ export default function TimelinePage() {
       }
       return response.json();
     },
-    onMutate: () => {
-      setIsReactionMutating(true);
-      // Store scroll position as backup
-      scrollPositionRef.current = window.scrollY;
-    },
-    onSuccess: (data, variables) => {
-      if (autoScrollPrevention) {
-        // When auto-scroll prevention is enabled, manually update the cache without refetching
-        const { itemId, emoji } = variables;
-        
-        // Update the reactions cache manually
-        queryClient.setQueryData(['/api/timeline/reactions'], (oldData: any) => {
-          if (!oldData) return oldData;
-          
-          // Add the new reaction to the cache
-          const newReactionData = { ...oldData };
-          if (!newReactionData[itemId]) {
-            newReactionData[itemId] = [];
-          }
-          
-          // Check if user already has this reaction
-          const existingIndex = newReactionData[itemId].findIndex(
-            (r: any) => r.createdBy === user?.id && r.emoji === emoji
-          );
-          
-          if (existingIndex === -1) {
-            // Add new reaction
-            newReactionData[itemId].push({
-              id: data.id,
-              emoji: emoji,
-              createdBy: user?.id,
-              createdAt: new Date().toISOString()
-            });
-          }
-          
-          return newReactionData;
-        });
-        
-        setIsReactionMutating(false);
-      } else {
-        // Normal behavior with query invalidation
-        queryClient.invalidateQueries({ 
-          queryKey: ['/api/timeline/reactions'],
-          refetchType: 'active'
-        });
-        setTimeout(() => {
-          setIsReactionMutating(false);
-          scrollPositionRef.current = 0;
-        }, 100);
-      }
-    },
-    onError: () => {
-      setIsReactionMutating(false);
-      scrollPositionRef.current = 0;
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/timeline/reactions'] });
     },
   });
 
@@ -365,32 +272,9 @@ export default function TimelinePage() {
     }
   };
 
-  const handleReaction = async (itemId: string, emoji: string) => {
-    if (autoScrollPrevention) {
-      // Capture scroll position before any operations
-      const scrollY = window.scrollY;
-      
-      // Don't close picker - keep it open to prevent state change
-      // Just send the reaction silently
-      try {
-        await fetch(`/api/timeline/${itemId}/reactions`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ emoji }),
-        });
-        
-        // No toast to prevent any UI updates
-        // Force scroll position restoration
-        window.scrollTo(0, scrollY);
-      } catch (error) {
-        // Silent error - no UI updates
-        console.error('Failed to add reaction:', error);
-      }
-    } else {
-      // Normal behavior
-      addReactionMutation.mutate({ itemId, emoji });
-      setShowReactionPicker(prev => ({ ...prev, [itemId]: false }));
-    }
+  const handleReaction = (itemId: string, emoji: string) => {
+    addReactionMutation.mutate({ itemId, emoji });
+    setShowReactionPicker(prev => ({ ...prev, [itemId]: false }));
   };
 
   // Close reaction picker when clicking outside
@@ -403,13 +287,12 @@ export default function TimelinePage() {
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
-  // Intersection Observer for loading more items (controlled by auto-scroll prevention setting)
+  // Intersection Observer for loading more items (after filteredData is defined)
   useEffect(() => {
-    if (autoScrollPrevention) return; // Skip lazy loading when auto-scroll prevention is enabled
-    
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && displayedItemCount < filteredData.length) {
+          console.log('🔄 Loading more items. Current:', displayedItemCount, 'Total:', filteredData.length);
           setDisplayedItemCount(prev => Math.min(prev + 3, filteredData.length));
         }
       },
@@ -421,57 +304,25 @@ export default function TimelinePage() {
     }
 
     return () => observer.disconnect();
-  }, [displayedItemCount, filteredData.length, autoScrollPrevention]);
+  }, [displayedItemCount, filteredData.length]);
 
   // Reset display count when filters change
   useEffect(() => {
-    if (!isReactionMutating && !autoScrollPrevention) {
-      setDisplayedItemCount(3);
-    }
-  }, [activityTypeFilter, userFilter, teamFilter, dateRangeFilter, contentTypeFilter, isReactionMutating, autoScrollPrevention]);
-
-  // Handle auto-scroll prevention setting changes
-  useEffect(() => {
-    if (autoScrollPrevention) {
-      // When auto-scroll prevention is enabled, show all items at once
-      setDisplayedItemCount(filteredData.length || 999);
-    } else {
-      // When disabled, reset to lazy loading (show 3 items)
-      setDisplayedItemCount(3);
-    }
-  }, [autoScrollPrevention, filteredData.length]);
-
-  // Prevent scroll during reactions when auto-scroll prevention is ON
-  useEffect(() => {
-    if (autoScrollPrevention && isReactionMutating) {
-      const preventScroll = (e: Event) => {
-        e.preventDefault();
-        e.stopPropagation();
-      };
-      
-      window.addEventListener('scroll', preventScroll, { passive: false });
-      window.addEventListener('wheel', preventScroll, { passive: false });
-      window.addEventListener('touchmove', preventScroll, { passive: false });
-      
-      return () => {
-        window.removeEventListener('scroll', preventScroll);
-        window.removeEventListener('wheel', preventScroll);
-        window.removeEventListener('touchmove', preventScroll);
-      };
-    }
-  }, [autoScrollPrevention, isReactionMutating]);
+    setDisplayedItemCount(3);
+    console.log('🔄 Filter changed, resetting to show 3 items');
+  }, [activityTypeFilter, userFilter, teamFilter, dateRangeFilter, contentTypeFilter]);
 
   // TimelineCard component - simplified without complex lazy loading
-  const TimelineCard = React.memo(({ 
+  function TimelineCard({ 
     item, 
     index
   }: {
     item: TimelineItem;
     index: number;
-  }) => {
+  }) {
 
     return (
-      <Card id={`timeline-item-${item.id}`} className="w-full bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden">
+      <Card className="w-full bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden">
         <CardContent className="p-0">
           <div className="p-3 md:p-4">
             <div className="flex items-start space-x-2 md:space-x-3">
@@ -659,27 +510,8 @@ export default function TimelinePage() {
                         </div>
                         {/* Total reaction count */}
                         <span 
-                          id={`reaction-count-${item.id}`}
                           className="text-gray-600 hover:underline cursor-pointer"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            
-                            if (autoScrollPrevention) {
-                              // Preserve scroll position when auto-scroll prevention is ON
-                              const scrollY = window.scrollY;
-                              const scrollX = window.scrollX;
-                              
-                              openReactionsModal(item.id);
-                              
-                              // Restore scroll position immediately after
-                              requestAnimationFrame(() => {
-                                window.scrollTo(scrollX, scrollY);
-                              });
-                            } else {
-                              openReactionsModal(item.id);
-                            }
-                          }}
+                          onClick={() => openReactionsModal(item.id)}
                         >
                           {Object.values(timelineReactions[item.id] || {}).reduce((sum, count) => sum + count, 0)} orang
                         </span>
@@ -702,11 +534,7 @@ export default function TimelinePage() {
               <div className="flex items-center space-x-4 md:space-x-6">
                 {/* Like Button */}
                 <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    toggleReaction(item.id);
-                  }}
+                  onClick={() => toggleReaction(item.id)}
                   className="flex items-center space-x-1 text-gray-500 hover:text-red-500 transition-colors"
                 >
                   <Heart className="w-4 h-4" />
@@ -718,25 +546,7 @@ export default function TimelinePage() {
                 
                 {/* Comment Button */}
                 <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    
-                    if (autoScrollPrevention) {
-                      // Preserve scroll position when auto-scroll prevention is ON
-                      const scrollY = window.scrollY;
-                      const scrollX = window.scrollX;
-                      
-                      toggleComments(item.id);
-                      
-                      // Restore scroll position immediately after
-                      requestAnimationFrame(() => {
-                        window.scrollTo(scrollX, scrollY);
-                      });
-                    } else {
-                      toggleComments(item.id);
-                    }
-                  }}
+                  onClick={() => toggleComments(item.id)}
                   className="flex items-center space-x-1 text-gray-500 hover:text-blue-500 transition-colors"
                 >
                   <MessageCircle className="w-4 h-4" />
@@ -748,9 +558,7 @@ export default function TimelinePage() {
                 
                 {/* Share Button */}
                 <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
+                  onClick={() => {
                     navigator.clipboard.writeText(`${window.location.origin}/timeline#${item.id}`);
                     toast({ title: "Link disalin", description: "Link timeline telah disalin ke clipboard" });
                   }}
@@ -765,23 +573,8 @@ export default function TimelinePage() {
               <div className="relative">
                 <button
                   onClick={(e) => {
-                    e.preventDefault();
                     e.stopPropagation();
-                    
-                    if (autoScrollPrevention) {
-                      // Preserve scroll position when auto-scroll prevention is ON
-                      const scrollY = window.scrollY;
-                      const scrollX = window.scrollX;
-                      
-                      setShowReactionPicker(prev => ({ ...prev, [item.id]: !prev[item.id] }));
-                      
-                      // Restore scroll position immediately after
-                      requestAnimationFrame(() => {
-                        window.scrollTo(scrollX, scrollY);
-                      });
-                    } else {
-                      setShowReactionPicker(prev => ({ ...prev, [item.id]: !prev[item.id] }));
-                    }
+                    setShowReactionPicker(prev => ({ ...prev, [item.id]: !prev[item.id] }));
                   }}
                   className="text-gray-500 hover:text-yellow-500 transition-colors"
                 >
@@ -790,18 +583,14 @@ export default function TimelinePage() {
                 
                 {showReactionPicker[item.id] && (
                   <div 
-                    className="reaction-picker absolute right-0 bottom-8 bg-white border border-gray-200 rounded-lg shadow-lg p-2 z-10"
+                    className="absolute right-0 bottom-8 bg-white border border-gray-200 rounded-lg shadow-lg p-2 z-10"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <div className="flex space-x-1">
                       {REACTION_EMOJIS.map((emoji) => (
                         <button
                           key={emoji}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            handleReaction(item.id, emoji);
-                          }}
+                          onClick={() => handleReaction(item.id, emoji)}
                           className="hover:bg-gray-100 rounded p-1 text-lg"
                         >
                           {emoji}
@@ -881,7 +670,7 @@ export default function TimelinePage() {
         </CardContent>
       </Card>
     );
-  });
+  }
 
   // Emoji options for coworker expressions
   const REACTION_EMOJIS = ['👍', '❤️', '🎉', '💪', '🔥', '👏', '😍', '🚀', '⭐', '💯', '👌', '🤝'];
@@ -1023,24 +812,6 @@ export default function TimelinePage() {
                 </Select>
               </div>
 
-              {/* Auto-scroll Prevention Toggle */}
-              <div className="border-t border-gray-200 pt-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <label className="text-sm font-medium text-gray-700">
-                      Cegah Auto-scroll
-                    </label>
-                    <p className="text-xs text-gray-500 mt-1">
-                      Mencegah halaman scroll otomatis saat berinteraksi
-                    </p>
-                  </div>
-                  <Switch
-                    checked={autoScrollPrevention}
-                    onCheckedChange={setAutoScrollPrevention}
-                  />
-                </div>
-              </div>
-
               {/* Clear Filters */}
               <Button
                 variant="outline"
@@ -1061,7 +832,7 @@ export default function TimelinePage() {
               <div className="space-y-3 md:space-y-4">
                 {/* Debug info */}
                 <div className="bg-yellow-50 border border-yellow-200 rounded p-2 text-xs">
-                  Total items: {timelineData.length} | Filtered: {filteredData.length} | Showing: {Math.min(displayedItemCount, filteredData.length)} | Auto-scroll Prevention: {autoScrollPrevention ? 'ON' : 'OFF'}
+                  Total items: {timelineData.length} | Filtered: {filteredData.length} | Showing: {Math.min(displayedItemCount, filteredData.length)}
                 </div>
                 
                 {/* Show only the first N items */}
