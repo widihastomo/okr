@@ -511,7 +511,11 @@ export default function TimelinePage() {
                         {/* Total reaction count */}
                         <span 
                           className="text-gray-600 hover:underline cursor-pointer"
-                          onClick={() => openReactionsModal(item.id)}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            openReactionsModal(item.id);
+                          }}
                         >
                           {Object.values(timelineReactions[item.id] || {}).reduce((sum, count) => sum + count, 0)} orang
                         </span>
@@ -534,7 +538,11 @@ export default function TimelinePage() {
               <div className="flex items-center space-x-4 md:space-x-6">
                 {/* Like Button */}
                 <button
-                  onClick={() => toggleReaction(item.id)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    toggleReaction(item.id);
+                  }}
                   className="flex items-center space-x-1 text-gray-500 hover:text-red-500 transition-colors"
                 >
                   <Heart className="w-4 h-4" />
@@ -546,7 +554,11 @@ export default function TimelinePage() {
                 
                 {/* Comment Button */}
                 <button
-                  onClick={() => toggleComments(item.id)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    toggleComments(item.id);
+                  }}
                   className="flex items-center space-x-1 text-gray-500 hover:text-blue-500 transition-colors"
                 >
                   <MessageCircle className="w-4 h-4" />
@@ -558,7 +570,9 @@ export default function TimelinePage() {
                 
                 {/* Share Button */}
                 <button
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
                     navigator.clipboard.writeText(`${window.location.origin}/timeline#${item.id}`);
                     toast({ title: "Link disalin", description: "Link timeline telah disalin ke clipboard" });
                   }}
@@ -590,7 +604,11 @@ export default function TimelinePage() {
                       {REACTION_EMOJIS.map((emoji) => (
                         <button
                           key={emoji}
-                          onClick={() => handleReaction(item.id, emoji)}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleReaction(item.id, emoji);
+                          }}
                           className="hover:bg-gray-100 rounded p-1 text-lg"
                         >
                           {emoji}
