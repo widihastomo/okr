@@ -426,36 +426,18 @@ export default function TimelinePage() {
     const [cursorPosition, setCursorPosition] = useState(0);
     const editorRef = useRef<HTMLTextAreaElement>(null);
 
-    // Add mention to editor when mention is clicked
-    const addMentionToEditor = useCallback((mentionName: string) => {
-      const currentContent = content;
-      const newContent = currentContent ? `${currentContent} @${mentionName} ` : `@${mentionName} `;
-      setContent(newContent);
-      
-      // Focus the editor
-      if (editorRef.current) {
-        editorRef.current.focus();
-        setTimeout(() => {
-          if (editorRef.current) {
-            const newPosition = newContent.length;
-            editorRef.current.setSelectionRange(newPosition, newPosition);
-          }
-        }, 0);
-      }
-    }, [content]);
-
-    // Expose function globally for mention click handling
+    // Handle input change to sync with textarea value changes from mention clicks
     useEffect(() => {
-      (window as any).handleMentionClick = (mentionName: string, timelineItemId: string) => {
-        if (timelineItemId === itemId) {
-          addMentionToEditor(mentionName);
-        }
-      };
-
-      return () => {
-        delete (window as any).handleMentionClick;
-      };
-    }, [itemId, addMentionToEditor]);
+      const textarea = editorRef.current;
+      if (textarea) {
+        const handleInputChange = () => {
+          setContent(textarea.value);
+        };
+        
+        textarea.addEventListener('input', handleInputChange);
+        return () => textarea.removeEventListener('input', handleInputChange);
+      }
+    }, []);
 
     // Fetch users for mention suggestions
     const { data: users = [] } = useQuery<User[]>({
@@ -1248,8 +1230,26 @@ export default function TimelinePage() {
                       <div className="font-semibold text-gray-900">{comment.user?.name}</div>
                       <div 
                         className="text-gray-700"
+                        onClick={(e) => {
+                          // Handle mention clicks
+                          if (e.target instanceof HTMLElement && e.target.dataset.mention) {
+                            const mentionName = e.target.dataset.mention;
+                            const timelineEditor = document.getElementById(`comment-${item.id}`) as HTMLTextAreaElement;
+                            if (timelineEditor) {
+                              const currentContent = timelineEditor.value;
+                              const newContent = currentContent ? `${currentContent} @${mentionName} ` : `@${mentionName} `;
+                              timelineEditor.value = newContent;
+                              timelineEditor.focus();
+                              timelineEditor.dispatchEvent(new Event('input', { bubbles: true }));
+                              // Set cursor position to end
+                              setTimeout(() => {
+                                timelineEditor.setSelectionRange(newContent.length, newContent.length);
+                              }, 0);
+                            }
+                          }
+                        }}
                         dangerouslySetInnerHTML={{
-                          __html: comment.content.replace(/@(\w+)/g, '<span class="text-blue-600 font-medium cursor-pointer hover:text-blue-800 hover:underline" onclick="window.handleMentionClick(\'$1\', \'${item.id}\')">@$1</span>')
+                          __html: comment.content.replace(/@(\w+)/g, '<span class="text-blue-600 font-medium cursor-pointer hover:text-blue-800 hover:underline" data-mention="$1">@$1</span>')
                         }}
                       />
                       <div className="text-gray-500 text-xs mt-1">
