@@ -422,6 +422,7 @@ export async function createComprehensiveDummyData(userId: string, organizationI
     await storage.createTimelineUpdate({
       userId: userId,
       organizationId: organizationId,
+      updateDate: new Date(),
       summary: "Update harian: Progress kampanye marketing dan sales acquisition berjalan baik. Target followers Instagram tercapai 50%, customer baru bertambah 15 orang.",
       detail: JSON.stringify({
         keyResultsUpdated: [
@@ -445,6 +446,7 @@ export async function createComprehensiveDummyData(userId: string, organizationI
     await storage.createTimelineUpdate({
       userId: userId,
       organizationId: organizationId,
+      updateDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
       summary: "Check-in mingguan: Milestone penting tercapai dalam initiative marketing dan sales. DoD items mulai diselesaikan secara bertahap.",
       detail: JSON.stringify({
         deliverablesCompleted: [
