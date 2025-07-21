@@ -195,7 +195,7 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
               onChange={(e) => handleInputChange("companyName", e.target.value)}
               className="bg-gray-50 border-gray-300"
             />
-            <p className="text-sm text-gray-600">Otomatis terisi dari data registrasi</p>
+            
           </div>
 
           {/* Company Address */}
