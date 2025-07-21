@@ -363,12 +363,7 @@ export default function TimelinePage() {
             position: 'relative',
             zIndex: 10
           }}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault();
-              handleSubmit();
-            }
-          }}
+
           onClick={(e) => {
             e.stopPropagation();
           }}
