@@ -31,6 +31,7 @@ interface CompanyDetailsModalProps {
 export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalProps) {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGeneratingData, setIsGeneratingData] = useState(false);
   const [formData, setFormData] = useState({
     companyName: "",
     companyAddress: "",
@@ -148,6 +149,7 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
 
       // Generate dummy data (cycles and teams) after company details completion
       try {
+        setIsGeneratingData(true);
         console.log("🔄 Generating dummy data with business name:", formData.companyName);
         const dummyDataResponse = await apiRequest("POST", "/api/auth/generate-dummy-data", {
           businessName: formData.companyName
@@ -167,6 +169,8 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
           description: "Informasi perusahaan telah tersimpan",
           variant: "default",
         });
+      } finally {
+        setIsGeneratingData(false);
       }
 
       // Mark company details as completed
@@ -187,10 +191,29 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
   return (
     <Dialog open={open} onOpenChange={() => {}}>
       <DialogContent 
-        className="max-w-2xl max-h-[90vh] overflow-y-auto [&>button]:hidden"
+        className="max-w-2xl max-h-[90vh] overflow-y-auto [&>button]:hidden relative"
         onPointerDownOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
+        {/* Loading Overlay for Dummy Data Generation */}
+        {isGeneratingData && (
+          <div className="absolute inset-0 bg-white/95 backdrop-blur-sm z-50 flex items-center justify-center">
+            <div className="text-center">
+              <div className="mb-4">
+                <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-lg font-semibold text-gray-900">Sedang menyiapkan sistem...</h3>
+                <p className="text-sm text-gray-600">Membuat struktur organisasi dan pengaturan awal</p>
+                <div className="flex items-center justify-center space-x-1 text-orange-500">
+                  <div className="w-2 h-2 bg-orange-500 rounded-full animate-bounce"></div>
+                  <div className="w-2 h-2 bg-orange-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                  <div className="w-2 h-2 bg-orange-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl">
             <Building2 className="h-6 w-6 text-orange-500" />
@@ -310,10 +333,19 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
           <div className="flex justify-end pt-4">
             <Button
               onClick={handleSubmit}
-              disabled={isSubmitting}
+              disabled={isSubmitting || isGeneratingData}
               className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white px-8"
             >
-              {isSubmitting ? "Menyimpan..." : "Simpan & Lanjutkan"}
+              {isGeneratingData ? (
+                <div className="flex items-center gap-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  Menyiapkan sistem...
+                </div>
+              ) : isSubmitting ? (
+                "Menyimpan..."
+              ) : (
+                "Simpan & Lanjutkan"
+              )}
             </Button>
           </div>
         </div>
