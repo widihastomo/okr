@@ -436,7 +436,7 @@ export default function TimelinePage() {
       <div className="flex-1 flex gap-4 lg:gap-6 min-h-0">
         {/* Filter Sidebar - Fixed positioning */}
         <div className={`${showMobileFilters ? 'fixed inset-0 z-50 bg-white' : 'hidden'} lg:block lg:w-72 lg:flex-shrink-0`}>
-          <div className="h-full bg-white border border-gray-200 rounded-lg overflow-y-auto lg:sticky lg:top-0"
+          <div className="h-full bg-white border border-gray-200 rounded-lg overflow-y-auto lg:sticky lg:top-0 slim-scroll"
                style={{ height: showMobileFilters ? '100vh' : 'calc(100vh - 120px)' }}>
             {/* Mobile header */}
             <div className="lg:hidden flex items-center justify-between p-3 md:p-4 border-b border-gray-200">
@@ -549,7 +549,7 @@ export default function TimelinePage() {
         </div>
 
         {/* Main Content - Scrollable */}
-        <div className="flex-1 min-w-0 overflow-y-auto">
+        <div className="flex-1 min-w-0 overflow-y-auto slim-scroll">
           <div className="pr-2"> {/* Add padding for scrollbar */}
             {timelineData && timelineData.length > 0 ? (
               <div className="space-y-3 md:space-y-4">
@@ -595,7 +595,7 @@ export default function TimelinePage() {
         {/* Leaderboard Sidebar - Fixed positioning */}
         <div className="hidden xl:block xl:w-80 xl:flex-shrink-0">
           <div className="sticky top-0 h-screen">
-            <div style={{ height: 'calc(100vh - 120px)' }} className="overflow-y-auto">
+            <div style={{ height: 'calc(100vh - 120px)' }} className="overflow-y-auto slim-scroll">
               <Leaderboard limit={8} />
             </div>
           </div>
