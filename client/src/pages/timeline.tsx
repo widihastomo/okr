@@ -814,8 +814,7 @@ export default function TimelinePage() {
                               const match = task.match(/^(.+?)\s*\((.+?)\s*->\s*(.+?)\)$/);
                               if (match) {
                                 const [, taskName, oldStatus, newStatus] = match;
-                                const statusMap```typescript
-: Record<string, string> = {
+                                const statusMap: Record<string, string> = {
                                   'belum_mulai': 'Belum Mulai',
                                   'in_progress': 'Sedang Berjalan',
                                   'completed': 'Selesai',
