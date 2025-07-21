@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -22,7 +22,8 @@ import {
   Loader2,
   ChevronDown,
   ChevronUp,
-  Gift
+  Gift,
+  XCircle
 } from "lucide-react";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 // Button will be replaced with Button
@@ -91,6 +92,10 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
   const [isVerifying, setIsVerifying] = useState(false);
   const [isResendingCode, setIsResendingCode] = useState(false);
   const [resetCode, setResetCode] = useState("");
+  const [invitationValidation, setInvitationValidation] = useState<{
+    status: 'idle' | 'validating' | 'valid' | 'invalid';
+    message: string;
+  }>({ status: 'idle', message: '' });
   const { toast } = useToast();
   const [, navigate] = useLocation();
 
@@ -114,6 +119,65 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
     resolver: zodResolver(resetPasswordSchema),
     defaultValues: { code: "", newPassword: "", confirmPassword: "" },
   });
+
+  // Debounced invitation code validation
+  const validateInvitationCode = useCallback(async (code: string) => {
+    if (!code || code.length < 3) {
+      setInvitationValidation({ status: 'idle', message: '' });
+      return;
+    }
+
+    setInvitationValidation({ status: 'validating', message: 'Memvalidasi kode...' });
+
+    try {
+      const response = await apiRequest("POST", "/api/referral-codes/validate-registration", {
+        code: code.toUpperCase()
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        setInvitationValidation({ 
+          status: 'invalid', 
+          message: error.message || 'Kode undangan tidak valid' 
+        });
+        return;
+      }
+
+      const result = await response.json();
+      
+      if (result.valid) {
+        setInvitationValidation({ 
+          status: 'valid', 
+          message: result.message || 'Kode undangan valid' 
+        });
+      } else {
+        setInvitationValidation({ 
+          status: 'invalid', 
+          message: result.message || 'Kode undangan tidak valid' 
+        });
+      }
+    } catch (error) {
+      setInvitationValidation({ 
+        status: 'invalid', 
+        message: 'Gagal memvalidasi kode undangan' 
+      });
+    }
+  }, []);
+
+  // Debounce validation
+  useEffect(() => {
+    const invitationCode = registerForm.watch("invitationCode");
+    if (!showInvitationCode || !invitationCode) {
+      setInvitationValidation({ status: 'idle', message: '' });
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      validateInvitationCode(invitationCode);
+    }, 800); // 800ms debounce
+
+    return () => clearTimeout(timer);
+  }, [registerForm.watch("invitationCode"), showInvitationCode, validateInvitationCode]);
 
   // Login mutation
   const loginMutation = useMutation({
@@ -659,10 +723,51 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                         type="text"
                         placeholder="Masukkan kode undangan"
                         {...registerForm.register("invitationCode")}
-                        className="pl-10 h-11 border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all duration-200 uppercase"
+                        className={`pl-10 pr-10 h-11 transition-all duration-200 uppercase ${
+                          invitationValidation.status === 'valid' 
+                            ? 'border-green-500 focus:border-green-500 focus:ring-2 focus:ring-green-200' 
+                            : invitationValidation.status === 'invalid'
+                            ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-200'
+                            : 'border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200'
+                        }`}
                         style={{ textTransform: 'uppercase' }}
                       />
+                      {/* Validation indicator */}
+                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                        {invitationValidation.status === 'validating' && (
+                          <Loader2 className="w-4 h-4 animate-spin text-orange-500" />
+                        )}
+                        {invitationValidation.status === 'valid' && (
+                          <CheckCircle className="w-4 h-4 text-green-500" />
+                        )}
+                        {invitationValidation.status === 'invalid' && (
+                          <XCircle className="w-4 h-4 text-red-500" />
+                        )}
+                      </div>
                     </div>
+                    
+                    {/* Validation message */}
+                    {invitationValidation.status !== 'idle' && invitationValidation.message && (
+                      <div className={`flex items-center gap-2 text-sm ${
+                        invitationValidation.status === 'valid' 
+                          ? 'text-green-600' 
+                          : invitationValidation.status === 'invalid'
+                          ? 'text-red-600'
+                          : 'text-orange-600'
+                      }`}>
+                        {invitationValidation.status === 'validating' && (
+                          <Loader2 className="w-3 h-3 animate-spin" />
+                        )}
+                        {invitationValidation.status === 'valid' && (
+                          <CheckCircle className="w-3 h-3" />
+                        )}
+                        {invitationValidation.status === 'invalid' && (
+                          <XCircle className="w-3 h-3" />
+                        )}
+                        <span>{invitationValidation.message}</span>
+                      </div>
+                    )}
+                    
                     {registerForm.formState.errors.invitationCode && (
                       <p className="text-sm text-red-600">{registerForm.formState.errors.invitationCode.message}</p>
                     )}

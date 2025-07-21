@@ -9870,7 +9870,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Validate and apply referral code (for registration)
+  // Validate referral code during registration (no auth required)
+  app.post("/api/referral-codes/validate-registration", async (req, res) => {
+    try {
+      const { code } = req.body;
+      const { db } = await import("./db");
+      const { referralCodes } = await import("@shared/schema");
+      const { eq, and } = await import("drizzle-orm");
+
+      if (!code) {
+        return res.status(400).json({ valid: false, message: "Kode undangan diperlukan" });
+      }
+
+      // Find active referral code
+      const referralCode = await db.select()
+        .from(referralCodes)
+        .where(and(
+          eq(referralCodes.code, code.toUpperCase()),
+          eq(referralCodes.isActive, true)
+        ))
+        .limit(1);
+
+      if (!referralCode.length) {
+        return res.status(200).json({ valid: false, message: "Kode undangan tidak valid atau tidak aktif" });
+      }
+
+      const codeData = referralCode[0];
+
+      // Check if code has expired
+      if (codeData.expiresAt && new Date() > codeData.expiresAt) {
+        return res.status(200).json({ valid: false, message: "Kode undangan sudah kedaluwarsa" });
+      }
+
+      // Check if code has reached usage limit
+      if (codeData.maxUses && codeData.currentUses >= codeData.maxUses) {
+        return res.status(200).json({ valid: false, message: "Kode undangan sudah mencapai batas penggunaan" });
+      }
+
+      res.json({
+        valid: true,
+        message: "Kode undangan valid",
+        discountType: codeData.discountType,
+        discountValue: codeData.discountValue,
+        description: codeData.description,
+      });
+    } catch (error) {
+      console.error("Error validating referral code:", error);
+      res.status(500).json({ valid: false, message: "Gagal memvalidasi kode undangan" });
+    }
+  });
+
+  // Validate and apply referral code (for logged-in users)
   app.post("/api/referral-codes/validate", requireAuth, async (req, res) => {
     try {
       const { code } = req.body;
