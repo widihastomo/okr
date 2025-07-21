@@ -104,6 +104,10 @@ export default function TimelinePage() {
   const [selectedReactionTab, setSelectedReactionTab] = useState('all');
   const [commentTexts, setCommentTexts] = useState<Record<string, string>>({});
   const commentTextRefs = useRef<Record<string, HTMLTextAreaElement | null>>({});
+  
+  // Scroll preservation untuk mengatasi scroll ke atas saat engagement button diklik
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const preservedScrollRef = useRef<number>(0);
 
   // Lazy loading states - simpler approach showing N items at a time
   const [displayedItemCount, setDisplayedItemCount] = useState(3);
@@ -203,30 +207,6 @@ export default function TimelinePage() {
   const isDefaultFilter = activityTypeFilter === 'all' && userFilter === 'all' && teamFilter === 'all' && 
     dateRangeFilter === 'all' && contentTypeFilter === 'all';
 
-  const toggleDetails = (itemId: string) => {
-    setExpandedDetails(prev => ({ ...prev, [itemId]: !prev[itemId] }));
-  };
-
-  const toggleComments = (itemId: string) => {
-    setShowComments(prev => ({ ...prev, [itemId]: !prev[itemId] }));
-  };
-
-  const toggleReaction = (itemId: string) => {
-    // Toggle like reaction
-    addReactionMutation.mutate({ itemId, emoji: '❤️' });
-  };
-
-  const openReactionsModal = (timelineId: string) => {
-    setCurrentReactionsTimelineId(timelineId);
-    setSelectedReactionTab('all'); // Reset tab selection
-    setShowReactionModal(prev => ({ ...prev, [timelineId]: true }));
-  };
-
-  const closeReactionsModal = (timelineId: string) => {
-    setCurrentReactionsTimelineId(null);
-    setShowReactionModal(prev => ({ ...prev, [timelineId]: false }));
-  };
-
   // Mutations for comments and reactions
   const addCommentMutation = useMutation({
     mutationFn: async ({ itemId, content }: { itemId: string; content: string }) => {
@@ -275,7 +255,62 @@ export default function TimelinePage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/timeline/reactions'] });
     },
+    onError: (error) => {
+      toast({
+        title: "Gagal menambahkan reaksi",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
   });
+
+  const toggleDetails = (itemId: string) => {
+    setExpandedDetails(prev => ({ ...prev, [itemId]: !prev[itemId] }));
+  };
+
+  const toggleComments = useCallback((itemId: string) => {
+    // Simpan scroll position sebelum state change
+    if (scrollContainerRef.current) {
+      preservedScrollRef.current = scrollContainerRef.current.scrollTop;
+    }
+    setShowComments(prev => ({ ...prev, [itemId]: !prev[itemId] }));
+  }, []);
+
+  const toggleReaction = useCallback((itemId: string) => {
+    // Simpan scroll position sebelum mutation
+    if (scrollContainerRef.current) {
+      preservedScrollRef.current = scrollContainerRef.current.scrollTop;
+    }
+    // Toggle like reaction
+    addReactionMutation.mutate({ itemId, emoji: '❤️' });
+  }, [addReactionMutation]);
+
+  // Restore scroll position setelah data change
+  useEffect(() => {
+    if (preservedScrollRef.current > 0 && scrollContainerRef.current) {
+      const timeoutId = setTimeout(() => {
+        if (scrollContainerRef.current) {
+          scrollContainerRef.current.scrollTop = preservedScrollRef.current;
+          preservedScrollRef.current = 0; // Reset
+        }
+      }, 50); // Small delay untuk memastikan DOM sudah update
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [timelineReactions, timelineComments]); // Monitor data changes
+
+  const openReactionsModal = (timelineId: string) => {
+    setCurrentReactionsTimelineId(timelineId);
+    setSelectedReactionTab('all'); // Reset tab selection
+    setShowReactionModal(prev => ({ ...prev, [timelineId]: true }));
+  };
+
+  const closeReactionsModal = (timelineId: string) => {
+    setCurrentReactionsTimelineId(null);
+    setShowReactionModal(prev => ({ ...prev, [timelineId]: false }));
+  };
+
+
 
   const handleAddComment = useCallback((itemId: string, content: string) => {
     if (content?.trim()) {
@@ -443,14 +478,14 @@ export default function TimelinePage() {
     );
   }
 
-  // TimelineCard component - simplified without complex lazy loading
-  function TimelineCard({ 
+  // TimelineCard component - memoized to prevent unnecessary re-renders
+  const TimelineCard = memo(({ 
     item, 
     index
   }: {
     item: TimelineItem;
     index: number;
-  }) {
+  }) => {
 
     return (
       <Card className="w-full bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden">
@@ -789,10 +824,7 @@ export default function TimelinePage() {
         </CardContent>
       </Card>
     );
-  }
-
-  // Emoji options for coworker expressions
-  const REACTION_EMOJIS = ['👍', '❤️', '🎉', '💪', '🔥', '👏', '😍', '🚀', '⭐', '💯', '👌', '🤝'];
+  });
 
   if (isLoading) {
     return <div className="text-center py-12">Loading timeline...</div>;
@@ -945,7 +977,7 @@ export default function TimelinePage() {
         </div>
 
         {/* Main Content - Scrollable */}
-        <div className="flex-1 min-w-0 overflow-y-auto slim-scroll">
+        <div ref={scrollContainerRef} className="flex-1 min-w-0 overflow-y-auto slim-scroll">
           <div className="pr-2"> {/* Add padding for scrollbar */}
             {isLoading ? (
               /* Loading skeleton state */
