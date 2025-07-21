@@ -228,6 +228,7 @@ export default function TimelinePage() {
   // Mutations for comments and reactions
   const addCommentMutation = useMutation({
     mutationFn: async ({ itemId, content }: { itemId: string; content: string }) => {
+      console.log('Comment mutation executing:', { itemId, content });
       const response = await fetch(`/api/timeline/${itemId}/comments`, {
         method: 'POST',
         headers: {
@@ -235,13 +236,31 @@ export default function TimelinePage() {
         },
         body: JSON.stringify({ content }),
       });
+      console.log('Comment response status:', response.status);
       if (!response.ok) {
-        throw new Error('Failed to add comment');
+        const errorText = await response.text();
+        console.error('Comment error response:', errorText);
+        throw new Error(`Failed to add comment: ${errorText}`);
       }
-      return response.json();
+      const result = await response.json();
+      console.log('Comment success result:', result);
+      return result;
     },
     onSuccess: () => {
+      console.log('Comment mutation success, invalidating queries');
       queryClient.invalidateQueries({ queryKey: ['/api/timeline/comments'] });
+      toast({
+        title: "Komentar berhasil ditambahkan",
+        variant: "default",
+      });
+    },
+    onError: (error) => {
+      console.error('Comment mutation error:', error);
+      toast({
+        title: "Gagal menambahkan komentar",
+        description: error.message,
+        variant: "destructive",
+      });
     },
   });
 
@@ -266,9 +285,12 @@ export default function TimelinePage() {
 
   const handleAddComment = (itemId: string) => {
     const content = commentTexts[itemId]?.trim();
+    console.log('Adding comment:', { itemId, content });
     if (content) {
       addCommentMutation.mutate({ itemId, content });
       setCommentTexts(prev => ({ ...prev, [itemId]: '' }));
+    } else {
+      console.log('No content to add comment');
     }
   };
 
@@ -650,7 +672,10 @@ export default function TimelinePage() {
                     <Textarea
                       placeholder="Tulis komentar..."
                       value={commentTexts[item.id] || ''}
-                      onChange={(e) => setCommentTexts(prev => ({ ...prev, [item.id]: e.target.value }))}
+                      onChange={(e) => {
+                        console.log('Textarea onChange:', { itemId: item.id, value: e.target.value });
+                        setCommentTexts(prev => ({ ...prev, [item.id]: e.target.value }));
+                      }}
                       className="flex-1 min-h-[32px] text-xs md:text-sm"
                       rows={1}
                     />
