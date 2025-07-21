@@ -8619,7 +8619,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         subscription: subscription ? {
           ...subscription.organization_subscriptions,
           plan: subscription.subscription_plans
-        } : null
+        } : null,
+        user
       });
     } catch (error) {
       console.error("Error fetching organization:", error);
