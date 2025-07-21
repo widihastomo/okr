@@ -17,9 +17,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Building2, MapPin, Briefcase, Users, Search } from "lucide-react";
+import { Building2, MapPin, Briefcase, Users, Search, Check, ChevronsUpDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 interface CompanyDetailsModalProps {
   open: boolean;
@@ -37,6 +40,12 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
     position: "",
     referralSource: "",
   });
+
+  // State untuk mengontrol combobox open/close
+  const [openProvince, setOpenProvince] = useState(false);
+  const [openCity, setOpenCity] = useState(false);
+  const [openIndustry, setOpenIndustry] = useState(false);
+  const [openReferral, setOpenReferral] = useState(false);
 
   const provinces = [
     "Aceh", "Sumatera Utara", "Sumatera Barat", "Riau", "Kepulauan Riau", "Jambi",
@@ -171,41 +180,93 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="province">Provinsi *</Label>
-              <Select
-                value={formData.province}
-                onValueChange={(value) => handleInputChange("province", value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Pilih provinsi" />
-                </SelectTrigger>
-                <SelectContent className="max-h-[200px]">
-                  {provinces.map((province) => (
-                    <SelectItem key={province} value={province}>
-                      {province}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Popover open={openProvince} onOpenChange={setOpenProvince}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={openProvince}
+                    className="w-full justify-between"
+                  >
+                    {formData.province || "Pilih provinsi..."}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-full p-0">
+                  <Command>
+                    <CommandInput placeholder="Cari provinsi..." />
+                    <CommandList>
+                      <CommandEmpty>Provinsi tidak ditemukan.</CommandEmpty>
+                      <CommandGroup>
+                        {provinces.map((province) => (
+                          <CommandItem
+                            key={province}
+                            value={province}
+                            onSelect={(currentValue) => {
+                              handleInputChange("province", currentValue === formData.province ? "" : currentValue);
+                              setOpenProvince(false);
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                formData.province === province ? "opacity-100" : "opacity-0"
+                              )}
+                            />
+                            {province}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="city">Kota *</Label>
-              <Select
-                value={formData.city}
-                onValueChange={(value) => handleInputChange("city", value)}
-                disabled={!formData.province}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder={formData.province ? "Pilih kota" : "Pilih provinsi dulu"} />
-                </SelectTrigger>
-                <SelectContent className="max-h-[200px]">
-                  {getAvailableCities().map((city) => (
-                    <SelectItem key={city} value={city}>
-                      {city}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Popover open={openCity} onOpenChange={setOpenCity}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={openCity}
+                    disabled={!formData.province}
+                    className="w-full justify-between"
+                  >
+                    {formData.city || (formData.province ? "Pilih kota..." : "Pilih provinsi dulu")}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-full p-0">
+                  <Command>
+                    <CommandInput placeholder="Cari kota..." />
+                    <CommandList>
+                      <CommandEmpty>Kota tidak ditemukan.</CommandEmpty>
+                      <CommandGroup>
+                        {getAvailableCities().map((city) => (
+                          <CommandItem
+                            key={city}
+                            value={city}
+                            onSelect={(currentValue) => {
+                              handleInputChange("city", currentValue === formData.city ? "" : currentValue);
+                              setOpenCity(false);
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                formData.city === city ? "opacity-100" : "opacity-0"
+                              )}
+                            />
+                            {city}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
 
@@ -215,21 +276,47 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
               <Briefcase className="h-4 w-4" />
               Jenis Industri *
             </Label>
-            <Select
-              value={formData.industryType}
-              onValueChange={(value) => handleInputChange("industryType", value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Pilih jenis industri" />
-              </SelectTrigger>
-              <SelectContent className="max-h-[200px]">
-                {industryTypes.map((industry) => (
-                  <SelectItem key={industry} value={industry}>
-                    {industry}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Popover open={openIndustry} onOpenChange={setOpenIndustry}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={openIndustry}
+                  className="w-full justify-between"
+                >
+                  {formData.industryType || "Pilih jenis industri..."}
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-full p-0">
+                <Command>
+                  <CommandInput placeholder="Cari industri..." />
+                  <CommandList>
+                    <CommandEmpty>Industri tidak ditemukan.</CommandEmpty>
+                    <CommandGroup>
+                      {industryTypes.map((industry) => (
+                        <CommandItem
+                          key={industry}
+                          value={industry}
+                          onSelect={(currentValue) => {
+                            handleInputChange("industryType", currentValue === formData.industryType ? "" : currentValue);
+                            setOpenIndustry(false);
+                          }}
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              formData.industryType === industry ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                          {industry}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
           </div>
 
           {/* Position */}
@@ -252,21 +339,47 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
               <Search className="h-4 w-4" />
               Tahu Refokus dari mana? *
             </Label>
-            <Select
-              value={formData.referralSource}
-              onValueChange={(value) => handleInputChange("referralSource", value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Pilih sumber referral" />
-              </SelectTrigger>
-              <SelectContent className="max-h-[200px]">
-                {referralSources.map((source) => (
-                  <SelectItem key={source} value={source}>
-                    {source}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Popover open={openReferral} onOpenChange={setOpenReferral}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={openReferral}
+                  className="w-full justify-between"
+                >
+                  {formData.referralSource || "Pilih sumber referral..."}
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-full p-0">
+                <Command>
+                  <CommandInput placeholder="Cari sumber referral..." />
+                  <CommandList>
+                    <CommandEmpty>Sumber referral tidak ditemukan.</CommandEmpty>
+                    <CommandGroup>
+                      {referralSources.map((source) => (
+                        <CommandItem
+                          key={source}
+                          value={source}
+                          onSelect={(currentValue) => {
+                            handleInputChange("referralSource", currentValue === formData.referralSource ? "" : currentValue);
+                            setOpenReferral(false);
+                          }}
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              formData.referralSource === source ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                          {source}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
           </div>
 
           {/* Submit Button */}
