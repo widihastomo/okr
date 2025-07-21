@@ -5,6 +5,7 @@ import { Link } from 'wouter';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
@@ -382,6 +383,65 @@ export default function TimelinePage() {
       </div>
     );
   });
+
+  // Timeline Card Skeleton Component
+  function TimelineCardSkeleton() {
+    return (
+      <Card className="w-full bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden">
+        <CardContent className="p-0">
+          <div className="p-3 md:p-4">
+            <div className="flex items-start space-x-2 md:space-x-3">
+              {/* Profile Image Skeleton */}
+              <Skeleton className="w-8 h-8 rounded-full flex-shrink-0" />
+              
+              <div className="flex-1 min-w-0 space-y-3">
+                {/* Header Skeleton */}
+                <div className="flex items-center justify-between">
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-3 w-32" />
+                  </div>
+                  <Skeleton className="h-6 w-16" />
+                </div>
+                
+                {/* Summary Skeleton */}
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-3/4" />
+                </div>
+                
+                {/* Progress Bar Skeleton */}
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <Skeleton className="h-3 w-20" />
+                    <Skeleton className="h-3 w-12" />
+                  </div>
+                  <Skeleton className="h-2 w-full rounded-full" />
+                </div>
+                
+                {/* Statistics Badges Skeleton */}
+                <div className="flex flex-wrap gap-1">
+                  <Skeleton className="h-6 w-16 rounded-full" />
+                  <Skeleton className="h-6 w-20 rounded-full" />
+                  <Skeleton className="h-6 w-18 rounded-full" />
+                  <Skeleton className="h-6 w-22 rounded-full" />
+                </div>
+                
+                {/* Engagement Buttons Skeleton */}
+                <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+                  <div className="flex items-center space-x-4">
+                    <Skeleton className="h-8 w-16" />
+                    <Skeleton className="h-8 w-20" />
+                    <Skeleton className="h-8 w-18" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   // TimelineCard component - simplified without complex lazy loading
   function TimelineCard({ 
@@ -887,7 +947,14 @@ export default function TimelinePage() {
         {/* Main Content - Scrollable */}
         <div className="flex-1 min-w-0 overflow-y-auto slim-scroll">
           <div className="pr-2"> {/* Add padding for scrollbar */}
-            {timelineData && timelineData.length > 0 ? (
+            {isLoading ? (
+              /* Loading skeleton state */
+              <div className="space-y-3 md:space-y-4">
+                {[...Array(3)].map((_, index) => (
+                  <TimelineCardSkeleton key={`skeleton-${index}`} />
+                ))}
+              </div>
+            ) : timelineData && timelineData.length > 0 ? (
               <div className="space-y-3 md:space-y-4">
                 {/* Debug info */}
                 <div className="bg-yellow-50 border border-yellow-200 rounded p-2 text-xs">
