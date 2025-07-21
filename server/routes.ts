@@ -3024,7 +3024,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const user = req.user as User;
       const { timelineId } = req.params;
-      const { content } = req.body;
+      const { content, mentionedUsers = [] } = req.body;
 
       if (!user?.organizationId || !user?.id) {
         return res.status(401).json({ message: "User not authenticated" });
@@ -3039,6 +3039,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         createdBy: user.id,
         organizationId: user.organizationId,
         content: content.trim()
+        // Note: mentionedUsers will be added once database schema is updated
       });
 
       res.status(201).json(comment);

@@ -1215,7 +1215,12 @@ export default function TimelinePage() {
                     </div>
                     <div className="flex-1 bg-gray-50 rounded-lg p-2">
                       <div className="font-semibold text-gray-900">{comment.user?.name}</div>
-                      <div className="text-gray-700">{comment.content}</div>
+                      <div 
+                        className="text-gray-700"
+                        dangerouslySetInnerHTML={{
+                          __html: comment.content.replace(/@(\w+)/g, '<span class="text-blue-600 font-medium">@$1</span>')
+                        }}
+                      />
                       <div className="text-gray-500 text-xs mt-1">
                         {format(new Date(comment.createdAt), "MMM dd, HH:mm")}
                       </div>
