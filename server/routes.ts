@@ -2933,8 +2933,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } else {
         // Add new reaction
         const reaction = await storage.createTimelineReaction({
-          timelineId,
-          userId: user.id,
+          timelineItemId: timelineId,
+          createdBy: user.id,
           organizationId: user.organizationId,
           emoji
         });
@@ -2962,8 +2962,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const comment = await storage.createTimelineComment({
-        timelineId,
-        userId: user.id,
+        timelineItemId: timelineId,
+        createdBy: user.id,
         organizationId: user.organizationId,
         content: content.trim()
       });
