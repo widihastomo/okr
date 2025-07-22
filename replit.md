@@ -332,9 +332,12 @@ PORT=5001 npm run dev
 - Comprehensive logging for port allocation debugging
 
 ## Current Features
-- **DUAL DATA RESET SYSTEM**: Organization settings page now provides two reset options - 1) Goals Only (resets goals, key results, initiatives, tasks, timeline while preserving teams, cycles, achievements), 2) Complete Reset (resets all data including goals, teams, cycles, achievements while preserving users, settings, invoices)
-- **COMPREHENSIVE RESET BACKEND**: Enhanced `/api/reset-data` endpoint with `resetType` parameter supporting both 'goals-only' and 'complete' reset operations with detailed deletion tracking
-- **ENHANCED USER INTERFACE**: Professional dual reset interface with color-coded options (orange for goals-only, red for complete) with detailed explanations of what data gets deleted vs preserved
+- **DUAL DATA RESET SYSTEM**: Organization settings page provides two reset options with invoice protection:
+  * **Goals Only Reset** (orange theme): Removes goals, key results, initiatives, tasks, timeline while preserving teams, cycles, achievements, invoices
+  * **Complete Reset** (red theme): Removes all organizational data including goals, teams, cycles, achievements while preserving users, settings, **and invoices**
+- **COMPREHENSIVE RESET BACKEND**: Enhanced `/api/reset-data` endpoint with `resetType` parameter ('goals-only' or 'complete') with detailed deletion tracking and invoice protection
+- **ENHANCED USER INTERFACE**: Professional dual reset interface with color-coded options and detailed explanations of preserved vs deleted data
+- **INVOICE PROTECTION**: Both reset types explicitly preserve invoice history and billing data for financial record integrity
 
 ## Current Issues  
 - **PERSISTENT DROPDOWN ISSUE**: Daily instant update task status dropdowns consistently fail to register clicks or onChange events despite multiple debugging approaches including native HTML select, custom buttons, visual debugging, and state management fixes. Root cause appears to be a deeper React/DOM interaction issue that requires alternative UI pattern.

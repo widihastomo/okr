@@ -1674,15 +1674,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       console.log(`✅ ${resetType} data reset completed for organization: ${currentUser.organizationId}`);
+      console.log(`📊 Reset summary:`, deletedCounts);
+      console.log(`💰 INVOICE PROTECTION: All invoices and billing history preserved during reset`);
       
       const message = resetType === 'goals-only' 
-        ? "Goals dan turunannya berhasil dihapus"
-        : "Semua data organisasi berhasil dihapus";
+        ? "Goals dan turunannya berhasil dihapus (invoice tetap aman)"
+        : "Semua data organisasi berhasil dihapus (invoice tetap aman)";
       
       res.json({ 
         message,
         resetType,
-        deleted: deletedCounts
+        deleted: deletedCounts,
+        invoiceProtection: "All invoices and billing history preserved"
       });
     } catch (error) {
       console.error("Error resetting data:", error);

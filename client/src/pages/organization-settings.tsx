@@ -138,22 +138,23 @@ export default function OrganizationSettings() {
   const { data: apiReminderSettings } = useQuery({
     queryKey: ["/api/reminder-settings"],
     staleTime: 5 * 60 * 1000, // 5 minutes
-    cacheTime: 10 * 60 * 1000, // 10 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
     refetchOnWindowFocus: false,
   });
 
   // Initialize reminder settings from API
   useEffect(() => {
     if (apiReminderSettings) {
+      const settings = apiReminderSettings as any;
       const updatedSettings = {
-        ...apiReminderSettings,
-        activeDays: apiReminderSettings.activeDays || ['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu'], // Default: semua kecuali minggu
+        ...settings,
+        activeDays: settings?.activeDays || ['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu'], // Default: semua kecuali minggu
         notificationTypes: {
           updateOverdue: true,
           taskOverdue: true,
           initiativeOverdue: true,
           chatMention: true,
-          ...apiReminderSettings.notificationTypes
+          ...settings?.notificationTypes
         }
       };
       
@@ -161,10 +162,10 @@ export default function OrganizationSettings() {
       
       // Check if custom time is being used
       const timeOptions = ['08:00', '09:00', '12:00', '15:00', '17:00', '19:00'];
-      const isPresetTime = timeOptions.includes(apiReminderSettings.reminderTime);
-      if (!isPresetTime && apiReminderSettings.reminderTime) {
+      const isPresetTime = timeOptions.includes(settings?.reminderTime);
+      if (!isPresetTime && settings?.reminderTime) {
         setUseCustomTime(true);
-        setCustomTime(apiReminderSettings.reminderTime);
+        setCustomTime(settings.reminderTime);
       } else {
         setUseCustomTime(false);
       }
@@ -188,7 +189,7 @@ export default function OrganizationSettings() {
   // Filtered users based on search and role filter
   const filteredUsers = users.filter(u => {
     const matchesSearch = searchTerm === "" || 
-      `${u.firstName} ${u.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      u.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       u.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       u.id.toLowerCase().includes(searchTerm.toLowerCase());
     
@@ -441,6 +442,15 @@ export default function OrganizationSettings() {
         description: message,
         variant: "success",
       });
+      
+      // Show additional toast about invoice protection
+      setTimeout(() => {
+        toast({
+          title: "Invoice Terlindungi",
+          description: "Semua invoice dan riwayat billing tetap aman dan tidak dihapus",
+          variant: "success",
+        });
+      }, 1500);
     },
     onError: (error) => {
       setIsResettingData(false);
@@ -564,15 +574,16 @@ export default function OrganizationSettings() {
       <Tabs defaultValue={(user as any)?.role === "member" ? "notifications" : "general"} className="space-y-6" onValueChange={(value) => {
         // Reset notification settings when switching to notifications tab
         if (value === 'notifications' && apiReminderSettings) {
+          const settings = apiReminderSettings as any;
           const updatedSettings = {
-            ...apiReminderSettings,
-            activeDays: apiReminderSettings.activeDays || ['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu'], // Default: semua kecuali minggu
+            ...settings,
+            activeDays: settings?.activeDays || ['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu'], // Default: semua kecuali minggu
             notificationTypes: {
               updateOverdue: true,
               taskOverdue: true,
               initiativeOverdue: true,
               chatMention: true,
-              ...apiReminderSettings.notificationTypes
+              ...settings?.notificationTypes
             }
           };
           
@@ -580,10 +591,10 @@ export default function OrganizationSettings() {
           
           // Check if custom time is being used and update accordingly
           const timeOptions = ['08:00', '09:00', '12:00', '15:00', '17:00', '19:00'];
-          const isPresetTime = timeOptions.includes(apiReminderSettings.reminderTime);
-          if (!isPresetTime && apiReminderSettings.reminderTime) {
+          const isPresetTime = timeOptions.includes(settings?.reminderTime);
+          if (!isPresetTime && settings?.reminderTime) {
             setUseCustomTime(true);
-            setCustomTime(apiReminderSettings.reminderTime);
+            setCustomTime(settings.reminderTime);
           } else {
             setUseCustomTime(false);
           }
@@ -714,9 +725,9 @@ export default function OrganizationSettings() {
                         <Badge variant="default">
                           {subscription.status === "active" ? "Aktif" : "Tidak Aktif"}
                         </Badge>
-                        {subscription.isTrialActive && (
+                        {(subscription as any)?.isTrialActive && (
                           <Badge variant="outline" className="text-orange-600 border-orange-200">
-                            Trial - {subscription.daysRemaining} hari tersisa
+                            Trial - {(subscription as any)?.daysRemaining} hari tersisa
                           </Badge>
                         )}
                       </div>
@@ -735,13 +746,13 @@ export default function OrganizationSettings() {
                       <div>
                         <p className="text-sm font-medium text-gray-900">Masa Aktif Langganan</p>
                         <p className="text-sm text-gray-600">
-                          {subscription.isTrialActive ? 'Trial berakhir' : 'Langganan berakhir'} pada:
+                          {(subscription as any)?.isTrialActive ? 'Trial berakhir' : 'Langganan berakhir'} pada:
                         </p>
                       </div>
                       <div className="text-right">
                         <p className="text-sm font-semibold text-gray-900">
-                          {subscription.isTrialActive && subscription.trialEndsAt
-                            ? new Date(subscription.trialEndsAt).toLocaleDateString('id-ID', { 
+                          {(subscription as any)?.isTrialActive && (subscription as any)?.trialEnd
+                            ? new Date((subscription as any).trialEnd).toLocaleDateString('id-ID', { 
                                 day: 'numeric', 
                                 month: 'long', 
                                 year: 'numeric' 
@@ -756,8 +767,8 @@ export default function OrganizationSettings() {
                           }
                         </p>
                         <p className="text-xs text-gray-500">
-                          {subscription.isTrialActive ? 
-                            `${subscription.daysRemaining || 0} hari tersisa` : 
+                          {(subscription as any)?.isTrialActive ? 
+                            `${(subscription as any)?.daysRemaining || 0} hari tersisa` : 
                             `${Math.ceil((new Date(subscription.currentPeriodEnd).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))} hari tersisa`
                           }
                         </p>
@@ -1563,6 +1574,7 @@ export default function OrganizationSettings() {
                                     <li>Teams dan Members</li>
                                     <li>Cycles dan Periods</li>
                                     <li>Achievements dan Settings</li>
+                                    <li>Invoice History</li>
                                   </ul>
                                 </div>
                               </div>
@@ -1742,13 +1754,13 @@ function InvoiceManagementSection() {
     },
   });
 
-  const filteredInvoices = invoices.filter((item: InvoiceData) => {
+  const filteredInvoices = (invoices as any[]).filter((item: any) => {
     const matchesSearch = 
-      item.invoice.invoiceNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.organization.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (item.invoice.description && item.invoice.description.toLowerCase().includes(searchTerm.toLowerCase()));
+      item.invoice?.invoiceNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.organization?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (item.invoice?.description && item.invoice.description.toLowerCase().includes(searchTerm.toLowerCase()));
     
-    const matchesStatus = statusFilter === "all" || item.invoice.status === statusFilter;
+    const matchesStatus = statusFilter === "all" || item.invoice?.status === statusFilter;
     
     return matchesSearch && matchesStatus;
   });
@@ -1781,7 +1793,7 @@ function InvoiceManagementSection() {
                 <FileText className="h-8 w-8 text-blue-600" />
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-600">Total Invoice</p>
-                  <p className="text-xl font-bold text-gray-900">{invoices.length}</p>
+                  <p className="text-xl font-bold text-gray-900">{(invoices as any[]).length}</p>
                 </div>
               </div>
             </CardContent>
@@ -1794,7 +1806,7 @@ function InvoiceManagementSection() {
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-600">Tertunda</p>
                   <p className="text-xl font-bold text-gray-900">
-                    {invoices.filter((item: InvoiceData) => item.invoice.status === 'pending').length}
+                    {(invoices as any[]).filter((item: any) => item.invoice?.status === 'pending').length}
                   </p>
                 </div>
               </div>
@@ -1808,7 +1820,7 @@ function InvoiceManagementSection() {
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-600">Dibayar</p>
                   <p className="text-xl font-bold text-gray-900">
-                    {invoices.filter((item: InvoiceData) => item.invoice.status === 'paid').length}
+                    {(invoices as any[]).filter((item: any) => item.invoice?.status === 'paid').length}
                   </p>
                 </div>
               </div>
@@ -1822,7 +1834,7 @@ function InvoiceManagementSection() {
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-600">Overdue</p>
                   <p className="text-xl font-bold text-gray-900">
-                    {invoices.filter((item: InvoiceData) => item.invoice.status === 'overdue').length}
+                    {(invoices as any[]).filter((item: any) => item.invoice?.status === 'overdue').length}
                   </p>
                 </div>
               </div>
@@ -1883,28 +1895,28 @@ function InvoiceManagementSection() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filteredInvoices.map((item: InvoiceData) => (
+                  filteredInvoices.map((item: any) => (
                     <TableRow key={item.invoice.id}>
                       <TableCell className="font-medium">
-                        {item.invoice.invoiceNumber}
+                        {item.invoice?.invoiceNumber}
                       </TableCell>
-                      <TableCell>{item.organization.name}</TableCell>
+                      <TableCell>{item.organization?.name}</TableCell>
                       <TableCell>
-                        {item.invoice.currency} {parseInt(item.invoice.amount).toLocaleString("id-ID")}
+                        {item.invoice?.currency} {parseInt(item.invoice?.amount || "0").toLocaleString("id-ID")}
                       </TableCell>
                       <TableCell>
                         <Badge variant={
-                          item.invoice.status === 'paid' ? 'default' : 
-                          item.invoice.status === 'pending' ? 'secondary' : 
+                          item.invoice?.status === 'paid' ? 'default' : 
+                          item.invoice?.status === 'pending' ? 'secondary' : 
                           'destructive'
                         }>
-                          {item.invoice.status === 'paid' ? 'Dibayar' : 
-                           item.invoice.status === 'pending' ? 'Tertunda' : 
+                          {item.invoice?.status === 'paid' ? 'Dibayar' : 
+                           item.invoice?.status === 'pending' ? 'Tertunda' : 
                            'Overdue'}
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        {new Date(item.invoice.issueDate).toLocaleDateString("id-ID")}
+                        {new Date(item.invoice?.issueDate).toLocaleDateString("id-ID")}
                       </TableCell>
                       <TableCell className="text-right">
                         <DropdownMenu>
@@ -1916,7 +1928,7 @@ function InvoiceManagementSection() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem asChild>
-                              <Link href={`/invoices/${item.invoice.id}`}>
+                              <Link href={`/invoices/${item.invoice?.id}`}>
                                 <Eye className="mr-2 h-4 w-4" />
                                 Lihat Detail
                               </Link>
@@ -1925,9 +1937,9 @@ function InvoiceManagementSection() {
                               <Download className="mr-2 h-4 w-4" />
                               Unduh PDF
                             </DropdownMenuItem>
-                            {item.invoice.status === 'pending' && (
+                            {item.invoice?.status === 'pending' && (
                               <DropdownMenuItem 
-                                onClick={() => handlePayWithMidtrans(item.invoice.id)}
+                                onClick={() => handlePayWithMidtrans(item.invoice?.id)}
                                 className="text-blue-600"
                               >
                                 <CreditCard className="mr-2 h-4 w-4" />
