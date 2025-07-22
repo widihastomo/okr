@@ -638,23 +638,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/auth/update-company-details", requireAuth, async (req, res) => {
     try {
       const user = req.user as User;
-      const { companyName, companyAddress, province, city, industryType, position, referralSource } = req.body;
+      const { companyName, companyAddress, province, city, industryType, companySize, position, referralSource } = req.body;
       
       console.log("🏢 Company details update request:", {
         userId: user.id,
         email: user.email,
         organizationId: user.organizationId,
-        formData: { companyName, companyAddress, province, city, industryType, position, referralSource }
+        formData: { companyName, companyAddress, province, city, industryType, companySize, position, referralSource }
       });
       
       // Validate required fields
-      if (!companyName || !companyAddress || !province || !city || !industryType || !position || !referralSource) {
+      if (!companyName || !companyAddress || !province || !city || !industryType || !companySize || !position || !referralSource) {
         console.log("❌ Validation failed - missing fields:", {
           companyName: !!companyName,
           companyAddress: !!companyAddress,
           province: !!province,
           city: !!city,
           industryType: !!industryType,
+          companySize: !!companySize,
           position: !!position,
           referralSource: !!referralSource
         });
@@ -670,6 +671,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           province, 
           city,
           industryType,
+          size: companySize,
           position,
           referralSource,
         });

@@ -77,6 +77,7 @@ export interface IStorage {
     province?: string;
     city?: string;
     industryType?: string;
+    size?: string;
     position?: string;
     referralSource?: string;
   }): Promise<Organization | undefined>;
@@ -2464,6 +2465,7 @@ export class DatabaseStorage implements IStorage {
     province?: string;
     city?: string;
     industryType?: string;
+    size?: string;
     position?: string;
     referralSource?: string;
   }): Promise<Organization | undefined> {
@@ -2494,6 +2496,7 @@ export class DatabaseStorage implements IStorage {
           province: null,
           city: null,
           industryType: null,
+          size: null,
           position: null,
           referralSource: null,
           onboardingCompanyDetailsCompleted: false, // Reset completion flag

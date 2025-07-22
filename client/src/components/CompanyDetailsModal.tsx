@@ -38,6 +38,7 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
     province: "",
     city: "",
     industryType: "",
+    companySize: "",
     position: "",
     referralSource: "",
   });
@@ -60,6 +61,7 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
         province: org.organization?.province || "",
         city: org.organization?.city || "",
         industryType: org.organization?.industryType || "",
+        companySize: org.organization?.size || "",
         position: org.organization?.position || "",
         referralSource: org.organization?.referralSource || "",
       }));
@@ -86,6 +88,17 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
     "Energi & Pertambangan", "Pertanian", "Real Estate", "Konsultan", "Pemerintahan",
     "Non-Profit", "E-commerce", "Startup", "FMCG", "Otomotif", "Farmasi",
     "Telekomunikasi", "Logistik", "Perbankan", "Asuransi", "Lainnya"
+  ];
+
+  const companySizes = [
+    "1-5 karyawan",
+    "6-10 karyawan", 
+    "11-25 karyawan",
+    "26-50 karyawan",
+    "51-100 karyawan",
+    "101-250 karyawan",
+    "251-500 karyawan",
+    "500+ karyawan"
   ];
 
   const referralSources = [
@@ -130,10 +143,10 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
   const handleSubmit = async () => {
     // Validate required fields
     if (!formData.companyName || !formData.companyAddress || !formData.province || !formData.city || 
-        !formData.industryType || !formData.position || !formData.referralSource) {
+        !formData.industryType || !formData.companySize || !formData.position || !formData.referralSource) {
       toast({
-        title: "Data tidak lengkap",
-        description: "Mohon lengkapi semua field yang diperlukan",
+        title: "Form Belum Lengkap",
+        description: "Semua field bertanda (*) wajib diisi.",
         variant: "destructive",
       });
       return;
@@ -265,20 +278,37 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
             </div>
           </div>
 
-          {/* Industry Type */}
-          <div className="space-y-2">
-            <Label htmlFor="industryType" className="flex items-center gap-2">
-              <Briefcase className="h-4 w-4" />
-              Jenis Industri *
-            </Label>
-            <SimpleSelect
-              options={industryTypes.map(i => ({ value: i, label: i }))}
-              value={formData.industryType}
-              placeholder="Pilih jenis industri..."
-              searchPlaceholder="Cari industri..."
-              emptyMessage="Industri tidak ditemukan."
-              onSelect={(value) => handleInputChange("industryType", value)}
-            />
+          {/* Industry Type and Company Size */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="industryType" className="flex items-center gap-2">
+                <Briefcase className="h-4 w-4" />
+                Jenis Industri *
+              </Label>
+              <SimpleSelect
+                options={industryTypes.map(i => ({ value: i, label: i }))}
+                value={formData.industryType}
+                placeholder="Pilih jenis industri..."
+                searchPlaceholder="Cari industri..."
+                emptyMessage="Industri tidak ditemukan."
+                onSelect={(value) => handleInputChange("industryType", value)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="companySize" className="flex items-center gap-2">
+                <Users className="h-4 w-4" />
+                Jumlah Karyawan *
+              </Label>
+              <SimpleSelect
+                options={companySizes.map(s => ({ value: s, label: s }))}
+                value={formData.companySize}
+                placeholder="Pilih jumlah karyawan..."
+                searchPlaceholder="Cari range karyawan..."
+                emptyMessage="Range karyawan tidak ditemukan."
+                onSelect={(value) => handleInputChange("companySize", value)}
+              />
+            </div>
           </div>
 
           {/* Position */}
