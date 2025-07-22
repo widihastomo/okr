@@ -1353,7 +1353,9 @@ export default function TimelinePage() {
             <span className="sm:hidden">Timeline</span>
           </h1>
           <div className="flex items-center gap-2 md:gap-3">
-            <DailyUpdateSimple />
+            <div data-tour="daily-checkin-button">
+              <DailyUpdateSimple />
+            </div>
             <div className="lg:hidden">
               <Button
                 variant="outline"
@@ -1375,7 +1377,7 @@ export default function TimelinePage() {
       {/* Main Layout Container - Flex and scrollable */}
       <div className="flex-1 flex gap-4 lg:gap-6 min-h-0">
         {/* Filter Sidebar - Fixed positioning */}
-        <div className={`${showMobileFilters ? 'fixed inset-0 z-50 bg-white' : 'hidden'} lg:block lg:w-72 lg:flex-shrink-0`}>
+        <div className={`${showMobileFilters ? 'fixed inset-0 z-50 bg-white' : 'hidden'} lg:block lg:w-72 lg:flex-shrink-0`} data-tour="timeline-filter">
           <div className="h-full bg-white border border-gray-200 rounded-lg overflow-y-auto lg:sticky lg:top-0 slim-scroll"
                style={{ height: showMobileFilters ? '100vh' : 'calc(100vh - 120px)' }}>
             {/* Mobile header */}
@@ -1489,7 +1491,7 @@ export default function TimelinePage() {
         </div>
 
         {/* Main Content - Scrollable */}
-        <div ref={scrollContainerRef} className="flex-1 min-w-0 overflow-y-auto slim-scroll">
+        <div ref={scrollContainerRef} className="flex-1 min-w-0 overflow-y-auto slim-scroll" data-tour="timeline-feed">
           <div className="pr-2"> {/* Add padding for scrollbar */}
             {isLoading ? (
               /* Loading skeleton state */

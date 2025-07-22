@@ -29,6 +29,8 @@ import {
   TrendingUp,
   Rocket,
   Target,
+  Activity,
+  Filter,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLocation } from "wouter";
@@ -298,13 +300,33 @@ const TOUR_STEPS: TourStep[] = [
     requiresClick: true,
   },
   {
-    id: "timeline-content",
+    id: "timeline-daily-checkin",
     title: "Timeline - Daily Check-in",
     description:
-      "Tombol Daily Check-in memungkinkan Anda mencatat progress harian dengan mudah. Setiap check-in akan ditampilkan dalam timeline kronologis untuk tracking yang lebih baik.",
+      "Tombol Daily Check-in memungkinkan Anda mencatat progress harian dengan mudah. Klik untuk membuka form update harian dimana Anda dapat melaporkan kemajuan task, key results, dan aktivitas lainnya. Setiap check-in akan ditampilkan dalam timeline kronologis untuk tracking yang lebih baik.",
     icon: Clock,
-    selector: '[data-tour="timeline-checkin"]',
+    selector: '[data-tour="daily-checkin-button"]',
     position: "bottom",
+    category: "action",
+  },
+  {
+    id: "timeline-filter",
+    title: "Timeline - Filter & Pencarian",
+    description:
+      "Panel filter memungkinkan Anda menyaring aktivitas timeline berdasarkan tipe aktivitas (update harian, check-in progress), pengguna, dan periode waktu. Gunakan filter ini untuk fokus pada aktivitas tertentu atau melihat progress anggota tim secara spesifik.",
+    icon: Filter,
+    selector: '[data-tour="timeline-filter"]',
+    position: "left",
+    category: "feature",
+  },
+  {
+    id: "timeline-feed",
+    title: "Timeline - Activity Feed",
+    description:
+      "Area utama timeline menampilkan semua aktivitas tim dalam urutan kronologis. Anda dapat melihat update harian, check-in progress, pencapaian milestone, dan aktivitas kolaboratif lainnya. Setiap kartu menampilkan detail lengkap dengan fitur interaksi seperti like, komentar, dan reaksi.",
+    icon: Activity,
+    selector: '[data-tour="timeline-feed"]',
+    position: "top",
     category: "feature",
   },
   {
