@@ -377,6 +377,7 @@ export default function Sidebar({
             ) : (
               <Link href="/help">
                 <button
+                  data-tour="help"
                   className={cn(
                     "flex items-center space-x-4 px-4 py-3 rounded-lg text-sm font-medium transition-colors w-full text-left",
                     location === "/help"

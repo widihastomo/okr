@@ -33,6 +33,7 @@ import {
   Filter,
   Medal,
   Briefcase,
+  HelpCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLocation } from "wouter";
@@ -433,6 +434,28 @@ const TOUR_STEPS: TourStep[] = [
       "Pengaturan organisasi memungkinkan Anda mengonfigurasi nama perusahaan, informasi kontak, dan preferensi sistem yang akan mempengaruhi seluruh tim dalam organisasi.",
     icon: Settings,
     selector: '[data-tour="org-settings"]',
+    position: "top",
+    category: "feature",
+  },
+  {
+    id: "help",
+    title: "Help Center - Bantuan & Dukungan",
+    description:
+      "Help Center menyediakan dokumentasi lengkap, FAQ, tutorial video, dan kontak support untuk membantu Anda memaksimalkan penggunaan platform OKR. Anda juga dapat restart tour sistem melalui halaman ini kapan saja.",
+    icon: HelpCircle,
+    selector: '[data-tour="help"]',
+    position: "left",
+    category: "navigation",
+    targetPath: "/help",
+    requiresClick: true,
+  },
+  {
+    id: "help-content",
+    title: "Help Center - Pusat Bantuan",
+    description:
+      "Selamat! Anda telah menyelesaikan tour lengkap. Help Center berisi dokumentasi, FAQ, tutorial, dan berbagai sumber daya untuk membantu Anda menggunakan platform dengan optimal. Anda dapat kembali ke sini kapan saja atau restart tour melalui tombol yang tersedia.",
+    icon: HelpCircle,
+    selector: '[data-tour="help-content"]',
     position: "top",
     category: "feature",
   },
