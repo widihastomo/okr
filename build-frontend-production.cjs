@@ -1,6 +1,4 @@
 
-#!/usr/bin/env node
-
 const { execSync } = require('child_process');
 const { writeFileSync, readFileSync, existsSync } = require('fs');
 const path = require('path');
