@@ -2468,24 +2468,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user.id;
       const organizationId = req.user.organizationId;
       
-      console.log("🎯 Generating comprehensive dummy data for user:", userId);
+      console.log("🎯 Comprehensive dummy data endpoint called");
+      console.log("🎯 User ID:", userId);
+      console.log("🎯 Organization ID:", organizationId);
+      console.log("🎯 User object:", req.user);
       
       const { createComprehensiveDummyData } = await import("./comprehensive-dummy-data");
+      console.log("🎯 Imported createComprehensiveDummyData function");
+      
       const result = await createComprehensiveDummyData(userId, organizationId);
+      console.log("🎯 createComprehensiveDummyData result:", result);
       
       if (result.success) {
+        console.log("✅ Comprehensive dummy data generation successful");
         res.json({
           message: "Comprehensive dummy data created successfully",
           data: result.data
         });
       } else {
+        console.error("❌ Comprehensive dummy data generation failed:", result.error);
         res.status(500).json({ 
           message: "Failed to create comprehensive dummy data",
           error: result.error
         });
       }
     } catch (error) {
-      console.error("Error creating comprehensive dummy data:", error);
+      console.error("❌ Error in comprehensive dummy data endpoint:", error);
+      console.error("❌ Error stack:", error.stack);
       res.status(500).json({ 
         message: "Failed to create comprehensive dummy data",
         error: error.message

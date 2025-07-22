@@ -26,7 +26,7 @@ import {
   Check,
   ChevronsUpDown,
   Loader2,
-  Sparkles,
+  Target,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -726,13 +726,16 @@ export function CompanyDetailsModal({
       // Generate comprehensive dummy data (cycles, teams, and OKR structure) after company details completion
       try {
         console.log(
-          "🔄 Generating comprehensive dummy data with business name:",
+          "🔄 Starting comprehensive dummy data generation with business name:",
           formData.companyName,
         );
+        console.log("🔄 Calling API endpoint: /api/auth/generate-comprehensive-dummy-data");
+        
         const dummyDataResponse = await apiRequest(
           "POST",
           "/api/auth/generate-comprehensive-dummy-data",
         );
+        
         console.log(
           "✅ Comprehensive dummy data generated successfully:",
           dummyDataResponse,
@@ -748,6 +751,12 @@ export function CompanyDetailsModal({
           "⚠️ Error generating comprehensive dummy data:",
           dummyDataError,
         );
+        console.error("⚠️ Full error details:", {
+          message: dummyDataError?.message,
+          status: dummyDataError?.status,
+          stack: dummyDataError?.stack
+        });
+        
         // Don't fail the whole process if dummy data generation fails
         toast({
           title: "Data berhasil disimpan",
@@ -939,7 +948,7 @@ export function CompanyDetailsModal({
               <div className="flex items-center justify-center">
                 <div className="relative">
                   <Loader2 className="h-12 w-12 text-orange-500 animate-spin" />
-                  <Sparkles className="h-6 w-6 text-yellow-500 absolute top-1 right-1 animate-pulse" />
+                  <Target className="h-6 w-6 text-yellow-500 absolute top-1 right-1 animate-pulse" />
                 </div>
               </div>
               <div className="space-y-2">
