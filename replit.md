@@ -438,6 +438,13 @@ The system now includes a comprehensive dummy data generation feature that creat
 
 ## Changelog
 ```
+- July 22, 2025. **TOUR CLEANUP OPTIMIZATION COMPLETED** - Successfully removed unnecessary tour steps as requested to optimize user experience:
+  * REMOVED: Tour step 12 (goals-add-button) - "Goals - Tambah Tujuan Baru" button explanation
+  * REMOVED: Tour step 18 (tasks-add-button) - "Tambah Task - Buat Tugas Baru" button explanation
+  * REMOVED: Tour step 40 (analytics-users-tab) - "User Performance Tab - Performa Individu" explanation
+  * REMOVED: Tour step 41 (analytics-initiatives-tab) - "Initiatives & Tasks Tab - Analisis Proyek" explanation
+  * OPTIMIZED: Tour system reduced from 45 to 41 total steps for streamlined user guidance
+  * RESULT: More focused tour experience eliminating redundant button explanations and detailed Analytics tab coverage
 - July 22, 2025. **TOUR URL NAVIGATION FIX COMPLETED** - Successfully fixed incorrect URLs for Users and Settings page navigation in tour system:
   * FIXED: Users page tour navigation from "/users" to correct "/client-users" URL path
   * FIXED: Settings page tour navigation from "/settings" to correct "/organization-settings" URL path

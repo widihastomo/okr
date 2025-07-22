@@ -166,16 +166,7 @@ const TOUR_STEPS: TourStep[] = [
     targetPath: "/goals",
     requiresClick: true,
   },
-  {
-    id: "goals-add-button",
-    title: "Goals - Tambah Tujuan Baru",
-    description:
-      'Tombol "Tambah Tujuan Baru" memungkinkan Anda membuat objectives dan key results baru. Setiap tujuan dapat memiliki multiple key results untuk pengukuran yang lebih akurat.',
-    icon: Target,
-    selector: '[data-tour="add-goal"]',
-    position: "bottom",
-    category: "feature",
-  },
+
   {
     id: "goals-filter",
     title: "Goals - Filter & Pencarian",
@@ -229,16 +220,7 @@ const TOUR_STEPS: TourStep[] = [
     targetPath: "/tasks",
     requiresClick: true,
   },
-  {
-    id: "tasks-add-button",
-    title: "Tambah Task - Buat Tugas Baru",
-    description:
-      "Tombol 'Tambah Task' memungkinkan Anda membuat tugas baru dengan mudah. Klik untuk membuka form pembuatan task di mana Anda bisa mengatur judul, deskripsi, prioritas, deadline, dan menentukan penanggungjawab. Setiap task bisa dikaitkan dengan objective atau key result tertentu.",
-    icon: CheckSquare,
-    selector: '[data-tour="add-task-button"]',
-    position: "bottom",
-    category: "action",
-  },
+
   {
     id: "tasks-content",
     title: "Tasks - Filter & Pencarian",
@@ -436,26 +418,6 @@ const TOUR_STEPS: TourStep[] = [
       "Tab Team Performance menyajikan perbandingan performa antar tim melalui bar chart dan detail performance table. Anda dapat melihat rata-rata progress, jumlah objectives, key results yang selesai, dan ranking tim berdasarkan pencapaian.",
     icon: Users,
     selector: '[data-tour="analytics-teams-tab"]',
-    position: "bottom",
-    category: "feature",
-  },
-  {
-    id: "analytics-users-tab",
-    title: "User Performance Tab - Performa Individu",
-    description:
-      "Tab User Performance menampilkan ranking individual berdasarkan progress Goal. Menampilkan top performers dengan badge khusus, statistik personal achievement, dan radar chart untuk visualisasi performa tim member secara individu.",
-    icon: TrendingUp,
-    selector: '[data-tour="analytics-users-tab"]',
-    position: "bottom",
-    category: "feature",
-  },
-  {
-    id: "analytics-initiatives-tab",
-    title: "Initiatives & Tasks Tab - Analisis Proyek",
-    description:
-      "Tab Initiatives & Tasks menyediakan analisis distribusi progress initiative, overview status task, dan priority matrix. Membantu memahami status executing dari berbagai proyek dan task management secara visual melalui chart dan diagram.",
-    icon: Briefcase,
-    selector: '[data-tour="analytics-initiatives-tab"]',
     position: "bottom",
     category: "feature",
   },
