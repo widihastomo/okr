@@ -698,6 +698,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
+
+  // Reset company details
+  app.delete("/api/auth/reset-company-details", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as User;
+      
+      console.log("🔄 Company details reset request:", {
+        userId: user.id,
+        email: user.email,
+        organizationId: user.organizationId
+      });
+      
+      if (!user.organizationId) {
+        return res.status(400).json({ 
+          message: "Organization ID diperlukan untuk reset company details" 
+        });
+      }
+      
+      // Reset company details in organization
+      await storage.resetOrganizationCompanyDetails(user.organizationId);
+      
+      console.log("✅ Company details berhasil di-reset untuk organization:", user.organizationId);
+      
+      res.json({
+        message: "Company details berhasil di-reset",
+        success: true,
+      });
+      
+    } catch (error) {
+      console.error("Reset company details error:", error);
+      res.status(500).json({ 
+        message: "Gagal reset company details. Silakan coba lagi." 
+      });
+    }
+  });
   
   // Reset Password endpoint
   app.post("/api/auth/reset-password", async (req, res) => {

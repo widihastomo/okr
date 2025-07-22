@@ -68,16 +68,20 @@
             <strong>Tujuan:</strong> Reset status pengisian company details agar form muncul kembali untuk testing comprehensive dummy data generation.
         </div>
 
+        <button class="button" onclick="resetCompanyDetailsDatabase()">
+            🗑️ Hapus Data Detail Perusahaan (Database)
+        </button>
+
         <button class="button" onclick="resetCompanyDetails()">
-            Reset Company Details Status
+            🔄 Reset Status LocalStorage
         </button>
 
         <button class="button" onclick="clearAllOnboardingData()">
-            Reset Semua Data Onboarding
+            🧹 Reset Semua Data Onboarding
         </button>
 
         <button class="button" onclick="checkCurrentStatus()">
-            Cek Status Saat Ini
+            📊 Cek Status Saat Ini
         </button>
 
         <div id="result"></div>
@@ -89,11 +93,41 @@
             resultDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
         }
 
+        // Reset company details from database via API
+        async function resetCompanyDetailsDatabase() {
+            try {
+                showResult('🔄 Menghapus data detail perusahaan dari database...', 'info');
+                
+                const response = await fetch('/api/auth/reset-company-details', {
+                    method: 'DELETE',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Gagal menghapus data dari database');
+                }
+
+                const result = await response.json();
+                showResult(`✅ ${result.message || 'Data detail perusahaan berhasil dihapus dari database'}. Refresh halaman untuk melihat form company details muncul kembali.`, 'success');
+                
+                // Also clear localStorage
+                localStorage.removeItem('company-details-completed');
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showResult(`❌ Error: ${error.message}`, 'warning');
+            }
+        }
+
         function resetCompanyDetails() {
             // Reset localStorage flags untuk company details
             localStorage.removeItem('company-details-completed');
             
-            showResult('✅ Status company details berhasil di-reset. Refresh halaman untuk melihat form company details muncul kembali.', 'success');
+            showResult('✅ Status localStorage berhasil di-reset. Catatan: Ini hanya menghapus status di browser, data database masih ada.', 'success');
         }
 
         function clearAllOnboardingData() {

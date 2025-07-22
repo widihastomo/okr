@@ -95,6 +95,8 @@ export interface IStorage {
     completedAt: Date | null | undefined; 
     data: any; 
   }>;
+  resetOrganizationCompanyDetails(organizationId: string): Promise<Organization | undefined>;
+  resetOrganizationCompanyDetails(organizationId: string): Promise<Organization | undefined>;
   
   // Subscription Plans
   getSubscriptionPlan(id: string): Promise<any>;
@@ -2479,6 +2481,30 @@ export class DatabaseStorage implements IStorage {
       return updated;
     } catch (error) {
       console.error("Error updating organization company details:", error);
+      throw error;
+    }
+  }
+
+  async resetOrganizationCompanyDetails(organizationId: string): Promise<Organization | undefined> {
+    try {
+      const [updated] = await db
+        .update(organizations)
+        .set({
+          companyAddress: null,
+          province: null,
+          city: null,
+          industryType: null,
+          position: null,
+          referralSource: null,
+          onboardingCompanyDetailsCompleted: false, // Reset completion flag
+          updatedAt: new Date()
+        })
+        .where(eq(organizations.id, organizationId))
+        .returning();
+
+      return updated;
+    } catch (error) {
+      console.error("Error resetting organization company details:", error);
       throw error;
     }
   }
