@@ -17,7 +17,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Building2, MapPin, Briefcase, Users, Search, Check, ChevronsUpDown, Loader2, Sparkles } from "lucide-react";
+import {
+  Building2,
+  MapPin,
+  Briefcase,
+  Users,
+  Search,
+  Check,
+  ChevronsUpDown,
+  Loader2,
+  Sparkles,
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { SimpleSelect } from "@/components/SimpleSelect";
@@ -28,7 +38,10 @@ interface CompanyDetailsModalProps {
   onComplete: () => void;
 }
 
-export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalProps) {
+export function CompanyDetailsModal({
+  open,
+  onComplete,
+}: CompanyDetailsModalProps) {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGeneratingDummyData, setIsGeneratingDummyData] = useState(false);
@@ -45,7 +58,7 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
 
   // Fetch user data with organization info
   const { data: userData } = useQuery({
-    queryKey: ['/api/my-organization-with-role'],
+    queryKey: ["/api/my-organization-with-role"],
     enabled: open,
   });
 
@@ -53,7 +66,7 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
   useEffect(() => {
     if (userData && open) {
       const org = userData as any;
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         companyName: org.organization?.name || "",
         // Pre-fill other fields if they exist in organization data
@@ -70,83 +83,588 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
 
   // State untuk mengontrol combobox open/close
 
-
   const provinces = [
-    "Aceh", "Sumatera Utara", "Sumatera Barat", "Riau", "Kepulauan Riau", "Jambi",
-    "Bengkulu", "Sumatera Selatan", "Bangka Belitung", "Lampung", "DKI Jakarta",
-    "Jawa Barat", "Banten", "Jawa Tengah", "DI Yogyakarta", "Jawa Timur",
-    "Bali", "Nusa Tenggara Barat", "Nusa Tenggara Timur", "Kalimantan Barat",
-    "Kalimantan Tengah", "Kalimantan Selatan", "Kalimantan Timur", "Kalimantan Utara",
-    "Sulawesi Utara", "Gorontalo", "Sulawesi Tengah", "Sulawesi Barat", "Sulawesi Selatan",
-    "Sulawesi Tenggara", "Maluku", "Maluku Utara", "Papua Barat", "Papua", "Papua Tengah",
-    "Papua Pegunungan", "Papua Selatan", "Papua Barat Daya"
+    "Aceh",
+    "Sumatera Utara",
+    "Sumatera Barat",
+    "Riau",
+    "Kepulauan Riau",
+    "Jambi",
+    "Bengkulu",
+    "Sumatera Selatan",
+    "Bangka Belitung",
+    "Lampung",
+    "DKI Jakarta",
+    "Jawa Barat",
+    "Banten",
+    "Jawa Tengah",
+    "DI Yogyakarta",
+    "Jawa Timur",
+    "Bali",
+    "Nusa Tenggara Barat",
+    "Nusa Tenggara Timur",
+    "Kalimantan Barat",
+    "Kalimantan Tengah",
+    "Kalimantan Selatan",
+    "Kalimantan Timur",
+    "Kalimantan Utara",
+    "Sulawesi Utara",
+    "Gorontalo",
+    "Sulawesi Tengah",
+    "Sulawesi Barat",
+    "Sulawesi Selatan",
+    "Sulawesi Tenggara",
+    "Maluku",
+    "Maluku Utara",
+    "Papua Barat",
+    "Papua",
+    "Papua Tengah",
+    "Papua Pegunungan",
+    "Papua Selatan",
+    "Papua Barat Daya",
   ];
 
   const industryTypes = [
-    "Teknologi Informasi", "Manufaktur", "Perdagangan", "Jasa Keuangan", "Pendidikan",
-    "Kesehatan", "Konstruksi", "Transportasi", "Perhotelan & Pariwisata", "Media & Komunikasi",
-    "Energi & Pertambangan", "Pertanian", "Real Estate", "Konsultan", "Pemerintahan",
-    "Non-Profit", "E-commerce", "Startup", "FMCG", "Otomotif", "Farmasi",
-    "Telekomunikasi", "Logistik", "Perbankan", "Asuransi", "Lainnya"
+    "Teknologi Informasi",
+    "Manufaktur",
+    "Perdagangan",
+    "Jasa Keuangan",
+    "Pendidikan",
+    "Kesehatan",
+    "Konstruksi",
+    "Transportasi",
+    "Perhotelan & Pariwisata",
+    "Media & Komunikasi",
+    "Energi & Pertambangan",
+    "Pertanian",
+    "Real Estate",
+    "Konsultan",
+    "Pemerintahan",
+    "Non-Profit",
+    "E-commerce",
+    "Startup",
+    "FMCG",
+    "Otomotif",
+    "Farmasi",
+    "Telekomunikasi",
+    "Logistik",
+    "Perbankan",
+    "Asuransi",
+    "Lainnya",
   ];
 
   const companySizes = [
     "1-5 karyawan",
-    "6-10 karyawan", 
+    "6-10 karyawan",
     "11-25 karyawan",
     "26-50 karyawan",
     "51-100 karyawan",
     "101-250 karyawan",
     "251-500 karyawan",
-    "500+ karyawan"
+    "500+ karyawan",
   ];
 
   const referralSources = [
-    "Google Search", "Media Sosial (Instagram, LinkedIn, Facebook)", "Rekomendasi Teman/Kolega",
-    "Event/Webinar", "YouTube", "Blog/Artikel", "Iklan Online", "Word of Mouth",
-    "Partnership/Kemitraan", "Cold Email/Sales", "Lainnya"
+    "Google Search",
+    "Media Sosial (Instagram, LinkedIn, Facebook)",
+    "Rekomendasi Teman/Kolega",
+    "Event/Webinar",
+    "YouTube",
+    "Blog/Artikel",
+    "Iklan Online",
+    "Word of Mouth",
+    "Partnership/Kemitraan",
+    "Cold Email/Sales",
+    "Lainnya",
   ];
 
   // Data kota per provinsi (sample utama)
   const citiesByProvince: Record<string, string[]> = {
-    "Aceh": ["Banda Aceh", "Sabang", "Langsa", "Lhokseumawe", "Subulussalam", "Aceh Besar", "Aceh Jaya", "Aceh Selatan", "Aceh Singkil", "Aceh Tamiang", "Aceh Tengah", "Aceh Tenggara", "Aceh Timur", "Aceh Utara", "Bener Meriah", "Bireuen", "Gayo Lues", "Nagan Raya", "Pidie", "Pidie Jaya", "Simeulue"],
-    "DKI Jakarta": ["Kota Jakarta Barat", "Kota Jakarta Pusat", "Kota Jakarta Selatan", "Kota Jakarta Timur", "Kota Jakarta Utara", "Kabupaten Kepulauan Seribu"],
-    "Jawa Barat": ["Kota Bandung", "Kabupaten Bandung", "Kabupaten Bandung Barat", "Kota Bekasi", "Kabupaten Bekasi", "Kota Bogor", "Kabupaten Bogor", "Kota Cirebon", "Kabupaten Cirebon", "Kota Depok", "Kabupaten Sukabumi", "Kota Sukabumi", "Kota Tasikmalaya", "Kabupaten Tasikmalaya", "Kabupaten Karawang", "Kabupaten Purwakarta", "Kabupaten Subang", "Kabupaten Sumedang", "Kabupaten Indramayu", "Kabupaten Majalengka", "Kabupaten Kuningan", "Kabupaten Ciamis", "Kabupaten Pangandaran", "Kabupaten Garut", "Kabupaten Cianjur", "Kota Banjar", "Kabupaten Ciamis"],
-    "Jawa Tengah": ["Kota Semarang", "Kabupaten Semarang", "Kota Surakarta", "Kota Magelang", "Kabupaten Magelang", "Kota Salatiga", "Kota Pekalongan", "Kabupaten Pekalongan", "Kota Tegal", "Kabupaten Tegal", "Kabupaten Kudus", "Kabupaten Purworejo", "Kabupaten Kebumen", "Kabupaten Cilacap", "Kabupaten Banyumas", "Kabupaten Purbalingga", "Kabupaten Banjarnegara", "Kabupaten Wonosobo", "Kabupaten Temanggung", "Kabupaten Kendal", "Kabupaten Demak", "Kabupaten Grobogan", "Kabupaten Blora", "Kabupaten Rembang", "Kabupaten Pati", "Kabupaten Jepara", "Kabupaten Boyolali", "Kabupaten Klaten", "Kabupaten Sukoharjo", "Kabupaten Karanganyar", "Kabupaten Sragen", "Kabupaten Wonogiri", "Kabupaten Brebes", "Kabupaten Batang", "Kabupaten Pemalang"],
-    "Jawa Timur": ["Kota Surabaya", "Kota Malang", "Kabupaten Malang", "Kota Kediri", "Kabupaten Kediri", "Kota Blitar", "Kabupaten Blitar", "Kota Madiun", "Kabupaten Madiun", "Kota Pasuruan", "Kabupaten Pasuruan", "Kota Probolinggo", "Kabupaten Probolinggo", "Kota Mojokerto", "Kabupaten Mojokerto", "Kota Batu", "Kabupaten Sidoarjo", "Kabupaten Gresik", "Kabupaten Lamongan", "Kabupaten Bojonegoro", "Kabupaten Tuban", "Kabupaten Jombang", "Kabupaten Nganjuk", "Kabupaten Magetan", "Kabupaten Ngawi", "Kabupaten Pacitan", "Kabupaten Ponorogo", "Kabupaten Trenggalek", "Kabupaten Tulungagung", "Kabupaten Lumajang", "Kabupaten Jember", "Kabupaten Bondowoso", "Kabupaten Situbondo", "Kabupaten Banyuwangi", "Kabupaten Sumenep", "Kabupaten Pamekasan", "Kabupaten Sampang", "Kabupaten Bangkalan"],
-    "Banten": ["Kota Tangerang", "Kota Tangerang Selatan", "Kota Serang", "Kota Cilegon", "Kabupaten Tangerang", "Kabupaten Serang", "Kabupaten Lebak", "Kabupaten Pandeglang"],
-    "Bali": ["Kota Denpasar", "Kabupaten Badung", "Kabupaten Gianyar", "Kabupaten Tabanan", "Kabupaten Klungkung", "Kabupaten Bangli", "Kabupaten Karangasem", "Kabupaten Buleleng", "Kabupaten Jembrana"],
-    "Sumatera Utara": ["Medan", "Binjai", "Tebing Tinggi", "Pematang Siantar", "Tanjung Balai", "Sibolga", "Padang Sidempuan"],
-    "Sumatera Barat": ["Padang", "Bukittinggi", "Padang Panjang", "Payakumbuh", "Sawahlunto", "Solok", "Pariaman"],
-    "Sumatera Selatan": ["Palembang", "Prabumulih", "Pagar Alam", "Lubuk Linggau", "Lahat", "Muara Enim"],
-    "Lampung": ["Bandar Lampung", "Metro", "Lampung Selatan", "Lampung Tengah", "Lampung Utara", "Lampung Timur"],
-    "Kalimantan Timur": ["Samarinda", "Balikpapan", "Bontang", "Kutai Kartanegara", "Berau", "Kutai Barat"],
-    "Kalimantan Selatan": ["Banjarmasin", "Banjarbaru", "Kotabaru", "Banjar", "Barito Kuala", "Tapin"],
-    "Sulawesi Selatan": ["Makassar", "Palopo", "Parepare", "Gowa", "Takalar", "Jeneponto", "Bantaeng"],
-    "Papua": ["Jayapura", "Sorong", "Merauke", "Nabire", "Timika", "Biak", "Wamena"],
-    "Riau": ["Pekanbaru", "Dumai", "Kampar", "Rokan Hulu", "Rokan Hilir", "Siak", "Kuantan Singingi", "Indragiri Hulu", "Indragiri Hilir", "Pelalawan", "Bengkalis"],
-    "Kepulauan Riau": ["Batam", "Tanjung Pinang", "Bintan", "Karimun", "Lingga", "Natuna", "Kepulauan Anambas"],
-    "Jambi": ["Jambi", "Sungai Penuh", "Batanghari", "Muaro Jambi", "Tanjung Jabung Timur", "Tanjung Jabung Barat", "Tebo", "Bungo", "Sarolangun", "Merangin", "Kerinci"],
-    "Bengkulu": ["Bengkulu", "Bengkulu Selatan", "Rejang Lebong", "Bengkulu Utara", "Kaur", "Seluma", "Mukomuko", "Lebong", "Kepahiang", "Bengkulu Tengah"],
-    "Bangka Belitung": ["Pangkal Pinang", "Bangka", "Belitung", "Bangka Barat", "Bangka Tengah", "Bangka Selatan", "Belitung Timur"],
-    "DI Yogyakarta": ["Yogyakarta", "Bantul", "Gunung Kidul", "Kulon Progo", "Sleman"],
-    "Nusa Tenggara Barat": ["Mataram", "Bima", "Lombok Barat", "Lombok Tengah", "Lombok Timur", "Sumbawa", "Dompu", "Lombok Utara", "Sumbawa Barat", "Bima"],
-    "Nusa Tenggara Timur": ["Kupang", "Ende", "Manggarai", "Timor Tengah Selatan", "Timor Tengah Utara", "Belu", "Alor", "Lembata", "Flores Timur", "Sikka", "Nagekeo", "Manggarai Barat", "Rote Ndao", "Manggarai Timur", "Sumba Timur", "Sumba Barat", "Sumba Tengah", "Sumba Barat Daya", "Malaka"],
-    "Kalimantan Barat": ["Pontianak", "Singkawang", "Sambas", "Bengkayang", "Landak", "Sanggau", "Ketapang", "Sintang", "Kapuas Hulu", "Sekadau", "Melawi", "Kayong Utara", "Kubu Raya"],
-    "Kalimantan Tengah": ["Palangka Raya", "Kotawaringin Barat", "Kotawaringin Timur", "Kapuas", "Barito Selatan", "Barito Utara", "Sukamara", "Lamandau", "Seruyan", "Katingan", "Pulang Pisau", "Gunung Mas", "Barito Timur", "Murung Raya"],
-    "Kalimantan Utara": ["Tarakan", "Bulungan", "Malinau", "Nunukan", "Tana Tidung"],
-    "Sulawesi Utara": ["Manado", "Bitung", "Tomohon", "Kotamobagu", "Bolaang Mongondow", "Minahasa", "Kepulauan Sangihe", "Kepulauan Talaud", "Minahasa Selatan", "Minahasa Utara", "Bolaang Mongondow Utara", "Siau Tagulandang Biaro", "Minahasa Tenggara", "Bolaang Mongondow Selatan", "Bolaang Mongondow Timur"],
-    "Gorontalo": ["Gorontalo", "Boalemo", "Gorontalo Utara", "Bone Bolango", "Pohuwato", "Gorontalo Utara"],
-    "Sulawesi Tengah": ["Palu", "Banggai", "Banggai Kepulauan", "Morowali", "Poso", "Donggala", "Toli-Toli", "Buol", "Parimo", "Tojo Una-Una", "Sigi", "Banggai Laut", "Morowali Utara"],
-    "Sulawesi Barat": ["Mamuju", "Polewali Mandar", "Mamasa", "Majene", "Mamuju Utara", "Mamuju Tengah"],
-    "Sulawesi Tenggara": ["Kendari", "Bau-Bau", "Konawe", "Kolaka", "Konawe Selatan", "Bombana", "Wakatobi", "Kolaka Utara", "Buton Utara", "Konawe Utara", "Kolaka Timur", "Konawe Kepulauan", "Muna", "Buton", "Muna Barat", "Buton Tengah", "Buton Selatan"],
-    "Maluku": ["Ambon", "Tual", "Maluku Tengah", "Buru", "Kepulauan Aru", "Seram Bagian Barat", "Seram Bagian Timur", "Maluku Tenggara", "Maluku Tenggara Barat", "Buru Selatan"],
-    "Maluku Utara": ["Ternate", "Tidore Kepulauan", "Halmahera Barat", "Halmahera Tengah", "Kepulauan Sula", "Halmahera Selatan", "Halmahera Utara", "Halmahera Timur", "Pulau Morotai", "Pulau Taliabu"],
-    "Papua Barat": ["Manokwari", "Sorong Selatan", "Raja Ampat", "Teluk Bintuni", "Teluk Wondama", "Kaimana", "Tambrauw", "Maybrat", "Manokwari Selatan", "Pegunungan Arfak"],
-    "Papua Tengah": ["Nabire", "Paniai", "Mimika", "Puncak Jaya", "Puncak", "Dogiyai", "Intan Jaya", "Deiyai"],
-    "Papua Pegunungan": ["Jayawijaya", "Pegunungan Bintang", "Yahukimo", "Tolikara", "Mamberamo Tengah", "Yalimo", "Lanny Jaya", "Nduga"],
+    Aceh: [
+      "Banda Aceh",
+      "Sabang",
+      "Langsa",
+      "Lhokseumawe",
+      "Subulussalam",
+      "Aceh Besar",
+      "Aceh Jaya",
+      "Aceh Selatan",
+      "Aceh Singkil",
+      "Aceh Tamiang",
+      "Aceh Tengah",
+      "Aceh Tenggara",
+      "Aceh Timur",
+      "Aceh Utara",
+      "Bener Meriah",
+      "Bireuen",
+      "Gayo Lues",
+      "Nagan Raya",
+      "Pidie",
+      "Pidie Jaya",
+      "Simeulue",
+    ],
+    "DKI Jakarta": [
+      "Kota Jakarta Barat",
+      "Kota Jakarta Pusat",
+      "Kota Jakarta Selatan",
+      "Kota Jakarta Timur",
+      "Kota Jakarta Utara",
+      "Kabupaten Kepulauan Seribu",
+    ],
+    "Jawa Barat": [
+      "Kota Bandung",
+      "Kabupaten Bandung",
+      "Kabupaten Bandung Barat",
+      "Kota Bekasi",
+      "Kabupaten Bekasi",
+      "Kota Bogor",
+      "Kabupaten Bogor",
+      "Kota Cirebon",
+      "Kabupaten Cirebon",
+      "Kota Depok",
+      "Kabupaten Sukabumi",
+      "Kota Sukabumi",
+      "Kota Tasikmalaya",
+      "Kabupaten Tasikmalaya",
+      "Kabupaten Karawang",
+      "Kabupaten Purwakarta",
+      "Kabupaten Subang",
+      "Kabupaten Sumedang",
+      "Kabupaten Indramayu",
+      "Kabupaten Majalengka",
+      "Kabupaten Kuningan",
+      "Kabupaten Ciamis",
+      "Kabupaten Pangandaran",
+      "Kabupaten Garut",
+      "Kabupaten Cianjur",
+      "Kota Banjar",
+      "Kabupaten Ciamis",
+    ],
+    "Jawa Tengah": [
+      "Kota Semarang",
+      "Kabupaten Semarang",
+      "Kota Surakarta",
+      "Kota Magelang",
+      "Kabupaten Magelang",
+      "Kota Salatiga",
+      "Kota Pekalongan",
+      "Kabupaten Pekalongan",
+      "Kota Tegal",
+      "Kabupaten Tegal",
+      "Kabupaten Kudus",
+      "Kabupaten Purworejo",
+      "Kabupaten Kebumen",
+      "Kabupaten Cilacap",
+      "Kabupaten Banyumas",
+      "Kabupaten Purbalingga",
+      "Kabupaten Banjarnegara",
+      "Kabupaten Wonosobo",
+      "Kabupaten Temanggung",
+      "Kabupaten Kendal",
+      "Kabupaten Demak",
+      "Kabupaten Grobogan",
+      "Kabupaten Blora",
+      "Kabupaten Rembang",
+      "Kabupaten Pati",
+      "Kabupaten Jepara",
+      "Kabupaten Boyolali",
+      "Kabupaten Klaten",
+      "Kabupaten Sukoharjo",
+      "Kabupaten Karanganyar",
+      "Kabupaten Sragen",
+      "Kabupaten Wonogiri",
+      "Kabupaten Brebes",
+      "Kabupaten Batang",
+      "Kabupaten Pemalang",
+    ],
+    "Jawa Timur": [
+      "Kota Surabaya",
+      "Kota Malang",
+      "Kabupaten Malang",
+      "Kota Kediri",
+      "Kabupaten Kediri",
+      "Kota Blitar",
+      "Kabupaten Blitar",
+      "Kota Madiun",
+      "Kabupaten Madiun",
+      "Kota Pasuruan",
+      "Kabupaten Pasuruan",
+      "Kota Probolinggo",
+      "Kabupaten Probolinggo",
+      "Kota Mojokerto",
+      "Kabupaten Mojokerto",
+      "Kota Batu",
+      "Kabupaten Sidoarjo",
+      "Kabupaten Gresik",
+      "Kabupaten Lamongan",
+      "Kabupaten Bojonegoro",
+      "Kabupaten Tuban",
+      "Kabupaten Jombang",
+      "Kabupaten Nganjuk",
+      "Kabupaten Magetan",
+      "Kabupaten Ngawi",
+      "Kabupaten Pacitan",
+      "Kabupaten Ponorogo",
+      "Kabupaten Trenggalek",
+      "Kabupaten Tulungagung",
+      "Kabupaten Lumajang",
+      "Kabupaten Jember",
+      "Kabupaten Bondowoso",
+      "Kabupaten Situbondo",
+      "Kabupaten Banyuwangi",
+      "Kabupaten Sumenep",
+      "Kabupaten Pamekasan",
+      "Kabupaten Sampang",
+      "Kabupaten Bangkalan",
+    ],
+    Banten: [
+      "Kota Tangerang",
+      "Kota Tangerang Selatan",
+      "Kota Serang",
+      "Kota Cilegon",
+      "Kabupaten Tangerang",
+      "Kabupaten Serang",
+      "Kabupaten Lebak",
+      "Kabupaten Pandeglang",
+    ],
+    Bali: [
+      "Kota Denpasar",
+      "Kabupaten Badung",
+      "Kabupaten Gianyar",
+      "Kabupaten Tabanan",
+      "Kabupaten Klungkung",
+      "Kabupaten Bangli",
+      "Kabupaten Karangasem",
+      "Kabupaten Buleleng",
+      "Kabupaten Jembrana",
+    ],
+    "Sumatera Utara": [
+      "Medan",
+      "Binjai",
+      "Tebing Tinggi",
+      "Pematang Siantar",
+      "Tanjung Balai",
+      "Sibolga",
+      "Padang Sidempuan",
+    ],
+    "Sumatera Barat": [
+      "Padang",
+      "Bukittinggi",
+      "Padang Panjang",
+      "Payakumbuh",
+      "Sawahlunto",
+      "Solok",
+      "Pariaman",
+    ],
+    "Sumatera Selatan": [
+      "Palembang",
+      "Prabumulih",
+      "Pagar Alam",
+      "Lubuk Linggau",
+      "Lahat",
+      "Muara Enim",
+    ],
+    Lampung: [
+      "Bandar Lampung",
+      "Metro",
+      "Lampung Selatan",
+      "Lampung Tengah",
+      "Lampung Utara",
+      "Lampung Timur",
+    ],
+    "Kalimantan Timur": [
+      "Samarinda",
+      "Balikpapan",
+      "Bontang",
+      "Kutai Kartanegara",
+      "Berau",
+      "Kutai Barat",
+    ],
+    "Kalimantan Selatan": [
+      "Banjarmasin",
+      "Banjarbaru",
+      "Kotabaru",
+      "Banjar",
+      "Barito Kuala",
+      "Tapin",
+    ],
+    "Sulawesi Selatan": [
+      "Makassar",
+      "Palopo",
+      "Parepare",
+      "Gowa",
+      "Takalar",
+      "Jeneponto",
+      "Bantaeng",
+    ],
+    Papua: [
+      "Jayapura",
+      "Sorong",
+      "Merauke",
+      "Nabire",
+      "Timika",
+      "Biak",
+      "Wamena",
+    ],
+    Riau: [
+      "Pekanbaru",
+      "Dumai",
+      "Kampar",
+      "Rokan Hulu",
+      "Rokan Hilir",
+      "Siak",
+      "Kuantan Singingi",
+      "Indragiri Hulu",
+      "Indragiri Hilir",
+      "Pelalawan",
+      "Bengkalis",
+    ],
+    "Kepulauan Riau": [
+      "Batam",
+      "Tanjung Pinang",
+      "Bintan",
+      "Karimun",
+      "Lingga",
+      "Natuna",
+      "Kepulauan Anambas",
+    ],
+    Jambi: [
+      "Jambi",
+      "Sungai Penuh",
+      "Batanghari",
+      "Muaro Jambi",
+      "Tanjung Jabung Timur",
+      "Tanjung Jabung Barat",
+      "Tebo",
+      "Bungo",
+      "Sarolangun",
+      "Merangin",
+      "Kerinci",
+    ],
+    Bengkulu: [
+      "Bengkulu",
+      "Bengkulu Selatan",
+      "Rejang Lebong",
+      "Bengkulu Utara",
+      "Kaur",
+      "Seluma",
+      "Mukomuko",
+      "Lebong",
+      "Kepahiang",
+      "Bengkulu Tengah",
+    ],
+    "Bangka Belitung": [
+      "Pangkal Pinang",
+      "Bangka",
+      "Belitung",
+      "Bangka Barat",
+      "Bangka Tengah",
+      "Bangka Selatan",
+      "Belitung Timur",
+    ],
+    "DI Yogyakarta": [
+      "Yogyakarta",
+      "Bantul",
+      "Gunung Kidul",
+      "Kulon Progo",
+      "Sleman",
+    ],
+    "Nusa Tenggara Barat": [
+      "Mataram",
+      "Bima",
+      "Lombok Barat",
+      "Lombok Tengah",
+      "Lombok Timur",
+      "Sumbawa",
+      "Dompu",
+      "Lombok Utara",
+      "Sumbawa Barat",
+      "Bima",
+    ],
+    "Nusa Tenggara Timur": [
+      "Kupang",
+      "Ende",
+      "Manggarai",
+      "Timor Tengah Selatan",
+      "Timor Tengah Utara",
+      "Belu",
+      "Alor",
+      "Lembata",
+      "Flores Timur",
+      "Sikka",
+      "Nagekeo",
+      "Manggarai Barat",
+      "Rote Ndao",
+      "Manggarai Timur",
+      "Sumba Timur",
+      "Sumba Barat",
+      "Sumba Tengah",
+      "Sumba Barat Daya",
+      "Malaka",
+    ],
+    "Kalimantan Barat": [
+      "Pontianak",
+      "Singkawang",
+      "Sambas",
+      "Bengkayang",
+      "Landak",
+      "Sanggau",
+      "Ketapang",
+      "Sintang",
+      "Kapuas Hulu",
+      "Sekadau",
+      "Melawi",
+      "Kayong Utara",
+      "Kubu Raya",
+    ],
+    "Kalimantan Tengah": [
+      "Palangka Raya",
+      "Kotawaringin Barat",
+      "Kotawaringin Timur",
+      "Kapuas",
+      "Barito Selatan",
+      "Barito Utara",
+      "Sukamara",
+      "Lamandau",
+      "Seruyan",
+      "Katingan",
+      "Pulang Pisau",
+      "Gunung Mas",
+      "Barito Timur",
+      "Murung Raya",
+    ],
+    "Kalimantan Utara": [
+      "Tarakan",
+      "Bulungan",
+      "Malinau",
+      "Nunukan",
+      "Tana Tidung",
+    ],
+    "Sulawesi Utara": [
+      "Manado",
+      "Bitung",
+      "Tomohon",
+      "Kotamobagu",
+      "Bolaang Mongondow",
+      "Minahasa",
+      "Kepulauan Sangihe",
+      "Kepulauan Talaud",
+      "Minahasa Selatan",
+      "Minahasa Utara",
+      "Bolaang Mongondow Utara",
+      "Siau Tagulandang Biaro",
+      "Minahasa Tenggara",
+      "Bolaang Mongondow Selatan",
+      "Bolaang Mongondow Timur",
+    ],
+    Gorontalo: [
+      "Gorontalo",
+      "Boalemo",
+      "Gorontalo Utara",
+      "Bone Bolango",
+      "Pohuwato",
+      "Gorontalo Utara",
+    ],
+    "Sulawesi Tengah": [
+      "Palu",
+      "Banggai",
+      "Banggai Kepulauan",
+      "Morowali",
+      "Poso",
+      "Donggala",
+      "Toli-Toli",
+      "Buol",
+      "Parimo",
+      "Tojo Una-Una",
+      "Sigi",
+      "Banggai Laut",
+      "Morowali Utara",
+    ],
+    "Sulawesi Barat": [
+      "Mamuju",
+      "Polewali Mandar",
+      "Mamasa",
+      "Majene",
+      "Mamuju Utara",
+      "Mamuju Tengah",
+    ],
+    "Sulawesi Tenggara": [
+      "Kendari",
+      "Bau-Bau",
+      "Konawe",
+      "Kolaka",
+      "Konawe Selatan",
+      "Bombana",
+      "Wakatobi",
+      "Kolaka Utara",
+      "Buton Utara",
+      "Konawe Utara",
+      "Kolaka Timur",
+      "Konawe Kepulauan",
+      "Muna",
+      "Buton",
+      "Muna Barat",
+      "Buton Tengah",
+      "Buton Selatan",
+    ],
+    Maluku: [
+      "Ambon",
+      "Tual",
+      "Maluku Tengah",
+      "Buru",
+      "Kepulauan Aru",
+      "Seram Bagian Barat",
+      "Seram Bagian Timur",
+      "Maluku Tenggara",
+      "Maluku Tenggara Barat",
+      "Buru Selatan",
+    ],
+    "Maluku Utara": [
+      "Ternate",
+      "Tidore Kepulauan",
+      "Halmahera Barat",
+      "Halmahera Tengah",
+      "Kepulauan Sula",
+      "Halmahera Selatan",
+      "Halmahera Utara",
+      "Halmahera Timur",
+      "Pulau Morotai",
+      "Pulau Taliabu",
+    ],
+    "Papua Barat": [
+      "Manokwari",
+      "Sorong Selatan",
+      "Raja Ampat",
+      "Teluk Bintuni",
+      "Teluk Wondama",
+      "Kaimana",
+      "Tambrauw",
+      "Maybrat",
+      "Manokwari Selatan",
+      "Pegunungan Arfak",
+    ],
+    "Papua Tengah": [
+      "Nabire",
+      "Paniai",
+      "Mimika",
+      "Puncak Jaya",
+      "Puncak",
+      "Dogiyai",
+      "Intan Jaya",
+      "Deiyai",
+    ],
+    "Papua Pegunungan": [
+      "Jayawijaya",
+      "Pegunungan Bintang",
+      "Yahukimo",
+      "Tolikara",
+      "Mamberamo Tengah",
+      "Yalimo",
+      "Lanny Jaya",
+      "Nduga",
+    ],
     "Papua Selatan": ["Merauke", "Boven Digoel", "Mappi", "Asmat"],
-    "Papua Barat Daya": ["Sorong", "Raja Ampat", "Tambrauw", "Maybrat"]
+    "Papua Barat Daya": ["Sorong", "Raja Ampat", "Tambrauw", "Maybrat"],
   };
 
   // Mendapatkan daftar kota berdasarkan provinsi yang dipilih
@@ -158,16 +676,24 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
   const handleInputChange = (field: string, value: string) => {
     if (field === "province") {
       // Reset kota ketika provinsi berubah
-      setFormData(prev => ({ ...prev, [field]: value, city: "" }));
+      setFormData((prev) => ({ ...prev, [field]: value, city: "" }));
     } else {
-      setFormData(prev => ({ ...prev, [field]: value }));
+      setFormData((prev) => ({ ...prev, [field]: value }));
     }
   };
 
   const handleSubmit = async () => {
     // Validate required fields
-    if (!formData.companyName || !formData.companyAddress || !formData.province || !formData.city || 
-        !formData.industryType || !formData.companySize || !formData.position || !formData.referralSource) {
+    if (
+      !formData.companyName ||
+      !formData.companyAddress ||
+      !formData.province ||
+      !formData.city ||
+      !formData.industryType ||
+      !formData.companySize ||
+      !formData.position ||
+      !formData.referralSource
+    ) {
       toast({
         title: "Form Belum Lengkap",
         description: "Semua field bertanda (*) wajib diisi.",
@@ -179,13 +705,19 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
     setIsSubmitting(true);
     try {
       console.log("🏢 Submitting company details:", formData);
-      
+
       // Save company details to user profile
-      const response = await apiRequest("POST", "/api/auth/update-company-details", formData);
+      const response = await apiRequest(
+        "POST",
+        "/api/auth/update-company-details",
+        formData,
+      );
       console.log("✅ Company details saved successfully:", response);
 
       // Invalidate organization data query to refresh UI
-      await queryClient.invalidateQueries({ queryKey: ['/api/my-organization-with-role'] });
+      await queryClient.invalidateQueries({
+        queryKey: ["/api/my-organization-with-role"],
+      });
 
       // Start comprehensive dummy data generation with loading animation
       setIsSubmitting(false);
@@ -193,21 +725,34 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
 
       // Generate comprehensive dummy data (cycles, teams, and OKR structure) after company details completion
       try {
-        console.log("🔄 Generating comprehensive dummy data with business name:", formData.companyName);
-        const dummyDataResponse = await apiRequest("POST", "/api/auth/generate-comprehensive-dummy-data");
-        console.log("✅ Comprehensive dummy data generated successfully:", dummyDataResponse);
-        
+        console.log(
+          "🔄 Generating comprehensive dummy data with business name:",
+          formData.companyName,
+        );
+        const dummyDataResponse = await apiRequest(
+          "POST",
+          "/api/auth/generate-comprehensive-dummy-data",
+        );
+        console.log(
+          "✅ Comprehensive dummy data generated successfully:",
+          dummyDataResponse,
+        );
+
         toast({
           title: "Selamat datang!",
-          description: `Data perusahaan tersimpan dan contoh struktur OKR lengkap telah disiapkan untuk ${formData.companyName}`,
+          description: `Data perusahaan tersimpan dan contoh struktur strategi lengkap telah disiapkan untuk ${formData.companyName}`,
           variant: "success",
         });
       } catch (dummyDataError) {
-        console.error("⚠️ Error generating comprehensive dummy data:", dummyDataError);
+        console.error(
+          "⚠️ Error generating comprehensive dummy data:",
+          dummyDataError,
+        );
         // Don't fail the whole process if dummy data generation fails
         toast({
-          title: "Data OKR siap digunakan",
-          description: "Informasi perusahaan telah tersimpan dan sistem OKR siap digunakan",
+          title: "Data berhasil disimpan",
+          description:
+            "Informasi perusahaan telah tersimpan dan sistem siap digunakan",
           variant: "success",
         });
       }
@@ -230,7 +775,7 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
 
   return (
     <Dialog open={open} onOpenChange={() => {}}>
-      <DialogContent 
+      <DialogContent
         className="max-w-2xl max-h-[90vh] overflow-y-auto [&>button]:hidden"
         onPointerDownOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
@@ -241,7 +786,9 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
             Lengkapi Profil Perusahaan
           </DialogTitle>
           <DialogDescription>
-            Lengkapi semua informasi di bawah ini untuk melanjutkan. Semua field bertanda (*) wajib diisi dan form tidak dapat ditutup sebelum diselesaikan.
+            Lengkapi semua informasi di bawah ini untuk melanjutkan. Semua field
+            bertanda (*) wajib diisi dan form tidak dapat ditutup sebelum
+            diselesaikan.
           </DialogDescription>
         </DialogHeader>
 
@@ -259,7 +806,6 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
               onChange={(e) => handleInputChange("companyName", e.target.value)}
               className="bg-gray-50 border-gray-300"
             />
-            
           </div>
 
           {/* Company Address */}
@@ -272,7 +818,9 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
               id="companyAddress"
               placeholder="Masukkan alamat lengkap perusahaan..."
               value={formData.companyAddress}
-              onChange={(e) => handleInputChange("companyAddress", e.target.value)}
+              onChange={(e) =>
+                handleInputChange("companyAddress", e.target.value)
+              }
             />
           </div>
 
@@ -281,7 +829,7 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
             <div className="space-y-2">
               <Label htmlFor="province">Provinsi *</Label>
               <SimpleSelect
-                options={provinces.map(p => ({ value: p, label: p }))}
+                options={provinces.map((p) => ({ value: p, label: p }))}
                 value={formData.province}
                 placeholder="Pilih provinsi..."
                 searchPlaceholder="Cari provinsi..."
@@ -293,9 +841,14 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
             <div className="space-y-2">
               <Label htmlFor="city">Kota *</Label>
               <SimpleSelect
-                options={getAvailableCities().map(c => ({ value: c, label: c }))}
+                options={getAvailableCities().map((c) => ({
+                  value: c,
+                  label: c,
+                }))}
                 value={formData.city}
-                placeholder={formData.province ? "Pilih kota..." : "Pilih provinsi dulu"}
+                placeholder={
+                  formData.province ? "Pilih kota..." : "Pilih provinsi dulu"
+                }
                 searchPlaceholder="Cari kota..."
                 emptyMessage="Kota tidak ditemukan."
                 disabled={!formData.province}
@@ -312,7 +865,7 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
                 Jenis Industri *
               </Label>
               <SimpleSelect
-                options={industryTypes.map(i => ({ value: i, label: i }))}
+                options={industryTypes.map((i) => ({ value: i, label: i }))}
                 value={formData.industryType}
                 placeholder="Pilih jenis industri..."
                 searchPlaceholder="Cari industri..."
@@ -327,7 +880,7 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
                 Jumlah Karyawan *
               </Label>
               <SimpleSelect
-                options={companySizes.map(s => ({ value: s, label: s }))}
+                options={companySizes.map((s) => ({ value: s, label: s }))}
                 value={formData.companySize}
                 placeholder="Pilih jumlah karyawan..."
                 searchPlaceholder="Cari range karyawan..."
@@ -358,7 +911,7 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
               Tahu Refokus dari mana? *
             </Label>
             <SimpleSelect
-              options={referralSources.map(s => ({ value: s, label: s }))}
+              options={referralSources.map((s) => ({ value: s, label: s }))}
               value={formData.referralSource}
               placeholder="Pilih sumber referral..."
               searchPlaceholder="Cari sumber referral..."
@@ -394,7 +947,8 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
                   Sedang menyiapkan sistem...
                 </h3>
                 <p className="text-sm text-gray-600">
-                  Kami sedang membuat struktur organisasi dan mengatur tim untuk {formData.companyName}
+                  Kami sedang membuat struktur organisasi dan mengatur tim untuk{" "}
+                  {formData.companyName}
                 </p>
                 <div className="flex items-center justify-center gap-1 mt-3">
                   <div className="h-2 w-2 bg-orange-500 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
