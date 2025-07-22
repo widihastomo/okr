@@ -477,9 +477,9 @@ export default function OrganizationSettings() {
       
       console.log("🔄 Cache invalidation completed for reset operation");
       
-      // Refresh the page after 2 seconds to ensure all UI components show updated data
+      // Navigate to home page after 2 seconds to ensure all data is cleared
       setTimeout(() => {
-        window.location.reload();
+        setLocation("/");
       }, 2000);
       
       const message = resetType === 'goals-only' 
