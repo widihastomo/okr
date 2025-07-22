@@ -128,6 +128,19 @@ export const organizations = pgTable("organizations", {
   size: text("size"), // "1-10", "11-50", "51-200", "201-500", "500+"
   ownerId: uuid("owner_id"), // Organization owner - will be added via migration
   registrationStatus: text("registration_status").notNull().default("pending"), // "pending", "approved", "rejected", "suspended"
+  // Company details fields - moved from users table
+  companyAddress: text("company_address"),
+  province: text("province"),
+  city: text("city"),
+  industryType: text("industry_type"),
+  position: text("position"),
+  referralSource: text("referral_source"),
+  // Onboarding progress tracking flags - moved from users table
+  onboardingRegistered: boolean("onboarding_registered").default(false).notNull(), // Step 1: User has registered
+  onboardingEmailConfirmed: boolean("onboarding_email_confirmed").default(false).notNull(), // Step 2: Email verified
+  onboardingCompanyDetailsCompleted: boolean("onboarding_company_details_completed").default(false).notNull(), // Step 3: Company info filled
+  onboardingMissionsCompleted: boolean("onboarding_missions_completed").default(false).notNull(), // Step 4: Mission/tour completed
+  onboardingPackageUpgraded: boolean("onboarding_package_upgraded").default(false).notNull(), // Step 5: Package upgrade completed
   onboardingCompleted: boolean("onboarding_completed").default(false), // Track if organization has completed onboarding
   onboardingCompletedAt: timestamp("onboarding_completed_at"),
   onboardingData: jsonb("onboarding_data"), // Store onboarding progress data
@@ -257,13 +270,6 @@ export const users = pgTable("users", {
   verificationCode: varchar("verification_code", { length: 10 }), // Email verification code
   verificationCodeExpiry: timestamp("verification_code_expiry"), // Expiry time for verification code
   isEmailVerified: boolean("is_email_verified").default(false).notNull(), // Track email verification status
-  // Company details fields
-  companyAddress: text("company_address"),
-  province: text("province"),
-  city: text("city"),
-  industryType: text("industry_type"),
-  position: text("position"),
-  referralSource: text("referral_source"),
   reminderConfig: jsonb("reminder_config"), // Store reminder settings for check-in notifications
   lastLoginAt: timestamp("last_login_at"),
   invitedBy: uuid("invited_by").references(() => users.id),
@@ -275,13 +281,6 @@ export const users = pgTable("users", {
   invitationAcceptedAt: timestamp("invitation_accepted_at"),
   // Referral code fields
   invitationCode: varchar("invitation_code", { length: 50 }), // Store the referral code used during registration
-  // Onboarding progress tracking flags
-  onboardingRegistered: boolean("onboarding_registered").default(false).notNull(), // Step 1: User has registered
-  onboardingEmailConfirmed: boolean("onboarding_email_confirmed").default(false).notNull(), // Step 2: Email verified
-  onboardingCompanyDetailsCompleted: boolean("onboarding_company_details_completed").default(false).notNull(), // Step 3: Company info filled
-  onboardingMissionsCompleted: boolean("onboarding_missions_completed").default(false).notNull(), // Step 4: Mission/tour completed
-  onboardingPackageUpgraded: boolean("onboarding_package_upgraded").default(false).notNull(), // Step 5: Package upgrade completed
-  onboardingCompletedAt: timestamp("onboarding_completed_at"), // Timestamp when full onboarding is completed
   // Tour tracking flags
   tourStarted: boolean("tour_started").default(false).notNull(), // Track if user has started the guided tour
   tourStartedAt: timestamp("tour_started_at"), // Timestamp when tour was first started

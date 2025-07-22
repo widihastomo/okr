@@ -898,6 +898,12 @@ export default function DailyFocusPage() {
     enabled: !!userId,
   });
   
+  // Fetch organization data to check company details completion
+  const { data: organizationData, isLoading: isOrgDataLoading } = useQuery({
+    queryKey: ['/api/my-organization-with-role'],
+    enabled: !!userId,
+  });
+  
   useEffect(() => {
     // Check localStorage flags
     const companyDetailsCompleted = localStorage.getItem("company-details-completed");
@@ -910,21 +916,21 @@ export default function DailyFocusPage() {
     console.log("🔍 Current user data:", currentUserData);
     console.log("🔍 Is loading:", isUserDataLoading);
     
-    // Check if user has complete company details from database
+    // Check if organization has complete company details from database
     let hasCompleteCompanyDetails = false;
-    if (currentUserData) {
-      const user = currentUserData;
-      hasCompleteCompanyDetails = !!(user.companyAddress && user.province && user.city);
+    if (organizationData?.organization) {
+      const org = organizationData.organization;
+      hasCompleteCompanyDetails = !!(org.companyAddress && org.province && org.city);
       console.log("🏢 Database company details check:", { 
-        companyAddress: user.companyAddress, 
-        province: user.province, 
-        city: user.city,
+        companyAddress: org.companyAddress, 
+        province: org.province, 
+        city: org.city,
         hasCompleteCompanyDetails
       });
     }
     
-    // Only show modal if we have loaded user data and company details are incomplete
-    if (currentUserData && !isUserDataLoading && !hasCompleteCompanyDetails) {
+    // Only show modal if we have loaded organization data and company details are incomplete
+    if (organizationData && !isOrgDataLoading && !hasCompleteCompanyDetails) {
       console.log("📝 Showing company details modal - missing required fields");
       setShowCompanyDetailsModal(true);
       return;
@@ -958,7 +964,7 @@ export default function DailyFocusPage() {
     return () => {
       window.removeEventListener('showWelcomeScreen', handleShowWelcomeScreen);
     };
-  }, [currentUserData, isUserDataLoading]);
+  }, [currentUserData, isUserDataLoading, organizationData, isOrgDataLoading]);
 
   const handleCompanyDetailsComplete = () => {
     setShowCompanyDetailsModal(false);

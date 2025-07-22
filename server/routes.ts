@@ -663,27 +663,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      // Update user with company details
-      await storage.updateUser(user.id, {
-        companyAddress,
-        province, 
-        city,
-        industryType,
-        position,
-        referralSource,
-        updatedAt: new Date(),
-      });
-
-      // Update organization name if companyName is provided
-      if (companyName && user.organizationId) {
-        await storage.updateOrganization(user.organizationId, {
-          name: companyName,
-          updatedAt: new Date(),
+      // Update organization with company details
+      if (user.organizationId) {
+        await storage.updateOrganizationCompanyDetails(user.organizationId, {
+          companyAddress,
+          province, 
+          city,
+          industryType,
+          position,
+          referralSource,
         });
+
+        // Update organization name if companyName is provided
+        if (companyName) {
+          await storage.updateOrganization(user.organizationId, {
+            name: companyName,
+            updatedAt: new Date(),
+          });
+        }
+        
+        // Update onboarding progress - mark company details as completed
+        await storage.updateOrganizationOnboardingProgress(user.organizationId, 'company_details_completed');
       }
-      
-      // Update onboarding progress - mark company details as completed
-      await storage.updateUserOnboardingProgress(user.id, 'company_details_completed');
       
       res.json({
         message: "Company details berhasil disimpan",
@@ -8733,6 +8734,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const { db } = await import("./db");
       const { eq } = await import("drizzle-orm");
+      const { organizations, organizationSubscriptions, subscriptionPlans } = await import("@shared/schema");
       
       // Get user with organization
       const user = await storage.getUser(userId);

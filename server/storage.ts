@@ -71,7 +71,15 @@ export interface IStorage {
   updateUser(id: string, user: Partial<UpsertUser>): Promise<User | undefined>;
   updateUserReminderConfig(userId: string, config: any): Promise<void>;
   updateUserProfileImage(userId: string, profileImageUrl: string | null): Promise<User | undefined>;
-  updateUserOnboardingProgress(userId: string, step: 'registered' | 'email_confirmed' | 'company_details_completed' | 'missions_completed' | 'package_upgraded'): Promise<User | undefined>;
+  updateOrganizationOnboardingProgress(organizationId: string, step: 'registered' | 'email_confirmed' | 'company_details_completed' | 'missions_completed' | 'package_upgraded'): Promise<Organization | undefined>;
+  updateOrganizationCompanyDetails(organizationId: string, details: {
+    companyAddress?: string;
+    province?: string;
+    city?: string;
+    industryType?: string;
+    position?: string;
+    referralSource?: string;
+  }): Promise<Organization | undefined>;
   deleteUser(id: string): Promise<boolean>;
   
   // Tour tracking
@@ -82,6 +90,11 @@ export interface IStorage {
   // Organizations
   getOrganization(id: string): Promise<Organization | undefined>;
   updateOrganization(id: string, updates: any): Promise<any>;
+  getOrganizationOnboardingStatus(organizationId: string): Promise<{ 
+    isCompleted: boolean; 
+    completedAt: Date | null | undefined; 
+    data: any; 
+  }>;
   
   // Subscription Plans
   getSubscriptionPlan(id: string): Promise<any>;
@@ -2398,6 +2411,74 @@ export class DatabaseStorage implements IStorage {
       };
     } catch (error) {
       console.error("Error saving company onboarding progress:", error);
+      throw error;
+    }
+  }
+
+  async updateOrganizationOnboardingProgress(organizationId: string, step: 'registered' | 'email_confirmed' | 'company_details_completed' | 'missions_completed' | 'package_upgraded'): Promise<Organization | undefined> {
+    try {
+      const updateData: Record<string, boolean | Date> = {};
+      
+      switch (step) {
+        case 'registered':
+          updateData.onboardingRegistered = true;
+          break;
+        case 'email_confirmed':
+          updateData.onboardingEmailConfirmed = true;
+          break;
+        case 'company_details_completed':
+          updateData.onboardingCompanyDetailsCompleted = true;
+          break;
+        case 'missions_completed':
+          updateData.onboardingMissionsCompleted = true;
+          break;
+        case 'package_upgraded':
+          updateData.onboardingPackageUpgraded = true;
+          break;
+      }
+
+      // If all steps are completed, mark onboarding as completed
+      const org = await this.getOrganization(organizationId);
+      if (org && step === 'package_upgraded') {
+        updateData.onboardingCompleted = true;
+        updateData.onboardingCompletedAt = new Date();
+      }
+
+      const [updated] = await db
+        .update(organizations)
+        .set(updateData)
+        .where(eq(organizations.id, organizationId))
+        .returning();
+
+      return updated;
+    } catch (error) {
+      console.error("Error updating organization onboarding progress:", error);
+      throw error;
+    }
+  }
+
+  async updateOrganizationCompanyDetails(organizationId: string, details: {
+    companyAddress?: string;
+    province?: string;
+    city?: string;
+    industryType?: string;
+    position?: string;
+    referralSource?: string;
+  }): Promise<Organization | undefined> {
+    try {
+      const [updated] = await db
+        .update(organizations)
+        .set({
+          ...details,
+          onboardingCompanyDetailsCompleted: true, // Mark this step as completed
+          updatedAt: new Date()
+        })
+        .where(eq(organizations.id, organizationId))
+        .returning();
+
+      return updated;
+    } catch (error) {
+      console.error("Error updating organization company details:", error);
       throw error;
     }
   }

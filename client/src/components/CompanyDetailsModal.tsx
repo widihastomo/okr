@@ -55,13 +55,13 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
       setFormData(prev => ({
         ...prev,
         companyName: org.organization?.name || "",
-        // Pre-fill other fields if they exist in user data
-        companyAddress: org.user?.companyAddress || "",
-        province: org.user?.province || "",
-        city: org.user?.city || "",
-        industryType: org.user?.industryType || "",
-        position: org.user?.position || "",
-        referralSource: org.user?.referralSource || "",
+        // Pre-fill other fields if they exist in organization data
+        companyAddress: org.organization?.companyAddress || "",
+        province: org.organization?.province || "",
+        city: org.organization?.city || "",
+        industryType: org.organization?.industryType || "",
+        position: org.organization?.position || "",
+        referralSource: org.organization?.referralSource || "",
       }));
     }
   }, [userData, open]);
