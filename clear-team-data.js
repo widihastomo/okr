@@ -1,6 +1,5 @@
-import { Pool } from '@neondatabase/serverless';
-import dotenv from 'dotenv';
-dotenv.config();
+const { Pool } = require('@neondatabase/serverless');
+require('dotenv').config();
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -119,4 +118,4 @@ async function clearTeamData() {
   }
 }
 
-clearTeamData();
+clearTeamData().catch(console.error);

@@ -331,7 +331,12 @@ PORT=5001 npm run dev
 - Prevents EADDRINUSE errors with fallback ports
 - Comprehensive logging for port allocation debugging
 
-## Current Issues
+## Current Features
+- **DUAL DATA RESET SYSTEM**: Organization settings page now provides two reset options - 1) Goals Only (resets goals, key results, initiatives, tasks, timeline while preserving teams, cycles, achievements), 2) Complete Reset (resets all data including goals, teams, cycles, achievements while preserving users, settings, invoices)
+- **COMPREHENSIVE RESET BACKEND**: Enhanced `/api/reset-data` endpoint with `resetType` parameter supporting both 'goals-only' and 'complete' reset operations with detailed deletion tracking
+- **ENHANCED USER INTERFACE**: Professional dual reset interface with color-coded options (orange for goals-only, red for complete) with detailed explanations of what data gets deleted vs preserved
+
+## Current Issues  
 - **PERSISTENT DROPDOWN ISSUE**: Daily instant update task status dropdowns consistently fail to register clicks or onChange events despite multiple debugging approaches including native HTML select, custom buttons, visual debugging, and state management fixes. Root cause appears to be a deeper React/DOM interaction issue that requires alternative UI pattern.
 - **WORKAROUND IMPLEMENTED**: Created 4-button selection interface (Belum/Jalan/Selesai/Batal) to replace dropdown for task status changes
 - **ISSUE DOCUMENTATION**: Documented the persistent dropdown/interaction problem in replit.md for future reference

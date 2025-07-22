@@ -1591,19 +1591,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Reset data endpoint for organizations
+  // Reset data endpoint for organizations with two options
   app.post("/api/reset-data", requireAuth, async (req, res) => {
     try {
       const currentUser = req.user as User;
+      const { resetType } = req.body;
       
       // Verify user has organization access
       if (!currentUser.organizationId) {
         return res.status(400).json({ message: "User not associated with an organization" });
       }
       
-      console.log(`🔄 Starting data reset for organization: ${currentUser.organizationId}`);
+      // Validate reset type
+      if (!resetType || !['goals-only', 'complete'].includes(resetType)) {
+        return res.status(400).json({ message: "Invalid reset type. Must be 'goals-only' or 'complete'" });
+      }
       
-      // Get all objectives for this organization
+      console.log(`🔄 Starting ${resetType} data reset for organization: ${currentUser.organizationId}`);
+      
+      let deletedCounts = {
+        objectives: 0,
+        cycles: 0,
+        teams: 0,
+        tasks: 0,
+        achievements: 0
+      };
+      
+      // Always delete objectives and their cascade (goals, key results, initiatives, tasks, timeline)
       const objectives = await storage.getObjectivesByOrganization(currentUser.organizationId);
       console.log(`📋 Found ${objectives.length} objectives to delete`);
       
@@ -1612,6 +1626,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log(`🗑️ Deleting objective: ${objective.title}`);
         await storage.deleteObjectiveWithCascade(objective.id);
       }
+      deletedCounts.objectives = objectives.length;
       
       // Delete any remaining standalone tasks for this organization
       const remainingTasks = await storage.getTasksByOrganization(currentUser.organizationId);
@@ -1621,23 +1636,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log(`🗑️ Deleting remaining task: ${task.title}`);
         await storage.deleteTask(task.id);
       }
+      deletedCounts.tasks = remainingTasks.length;
       
-      // Delete all cycles for this organization
-      const cycles = await storage.getCyclesByOrganization(currentUser.organizationId);
-      console.log(`📋 Found ${cycles.length} cycles to delete`);
-      
-      for (const cycle of cycles) {
-        console.log(`🗑️ Deleting cycle: ${cycle.name}`);
-        await storage.deleteCycle(cycle.id);
+      if (resetType === 'complete') {
+        // Delete cycles
+        const cycles = await storage.getCyclesByOrganization(currentUser.organizationId);
+        console.log(`📋 Found ${cycles.length} cycles to delete`);
+        
+        for (const cycle of cycles) {
+          console.log(`🗑️ Deleting cycle: ${cycle.name}`);
+          await storage.deleteCycle(cycle.id);
+        }
+        deletedCounts.cycles = cycles.length;
+        
+        // Delete teams (but keep team members for user consistency)
+        const teams = await storage.getTeamsByOrganization(currentUser.organizationId);
+        console.log(`📋 Found ${teams.length} teams to delete`);
+        
+        for (const team of teams) {
+          console.log(`🗑️ Deleting team: ${team.name}`);
+          await storage.deleteTeam(team.id);
+        }
+        deletedCounts.teams = teams.length;
+        
+        // Delete trial achievements for organization users
+        try {
+          const orgUsers = await storage.getUsersByOrganization(currentUser.organizationId);
+          for (const user of orgUsers) {
+            console.log(`🗑️ Deleting achievements for user: ${user.name || user.email}`);
+            await db.delete(userTrialAchievements)
+              .where(eq(userTrialAchievements.userId, user.id));
+          }
+          deletedCounts.achievements = orgUsers.length;
+        } catch (error) {
+          console.error("Error deleting achievements:", error);
+        }
       }
       
-      console.log(`✅ Data reset completed for organization: ${currentUser.organizationId}`);
+      console.log(`✅ ${resetType} data reset completed for organization: ${currentUser.organizationId}`);
+      
+      const message = resetType === 'goals-only' 
+        ? "Goals dan turunannya berhasil dihapus"
+        : "Semua data organisasi berhasil dihapus";
       
       res.json({ 
-        message: "All data reset successfully",
-        deletedObjectives: objectives.length,
-        deletedCycles: cycles.length,
-        deletedTasks: remainingTasks.length
+        message,
+        resetType,
+        deleted: deletedCounts
       });
     } catch (error) {
       console.error("Error resetting data:", error);

@@ -413,25 +413,33 @@ export default function OrganizationSettings() {
 
   // Data reset mutation
   const resetDataMutation = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (resetType: 'goals-only' | 'complete') => {
       const response = await fetch("/api/reset-data", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ resetType }),
       });
       if (!response.ok) throw new Error('Failed to reset data');
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data, resetType) => {
       queryClient.invalidateQueries({ queryKey: ["/api/objectives"] });
       queryClient.invalidateQueries({ queryKey: ["/api/key-results"] });
       queryClient.invalidateQueries({ queryKey: ["/api/initiatives"] });
       queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
       queryClient.invalidateQueries({ queryKey: ["/api/cycles"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/teams"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/trial/achievements"] });
       setIsResettingData(false);
+      
+      const message = resetType === 'goals-only' 
+        ? "Goals dan turunannya (Key Results, Initiatives, Tasks, Timeline) telah dihapus."
+        : "Semua data (Goals, Teams, Cycles, Achievements, Timeline) telah dihapus.";
+      
       toast({
         title: "Data Berhasil Direset",
-        description: "Semua objective, key result, initiative, task, dan siklus telah dihapus.",
-        className: "border-green-200 bg-green-50 text-green-800",
+        description: message,
+        variant: "success",
       });
     },
     onError: (error) => {
@@ -1499,65 +1507,156 @@ export default function OrganizationSettings() {
             <CardContent>
               <div className="space-y-6">
                 {/* Data Reset Section */}
-                <div className="p-4 border border-orange-200 rounded-lg bg-orange-50">
-                  <h4 className="font-semibold text-orange-900 mb-2">Reset Data</h4>
-                  <p className="text-sm text-orange-700 mb-4">
-                    Hapus semua goal, angka target, initiative, task, dan siklus dari organisasi ini. 
-                    Data anggota dan tim akan tetap tersimpan.
+                <div className="p-4 border border-orange-200 rounded-lg bg-orange-50 space-y-4">
+                  <h4 className="font-semibold text-orange-900">Reset Data</h4>
+                  <p className="text-sm text-orange-700">
+                    Pilih jenis reset data yang sesuai dengan kebutuhan Anda. 
+                    Semua tindakan ini tidak dapat dibatalkan.
                   </p>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="border-orange-300 text-orange-700 hover:bg-orange-100"
-                        disabled={resetDataMutation.isPending}
-                      >
-                        {resetDataMutation.isPending ? "Mereset..." : "Reset Data"}
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Konfirmasi Reset Data</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          <div className="space-y-4">
-                            <p>Apakah Anda yakin ingin mereset semua data Goal (Goal, Angka Target, Initiative, Task, dan Siklus)? 
-                            Tindakan ini tidak dapat dibatalkan.</p>
-                            
-                            <div>
-                              <strong>Data yang akan dihapus:</strong>
-                              <ul className="list-disc ml-6 mt-2">
-                                <li>Semua goal dan angka target</li>
-                                <li>Semua initiative dan task</li>
-                                <li>Semua siklus</li>
-                              </ul>
-                            </div>
-                            
-                            <div>
-                              <strong>Data yang tetap tersimpan:</strong>
-                              <ul className="list-disc ml-6 mt-2">
-                                <li>Anggota dan tim</li>
-                                <li>Pengaturan organisasi</li>
-                                <li>Riwayat invoice</li>
-                              </ul>
-                            </div>
-                          </div>
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Batal</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={() => {
-                            setIsResettingData(true);
-                            resetDataMutation.mutate();
-                          }}
-                          className="bg-orange-600 hover:bg-orange-700"
-                        >
-                          Ya, Reset Data
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
+                  
+                  {/* Option 1: Goals Only */}
+                  <div className="border border-orange-100 rounded-md p-3 bg-white">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <h5 className="font-medium text-orange-900 mb-1">Reset Goals Saja</h5>
+                        <p className="text-xs text-orange-700 mb-2">
+                          Hapus semua goals dan turunannya (key results, initiatives, tasks)
+                        </p>
+                        <div className="text-xs text-orange-600">
+                          <strong>Akan dihapus:</strong> Goals, Key Results, Initiatives, Tasks, Timeline
+                        </div>
+                        <div className="text-xs text-green-600 mt-1">
+                          <strong>Tetap tersimpan:</strong> Teams, Cycles, Members, Settings, Achievements
+                        </div>
+                      </div>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="border-orange-300 text-orange-700 hover:bg-orange-100 ml-3"
+                            disabled={resetDataMutation.isPending}
+                          >
+                            {resetDataMutation.isPending ? "Mereset..." : "Reset Goals"}
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Konfirmasi Reset Goals</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Apakah Anda yakin ingin mereset semua Goals dan turunannya? 
+                              Tindakan ini tidak dapat dibatalkan.
+                              
+                              <div className="mt-4 space-y-2">
+                                <div>
+                                  <strong className="text-red-600">Data yang akan dihapus:</strong>
+                                  <ul className="list-disc ml-6 mt-1 text-sm">
+                                    <li>Semua Goals dan Key Results</li>
+                                    <li>Semua Initiatives dan Tasks</li>
+                                    <li>Timeline dan Check-ins</li>
+                                  </ul>
+                                </div>
+                                
+                                <div>
+                                  <strong className="text-green-600">Data yang tetap tersimpan:</strong>
+                                  <ul className="list-disc ml-6 mt-1 text-sm">
+                                    <li>Teams dan Members</li>
+                                    <li>Cycles dan Periods</li>
+                                    <li>Achievements dan Settings</li>
+                                  </ul>
+                                </div>
+                              </div>
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Batal</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => {
+                                setIsResettingData(true);
+                                resetDataMutation.mutate('goals-only');
+                              }}
+                              className="bg-orange-600 hover:bg-orange-700"
+                            >
+                              Ya, Reset Goals Saja
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  </div>
+
+                  {/* Option 2: Complete Reset */}
+                  <div className="border border-red-200 rounded-md p-3 bg-red-50">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <h5 className="font-medium text-red-900 mb-1">Reset Semua Data</h5>
+                        <p className="text-xs text-red-700 mb-2">
+                          Hapus semua data termasuk goals, cycles, teams, dan achievements
+                        </p>
+                        <div className="text-xs text-red-600">
+                          <strong>Akan dihapus:</strong> Goals, Teams, Cycles, Achievements, Timeline
+                        </div>
+                        <div className="text-xs text-green-600 mt-1">
+                          <strong>Tetap tersimpan:</strong> Members, Organization Settings, Invoices
+                        </div>
+                      </div>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="border-red-300 text-red-700 hover:bg-red-100 ml-3"
+                            disabled={resetDataMutation.isPending}
+                          >
+                            {resetDataMutation.isPending ? "Mereset..." : "Reset Semua"}
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Konfirmasi Reset Semua Data</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              <strong className="text-red-600">PERINGATAN:</strong> Anda akan mereset SEMUA data organisasi! 
+                              Tindakan ini tidak dapat dibatalkan.
+                              
+                              <div className="mt-4 space-y-2">
+                                <div>
+                                  <strong className="text-red-600">Data yang akan dihapus:</strong>
+                                  <ul className="list-disc ml-6 mt-1 text-sm">
+                                    <li>Semua Goals dan Key Results</li>
+                                    <li>Semua Teams dan Team Members</li>
+                                    <li>Semua Cycles dan Periods</li>
+                                    <li>Semua Initiatives dan Tasks</li>
+                                    <li>Achievements dan Timeline</li>
+                                  </ul>
+                                </div>
+                                
+                                <div>
+                                  <strong className="text-green-600">Data yang tetap tersimpan:</strong>
+                                  <ul className="list-disc ml-6 mt-1 text-sm">
+                                    <li>User accounts dan profiles</li>
+                                    <li>Organization settings</li>
+                                    <li>Invoice history</li>
+                                  </ul>
+                                </div>
+                              </div>
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Batal</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => {
+                                setIsResettingData(true);
+                                resetDataMutation.mutate('complete');
+                              }}
+                              className="bg-red-600 hover:bg-red-700"
+                            >
+                              Ya, Reset Semua Data
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Danger Zone */}
