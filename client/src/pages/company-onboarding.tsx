@@ -275,7 +275,6 @@ export default function CompanyOnboarding() {
     queryKey: ["/api/onboarding/progress"],
     retry: false,
     staleTime: 30 * 1000, // 30 seconds cache
-    cacheTime: 2 * 60 * 1000, // 2 minutes cache
     refetchOnWindowFocus: false, // Don't refetch on window focus
     refetchInterval: false, // Don't auto-refetch
   });
@@ -306,7 +305,7 @@ export default function CompanyOnboarding() {
         }
         break;
       case 2:
-        if (!data.objective.trim()) {
+        if (!data.objective?.trim()) {
           return {
             isValid: false,
             message: "Silakan pilih atau tulis goal yang ingin dicapai",
@@ -765,7 +764,7 @@ export default function CompanyOnboarding() {
 
       case 2: // Buat Objective
         const getObjectiveOptions = (teamFocus: string) => {
-          const options = {
+          const options: Record<string, string[]> = {
             penjualan: [
               "Menciptakan pertumbuhan penjualan yang berkelanjutan dan signifikan",
               "Membangun basis pelanggan yang kuat dan loyal",
@@ -790,7 +789,7 @@ export default function CompanyOnboarding() {
           return options[teamFocus] || [];
         };
 
-        const objectiveOptions = getObjectiveOptions(onboardingData.teamFocus);
+        const objectiveOptions = getObjectiveOptions(onboardingData.teamFocus || "");
 
         return (
           <div className="space-y-4">
@@ -807,7 +806,7 @@ export default function CompanyOnboarding() {
                     setOnboardingData({ ...onboardingData, objective: value })
                   }
                 >
-                  {objectiveOptions.map((option, index) => (
+                  {objectiveOptions.map((option: string, index: number) => (
                     <div
                       key={index}
                       className="flex items-start space-x-2 p-3 rounded-lg border border-gray-200 hover:bg-gray-50"
@@ -841,9 +840,10 @@ export default function CompanyOnboarding() {
         );
 
       case 3: // Ukuran Keberhasilan
-        const getKeyResultOptions = (objective: string) => {
+        const getKeyResultOptions = (objective: string | undefined) => {
+          if (!objective) return [];
           // Key Results untuk objective penjualan
-          const salesKeyResults = {
+          const salesKeyResults: Record<string, string[]> = {
             "Menciptakan pertumbuhan penjualan yang berkelanjutan dan signifikan":
               [
                 "Mencapai target penjualan Rp 500 juta per bulan",
@@ -863,7 +863,7 @@ export default function CompanyOnboarding() {
           };
 
           // Key Results untuk objective operasional
-          const operationalKeyResults = {
+          const operationalKeyResults: Record<string, string[]> = {
             "Mencapai efisiensi operasional yang optimal dan berkelanjutan": [
               "Mengurangi waktu proses produksi menjadi 4 jam per unit",
               "Meningkatkan utilitas mesin menjadi 85%",
@@ -882,7 +882,7 @@ export default function CompanyOnboarding() {
           };
 
           // Key Results untuk objective customer service
-          const customerServiceKeyResults = {
+          const customerServiceKeyResults: Record<string, string[]> = {
             "Mencapai kepuasan pelanggan yang luar biasa dan berkelanjutan": [
               "Mencapai CSAT score 4.8/5 dalam survey bulanan",
               "Meningkatkan customer retention rate menjadi 95%",
@@ -901,7 +901,7 @@ export default function CompanyOnboarding() {
           };
 
           // Key Results untuk objective marketing
-          const marketingKeyResults = {
+          const marketingKeyResults: Record<string, string[]> = {
             "Meningkatkan kesadaran merek di pasar target": [
               "Mencapai brand recall 60% dalam market research",
               "Meningkatkan social media reach menjadi 100,000 per post",
@@ -920,7 +920,7 @@ export default function CompanyOnboarding() {
           };
 
           // Gabungkan semua key results
-          const allKeyResults = {
+          const allKeyResults: Record<string, string[]> = {
             ...salesKeyResults,
             ...operationalKeyResults,
             ...customerServiceKeyResults,
@@ -944,7 +944,7 @@ export default function CompanyOnboarding() {
                   kemajual Goal : "{onboardingData.objective}"
                 </Label>
                 <div className="space-y-2">
-                  {keyResultOptions.map((option, index) => (
+                  {keyResultOptions.map((option: string, index: number) => (
                     <div
                       key={index}
                       className="flex items-start space-x-2 p-3 rounded-lg border border-gray-200 hover:bg-gray-50"
@@ -985,7 +985,7 @@ export default function CompanyOnboarding() {
                   <strong>Angka target terpilih:</strong>
                 </p>
                 <ul className="text-sm text-blue-700 space-y-1">
-                  {selectedKeyResults.map((kr, index) => (
+                  {selectedKeyResults.map((kr: string, index: number) => (
                     <li key={index}>• {kr}</li>
                   ))}
                 </ul>
