@@ -436,8 +436,48 @@ The system now includes a comprehensive dummy data generation feature that creat
 - **Authentication**: Full integration with authentication middleware
 - **Data Integrity**: All generated data follows proper relationships and constraints
 
+## Frontend API Configuration for Production Builds
+
+### Issue Resolution
+Frontend builds cannot access backend API when deployed separately because they use relative URLs (e.g., `/api/auth/me`) that work in development with Vite proxy but fail in production.
+
+### Solution Implemented
+- **API URL Helper Functions**: Added `getApiBaseUrl()` and `getApiUrl()` to `client/src/lib/queryClient.ts`
+- **Environment Variable**: `VITE_API_URL` for configuring production API endpoint
+- **Automatic Fallback**: Uses same-domain deployment if no API URL specified
+- **Development Compatibility**: Continues using relative URLs in development mode
+
+### Environment Configuration
+```bash
+# Development (uses Vite proxy)
+VITE_API_URL=
+
+# Production deployment
+VITE_API_URL=https://your-app-name.replit.app
+# or
+VITE_API_URL=https://api.yourdomain.com
+```
+
+### Implementation Details
+- **Development**: `getApiBaseUrl()` returns empty string, uses relative URLs
+- **Production**: Checks `VITE_API_URL` environment variable first
+- **Fallback**: Uses `window.location.origin` for same-domain deployments
+- **Modified Functions**: Updated `apiRequest()` and `getQueryFn()` to use API helper
+- **Updated Files**: `useLogout.ts` now uses `apiRequest()` instead of direct fetch
+
+### Additional Frontend Environment Variables
+- **VITE_MIDTRANS_CLIENT_KEY**: Payment gateway client key for frontend
+- **VITE_API_URL**: Backend API base URL for production builds
+
 ## Changelog
 ```
+- July 22, 2025. **FRONTEND API CONFIGURATION COMPLETED** - Successfully implemented production API URL configuration system:
+  * ADDED: getApiUrl() helper function to handle development vs production API endpoints
+  * ENHANCED: apiRequest() and getQueryFn() functions now use proper API URLs for frontend builds
+  * CONFIGURED: VITE_API_URL environment variable for production deployment API endpoints
+  * UPDATED: useLogout.ts to use apiRequest() instead of direct fetch calls
+  * DOCUMENTED: Complete API configuration guide for production deployments
+  * RESULT: Frontend builds can now properly connect to backend APIs in production environment
 - July 22, 2025. **PRODUCTION UI FINALIZED** - Successfully removed "Data Contoh" (sample data) button and DummyDataGeneratorModal for cleaner interface:
   * REMOVED: "Data Contoh" button from daily focus page action buttons
   * REMOVED: DummyDataGeneratorModal component integration and import
