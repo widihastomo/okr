@@ -457,6 +457,7 @@ export default function OrganizationSettings() {
       return response.json();
     },
     onSuccess: (data, resetType) => {
+      // Comprehensive cache invalidation for all related data
       queryClient.invalidateQueries({ queryKey: ["/api/objectives"] });
       queryClient.invalidateQueries({ queryKey: ["/api/key-results"] });
       queryClient.invalidateQueries({ queryKey: ["/api/initiatives"] });
@@ -464,7 +465,22 @@ export default function OrganizationSettings() {
       queryClient.invalidateQueries({ queryKey: ["/api/cycles"] });
       queryClient.invalidateQueries({ queryKey: ["/api/teams"] });
       queryClient.invalidateQueries({ queryKey: ["/api/trial/achievements"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/okrs"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/timeline"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/gamification"] });
+      
+      // Clear all cached data and force refetch
+      queryClient.clear();
+      queryClient.refetchQueries();
+      
       setIsResettingData(false);
+      
+      console.log("🔄 Cache invalidation completed for reset operation");
+      
+      // Refresh the page after 2 seconds to ensure all UI components show updated data
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
       
       const message = resetType === 'goals-only' 
         ? "Goals dan turunannya (Key Results, Initiatives, Tasks, Timeline) telah dihapus."
