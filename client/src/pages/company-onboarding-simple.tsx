@@ -1,0 +1,158 @@
+import { useState, useEffect } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { useLocation } from "wouter";
+import { CompanyDetailsModal } from "@/components/CompanyDetailsModal";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Building2, Target, Users, TrendingUp } from "lucide-react";
+import refokusLogo from "@assets/refokus_1751810711179.png";
+
+export default function CompanyOnboardingSimple() {
+  const { user, isLoading } = useAuth();
+  const [, navigate] = useLocation();
+  const [showCompanyModal, setShowCompanyModal] = useState(false);
+
+  // Check if user needs to complete company details
+  useEffect(() => {
+    if (!isLoading && user) {
+      const hasCompleteCompanyDetails = 
+        (user as any).companyAddress && 
+        (user as any).province && 
+        (user as any).city;
+
+      if (!hasCompleteCompanyDetails) {
+        setShowCompanyModal(true);
+      } else {
+        // If company details are complete, proceed to main app
+        localStorage.setItem("onboarding-completed", "true");
+        navigate("/");
+      }
+    }
+  }, [user, isLoading, navigate]);
+
+  // Handle company details completion
+  const handleCompanyDetailsComplete = () => {
+    setShowCompanyModal(false);
+    localStorage.setItem("onboarding-completed", "true");
+    navigate("/");
+  };
+
+  // Handle skip onboarding (temporary)
+  const handleSkipOnboarding = () => {
+    localStorage.setItem("onboarding-completed", "true");
+    navigate("/");
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50">
+      {/* Company Details Modal */}
+      <CompanyDetailsModal
+        open={showCompanyModal}
+        onComplete={handleCompanyDetailsComplete}
+      />
+
+      {/* Header */}
+      <div className="bg-white shadow-sm border-b">
+        <div className="max-w-4xl mx-auto px-6 py-4">
+          <div className="flex items-center">
+            <img src={refokusLogo} alt="Refokus Logo" className="h-8 w-auto" />
+            <span className="ml-3 text-xl font-bold text-gray-900">
+              Setup Organisasi
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="max-w-4xl mx-auto px-6 py-12">
+        <div className="text-center mb-12">
+          <h1 className="text-3xl font-bold text-gray-900 mb-4">
+            Selamat datang di Refokus!
+          </h1>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Mari setup organisasi Anda untuk memulai perjalanan pencapaian target yang terukur
+          </p>
+        </div>
+
+        {/* Features Overview */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          <Card className="text-center">
+            <CardHeader className="pb-3">
+              <Building2 className="h-8 w-8 text-orange-500 mx-auto mb-2" />
+              <CardTitle className="text-sm">Setup Organisasi</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <CardDescription className="text-xs">
+                Lengkapi profil dan struktur perusahaan
+              </CardDescription>
+            </CardContent>
+          </Card>
+
+          <Card className="text-center">
+            <CardHeader className="pb-3">
+              <Target className="h-8 w-8 text-orange-500 mx-auto mb-2" />
+              <CardTitle className="text-sm">Buat Target</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <CardDescription className="text-xs">
+                Tentukan objective dan key results
+              </CardDescription>
+            </CardContent>
+          </Card>
+
+          <Card className="text-center">
+            <CardHeader className="pb-3">
+              <Users className="h-8 w-8 text-orange-500 mx-auto mb-2" />
+              <CardTitle className="text-sm">Undang Tim</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <CardDescription className="text-xs">
+                Ajak anggota tim untuk berkolaborasi
+              </CardDescription>
+            </CardContent>
+          </Card>
+
+          <Card className="text-center">
+            <CardHeader className="pb-3">
+              <TrendingUp className="h-8 w-8 text-orange-500 mx-auto mb-2" />
+              <CardTitle className="text-sm">Tracking Progress</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <CardDescription className="text-xs">
+                Monitor pencapaian secara real-time
+              </CardDescription>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="text-center space-y-4">
+          <Button
+            onClick={() => setShowCompanyModal(true)}
+            className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 text-lg"
+          >
+            Mulai Setup Organisasi
+          </Button>
+          
+          <div>
+            <Button
+              variant="ghost"
+              onClick={handleSkipOnboarding}
+              className="text-gray-500 hover:text-gray-700 text-sm"
+            >
+              Lewati untuk sekarang
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

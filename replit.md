@@ -438,6 +438,14 @@ The system now includes a comprehensive dummy data generation feature that creat
 
 ## Changelog
 ```
+- July 22, 2025. **COMPANY ONBOARDING FLOW REACTIVATED** - Successfully reactivated company onboarding page to redirect new users:
+  * CREATED: company-onboarding-simple.tsx as simplified onboarding page with company details collection
+  * MODIFIED: AuthFlow.tsx email verification to redirect new users to /onboarding instead of directly to main app
+  * MODIFIED: App.tsx routing to use CompanyOnboardingSimple component and proper new user redirect logic
+  * ENHANCED: New user flow now goes: Registration → Email Verification → Onboarding Page → Company Details Modal → Main App
+  * FIXED: TypeScript errors in onboarding component with proper user type casting and modal props
+  * PRESERVED: Invoice data protection - onboarding flow never affects billing/invoice data
+  * RESULT: New registered users are now properly guided through onboarding before accessing main application
 - July 22, 2025. **COMPANY DETAILS RESET COMPLETED** - Successfully cleared all company details from organization data:
   * CLEARED: Company address, province, city, industry type, position, referral source fields set to NULL
   * RESET: onboarding_company_details_completed flag set to false

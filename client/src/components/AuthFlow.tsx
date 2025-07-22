@@ -390,18 +390,18 @@ export default function AuthFlow({
         localStorage.removeItem("isLoggedOut");
         await queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
 
-        // Set flags for new user flow - skip onboarding and show welcome screen
-        localStorage.setItem("onboarding-completed", "true");
+        // Set flags for new user flow - redirect to onboarding first
+        localStorage.removeItem("onboarding-completed");
         localStorage.removeItem("welcome-screen-shown");
 
         toast({
           title: "Email berhasil diverifikasi",
-          description: "Akun Anda sudah aktif! Selamat datang di Refokus",
+          description: "Akun Anda sudah aktif! Mari lengkapi profil perusahaan",
           variant: "success",
         });
 
-        // Redirect directly to index page - welcome screen will show automatically
-        navigate("/");
+        // Redirect to onboarding page for new users
+        navigate("/onboarding");
 
         // Call onSuccess callback if provided
         if (onSuccess) onSuccess();

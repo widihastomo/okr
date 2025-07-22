@@ -62,7 +62,7 @@ import SubscriptionAddonIntegration from "@/pages/subscription-addon-integration
 import DummyClientExamples from "@/pages/dummy-client-examples";
 import ReferralCodes from "@/pages/referral-codes";
 
-import CompanyOnboarding from "@/pages/company-onboarding";
+import CompanyOnboardingSimple from "@/pages/company-onboarding-simple";
 
 import ClientStatusMapping from "@/pages/client-status-mapping";
 import ApplicationSettings from "@/pages/system-admin/application-settings";
@@ -101,8 +101,7 @@ function Router() {
     }
   }, [isAuthenticated]);
 
-  // Handle onboarding redirect only on root path
-  // Skip onboarding redirect for new users - they get welcome screen instead
+  // Handle onboarding redirect for new users
   useEffect(() => {
     if (
       isAuthenticated &&
@@ -111,12 +110,12 @@ function Router() {
       onboardingStatus &&
       !(onboardingStatus as any)?.isCompleted
     ) {
-      // Check if user is completely new (no onboarding-completed flag)
+      // Check if user has completed onboarding
       const onboardingCompleted = localStorage.getItem("onboarding-completed") === "true";
       
-      // Only redirect to onboarding if user has started but not completed it
-      // New users (no onboarding-completed flag) skip onboarding and get welcome screen
-      if (!onboardingCompleted && (onboardingStatus as any)?.data && (onboardingStatus as any).data.currentStep > 1) {
+      // Redirect new users to onboarding page first
+      if (!onboardingCompleted) {
+        console.log("🎯 New user detected, redirecting to onboarding page");
         navigate("/onboarding");
       }
     }
@@ -230,7 +229,7 @@ function Router() {
             )}
           >
             <Switch>
-              <Route path="/onboarding" component={CompanyOnboarding} />
+              <Route path="/onboarding" component={CompanyOnboardingSimple} />
               <Route path="/" component={DailyFocusPage} />
               <Route path="/daily-focus" component={DailyFocusPage} />
               <Route path="/tasks" component={TasksPage} />
