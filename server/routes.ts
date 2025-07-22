@@ -18,7 +18,7 @@ import {
 import { z } from "zod";
 import { createInsertSchema } from "drizzle-zod";
 import { setupEmailAuth } from "./authRoutes";
-import { requireAuth, hashPassword } from "./emailAuth";
+import { requireAuth, hashPassword, verifyPassword } from "./emailAuth";
 import { calculateProgressStatus } from "./progress-tracker";
 import { updateObjectiveWithAutoStatus } from "./storage";
 

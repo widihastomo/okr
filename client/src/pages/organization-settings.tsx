@@ -1619,64 +1619,68 @@ export default function OrganizationSettings() {
                         <AlertDialogContent>
                           <AlertDialogHeader>
                             <AlertDialogTitle>Konfirmasi Reset Goals</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Apakah Anda yakin ingin mereset semua Goals dan turunannya? 
-                              Tindakan ini tidak dapat dibatalkan.
-                              
-                              <div className="mt-4 space-y-2">
-                                <div>
-                                  <strong className="text-red-600">Data yang akan dihapus:</strong>
-                                  <ul className="list-disc ml-6 mt-1 text-sm">
-                                    <li>Semua Goals dan Key Results</li>
-                                    <li>Semua Initiatives dan Tasks</li>
-                                    <li>Timeline dan Check-ins</li>
-                                  </ul>
-                                </div>
+                            <AlertDialogDescription asChild>
+                              <div>
+                                <p className="mb-4">
+                                  Apakah Anda yakin ingin mereset semua Goals dan turunannya? 
+                                  Tindakan ini tidak dapat dibatalkan.
+                                </p>
                                 
-                                <div>
-                                  <strong className="text-green-600">Data yang tetap tersimpan:</strong>
-                                  <ul className="list-disc ml-6 mt-1 text-sm">
-                                    <li>Teams dan Members</li>
-                                    <li>Cycles dan Periods</li>
-                                    <li>Achievements dan Settings</li>
-                                    <li>Invoice History</li>
-                                  </ul>
-                                </div>
-                                
-                                <div className="mt-6 p-4 border border-orange-200 rounded-lg bg-orange-50">
-                                  <label className="block text-sm font-medium text-orange-900 mb-2">
-                                    Masukkan Password Anda untuk Konfirmasi
-                                  </label>
-                                  <div className="flex gap-2">
-                                    <Input
-                                      type="password"
-                                      placeholder="Password akun Anda"
-                                      value={resetPassword}
-                                      onChange={(e) => {
-                                        setResetPassword(e.target.value);
-                                        setIsPasswordValid(false);
-                                        setPasswordError("");
-                                      }}
-                                      className="flex-1"
-                                    />
-                                    <Button
-                                      onClick={() => handlePasswordVerification(resetPassword)}
-                                      disabled={!resetPassword || verifyingPassword}
-                                      size="sm"
-                                      variant="outline"
-                                    >
-                                      {verifyingPassword ? <Loader2 className="h-4 w-4 animate-spin" /> : "Verifikasi"}
-                                    </Button>
+                                <div className="space-y-2">
+                                  <div>
+                                    <strong className="text-red-600">Data yang akan dihapus:</strong>
+                                    <ul className="list-disc ml-6 mt-1 text-sm">
+                                      <li>Semua Goals dan Key Results</li>
+                                      <li>Semua Initiatives dan Tasks</li>
+                                      <li>Timeline dan Check-ins</li>
+                                    </ul>
                                   </div>
-                                  {passwordError && (
-                                    <p className="text-red-600 text-xs mt-1">{passwordError}</p>
-                                  )}
-                                  {isPasswordValid && (
-                                    <p className="text-green-600 text-xs mt-1 flex items-center">
-                                      <CheckCircle className="h-3 w-3 mr-1" />
-                                      Password terverifikasi
-                                    </p>
-                                  )}
+                                  
+                                  <div>
+                                    <strong className="text-green-600">Data yang tetap tersimpan:</strong>
+                                    <ul className="list-disc ml-6 mt-1 text-sm">
+                                      <li>Teams dan Members</li>
+                                      <li>Cycles dan Periods</li>
+                                      <li>Achievements dan Settings</li>
+                                      <li>Invoice History</li>
+                                    </ul>
+                                  </div>
+                                  
+                                  <div className="mt-6 p-4 border border-orange-200 rounded-lg bg-orange-50">
+                                    <label className="block text-sm font-medium text-orange-900 mb-2">
+                                      Masukkan Password Anda untuk Konfirmasi
+                                    </label>
+                                    <div className="flex gap-2">
+                                      <Input
+                                        type="password"
+                                        placeholder="Password akun Anda"
+                                        value={resetPassword}
+                                        onChange={(e) => {
+                                          setResetPassword(e.target.value);
+                                          setIsPasswordValid(false);
+                                          setPasswordError("");
+                                        }}
+                                        className="flex-1"
+                                      />
+                                      <Button
+                                        onClick={() => handlePasswordVerification(resetPassword)}
+                                        disabled={!resetPassword || verifyingPassword}
+                                        size="sm"
+                                        variant="outline"
+                                      >
+                                        {verifyingPassword ? <Loader2 className="h-4 w-4 animate-spin" /> : "Verifikasi"}
+                                      </Button>
+                                    </div>
+                                    {passwordError && (
+                                      <div className="text-red-600 text-xs mt-1">{passwordError}</div>
+                                    )}
+                                    {isPasswordValid && (
+                                      <div className="text-green-600 text-xs mt-1 flex items-center">
+                                        <CheckCircle className="h-3 w-3 mr-1" />
+                                        Password terverifikasi
+                                      </div>
+                                    )}
+                                  </div>
                                 </div>
                               </div>
                             </AlertDialogDescription>
@@ -1736,65 +1740,69 @@ export default function OrganizationSettings() {
                         <AlertDialogContent>
                           <AlertDialogHeader>
                             <AlertDialogTitle>Konfirmasi Reset Semua Data</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              <strong className="text-red-600">PERINGATAN:</strong> Anda akan mereset SEMUA data organisasi! 
-                              Tindakan ini tidak dapat dibatalkan.
-                              
-                              <div className="mt-4 space-y-2">
-                                <div>
-                                  <strong className="text-red-600">Data yang akan dihapus:</strong>
-                                  <ul className="list-disc ml-6 mt-1 text-sm">
-                                    <li>Semua Goals dan Key Results</li>
-                                    <li>Semua Teams dan Team Members</li>
-                                    <li>Semua Cycles dan Periods</li>
-                                    <li>Semua Initiatives dan Tasks</li>
-                                    <li>Achievements dan Timeline</li>
-                                  </ul>
-                                </div>
+                            <AlertDialogDescription asChild>
+                              <div>
+                                <p className="mb-4">
+                                  <strong className="text-red-600">PERINGATAN:</strong> Anda akan mereset SEMUA data organisasi! 
+                                  Tindakan ini tidak dapat dibatalkan.
+                                </p>
                                 
-                                <div>
-                                  <strong className="text-green-600">Data yang tetap tersimpan:</strong>
-                                  <ul className="list-disc ml-6 mt-1 text-sm">
-                                    <li>User accounts dan profiles</li>
-                                    <li>Organization settings</li>
-                                    <li>Invoice history</li>
-                                  </ul>
-                                </div>
-                                
-                                <div className="mt-6 p-4 border border-red-200 rounded-lg bg-red-50">
-                                  <label className="block text-sm font-medium text-red-900 mb-2">
-                                    Masukkan Password Anda untuk Konfirmasi
-                                  </label>
-                                  <div className="flex gap-2">
-                                    <Input
-                                      type="password"
-                                      placeholder="Password akun Anda"
-                                      value={resetPassword}
-                                      onChange={(e) => {
-                                        setResetPassword(e.target.value);
-                                        setIsPasswordValid(false);
-                                        setPasswordError("");
-                                      }}
-                                      className="flex-1"
-                                    />
-                                    <Button
-                                      onClick={() => handlePasswordVerification(resetPassword)}
-                                      disabled={!resetPassword || verifyingPassword}
-                                      size="sm"
-                                      variant="outline"
-                                    >
-                                      {verifyingPassword ? <Loader2 className="h-4 w-4 animate-spin" /> : "Verifikasi"}
-                                    </Button>
+                                <div className="space-y-2">
+                                  <div>
+                                    <strong className="text-red-600">Data yang akan dihapus:</strong>
+                                    <ul className="list-disc ml-6 mt-1 text-sm">
+                                      <li>Semua Goals dan Key Results</li>
+                                      <li>Semua Teams dan Team Members</li>
+                                      <li>Semua Cycles dan Periods</li>
+                                      <li>Semua Initiatives dan Tasks</li>
+                                      <li>Achievements dan Timeline</li>
+                                    </ul>
                                   </div>
-                                  {passwordError && (
-                                    <p className="text-red-600 text-xs mt-1">{passwordError}</p>
-                                  )}
-                                  {isPasswordValid && (
-                                    <p className="text-green-600 text-xs mt-1 flex items-center">
-                                      <CheckCircle className="h-3 w-3 mr-1" />
-                                      Password terverifikasi
-                                    </p>
-                                  )}
+                                  
+                                  <div>
+                                    <strong className="text-green-600">Data yang tetap tersimpan:</strong>
+                                    <ul className="list-disc ml-6 mt-1 text-sm">
+                                      <li>User accounts dan profiles</li>
+                                      <li>Organization settings</li>
+                                      <li>Invoice history</li>
+                                    </ul>
+                                  </div>
+                                  
+                                  <div className="mt-6 p-4 border border-red-200 rounded-lg bg-red-50">
+                                    <label className="block text-sm font-medium text-red-900 mb-2">
+                                      Masukkan Password Anda untuk Konfirmasi
+                                    </label>
+                                    <div className="flex gap-2">
+                                      <Input
+                                        type="password"
+                                        placeholder="Password akun Anda"
+                                        value={resetPassword}
+                                        onChange={(e) => {
+                                          setResetPassword(e.target.value);
+                                          setIsPasswordValid(false);
+                                          setPasswordError("");
+                                        }}
+                                        className="flex-1"
+                                      />
+                                      <Button
+                                        onClick={() => handlePasswordVerification(resetPassword)}
+                                        disabled={!resetPassword || verifyingPassword}
+                                        size="sm"
+                                        variant="outline"
+                                      >
+                                        {verifyingPassword ? <Loader2 className="h-4 w-4 animate-spin" /> : "Verifikasi"}
+                                      </Button>
+                                    </div>
+                                    {passwordError && (
+                                      <div className="text-red-600 text-xs mt-1">{passwordError}</div>
+                                    )}
+                                    {isPasswordValid && (
+                                      <div className="text-green-600 text-xs mt-1 flex items-center">
+                                        <CheckCircle className="h-3 w-3 mr-1" />
+                                        Password terverifikasi
+                                      </div>
+                                    )}
+                                  </div>
                                 </div>
                               </div>
                             </AlertDialogDescription>
