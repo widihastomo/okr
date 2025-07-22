@@ -372,22 +372,12 @@ const TOUR_STEPS: TourStep[] = [
     category: "feature",
   },
   {
-    id: "analytics-overview-tab",
-    title: "Overview Tab - Dashboard Umum",
+    id: "analytics-tabs",
+    title: "Analytics Tabs - Tab Navigation",
     description:
-      "Tab Overview menampilkan ringkasan dashboard dengan chart distribusi status objective, progress over time, dan metrics utama seperti total initiatives, key results, dan task completion rate. Ini memberikan gambaran cepat performa organisasi secara keseluruhan.",
+      "Navigasi tab Analytics terdiri dari 4 bagian utama: Overview (dashboard umum), Team Performance (performa tim), User Performance (performa individu), dan Initiatives & Tasks (analisis proyek). Gunakan tab ini untuk melihat berbagai perspektif analytics sesuai kebutuhan analisis Anda.",
     icon: Activity,
-    selector: '[data-tour="analytics-overview-tab"]',
-    position: "bottom",
-    category: "feature",
-  },
-  {
-    id: "analytics-teams-tab",
-    title: "Team Performance Tab - Performa Tim",
-    description:
-      "Tab Team Performance menyajikan perbandingan performa antar tim melalui bar chart dan detail performance table. Anda dapat melihat rata-rata progress, jumlah objectives, key results yang selesai, dan ranking tim berdasarkan pencapaian.",
-    icon: Users,
-    selector: '[data-tour="analytics-teams-tab"]',
+    selector: '[data-tour="analytics-tabs"]',
     position: "bottom",
     category: "feature",
   },

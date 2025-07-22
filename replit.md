@@ -438,6 +438,13 @@ The system now includes a comprehensive dummy data generation feature that creat
 
 ## Changelog
 ```
+- July 22, 2025. **ANALYTICS TOUR SIMPLIFICATION COMPLETED** - Successfully simplified Analytics page tour to only highlight filter and tabs:
+  * SIMPLIFIED: Combined all individual analytics tab tours into single analytics-tabs highlight
+  * REMOVED: analytics-overview-tab and analytics-teams-tab individual steps
+  * CONSOLIDATED: All 4 analytics tabs (Overview, Team Performance, User Performance, Initiatives & Tasks) now highlighted together
+  * MAINTAINED: Analytics filters tour step for data filtering explanation
+  * OPTIMIZED: Analytics tour now consists of only 2 focused steps: filters + tabs navigation
+  * RESULT: Cleaner Analytics tour focusing on essential navigation elements without overwhelming individual tab explanations
 - July 22, 2025. **ADDITIONAL TOUR CLEANUP COMPLETED** - Successfully removed 5 additional unnecessary tour steps for further optimization:
   * REMOVED: Tour step 13 (goals-overview) - "Goals - Ringkasan Overview" card explanation
   * REMOVED: Tour step 17 (tasks-content) - "Tasks - Filter & Pencarian" explanation
