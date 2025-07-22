@@ -1230,53 +1230,8 @@ export default function DailyFocusPage() {
             </p>
           </div>
 
-          {/* Welcome Screen Button and Date display - desktop */}
+          {/* Date display - desktop */}
           <div className="flex items-center gap-3 relative z-10">
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('Welcome Screen button clicked');
-                window.dispatchEvent(new CustomEvent('showWelcomeScreen'));
-              }}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-md text-sm font-medium transition-colors cursor-pointer border-0 outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-              type="button"
-              style={{ pointerEvents: 'auto' }}
-            >
-              Welcome Screen
-            </button>
-            <button
-              onClick={async (e) => {
-                e.preventDefault();
-                try {
-                  const response = await fetch('/api/auth/update-onboarding-progress', {
-                    method: 'POST',
-                    body: JSON.stringify({ step: 'package_upgraded' }),
-                    headers: { 'Content-Type': 'application/json' },
-                  });
-                  
-                  if (response.ok) {
-                    toast({
-                      title: "Package upgrade progress updated!",
-                      description: "Onboarding step package_upgraded berhasil dicatat.",
-                    });
-                  } else {
-                    throw new Error('Failed to update progress');
-                  }
-                } catch (error) {
-                  console.error('Failed to update package upgrade:', error);
-                  toast({
-                    title: "Error",
-                    description: "Gagal mengupdate progress package upgrade.",
-                    variant: "destructive",
-                  });
-                }
-              }}
-              className="bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded-md text-sm font-medium transition-colors cursor-pointer border-0 outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
-              type="button"
-            >
-              Test Package Upgrade
-            </button>
             <div className="hidden sm:flex items-center gap-2 text-sm text-gray-500">
               <Calendar className="h-4 w-4" />
               <span>
