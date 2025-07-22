@@ -82,6 +82,10 @@ export default function OrganizationSettings() {
   const [roleSearchTerm, setRoleSearchTerm] = useState("");
   const [selectedRoleForDetails, setSelectedRoleForDetails] = useState<any>(null);
   const [isResettingData, setIsResettingData] = useState(false);
+  const [resetPassword, setResetPassword] = useState("");
+  const [isPasswordValid, setIsPasswordValid] = useState(false);
+  const [passwordError, setPasswordError] = useState("");
+  const [verifyingPassword, setVerifyingPassword] = useState(false);
 
   // Notification/Reminder settings states
   const [useCustomTime, setUseCustomTime] = useState(false);
@@ -412,15 +416,44 @@ export default function OrganizationSettings() {
     },
   });
 
+  // Password verification mutation
+  const verifyPasswordMutation = useMutation({
+    mutationFn: async (password: string) => {
+      const response = await fetch("/api/auth/verify-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Password verification failed');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      setIsPasswordValid(true);
+      setPasswordError("");
+      setVerifyingPassword(false);
+    },
+    onError: (error: any) => {
+      setIsPasswordValid(false);
+      setPasswordError(error.message);
+      setVerifyingPassword(false);
+    },
+  });
+
   // Data reset mutation
   const resetDataMutation = useMutation({
-    mutationFn: async (resetType: 'goals-only' | 'complete') => {
+    mutationFn: async ({ resetType, password }: { resetType: 'goals-only' | 'complete', password: string }) => {
       const response = await fetch("/api/reset-data", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ resetType }),
+        body: JSON.stringify({ resetType, password }),
       });
-      if (!response.ok) throw new Error('Failed to reset data');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to reset data');
+      }
       return response.json();
     },
     onSuccess: (data, resetType) => {
@@ -451,9 +484,18 @@ export default function OrganizationSettings() {
           variant: "success",
         });
       }, 1500);
+      
+      // Reset password states
+      setResetPassword("");
+      setIsPasswordValid(false);
+      setPasswordError("");
     },
-    onError: (error) => {
+    onError: (error: any) => {
       setIsResettingData(false);
+      // Also reset password states on error
+      setResetPassword("");
+      setIsPasswordValid(false);
+      setPasswordError("");
       toast({
         title: "Error",
         description: error.message,
@@ -461,6 +503,29 @@ export default function OrganizationSettings() {
       });
     },
   });
+
+  // Function to handle password verification
+  const handlePasswordVerification = async (password: string) => {
+    if (!password.trim()) {
+      setPasswordError("Password harus diisi");
+      return;
+    }
+    
+    setVerifyingPassword(true);
+    setPasswordError("");
+    verifyPasswordMutation.mutate(password);
+  };
+
+  // Function to handle reset with password
+  const handleResetWithPassword = (resetType: 'goals-only' | 'complete') => {
+    if (!isPasswordValid) {
+      setPasswordError("Harap verifikasi password terlebih dahulu");
+      return;
+    }
+    
+    setIsResettingData(true);
+    resetDataMutation.mutate({ resetType, password: resetPassword });
+  };
 
   // Filtered teams
   const filteredTeams = teams.filter(team => {
@@ -1577,19 +1642,64 @@ export default function OrganizationSettings() {
                                     <li>Invoice History</li>
                                   </ul>
                                 </div>
+                                
+                                <div className="mt-6 p-4 border border-orange-200 rounded-lg bg-orange-50">
+                                  <label className="block text-sm font-medium text-orange-900 mb-2">
+                                    Masukkan Password Anda untuk Konfirmasi
+                                  </label>
+                                  <div className="flex gap-2">
+                                    <Input
+                                      type="password"
+                                      placeholder="Password akun Anda"
+                                      value={resetPassword}
+                                      onChange={(e) => {
+                                        setResetPassword(e.target.value);
+                                        setIsPasswordValid(false);
+                                        setPasswordError("");
+                                      }}
+                                      className="flex-1"
+                                    />
+                                    <Button
+                                      onClick={() => handlePasswordVerification(resetPassword)}
+                                      disabled={!resetPassword || verifyingPassword}
+                                      size="sm"
+                                      variant="outline"
+                                    >
+                                      {verifyingPassword ? <Loader2 className="h-4 w-4 animate-spin" /> : "Verifikasi"}
+                                    </Button>
+                                  </div>
+                                  {passwordError && (
+                                    <p className="text-red-600 text-xs mt-1">{passwordError}</p>
+                                  )}
+                                  {isPasswordValid && (
+                                    <p className="text-green-600 text-xs mt-1 flex items-center">
+                                      <CheckCircle className="h-3 w-3 mr-1" />
+                                      Password terverifikasi
+                                    </p>
+                                  )}
+                                </div>
                               </div>
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
-                            <AlertDialogCancel>Batal</AlertDialogCancel>
+                            <AlertDialogCancel onClick={() => {
+                              setResetPassword("");
+                              setIsPasswordValid(false);
+                              setPasswordError("");
+                            }}>Batal</AlertDialogCancel>
                             <AlertDialogAction
-                              onClick={() => {
-                                setIsResettingData(true);
-                                resetDataMutation.mutate('goals-only');
-                              }}
-                              className="bg-orange-600 hover:bg-orange-700"
+                              onClick={() => handleResetWithPassword('goals-only')}
+                              disabled={!isPasswordValid || resetDataMutation.isPending}
+                              className="bg-orange-600 hover:bg-orange-700 disabled:bg-gray-400"
                             >
-                              Ya, Reset Goals Saja
+                              {resetDataMutation.isPending ? (
+                                <>
+                                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                                  Mereset...
+                                </>
+                              ) : (
+                                'Ya, Reset Goals Saja'
+                              )}
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
@@ -1650,19 +1760,64 @@ export default function OrganizationSettings() {
                                     <li>Invoice history</li>
                                   </ul>
                                 </div>
+                                
+                                <div className="mt-6 p-4 border border-red-200 rounded-lg bg-red-50">
+                                  <label className="block text-sm font-medium text-red-900 mb-2">
+                                    Masukkan Password Anda untuk Konfirmasi
+                                  </label>
+                                  <div className="flex gap-2">
+                                    <Input
+                                      type="password"
+                                      placeholder="Password akun Anda"
+                                      value={resetPassword}
+                                      onChange={(e) => {
+                                        setResetPassword(e.target.value);
+                                        setIsPasswordValid(false);
+                                        setPasswordError("");
+                                      }}
+                                      className="flex-1"
+                                    />
+                                    <Button
+                                      onClick={() => handlePasswordVerification(resetPassword)}
+                                      disabled={!resetPassword || verifyingPassword}
+                                      size="sm"
+                                      variant="outline"
+                                    >
+                                      {verifyingPassword ? <Loader2 className="h-4 w-4 animate-spin" /> : "Verifikasi"}
+                                    </Button>
+                                  </div>
+                                  {passwordError && (
+                                    <p className="text-red-600 text-xs mt-1">{passwordError}</p>
+                                  )}
+                                  {isPasswordValid && (
+                                    <p className="text-green-600 text-xs mt-1 flex items-center">
+                                      <CheckCircle className="h-3 w-3 mr-1" />
+                                      Password terverifikasi
+                                    </p>
+                                  )}
+                                </div>
                               </div>
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
-                            <AlertDialogCancel>Batal</AlertDialogCancel>
+                            <AlertDialogCancel onClick={() => {
+                              setResetPassword("");
+                              setIsPasswordValid(false);
+                              setPasswordError("");
+                            }}>Batal</AlertDialogCancel>
                             <AlertDialogAction
-                              onClick={() => {
-                                setIsResettingData(true);
-                                resetDataMutation.mutate('complete');
-                              }}
-                              className="bg-red-600 hover:bg-red-700"
+                              onClick={() => handleResetWithPassword('complete')}
+                              disabled={!isPasswordValid || resetDataMutation.isPending}
+                              className="bg-red-600 hover:bg-red-700 disabled:bg-gray-400"
                             >
-                              Ya, Reset Semua Data
+                              {resetDataMutation.isPending ? (
+                                <>
+                                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                                  Mereset...
+                                </>
+                              ) : (
+                                'Ya, Reset Semua Data'
+                              )}
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>

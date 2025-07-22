@@ -1591,11 +1591,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Password verification endpoint
+  app.post("/api/auth/verify-password", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      const { password } = req.body;
+      
+      if (!password) {
+        return res.status(400).json({ message: "Password is required" });
+      }
+      
+      // Get current user's password from database
+      const user = await storage.getUser(currentUser.id);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Verify password
+      const isValidPassword = await verifyPassword(password, user.password);
+      if (!isValidPassword) {
+        return res.status(401).json({ message: "Password tidak valid" });
+      }
+      
+      res.json({ message: "Password verified successfully" });
+    } catch (error) {
+      console.error("Error verifying password:", error);
+      res.status(500).json({ message: "Failed to verify password" });
+    }
+  });
+
   // Reset data endpoint for organizations with two options
   app.post("/api/reset-data", requireAuth, async (req, res) => {
     try {
       const currentUser = req.user as User;
-      const { resetType } = req.body;
+      const { resetType, password } = req.body;
       
       // Verify user has organization access
       if (!currentUser.organizationId) {
@@ -1605,6 +1634,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Validate reset type
       if (!resetType || !['goals-only', 'complete'].includes(resetType)) {
         return res.status(400).json({ message: "Invalid reset type. Must be 'goals-only' or 'complete'" });
+      }
+      
+      // Validate password
+      if (!password) {
+        return res.status(400).json({ message: "Password is required for reset operation" });
+      }
+      
+      // Verify password
+      const user = await storage.getUser(currentUser.id);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const isValidPassword = await verifyPassword(password, user.password);
+      if (!isValidPassword) {
+        return res.status(401).json({ message: "Password tidak valid. Reset dibatalkan." });
       }
       
       console.log(`🔄 Starting ${resetType} data reset for organization: ${currentUser.organizationId}`);
