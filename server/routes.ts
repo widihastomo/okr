@@ -1380,8 +1380,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Verify user has access to this objective
       if (!currentUser.isSystemOwner) {
-        const objectiveOwner = await storage.getUser(objectiveWithKeyResults.ownerId);
-        if (!objectiveOwner || objectiveOwner.organizationId !== currentUser.organizationId) {
+        // Check if objective belongs to user's organization
+        if (objectiveWithKeyResults.organizationId !== currentUser.organizationId) {
           return res.status(403).json({ message: "Access denied to this objective" });
         }
       }
@@ -1407,8 +1407,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Verify user has access to this objective
       if (!currentUser.isSystemOwner) {
-        const objectiveOwner = await storage.getUser(objective.ownerId);
-        if (!objectiveOwner || objectiveOwner.organizationId !== currentUser.organizationId) {
+        // Check if objective belongs to user's organization
+        if (objective.organizationId !== currentUser.organizationId) {
           return res.status(403).json({ message: "Access denied to this objective" });
         }
       }
@@ -5256,10 +5256,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Objective not found" });
       }
       
-      // Check if user belongs to same organization as objective owner
+      // Check if user belongs to same organization as objective
       if (!currentUser.isSystemOwner) {
-        const objectiveOwner = await storage.getUser(objective.ownerId);
-        if (!objectiveOwner || objectiveOwner.organizationId !== currentUser.organizationId) {
+        if (objective.organizationId !== currentUser.organizationId) {
           return res.status(403).json({ message: "Akses ditolak. Objective ini tidak tersedia dalam organisasi Anda." });
         }
       }
@@ -6073,8 +6072,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       if (!currentUser.isSystemOwner) {
-        const objectiveOwner = await storage.getUser(objective.ownerId);
-        if (!objectiveOwner || objectiveOwner.organizationId !== currentUser.organizationId) {
+        if (objective.organizationId !== currentUser.organizationId) {
           return res.status(403).json({ message: "Access denied to this objective" });
         }
       }
