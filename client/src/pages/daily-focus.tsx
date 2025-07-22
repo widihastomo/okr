@@ -39,7 +39,7 @@ import {
   Plus,
   ChevronsUpDown,
   Rocket,
-  Sparkles,
+
   CheckCircle2,
   UserPlus,
   Users,
@@ -127,7 +127,7 @@ import InitiativeFormModal from "@/components/initiative-form-modal";
 import TourStartButton from "@/components/tour-start-button";
 import { CompanyDetailsModal } from "@/components/CompanyDetailsModal";
 import WelcomeScreen from "@/components/WelcomeScreen";
-import { DummyDataGeneratorModal } from "@/components/DummyDataGeneratorModal";
+
 
 // Icon mapping for mission cards
 const iconMapping = {
@@ -187,7 +187,7 @@ function MissionCard({
             </div>
             <div className="flex-1">
               <CardTitle className="text-base font-bold text-orange-800 flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-yellow-500" />
+                <Target className="h-4 w-4 text-yellow-500" />
                 {title}
                 <Badge
                   variant="outline"
@@ -1222,13 +1222,7 @@ export default function DailyFocusPage() {
             <div data-tour="update-harian-instan">
               <DailyUpdateSimple />
             </div>
-            <DummyDataGeneratorModal>
-              <Button variant="outline" size="sm" className="flex items-center gap-1.5">
-                <Sparkles className="h-4 w-4" />
-                <span className="hidden sm:inline">Data Contoh</span>
-                <span className="sm:hidden">Demo</span>
-              </Button>
-            </DummyDataGeneratorModal>
+
             <TourStartButton variant="outline" size="sm" />
           </div>
         </div>
