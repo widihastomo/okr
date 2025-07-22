@@ -438,6 +438,21 @@ The system now includes a comprehensive dummy data generation feature that creat
 
 ## Changelog
 ```
+- July 22, 2025. **ADDITIONAL TOUR CLEANUP COMPLETED** - Successfully removed 5 additional unnecessary tour steps for further optimization:
+  * REMOVED: Tour step 13 (goals-overview) - "Goals - Ringkasan Overview" card explanation
+  * REMOVED: Tour step 17 (tasks-content) - "Tasks - Filter & Pencarian" explanation
+  * REMOVED: Tour step 24 (timeline-filter) - "Timeline - Filter & Pencarian" panel explanation
+  * REMOVED: Tour step 36 (analytics) - Duplicate "Analytics - Dashboard Performa" step
+  * REMOVED: Tour step 37 (analytics-content) - Duplicate "Analytics - Grafik Performa" step
+  * OPTIMIZED: Tour system further reduced from 42 to 37 total steps for maximum streamlined user guidance
+  * RESULT: Cleaner tour experience eliminating duplicate analytics steps and unnecessary filter explanations
+- July 22, 2025. **TOUR CLEANUP OPTIMIZATION COMPLETED** - Successfully removed unnecessary tour steps as requested to optimize user experience:
+  * REMOVED: Tour step 12 (goals-add-button) - "Goals - Tambah Tujuan Baru" button explanation
+  * REMOVED: Tour step 18 (tasks-add-button) - "Tambah Task - Buat Tugas Baru" button explanation
+  * REMOVED: Tour step 40 (analytics-users-tab) - "User Performance Tab - Performa Individu" explanation
+  * REMOVED: Tour step 41 (analytics-initiatives-tab) - "Initiatives & Tasks Tab - Analisis Proyek" explanation
+  * OPTIMIZED: Tour system reduced from 45 to 41 total steps for streamlined user guidance
+  * RESULT: More focused tour experience eliminating redundant button explanations and detailed Analytics tab coverage
 - July 22, 2025. **CLIENT-USER PAGE TOUR OPTIMIZATION COMPLETED** - Successfully modified client-user page tour to only highlight "Pengguna" and "Tim" tabs:
   * ADDED: data-tour="users-tab" and data-tour="teams-tab" attributes to client-user management page tabs
   * REPLACED: Single "users-content" tour step with two specific tab-focused steps (users-tab, teams-tab)

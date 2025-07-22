@@ -177,16 +177,7 @@ const TOUR_STEPS: TourStep[] = [
     position: "bottom",
     category: "feature",
   },
-  {
-    id: "goals-overview",
-    title: "Goals - Ringkasan Overview",
-    description:
-      "Kartu overview menampilkan statistik keseluruhan goals Anda termasuk jumlah total, progress rata-rata, dan distribusi status. Informasi ini memberikan gambaran cepat tentang performa organisasi.",
-    icon: Target,
-    selector: '[data-tour="goals-overview-card"]',
-    position: "bottom",
-    category: "feature",
-  },
+
   {
     id: "goals-list-view-tab",
     title: "Goals - Tampilan List",
@@ -218,17 +209,6 @@ const TOUR_STEPS: TourStep[] = [
     category: "feature",
     targetPath: "/tasks",
     requiresClick: true,
-  },
-
-  {
-    id: "tasks-content",
-    title: "Tasks - Filter & Pencarian",
-    description:
-      "Gunakan filter dan pencarian untuk menemukan tugas dengan cepat. Anda dapat memfilter berdasarkan status, prioritas, penanggungjawab, dan tim untuk manajemen yang lebih efisien.",
-    icon: CheckSquare,
-    selector: '[data-tour="tasks-filter"]',
-    position: "bottom",
-    category: "feature",
   },
   {
     id: "tasks-list-view",
@@ -292,16 +272,7 @@ const TOUR_STEPS: TourStep[] = [
     position: "bottom",
     category: "action",
   },
-  {
-    id: "timeline-filter",
-    title: "Timeline - Filter & Pencarian",
-    description:
-      "Panel filter memungkinkan Anda menyaring aktivitas timeline berdasarkan tipe aktivitas (update harian, check-in progress), pengguna, dan periode waktu. Gunakan filter ini untuk fokus pada aktivitas tertentu atau melihat progress anggota tim secara spesifik.",
-    icon: Filter,
-    selector: '[data-tour="timeline-filter"]',
-    position: "left",
-    category: "feature",
-  },
+
   {
     id: "timeline-feed",
     title: "Timeline - Activity Feed",
@@ -420,28 +391,7 @@ const TOUR_STEPS: TourStep[] = [
     position: "bottom",
     category: "feature",
   },
-  {
-    id: "analytics",
-    title: "Analytics - Dashboard Performa",
-    description:
-      "Analisis mendalam tentang performa tim dan pencapaian objectives. Dashboard ini menyediakan insights berbasis data untuk membantu pengambilan keputusan strategis. Lihat tren progress, identifikasi area yang perlu perbaikan, dan ukur ROI dari setiap inisiatif.",
-    icon: BarChart3,
-    selector: '[data-tour="analytics"]',
-    position: "right",
-    category: "feature",
-    targetPath: "/analytics",
-    requiresClick: true,
-  },
-  {
-    id: "analytics-content",
-    title: "Analytics - Grafik Performa",
-    description:
-      "Grafik dan chart memberikan visualisasi performa tim dalam bentuk yang mudah dipahami. Analisis tren ini membantu dalam pengambilan keputusan strategis.",
-    icon: BarChart3,
-    selector: '[data-tour="analytics-chart"]',
-    position: "top",
-    category: "feature",
-  },
+
   {
     id: "users",
     title: "Kelola Pengguna - Tim Management",
