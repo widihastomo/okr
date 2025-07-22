@@ -341,7 +341,7 @@ export default function AnalyticsPage() {
             Monitor progress dan performa Goal, initiative, dan tim
           </p>
         </div>
-        <div className="flex gap-4">
+        <div className="flex gap-4" data-tour="analytics-filters">
           <Select value={selectedCycle} onValueChange={setSelectedCycle}>
             <SelectTrigger className="w-48">
               <SelectValue placeholder="Pilih Cycle" />
@@ -446,11 +446,11 @@ export default function AnalyticsPage() {
 
       {/* Main Analytics Content */}
       <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="teams">Team Performance</TabsTrigger>
-          <TabsTrigger value="users">User Performance</TabsTrigger>
-          <TabsTrigger value="initiatives">Initiatives & Tasks</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-4" data-tour="analytics-tabs">
+          <TabsTrigger value="overview" data-tour="analytics-overview-tab">Overview</TabsTrigger>
+          <TabsTrigger value="teams" data-tour="analytics-teams-tab">Team Performance</TabsTrigger>
+          <TabsTrigger value="users" data-tour="analytics-users-tab">User Performance</TabsTrigger>
+          <TabsTrigger value="initiatives" data-tour="analytics-initiatives-tab">Initiatives & Tasks</TabsTrigger>
         </TabsList>
 
         {/* Overview Tab */}

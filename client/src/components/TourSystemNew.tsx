@@ -32,6 +32,7 @@ import {
   Activity,
   Filter,
   Medal,
+  Briefcase,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLocation } from "wouter";
@@ -391,6 +392,70 @@ const TOUR_STEPS: TourStep[] = [
       "Tab Leaderboard menampilkan peringkat tim berdasarkan total poin yang dikumpulkan. Sistem ini menciptakan kompetisi sehat antar anggota tim dan memotivasi pencapaian target bersama. Anda dapat melihat posisi ranking Anda dibandingkan rekan tim lainnya.",
     icon: Users,
     selector: '[data-tour="achievement-leaderboard-tab"]',
+    position: "bottom",
+    category: "feature",
+  },
+
+  // Analytics page tour
+  {
+    id: "analytics",
+    title: "Analytics - Laporan & Analisa",
+    description:
+      "Halaman Analytics menyediakan dashboard komprehensif untuk monitor progress dan performa Goal, Initiative, serta Tim. Anda dapat melihat berbagai grafik, chart, dan statistik untuk evaluasi pencapaian organisasi secara data-driven.",
+    icon: Activity,
+    selector: '[data-tour="analytics"]',
+    position: "bottom",
+    category: "navigation",
+    targetPath: "/analytics",
+    requiresClick: true,
+  },
+  {
+    id: "analytics-filters",
+    title: "Analytics Filters - Filter Data",
+    description:
+      "Filter ini memungkinkan Anda menyaring data analytics berdasarkan Cycle (periode waktu) dan Team tertentu. Gunakan filter untuk fokus pada analisis periode atau tim spesifik yang ingin dievaluasi performanya.",
+    icon: Filter,
+    selector: '[data-tour="analytics-filters"]',
+    position: "bottom",
+    category: "feature",
+  },
+  {
+    id: "analytics-overview-tab",
+    title: "Overview Tab - Dashboard Umum",
+    description:
+      "Tab Overview menampilkan ringkasan dashboard dengan chart distribusi status objective, progress over time, dan metrics utama seperti total initiatives, key results, dan task completion rate. Ini memberikan gambaran cepat performa organisasi secara keseluruhan.",
+    icon: Activity,
+    selector: '[data-tour="analytics-overview-tab"]',
+    position: "bottom",
+    category: "feature",
+  },
+  {
+    id: "analytics-teams-tab",
+    title: "Team Performance Tab - Performa Tim",
+    description:
+      "Tab Team Performance menyajikan perbandingan performa antar tim melalui bar chart dan detail performance table. Anda dapat melihat rata-rata progress, jumlah objectives, key results yang selesai, dan ranking tim berdasarkan pencapaian.",
+    icon: Users,
+    selector: '[data-tour="analytics-teams-tab"]',
+    position: "bottom",
+    category: "feature",
+  },
+  {
+    id: "analytics-users-tab",
+    title: "User Performance Tab - Performa Individu",
+    description:
+      "Tab User Performance menampilkan ranking individual berdasarkan progress Goal. Menampilkan top performers dengan badge khusus, statistik personal achievement, dan radar chart untuk visualisasi performa tim member secara individu.",
+    icon: TrendingUp,
+    selector: '[data-tour="analytics-users-tab"]',
+    position: "bottom",
+    category: "feature",
+  },
+  {
+    id: "analytics-initiatives-tab",
+    title: "Initiatives & Tasks Tab - Analisis Proyek",
+    description:
+      "Tab Initiatives & Tasks menyediakan analisis distribusi progress initiative, overview status task, dan priority matrix. Membantu memahami status executing dari berbagai proyek dan task management secara visual melalui chart dan diagram.",
+    icon: Briefcase,
+    selector: '[data-tour="analytics-initiatives-tab"]',
     position: "bottom",
     category: "feature",
   },
