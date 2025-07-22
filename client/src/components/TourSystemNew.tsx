@@ -236,6 +236,56 @@ const TOUR_STEPS: TourStep[] = [
     category: "feature",
   },
   {
+    id: "tasks-add-button",
+    title: "Tambah Task - Buat Tugas Baru",
+    description:
+      "Tombol 'Tambah Task' memungkinkan Anda membuat tugas baru dengan mudah. Klik untuk membuka form pembuatan task di mana Anda bisa mengatur judul, deskripsi, prioritas, deadline, dan menentukan penanggungjawab. Setiap task bisa dikaitkan dengan objective atau key result tertentu.",
+    icon: CheckSquare,
+    selector: '[data-tour="add-task-button"]',
+    position: "bottom",
+    category: "action",
+  },
+  {
+    id: "tasks-list-view",
+    title: "Tasks - Tampilan List",
+    description:
+      "Tampilan List menampilkan semua tugas dalam format tabel yang mudah dibaca. Anda dapat melihat detail task, status, prioritas, deadline, dan penanggungjawab dalam satu view yang komprehensif. Ideal untuk mendapatkan overview lengkap dari semua tugas.",
+    icon: CheckSquare,
+    selector: '[data-tour="tasks-list-tab"]',
+    position: "bottom",
+    category: "feature",
+  },
+  {
+    id: "tasks-kanban-view",
+    title: "Tasks - Tampilan Kanban",
+    description:
+      "Tampilan Kanban mengorganisir tugas berdasarkan status dalam kolom-kolom yang visual. Anda dapat drag & drop task antar kolom untuk mengubah status dengan mudah. View ini sangat efektif untuk workflow management dan tracking progress secara visual.",
+    icon: CheckSquare,
+    selector: '[data-tour="tasks-kanban-tab"]',
+    position: "bottom",
+    category: "feature",
+  },
+  {
+    id: "tasks-timeline-view",
+    title: "Tasks - Tampilan Timeline",
+    description:
+      "Tampilan Timeline menunjukkan tugas dalam format kronologis berdasarkan tanggal mulai dan deadline. View ini membantu Anda memahami urutan pekerjaan, mendeteksi potensi konflik jadwal, dan merencanakan resource allocation yang optimal.",
+    icon: Clock,
+    selector: '[data-tour="tasks-timeline-tab"]',
+    position: "bottom",
+    category: "feature",
+  },
+  {
+    id: "tasks-calendar-view",
+    title: "Tasks - Tampilan Calendar",
+    description:
+      "Tampilan Calendar menampilkan tugas dalam format kalender bulanan yang familiar. Anda dapat melihat distribusi beban kerja harian, deadline yang mendekat, dan merencanakan jadwal dengan lebih efektif. View ini sangat berguna untuk time management dan perencanaan kapasitas tim.",
+    icon: Calendar,
+    selector: '[data-tour="tasks-calendar-tab"]',
+    position: "bottom",
+    category: "feature",
+  },
+  {
     id: "timeline",
     title: "Timeline - Riwayat Progress",
     description:

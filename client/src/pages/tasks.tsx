@@ -1277,6 +1277,7 @@ const TasksPage = () => {
         <Button 
           onClick={handleAddTask}
           className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white w-full sm:w-auto"
+          data-tour="add-task-button"
         >
           <Plus className="w-4 h-4 mr-2" />
           Tambah Task
@@ -1426,19 +1427,19 @@ const TasksPage = () => {
       {/* Task Views */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="list" className="flex items-center justify-center">
+          <TabsTrigger value="list" className="flex items-center justify-center" data-tour="tasks-list-tab">
             <List className="w-4 h-4 sm:mr-2" />
             <span className="hidden sm:inline">List</span>
           </TabsTrigger>
-          <TabsTrigger value="kanban" className="flex items-center justify-center">
+          <TabsTrigger value="kanban" className="flex items-center justify-center" data-tour="tasks-kanban-tab">
             <Kanban className="w-4 h-4 sm:mr-2" />
             <span className="hidden sm:inline">Kanban</span>
           </TabsTrigger>
-          <TabsTrigger value="gantt" className="flex items-center justify-center">
+          <TabsTrigger value="gantt" className="flex items-center justify-center" data-tour="tasks-timeline-tab">
             <BarChart3 className="w-4 h-4 sm:mr-2" />
             <span className="hidden sm:inline">Timeline</span>
           </TabsTrigger>
-          <TabsTrigger value="calendar" className="flex items-center justify-center">
+          <TabsTrigger value="calendar" className="flex items-center justify-center" data-tour="tasks-calendar-tab">
             <CalendarIcon className="w-4 h-4 sm:mr-2" />
             <span className="hidden sm:inline">Calendar</span>
           </TabsTrigger>
