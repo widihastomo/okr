@@ -331,6 +331,7 @@ export default function Sidebar({
                     <TooltipTrigger asChild>
                       <Link href="/help">
                         <button
+                          data-tour="help"
                           className={cn(
                             "flex items-center justify-center px-4 py-3 rounded-lg text-sm font-medium transition-colors w-full",
                             location === "/help"
@@ -356,6 +357,7 @@ export default function Sidebar({
                 <div className="lg:hidden">
                   <Link href="/help">
                     <button
+                      data-tour="help"
                       className={cn(
                         "flex items-center space-x-4 px-4 py-3 rounded-lg text-sm font-medium transition-colors w-full text-left",
                         location === "/help"
