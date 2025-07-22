@@ -63,6 +63,7 @@ import DummyClientExamples from "@/pages/dummy-client-examples";
 import ReferralCodes from "@/pages/referral-codes";
 
 import CompanyOnboardingSimple from "@/pages/company-onboarding-simple";
+import CompanyOnboardingFunctional from "@/pages/company-onboarding-functional";
 
 import ClientStatusMapping from "@/pages/client-status-mapping";
 import ApplicationSettings from "@/pages/system-admin/application-settings";
@@ -230,6 +231,7 @@ function Router() {
           >
             <Switch>
               <Route path="/onboarding" component={CompanyOnboardingSimple} />
+              <Route path="/company-onboarding" component={CompanyOnboardingFunctional} />
               <Route path="/" component={DailyFocusPage} />
               <Route path="/daily-focus" component={DailyFocusPage} />
               <Route path="/tasks" component={TasksPage} />

@@ -23,18 +23,18 @@ export default function CompanyOnboardingSimple() {
       if (!hasCompleteCompanyDetails) {
         setShowCompanyModal(true);
       } else {
-        // If company details are complete, proceed to main app
-        localStorage.setItem("onboarding-completed", "true");
-        navigate("/");
+        // If company details are complete, proceed to full onboarding
+        navigate("/company-onboarding");
       }
     }
   }, [user, isLoading, navigate]);
 
-  // Handle company details completion
+  // Handle company details completion - redirect to full onboarding
   const handleCompanyDetailsComplete = () => {
     setShowCompanyModal(false);
-    localStorage.setItem("onboarding-completed", "true");
-    navigate("/");
+    // Don't mark onboarding as completed yet - let user go through full onboarding
+    localStorage.removeItem("onboarding-completed");
+    navigate("/company-onboarding");
   };
 
   // Handle skip onboarding (temporary)
