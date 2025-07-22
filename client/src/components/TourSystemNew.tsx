@@ -490,7 +490,7 @@ const TOUR_STEPS: TourStep[] = [
     selector: '[data-tour="users"]',
     position: "right",
     category: "navigation",
-    targetPath: "/users",
+    targetPath: "/client-users",
     requiresClick: true,
   },
   {
@@ -512,7 +512,7 @@ const TOUR_STEPS: TourStep[] = [
     selector: '[data-tour="settings"]',
     position: "right",
     category: "navigation",
-    targetPath: "/settings",
+    targetPath: "/organization-settings",
     requiresClick: true,
   },
   {
