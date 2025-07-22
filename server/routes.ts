@@ -9,7 +9,7 @@ import {
   subscriptionPlans, organizations, organizationSubscriptions, users, dailyReflections, companyOnboardingDataSchema,
   trialAchievements, userTrialAchievements, billingPeriods, referralCodes,
   applicationSettings, insertApplicationSettingSchema, updateApplicationSettingSchema,
-  insertTimelineCommentSchema, insertTimelineReactionSchema,
+  insertTimelineCommentSchema, insertTimelineReactionSchema, timelineUpdates,
   teams, teamMembers, cycles,
   type User, type SubscriptionPlan, type Organization, type OrganizationSubscription, type UserOnboardingProgress, type UpdateOnboardingProgress, type CompanyOnboardingData,
   type InsertUser, type ApplicationSetting, type InsertApplicationSetting, type UpdateApplicationSetting,
@@ -1659,7 +1659,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         cycles: 0,
         teams: 0,
         tasks: 0,
-        achievements: 0
+        achievements: 0,
+        timeline: 0
       };
       
       // Always delete objectives and their cascade (goals, key results, initiatives, tasks, timeline)
@@ -1682,6 +1683,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await storage.deleteTask(task.id);
       }
       deletedCounts.tasks = remainingTasks.length;
+      
+      // Delete all timeline entries for this organization
+      try {
+        const timelineEntries = await db.select().from(timelineUpdates)
+          .where(eq(timelineUpdates.organizationId, currentUser.organizationId));
+        console.log(`📋 Found ${timelineEntries.length} timeline entries to delete`);
+        
+        for (const entry of timelineEntries) {
+          console.log(`🗑️ Deleting timeline entry: ${entry.type} - ${entry.summary?.substring(0, 50)}...`);
+          await db.delete(timelineUpdates).where(eq(timelineUpdates.id, entry.id));
+        }
+        deletedCounts.timeline = timelineEntries.length;
+      } catch (error) {
+        console.error("Error deleting timeline entries:", error);
+      }
       
       if (resetType === 'complete') {
         // Delete cycles
