@@ -551,8 +551,8 @@ export default function ClientUserManagement() {
       {/* Tabs */}
       <Tabs defaultValue="users" className="space-y-6">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="users">Pengguna</TabsTrigger>
-          <TabsTrigger value="teams">Tim</TabsTrigger>
+          <TabsTrigger value="users" data-tour="users-tab">Pengguna</TabsTrigger>
+          <TabsTrigger value="teams" data-tour="teams-tab">Tim</TabsTrigger>
         </TabsList>
 
         {/* Users Tab */}

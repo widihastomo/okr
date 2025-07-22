@@ -438,6 +438,13 @@ The system now includes a comprehensive dummy data generation feature that creat
 
 ## Changelog
 ```
+- July 22, 2025. **CLIENT-USER PAGE TOUR OPTIMIZATION COMPLETED** - Successfully modified client-user page tour to only highlight "Pengguna" and "Tim" tabs:
+  * ADDED: data-tour="users-tab" and data-tour="teams-tab" attributes to client-user management page tabs
+  * REPLACED: Single "users-content" tour step with two specific tab-focused steps (users-tab, teams-tab)
+  * ENHANCED: Tab Pengguna tour step explains user management capabilities (invite, roles, permissions, account status)
+  * ENHANCED: Tab Tim tour step explains team structure management (create teams, assign members, team leaders, roles)
+  * OPTIMIZED: Tour now specifically highlights only the two main tabs instead of focusing on "Undang Pengguna" button
+  * RESULT: More focused client-user page tour that guides users through the primary navigation tabs
 - July 22, 2025. **TOUR HIERARCHY VIEW INTERACTION FIX COMPLETED** - Successfully removed requiresClick property from Goals Hierarchy View tour step:
   * FIXED: Removed requiresClick: true from tour step 15 (goals-hierarchy-view-tab)
   * ENHANCED: Goals Hierarchy View tour step now displays tooltip without requiring user click interaction

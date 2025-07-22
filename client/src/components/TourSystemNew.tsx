@@ -455,12 +455,22 @@ const TOUR_STEPS: TourStep[] = [
     requiresClick: true,
   },
   {
-    id: "users-content",
-    title: "Kelola Pengguna - Undang Tim",
+    id: "users-tab",
+    title: "Tab Pengguna",
     description:
-      'Tombol "Undang Pengguna" memungkinkan Anda menambahkan anggota tim baru dengan mengatur peran dan permissions yang sesuai. Setiap pengguna dapat memiliki akses yang berbeda sesuai tanggung jawabnya.',
+      "Tab Pengguna memungkinkan Anda mengelola anggota organisasi. Di sini Anda dapat melihat daftar semua pengguna, mengundang pengguna baru, mengatur role dan permission, serta mengelola status akun pengguna.",
     icon: Users,
-    selector: '[data-tour="invite-user"]',
+    selector: '[data-tour="users-tab"]',
+    position: "bottom",
+    category: "feature",
+  },
+  {
+    id: "teams-tab",
+    title: "Tab Tim",
+    description:
+      "Tab Tim memungkinkan Anda mengelola struktur tim dalam organisasi. Anda dapat membuat tim baru, mengatur anggota tim, menetapkan team leader, dan mengonfigurasi peran setiap anggota dalam tim.",
+    icon: Users,
+    selector: '[data-tour="teams-tab"]',
     position: "bottom",
     category: "feature",
   },
