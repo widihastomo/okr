@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
-import { apiRequest } from "@/lib/queryClient";
 
 export function useLogout() {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -17,10 +16,20 @@ export function useLogout() {
     try {
       // 1. Call logout API first and wait for response
       console.log('🔓 Calling logout API...');
-      const response = await apiRequest('POST', '/api/auth/logout');
+      const response = await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
       
       const result = await response.json();
       console.log('🔓 Logout API response:', result);
+      
+      if (!response.ok) {
+        console.error('Logout API failed:', result);
+      }
     } catch (error) {
       console.warn('Logout API error (continuing with client cleanup):', error);
     } finally {
