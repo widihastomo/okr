@@ -143,18 +143,11 @@ const iconMapping = {
   Zap: Zap,
 };
 
-// Mission action functions
+// Mission action functions for 3 core missions
 const missionActions = {
   addMember: () => (window.location.href = "/client-users"),
-  createTeam: () => (window.location.href = "/teams"),
   createObjective: () => (window.location.href = "/"),
-  addKeyResult: () => (window.location.href = "/"),
-  addInitiative: () => (window.location.href = "/"),
-  addTask: () => (window.location.href = "/daily-focus"),
   updateKeyResult: () => (window.location.href = "/"),
-  updateMetrics: () => (window.location.href = "/"),
-  updateTaskStatus: () => (window.location.href = "/daily-focus"),
-  dailyUpdate: () => (window.location.href = "/daily-focus"),
 };
 
 // Mission Card Component
@@ -236,30 +229,12 @@ function MissionCard({
                 mission.name.includes("Tambah Pengguna") ||
                 mission.name.includes("Menambahkan Member")
                   ? "addMember"
-                  : mission.name.includes("Buat Tim") ||
-                      mission.name.includes("Membuat Tim")
-                    ? "createTeam"
-                    : mission.name.includes("Buat Objective") ||
-                        mission.name.includes("Membuat Objective")
-                      ? "createObjective"
-                      : mission.name.includes("Tambah Key Result") ||
-                          mission.name.includes("Menambahkan Key Result")
-                        ? "addKeyResult"
-                        : mission.name.includes("Buat Inisiatif") ||
-                            mission.name.includes("Menambahkan Inisiatif")
-                          ? "addInitiative"
-                          : mission.name.includes("Tambah Task") ||
-                              mission.name.includes("Menambahkan Task")
-                            ? "addTask"
-                            : mission.name.includes("Update Capaian Key Result")
-                              ? "updateKeyResult"
-                              : mission.name.includes("Update Capaian Metrik")
-                                ? "updateMetrics"
-                                : mission.name.includes("Update Status Task")
-                                  ? "updateTaskStatus"
-                                  : mission.name.includes("Update Harian")
-                                    ? "dailyUpdate"
-                                    : "addMember";
+                  : mission.name.includes("Buat Objective") ||
+                      mission.name.includes("Membuat Objective")
+                    ? "createObjective"
+                    : mission.name.includes("Update Capaian Key Result")
+                      ? "updateKeyResult"
+                      : "addMember";
 
               return (
                 <div
@@ -479,7 +454,7 @@ export default function DailyFocusPage() {
     );
   };
 
-  // Specific 10-step sequential missions configuration
+  // Specific 3-step sequential missions configuration
   const missionSequence = [
     {
       name: "Menambahkan Member",
@@ -488,52 +463,14 @@ export default function DailyFocusPage() {
         "Tambahkan anggota baru ke tim Anda untuk memulai kolaborasi",
     },
     {
-      name: "Membuat Tim",
-      icon: "Users",
-      description: "Buat tim dengan struktur yang jelas untuk mengelola proyek",
-    },
-    {
       name: "Membuat Objective",
       icon: "Target",
       description: "Definisikan tujuan utama yang ingin dicapai tim Anda",
     },
     {
-      name: "Menambahkan Key Result",
-      icon: "BarChart3",
-      description:
-        "Tentukan indikator pencapaian yang dapat diukur secara kuantitatif",
-    },
-    {
-      name: "Menambahkan Inisiatif",
-      icon: "Lightbulb",
-      description: "Buat rencana aksi konkret untuk mencapai tujuan",
-    },
-    {
-      name: "Menambahkan Task",
-      icon: "CheckSquare",
-      description:
-        "Breakdown inisiatif menjadi tugas-tugas yang dapat dikerjakan",
-    },
-    {
       name: "Update Capaian Key Result",
       icon: "TrendingUp",
       description: "Pantau dan update progress pencapaian target angka",
-    },
-    {
-      name: "Update Capaian Metrik Inisiatif",
-      icon: "LineChart",
-      description: "Evaluasi kemajuan pelaksanaan inisiatif secara berkala",
-    },
-    {
-      name: "Update Status Task",
-      icon: "CheckCircle2",
-      description: "Pantau dan update status penyelesaian tugas harian",
-    },
-    {
-      name: "Update Harian Instan",
-      icon: "Zap",
-      description:
-        "Lakukan review harian untuk memastikan kemajuan yang konsisten",
     },
   ];
 
