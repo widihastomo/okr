@@ -226,16 +226,6 @@ const TOUR_STEPS: TourStep[] = [
     requiresClick: true,
   },
   {
-    id: "tasks-content",
-    title: "Tasks - Filter & Pencarian",
-    description:
-      "Gunakan filter dan pencarian untuk menemukan tugas dengan cepat. Anda dapat memfilter berdasarkan status, prioritas, penanggungjawab, dan tim untuk manajemen yang lebih efisien.",
-    icon: CheckSquare,
-    selector: '[data-tour="tasks-filter"]',
-    position: "bottom",
-    category: "feature",
-  },
-  {
     id: "tasks-add-button",
     title: "Tambah Task - Buat Tugas Baru",
     description:
@@ -244,6 +234,16 @@ const TOUR_STEPS: TourStep[] = [
     selector: '[data-tour="add-task-button"]',
     position: "bottom",
     category: "action",
+  },
+  {
+    id: "tasks-content",
+    title: "Tasks - Filter & Pencarian",
+    description:
+      "Gunakan filter dan pencarian untuk menemukan tugas dengan cepat. Anda dapat memfilter berdasarkan status, prioritas, penanggungjawab, dan tim untuk manajemen yang lebih efisien.",
+    icon: CheckSquare,
+    selector: '[data-tour="tasks-filter"]',
+    position: "bottom",
+    category: "feature",
   },
   {
     id: "tasks-list-view",
