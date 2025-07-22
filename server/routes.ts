@@ -9,8 +9,11 @@ import {
   subscriptionPlans, organizations, organizationSubscriptions, users, dailyReflections, companyOnboardingDataSchema,
   trialAchievements, userTrialAchievements, billingPeriods, referralCodes,
   applicationSettings, insertApplicationSettingSchema, updateApplicationSettingSchema,
-  insertTimelineCommentSchema, insertTimelineReactionSchema, timelineUpdates,
-  teams, teamMembers, cycles,
+  insertTimelineCommentSchema, insertTimelineReactionSchema, timelineUpdates, timelineComments, timelineReactions,
+  teams, teamMembers, cycles, objectives, keyResults, checkIns, initiatives, tasks, taskComments,
+  initiativeSuccessMetrics, successMetricUpdates, definitionOfDoneItems, initiativeComments, initiativeNotes,
+  initiativeDocuments, initiativeMembers, templates, userAchievements, userStats, activityLogs,
+  userActivityLog, notifications, userOnboardingProgress, taskAuditTrail,
   type User, type SubscriptionPlan, type Organization, type OrganizationSubscription, type UserOnboardingProgress, type UpdateOnboardingProgress, type CompanyOnboardingData,
   type InsertUser, type ApplicationSetting, type InsertApplicationSetting, type UpdateApplicationSetting,
   type TaskAuditTrail, type InsertTaskAuditTrail
@@ -12743,6 +12746,169 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error getting storage stats:", error);
       res.status(500).json({ message: "Failed to get storage statistics" });
+    }
+  });
+
+  // Complete Organization Data Reset (preserves invoices and billing)
+  app.post("/api/reset-organization-data", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      
+      // Check if user has admin privileges to reset organization data
+      if (currentUser.role !== "owner" && currentUser.role !== "administrator" && !currentUser.isSystemOwner) {
+        return res.status(403).json({ message: "Access denied. Admin privileges required." });
+      }
+      
+      const organizationId = currentUser.organizationId;
+      if (!organizationId) {
+        return res.status(400).json({ message: "No organization found for user" });
+      }
+      
+      console.log(`🗑️ Starting complete organization data reset for org: ${organizationId}`);
+      
+      // Execute deletion in correct order (respecting foreign key constraints)
+      const deletionResults = [];
+      
+      try {
+        // 1. Timeline and social data
+        const timelineReactions = await db.delete(timelineReactions).where(eq(timelineReactions.organizationId, organizationId));
+        deletionResults.push(`Timeline reactions: ${timelineReactions.rowCount || 0}`);
+        
+        const timelineComments = await db.delete(timelineComments).where(eq(timelineComments.organizationId, organizationId));
+        deletionResults.push(`Timeline comments: ${timelineComments.rowCount || 0}`);
+        
+        const timelineUpdatesDeleted = await db.delete(timelineUpdates).where(eq(timelineUpdates.organizationId, organizationId));
+        deletionResults.push(`Timeline updates: ${timelineUpdatesDeleted.rowCount || 0}`);
+        
+        // 2. Task-related data
+        const taskComments = await db.delete(taskComments).where(eq(taskComments.organizationId, organizationId));
+        deletionResults.push(`Task comments: ${taskComments.rowCount || 0}`);
+        
+        const taskAuditTrail = await db.delete(taskAuditTrail).where(eq(taskAuditTrail.organizationId, organizationId));
+        deletionResults.push(`Task audit trail: ${taskAuditTrail.rowCount || 0}`);
+        
+        const tasksDeleted = await db.delete(tasks).where(eq(tasks.organizationId, organizationId));
+        deletionResults.push(`Tasks: ${tasksDeleted.rowCount || 0}`);
+        
+        // 3. Initiative-related data
+        const successMetricUpdates = await db.delete(successMetricUpdates).where(eq(successMetricUpdates.organizationId, organizationId));
+        deletionResults.push(`Success metric updates: ${successMetricUpdates.rowCount || 0}`);
+        
+        const successMetrics = await db.delete(initiativeSuccessMetrics).where(eq(initiativeSuccessMetrics.organizationId, organizationId));
+        deletionResults.push(`Initiative success metrics: ${successMetrics.rowCount || 0}`);
+        
+        const definitionOfDone = await db.delete(definitionOfDoneItems).where(eq(definitionOfDoneItems.organizationId, organizationId));
+        deletionResults.push(`Definition of done items: ${definitionOfDone.rowCount || 0}`);
+        
+        const initiativeComments = await db.delete(initiativeComments).where(eq(initiativeComments.organizationId, organizationId));
+        deletionResults.push(`Initiative comments: ${initiativeComments.rowCount || 0}`);
+        
+        const initiativeNotes = await db.delete(initiativeNotes).where(eq(initiativeNotes.organizationId, organizationId));
+        deletionResults.push(`Initiative notes: ${initiativeNotes.rowCount || 0}`);
+        
+        const initiativeDocuments = await db.delete(initiativeDocuments).where(eq(initiativeDocuments.organizationId, organizationId));
+        deletionResults.push(`Initiative documents: ${initiativeDocuments.rowCount || 0}`);
+        
+        const initiativeMembers = await db.delete(initiativeMembers).where(eq(initiativeMembers.organizationId, organizationId));
+        deletionResults.push(`Initiative members: ${initiativeMembers.rowCount || 0}`);
+        
+        const initiativesDeleted = await db.delete(initiatives).where(eq(initiatives.organizationId, organizationId));
+        deletionResults.push(`Initiatives: ${initiativesDeleted.rowCount || 0}`);
+        
+        // 4. Key results and check-ins
+        const checkInsDeleted = await db.delete(checkIns).where(eq(checkIns.organizationId, organizationId));
+        deletionResults.push(`Check-ins: ${checkInsDeleted.rowCount || 0}`);
+        
+        const keyResultsDeleted = await db.delete(keyResults).where(eq(keyResults.organizationId, organizationId));
+        deletionResults.push(`Key results: ${keyResultsDeleted.rowCount || 0}`);
+        
+        // 5. Objectives
+        const objectivesDeleted = await db.delete(objectives).where(eq(objectives.organizationId, organizationId));
+        deletionResults.push(`Objectives: ${objectivesDeleted.rowCount || 0}`);
+        
+        // 6. Team-related data
+        const teamMembersDeleted = await db.delete(teamMembers).where(eq(teamMembers.organizationId, organizationId));
+        deletionResults.push(`Team members: ${teamMembersDeleted.rowCount || 0}`);
+        
+        const teamsDeleted = await db.delete(teams).where(eq(teams.organizationId, organizationId));
+        deletionResults.push(`Teams: ${teamsDeleted.rowCount || 0}`);
+        
+        // 7. Cycles and templates
+        const cyclesDeleted = await db.delete(cycles).where(eq(cycles.organizationId, organizationId));
+        deletionResults.push(`Cycles: ${cyclesDeleted.rowCount || 0}`);
+        
+        const templatesDeleted = await db.delete(templates).where(eq(templates.organizationId, organizationId));
+        deletionResults.push(`Templates: ${templatesDeleted.rowCount || 0}`);
+        
+        // 8. Gamification and achievements (preserve user accounts)
+        const userAchievements = await db.delete(userAchievements).where(eq(userAchievements.organizationId, organizationId));
+        deletionResults.push(`User achievements: ${userAchievements.rowCount || 0}`);
+        
+        const userTrialAchievementsDeleted = await db.delete(userTrialAchievements).where(eq(userTrialAchievements.organizationId, organizationId));
+        deletionResults.push(`User trial achievements: ${userTrialAchievementsDeleted.rowCount || 0}`);
+        
+        const userStats = await db.delete(userStats).where(eq(userStats.organizationId, organizationId));
+        deletionResults.push(`User stats: ${userStats.rowCount || 0}`);
+        
+        const activityLogs = await db.delete(activityLogs).where(eq(activityLogs.organizationId, organizationId));
+        deletionResults.push(`Activity logs: ${activityLogs.rowCount || 0}`);
+        
+        const userActivityLogs = await db.delete(userActivityLog).where(eq(userActivityLog.organizationId, organizationId));
+        deletionResults.push(`User activity logs: ${userActivityLogs.rowCount || 0}`);
+        
+        // 9. Daily reflections and notifications
+        const dailyReflectionsDeleted = await db.delete(dailyReflections).where(eq(dailyReflections.organizationId, organizationId));
+        deletionResults.push(`Daily reflections: ${dailyReflectionsDeleted.rowCount || 0}`);
+        
+        const notificationsDeleted = await db.delete(notifications).where(eq(notifications.organizationId, organizationId));
+        deletionResults.push(`Notifications: ${notificationsDeleted.rowCount || 0}`);
+        
+        // 10. Reset user onboarding and company details (preserve user accounts but reset onboarding)
+        const userOnboardingReset = await db.update(users)
+          .set({
+            companyAddress: null,
+            province: null,
+            city: null,
+            industryType: null,
+            position: null,
+            referralSource: null,
+            size: null,
+            tourStarted: false,
+            tourStartedAt: null,
+            tourCompleted: false,
+            tourCompletedAt: null
+          })
+          .where(eq(users.organizationId, organizationId));
+        deletionResults.push(`User onboarding reset: ${userOnboardingReset.rowCount || 0} users`);
+        
+        const onboardingProgressDeleted = await db.delete(userOnboardingProgress).where(eq(userOnboardingProgress.organizationId, organizationId));
+        deletionResults.push(`User onboarding progress: ${onboardingProgressDeleted.rowCount || 0}`);
+        
+        console.log(`✅ Complete organization data reset completed for org: ${organizationId}`);
+        console.log(`📊 Deletion results:`, deletionResults);
+        
+        res.json({
+          message: "Complete organization data reset successful. All data except invoices and user accounts have been cleared.",
+          organizationId,
+          deletionResults,
+          note: "Invoice data and billing information have been preserved. User accounts maintained but onboarding reset."
+        });
+        
+      } catch (dbError) {
+        console.error("Database error during organization reset:", dbError);
+        res.status(500).json({ 
+          message: "Failed to reset organization data", 
+          error: dbError instanceof Error ? dbError.message : String(dbError),
+          completedDeletions: deletionResults
+        });
+      }
+      
+    } catch (error) {
+      console.error("Error resetting organization data:", error);
+      res.status(500).json({ 
+        message: "Failed to reset organization data", 
+        error: error instanceof Error ? error.message : String(error) 
+      });
     }
   });
 
