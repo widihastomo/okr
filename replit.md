@@ -438,6 +438,13 @@ The system now includes a comprehensive dummy data generation feature that creat
 
 ## Changelog
 ```
+- July 22, 2025. **UNIFIED COMPREHENSIVE DUMMY DATA SYSTEM IMPLEMENTED** - Successfully unified dummy data generation to use comprehensive system:
+  * REPLACED: CompanyDetailsModal now calls comprehensive dummy data endpoint instead of simple cycles/teams generation
+  * REMOVED: Deprecated /api/auth/generate-dummy-data endpoint that only created basic cycles and teams
+  * ENHANCED: Company details completion now generates complete OKR structure with goals, key results, initiatives, tasks, and timeline entries
+  * UNIFIED: Both manual "Data Contoh" button and company details completion use same comprehensive generation system
+  * IMPROVED: New users get complete example OKR structure immediately after completing company profile
+  * RESULT: Seamless onboarding experience with full example data structure available from day one
 - July 21, 2025. **COMPREHENSIVE DUMMY DATA GENERATION SYSTEM COMPLETED** - Successfully implemented complete automated dummy data generation with professional UI integration:
   * CREATED: Complete backend system (server/comprehensive-dummy-data.ts) that generates 1 parent goal + 4 child goals with " - Contoh" suffix
   * IMPLEMENTED: Professional modal interface (DummyDataGeneratorModal.tsx) with loading animations, sparkles, and success states

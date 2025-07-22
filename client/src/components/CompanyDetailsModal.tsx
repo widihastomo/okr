@@ -150,24 +150,22 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
       // Invalidate organization data query to refresh UI
       await queryClient.invalidateQueries({ queryKey: ['/api/my-organization-with-role'] });
 
-      // Start dummy data generation with loading animation
+      // Start comprehensive dummy data generation with loading animation
       setIsSubmitting(false);
       setIsGeneratingDummyData(true);
 
-      // Generate dummy data (cycles and teams) after company details completion
+      // Generate comprehensive dummy data (cycles, teams, and OKR structure) after company details completion
       try {
-        console.log("🔄 Generating dummy data with business name:", formData.companyName);
-        const dummyDataResponse = await apiRequest("POST", "/api/auth/generate-dummy-data", {
-          businessName: formData.companyName
-        });
-        console.log("✅ Dummy data generated successfully:", dummyDataResponse);
+        console.log("🔄 Generating comprehensive dummy data with business name:", formData.companyName);
+        const dummyDataResponse = await apiRequest("POST", "/api/auth/generate-comprehensive-dummy-data");
+        console.log("✅ Comprehensive dummy data generated successfully:", dummyDataResponse);
         
         toast({
           title: "Selamat datang!",
-          description: `Data perusahaan tersimpan dan struktur organisasi untuk ${formData.companyName} telah disiapkan`,
+          description: `Data perusahaan tersimpan dan contoh struktur OKR lengkap telah disiapkan untuk ${formData.companyName}`,
         });
       } catch (dummyDataError) {
-        console.error("⚠️ Error generating dummy data:", dummyDataError);
+        console.error("⚠️ Error generating comprehensive dummy data:", dummyDataError);
         // Don't fail the whole process if dummy data generation fails
         toast({
           title: "Data berhasil disimpan",
