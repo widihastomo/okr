@@ -200,13 +200,15 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
         toast({
           title: "Selamat datang!",
           description: `Data perusahaan tersimpan dan contoh struktur OKR lengkap telah disiapkan untuk ${formData.companyName}`,
+          variant: "success",
         });
       } catch (dummyDataError) {
         console.error("⚠️ Error generating comprehensive dummy data:", dummyDataError);
         // Don't fail the whole process if dummy data generation fails
         toast({
-          title: "Data berhasil disimpan",
-          description: "Informasi perusahaan telah tersimpan",
+          title: "Data OKR siap digunakan",
+          description: "Informasi perusahaan telah tersimpan dan sistem OKR siap digunakan",
+          variant: "success",
         });
       }
 
