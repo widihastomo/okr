@@ -1,4 +1,6 @@
 import { storage } from "./storage";
+import { db } from "./db";
+import { cycles } from "../shared/schema";
 
 export async function createComprehensiveDummyData(userId: string, organizationId: string) {
   try {
@@ -10,23 +12,80 @@ export async function createComprehensiveDummyData(userId: string, organizationI
       throw new Error("User not found");
     }
 
-    // Get existing monthly cycle for this organization
+    // Get or create cycles for this organization
     const existingCycles = await storage.getCycles();
-    const monthlyCycle = existingCycles.find(cycle => 
-      cycle.type === "monthly" && cycle.organizationId === organizationId
-    );
+    const organizationCycles = existingCycles.filter(cycle => cycle.organizationId === organizationId);
+    let monthlyCycle = organizationCycles.find(cycle => cycle.type === "monthly");
     
+    // Create cycles if they don't exist
+    if (organizationCycles.length === 0) {
+      console.log("🔧 No cycles found, creating basic cycles...");
+      
+      // Create annual cycle
+      const currentYear = new Date().getFullYear();
+      await db.insert(cycles).values({
+        name: `Annual ${currentYear}`,
+        type: "annual",
+        startDate: `${currentYear}-01-01`,
+        endDate: `${currentYear}-12-31`,
+        organizationId: organizationId,
+        createdBy: userId
+      });
+      
+      // Create quarterly cycles
+      const quarters = [
+        { name: `Q1 ${currentYear}`, start: `${currentYear}-01-01`, end: `${currentYear}-03-31` },
+        { name: `Q2 ${currentYear}`, start: `${currentYear}-04-01`, end: `${currentYear}-06-30` },
+        { name: `Q3 ${currentYear}`, start: `${currentYear}-07-01`, end: `${currentYear}-09-30` },
+        { name: `Q4 ${currentYear}`, start: `${currentYear}-10-01`, end: `${currentYear}-12-31` }
+      ];
+      
+      for (const quarter of quarters) {
+        await db.insert(cycles).values({
+          name: quarter.name,
+          type: "quarterly",
+          startDate: quarter.start,
+          endDate: quarter.end,
+          organizationId: organizationId,
+          createdBy: userId
+        });
+      }
+      
+      // Create current monthly cycle
+      const currentDate = new Date();
+      const currentMonth = currentDate.getMonth() + 1;
+      const monthName = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
+      const startDate = `${currentYear}-${currentMonth.toString().padStart(2, '0')}-01`;
+      const endDate = new Date(currentYear, currentMonth, 0).toISOString().split('T')[0];
+      
+      const [insertedMonthlyCycle] = await db.insert(cycles).values({
+        name: monthName,
+        type: "monthly",
+        startDate: startDate,
+        endDate: endDate,
+        organizationId: organizationId,
+        createdBy: userId
+      }).returning();
+      monthlyCycle = insertedMonthlyCycle;
+      
+      console.log("✅ Created cycles:", { annual: 1, quarterly: 4, monthly: 1 });
+    }
+    
+    // Ensure we have a monthly cycle
     if (!monthlyCycle) {
-      throw new Error("No monthly cycle found for this organization. Please create a monthly cycle first.");
+      monthlyCycle = organizationCycles.find(cycle => cycle.type === "monthly");
+      if (!monthlyCycle) {
+        throw new Error("Failed to create or find monthly cycle for this organization.");
+      }
     }
 
-    // Get existing teams for this organization  
+    // Get or create teams for this organization  
     const teams = await storage.getTeams();
     const organizationTeams = teams.filter(team => team.organizationId === organizationId);
-    const companyTeam = organizationTeams.find(team => team.name.toLowerCase().includes("company") || team.name.toLowerCase().includes("perusahaan"));
-    const marketingTeam = organizationTeams.find(team => team.name.toLowerCase().includes("marketing"));
-    const salesTeam = organizationTeams.find(team => team.name.toLowerCase().includes("sales"));
-    const operationTeam = organizationTeams.find(team => team.name.toLowerCase().includes("operation") || team.name.toLowerCase().includes("operasi"));
+    let companyTeam = organizationTeams.find(team => team.name.toLowerCase().includes("company") || team.name.toLowerCase().includes("perusahaan"));
+    let marketingTeam = organizationTeams.find(team => team.name.toLowerCase().includes("marketing"));
+    let salesTeam = organizationTeams.find(team => team.name.toLowerCase().includes("sales"));
+    let operationTeam = organizationTeams.find(team => team.name.toLowerCase().includes("operation") || team.name.toLowerCase().includes("operasi"));
 
     console.log("🏢 Found teams for organization:", {
       organizationId,
@@ -38,11 +97,11 @@ export async function createComprehensiveDummyData(userId: string, organizationI
       operationTeam: operationTeam?.name
     });
 
-    // If no teams found, create basic teams
+    // Create teams if they don't exist
     if (organizationTeams.length === 0) {
       console.log("🔧 No teams found, creating basic teams...");
       
-      const companyTeamCreated = await storage.createTeam({
+      companyTeam = await storage.createTeam({
         name: "Company Team",
         description: "Tim utama perusahaan",
         organizationId: organizationId,
@@ -50,7 +109,7 @@ export async function createComprehensiveDummyData(userId: string, organizationI
         createdBy: userId
       });
 
-      const marketingTeamCreated = await storage.createTeam({
+      marketingTeam = await storage.createTeam({
         name: "Marketing Team", 
         description: "Tim marketing dan branding",
         organizationId: organizationId,
@@ -58,7 +117,7 @@ export async function createComprehensiveDummyData(userId: string, organizationI
         createdBy: userId
       });
 
-      const salesTeamCreated = await storage.createTeam({
+      salesTeam = await storage.createTeam({
         name: "Sales Team",
         description: "Tim penjualan dan customer acquisition", 
         organizationId: organizationId,
@@ -66,20 +125,21 @@ export async function createComprehensiveDummyData(userId: string, organizationI
         createdBy: userId
       });
 
-      const operationTeamCreated = await storage.createTeam({
+      operationTeam = await storage.createTeam({
         name: "Operation Team",
         description: "Tim operasional dan proses bisnis",
         organizationId: organizationId, 
         ownerId: userId,
         createdBy: userId
       });
-
-      // Update team references
-      Object.assign(companyTeam, companyTeamCreated);
-      Object.assign(marketingTeam, marketingTeamCreated);
-      Object.assign(salesTeam, salesTeamCreated);
-      Object.assign(operationTeam, operationTeamCreated);
       
+      console.log("✅ Created teams:", { 
+        companyTeam: companyTeam.name, 
+        marketingTeam: marketingTeam.name, 
+        salesTeam: salesTeam.name, 
+        operationTeam: operationTeam.name 
+      });
+
       console.log("✅ Basic teams created successfully");
     }
 
