@@ -96,15 +96,15 @@ export default function AchievementsPage() {
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid grid-cols-3 w-full max-w-md">
-            <TabsTrigger value="progress" className="flex items-center gap-2">
+            <TabsTrigger value="progress" className="flex items-center gap-2" data-tour="achievement-progress-tab">
               <Trophy className="h-4 w-4" />
               Progress
             </TabsTrigger>
-            <TabsTrigger value="achievements" className="flex items-center gap-2">
+            <TabsTrigger value="achievements" className="flex items-center gap-2" data-tour="achievement-medals-tab">
               <Medal className="h-4 w-4" />
               Achievements
             </TabsTrigger>
-            <TabsTrigger value="leaderboard" className="flex items-center gap-2">
+            <TabsTrigger value="leaderboard" className="flex items-center gap-2" data-tour="achievement-leaderboard-tab">
               <Users className="h-4 w-4" />
               Leaderboard
             </TabsTrigger>

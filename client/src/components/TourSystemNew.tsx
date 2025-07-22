@@ -31,6 +31,7 @@ import {
   Target,
   Activity,
   Filter,
+  Medal,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLocation } from "wouter";
@@ -364,13 +365,33 @@ const TOUR_STEPS: TourStep[] = [
     requiresClick: true,
   },
   {
-    id: "achievements-content",
-    title: "Pencapaian - Leaderboard",
+    id: "achievement-progress-tab",
+    title: "Progress Tab - Personal Statistics",
     description:
-      "Leaderboard menampilkan ranking anggota tim berdasarkan poin yang diperoleh. Sistem ini menciptakan kompetisi sehat dan memotivasi tim untuk mencapai target lebih baik.",
+      "Tab Progress menampilkan statistik personal Anda dalam sistem gamifikasi. Anda dapat melihat total poin yang dikumpulkan, level pencapaian, dan performa individual dalam menyelesaikan task dan mencapai target key results.",
     icon: Trophy,
-    selector: '[data-tour="leaderboard"]',
-    position: "top",
+    selector: '[data-tour="achievement-progress-tab"]',
+    position: "bottom",
+    category: "feature",
+  },
+  {
+    id: "achievement-medals-tab",
+    title: "Achievements Tab - Badge & Medals",
+    description:
+      "Tab Achievements menampilkan koleksi badge dan medal yang telah Anda raih. Setiap pencapaian milestone seperti menyelesaikan task pertama, mencapai target key result, atau konsistensi update harian akan memberikan badge khusus sebagai pengakuan prestasi.",
+    icon: Medal,
+    selector: '[data-tour="achievement-medals-tab"]',
+    position: "bottom",
+    category: "feature",
+  },
+  {
+    id: "achievement-leaderboard-tab",
+    title: "Leaderboard Tab - Team Rankings",
+    description:
+      "Tab Leaderboard menampilkan peringkat tim berdasarkan total poin yang dikumpulkan. Sistem ini menciptakan kompetisi sehat antar anggota tim dan memotivasi pencapaian target bersama. Anda dapat melihat posisi ranking Anda dibandingkan rekan tim lainnya.",
+    icon: Users,
+    selector: '[data-tour="achievement-leaderboard-tab"]',
+    position: "bottom",
     category: "feature",
   },
   {
