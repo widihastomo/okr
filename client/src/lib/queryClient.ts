@@ -1,4 +1,5 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
+import { apiClient } from "./api-client";
 
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
@@ -12,15 +13,20 @@ export async function apiRequest(
   url: string,
   data?: unknown | undefined,
 ): Promise<Response> {
-  const res = await fetch(url, {
-    method,
-    headers: data ? { "Content-Type": "application/json" } : {},
-    body: data ? JSON.stringify(data) : undefined,
-    credentials: "include",
-  });
-
-  await throwIfResNotOk(res);
-  return res;
+  switch (method.toUpperCase()) {
+    case 'GET':
+      return apiClient.get(url);
+    case 'POST':
+      return apiClient.post(url, data);
+    case 'PUT':
+      return apiClient.put(url, data);
+    case 'PATCH':
+      return apiClient.patch(url, data);
+    case 'DELETE':
+      return apiClient.delete(url);
+    default:
+      throw new Error(`Unsupported method: ${method}`);
+  }
 }
 
 type UnauthorizedBehavior = "returnNull" | "throw";
@@ -63,17 +69,17 @@ const invalidationThrottleMap = new Map<string, NodeJS.Timeout>();
 
 export const throttledInvalidateQueries = (queryKey: string[], delay: number = 1000) => {
   const keyString = queryKey.join('|');
-  
+
   // Clear existing timeout
   if (invalidationThrottleMap.has(keyString)) {
     clearTimeout(invalidationThrottleMap.get(keyString)!);
   }
-  
+
   // Set new timeout
   const timeoutId = setTimeout(() => {
     queryClient.invalidateQueries({ queryKey });
     invalidationThrottleMap.delete(keyString);
   }, delay);
-  
+
   invalidationThrottleMap.set(keyString, timeoutId);
 };
