@@ -206,7 +206,6 @@ const TOUR_STEPS: TourStep[] = [
     selector: '[data-tour="goals-hierarchy-view"]',
     position: "bottom",
     category: "feature",
-    requiresClick: true,
   },
   {
     id: "tasks",

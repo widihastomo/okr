@@ -438,6 +438,11 @@ The system now includes a comprehensive dummy data generation feature that creat
 
 ## Changelog
 ```
+- July 22, 2025. **TOUR HIERARCHY VIEW INTERACTION FIX COMPLETED** - Successfully removed requiresClick property from Goals Hierarchy View tour step:
+  * FIXED: Removed requiresClick: true from tour step 15 (goals-hierarchy-view-tab)
+  * ENHANCED: Goals Hierarchy View tour step now displays tooltip without requiring user click interaction
+  * IMPROVED: Smoother tour flow eliminating mandatory click requirement for hierarchy view tab
+  * RESULT: Tour step 15 now shows guidance tooltip automatically without forcing user interaction with the tab
 - July 22, 2025. **TOUR CLEANUP OPTIMIZATION COMPLETED** - Successfully removed unnecessary tour steps as requested to optimize user experience:
   * REMOVED: Tour step 12 (goals-add-button) - "Goals - Tambah Tujuan Baru" button explanation
   * REMOVED: Tour step 18 (tasks-add-button) - "Tambah Task - Buat Tugas Baru" button explanation
