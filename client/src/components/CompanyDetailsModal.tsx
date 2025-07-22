@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/dialog";
 import { Building2, MapPin, Briefcase, Users, Search, Check, ChevronsUpDown, Loader2, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import { SimpleSelect } from "@/components/SimpleSelect";
 import { useQuery } from "@tanstack/react-query";
 
@@ -146,6 +146,9 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
       // Save company details to user profile
       const response = await apiRequest("POST", "/api/auth/update-company-details", formData);
       console.log("✅ Company details saved successfully:", response);
+
+      // Invalidate organization data query to refresh UI
+      await queryClient.invalidateQueries({ queryKey: ['/api/my-organization-with-role'] });
 
       // Start dummy data generation with loading animation
       setIsSubmitting(false);
