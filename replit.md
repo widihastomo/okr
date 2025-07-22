@@ -438,6 +438,11 @@ The system now includes a comprehensive dummy data generation feature that creat
 
 ## Changelog
 ```
+- July 22, 2025. **COMPANY DETAILS RESET COMPLETED** - Successfully cleared all company details from organization data:
+  * CLEARED: Company address, province, city, industry type, position, referral source fields set to NULL
+  * RESET: onboarding_company_details_completed flag set to false
+  * VERIFICATION: All company detail fields confirmed empty in database
+  * RESULT: Organization now shows as having incomplete company details, CompanyDetailsModal will appear for data collection
 - July 22, 2025. **PRODUCTION UI FINALIZED** - Successfully removed "Data Contoh" (sample data) button and DummyDataGeneratorModal for cleaner interface:
   * REMOVED: "Data Contoh" button from daily focus page action buttons
   * REMOVED: DummyDataGeneratorModal component integration and import
