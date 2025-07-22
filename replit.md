@@ -438,6 +438,19 @@ The system now includes a comprehensive dummy data generation feature that creat
 
 ## Changelog
 ```
+- July 22, 2025. **ACEH PROVINCE CITY DATA BUG FIXED** - Successfully resolved empty city dropdown for Aceh province:
+  * FIXED: Added comprehensive city data for Aceh province including Banda Aceh, Sabang, Langsa, Lhokseumawe, and all 21 kabupaten/kota
+  * ENHANCED: Added complete city data for all 38 Indonesian provinces (Riau, Kepulauan Riau, Jambi, Bengkulu, Bangka Belitung, etc.)
+  * COMPLETED: Company details modal now has complete geographical coverage for all Indonesian provinces
+  * VERIFIED: All provinces now have proper city/kabupaten options available in dropdown selection
+  * TESTED: Employee count dropdown field working properly alongside industry type field
+  * RESULT: Company details form now functions correctly for users from all Indonesian provinces
+- July 22, 2025. **EMPLOYEE COUNT FEATURE COMPLETED** - Successfully implemented employee count selection field:
+  * ADDED: Employee count select field with 8 predefined ranges (1-5, 6-10, 11-25, 26-50, 51-100, 101-250, 251-500, 500+ employees)
+  * POSITIONED: Company size field alongside industry type in same row for optimal space utilization
+  * INTEGRATED: Backend API validation and database schema support for companySize field
+  * ENHANCED: Form validation now requires company size selection before submission
+  * PREPARED: All required fields ready for comprehensive dummy data generation testing
 - July 22, 2025. **UNIFIED COMPREHENSIVE DUMMY DATA SYSTEM IMPLEMENTED** - Successfully unified dummy data generation to use comprehensive system:
   * REPLACED: CompanyDetailsModal now calls comprehensive dummy data endpoint instead of simple cycles/teams generation
   * REMOVED: Deprecated /api/auth/generate-dummy-data endpoint that only created basic cycles and teams

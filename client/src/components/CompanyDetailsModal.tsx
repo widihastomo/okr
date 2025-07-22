@@ -109,6 +109,7 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
 
   // Data kota per provinsi (sample utama)
   const citiesByProvince: Record<string, string[]> = {
+    "Aceh": ["Banda Aceh", "Sabang", "Langsa", "Lhokseumawe", "Subulussalam", "Aceh Besar", "Aceh Jaya", "Aceh Selatan", "Aceh Singkil", "Aceh Tamiang", "Aceh Tengah", "Aceh Tenggara", "Aceh Timur", "Aceh Utara", "Bener Meriah", "Bireuen", "Gayo Lues", "Nagan Raya", "Pidie", "Pidie Jaya", "Simeulue"],
     "DKI Jakarta": ["Kota Jakarta Barat", "Kota Jakarta Pusat", "Kota Jakarta Selatan", "Kota Jakarta Timur", "Kota Jakarta Utara", "Kabupaten Kepulauan Seribu"],
     "Jawa Barat": ["Kota Bandung", "Kabupaten Bandung", "Kabupaten Bandung Barat", "Kota Bekasi", "Kabupaten Bekasi", "Kota Bogor", "Kabupaten Bogor", "Kota Cirebon", "Kabupaten Cirebon", "Kota Depok", "Kabupaten Sukabumi", "Kota Sukabumi", "Kota Tasikmalaya", "Kabupaten Tasikmalaya", "Kabupaten Karawang", "Kabupaten Purwakarta", "Kabupaten Subang", "Kabupaten Sumedang", "Kabupaten Indramayu", "Kabupaten Majalengka", "Kabupaten Kuningan", "Kabupaten Ciamis", "Kabupaten Pangandaran", "Kabupaten Garut", "Kabupaten Cianjur", "Kota Banjar", "Kabupaten Ciamis"],
     "Jawa Tengah": ["Kota Semarang", "Kabupaten Semarang", "Kota Surakarta", "Kota Magelang", "Kabupaten Magelang", "Kota Salatiga", "Kota Pekalongan", "Kabupaten Pekalongan", "Kota Tegal", "Kabupaten Tegal", "Kabupaten Kudus", "Kabupaten Purworejo", "Kabupaten Kebumen", "Kabupaten Cilacap", "Kabupaten Banyumas", "Kabupaten Purbalingga", "Kabupaten Banjarnegara", "Kabupaten Wonosobo", "Kabupaten Temanggung", "Kabupaten Kendal", "Kabupaten Demak", "Kabupaten Grobogan", "Kabupaten Blora", "Kabupaten Rembang", "Kabupaten Pati", "Kabupaten Jepara", "Kabupaten Boyolali", "Kabupaten Klaten", "Kabupaten Sukoharjo", "Kabupaten Karanganyar", "Kabupaten Sragen", "Kabupaten Wonogiri", "Kabupaten Brebes", "Kabupaten Batang", "Kabupaten Pemalang"],
@@ -122,7 +123,30 @@ export function CompanyDetailsModal({ open, onComplete }: CompanyDetailsModalPro
     "Kalimantan Timur": ["Samarinda", "Balikpapan", "Bontang", "Kutai Kartanegara", "Berau", "Kutai Barat"],
     "Kalimantan Selatan": ["Banjarmasin", "Banjarbaru", "Kotabaru", "Banjar", "Barito Kuala", "Tapin"],
     "Sulawesi Selatan": ["Makassar", "Palopo", "Parepare", "Gowa", "Takalar", "Jeneponto", "Bantaeng"],
-    "Papua": ["Jayapura", "Sorong", "Merauke", "Nabire", "Timika", "Biak", "Wamena"]
+    "Papua": ["Jayapura", "Sorong", "Merauke", "Nabire", "Timika", "Biak", "Wamena"],
+    "Riau": ["Pekanbaru", "Dumai", "Kampar", "Rokan Hulu", "Rokan Hilir", "Siak", "Kuantan Singingi", "Indragiri Hulu", "Indragiri Hilir", "Pelalawan", "Bengkalis"],
+    "Kepulauan Riau": ["Batam", "Tanjung Pinang", "Bintan", "Karimun", "Lingga", "Natuna", "Kepulauan Anambas"],
+    "Jambi": ["Jambi", "Sungai Penuh", "Batanghari", "Muaro Jambi", "Tanjung Jabung Timur", "Tanjung Jabung Barat", "Tebo", "Bungo", "Sarolangun", "Merangin", "Kerinci"],
+    "Bengkulu": ["Bengkulu", "Bengkulu Selatan", "Rejang Lebong", "Bengkulu Utara", "Kaur", "Seluma", "Mukomuko", "Lebong", "Kepahiang", "Bengkulu Tengah"],
+    "Bangka Belitung": ["Pangkal Pinang", "Bangka", "Belitung", "Bangka Barat", "Bangka Tengah", "Bangka Selatan", "Belitung Timur"],
+    "DI Yogyakarta": ["Yogyakarta", "Bantul", "Gunung Kidul", "Kulon Progo", "Sleman"],
+    "Nusa Tenggara Barat": ["Mataram", "Bima", "Lombok Barat", "Lombok Tengah", "Lombok Timur", "Sumbawa", "Dompu", "Lombok Utara", "Sumbawa Barat", "Bima"],
+    "Nusa Tenggara Timur": ["Kupang", "Ende", "Manggarai", "Timor Tengah Selatan", "Timor Tengah Utara", "Belu", "Alor", "Lembata", "Flores Timur", "Sikka", "Nagekeo", "Manggarai Barat", "Rote Ndao", "Manggarai Timur", "Sumba Timur", "Sumba Barat", "Sumba Tengah", "Sumba Barat Daya", "Malaka"],
+    "Kalimantan Barat": ["Pontianak", "Singkawang", "Sambas", "Bengkayang", "Landak", "Sanggau", "Ketapang", "Sintang", "Kapuas Hulu", "Sekadau", "Melawi", "Kayong Utara", "Kubu Raya"],
+    "Kalimantan Tengah": ["Palangka Raya", "Kotawaringin Barat", "Kotawaringin Timur", "Kapuas", "Barito Selatan", "Barito Utara", "Sukamara", "Lamandau", "Seruyan", "Katingan", "Pulang Pisau", "Gunung Mas", "Barito Timur", "Murung Raya"],
+    "Kalimantan Utara": ["Tarakan", "Bulungan", "Malinau", "Nunukan", "Tana Tidung"],
+    "Sulawesi Utara": ["Manado", "Bitung", "Tomohon", "Kotamobagu", "Bolaang Mongondow", "Minahasa", "Kepulauan Sangihe", "Kepulauan Talaud", "Minahasa Selatan", "Minahasa Utara", "Bolaang Mongondow Utara", "Siau Tagulandang Biaro", "Minahasa Tenggara", "Bolaang Mongondow Selatan", "Bolaang Mongondow Timur"],
+    "Gorontalo": ["Gorontalo", "Boalemo", "Gorontalo Utara", "Bone Bolango", "Pohuwato", "Gorontalo Utara"],
+    "Sulawesi Tengah": ["Palu", "Banggai", "Banggai Kepulauan", "Morowali", "Poso", "Donggala", "Toli-Toli", "Buol", "Parimo", "Tojo Una-Una", "Sigi", "Banggai Laut", "Morowali Utara"],
+    "Sulawesi Barat": ["Mamuju", "Polewali Mandar", "Mamasa", "Majene", "Mamuju Utara", "Mamuju Tengah"],
+    "Sulawesi Tenggara": ["Kendari", "Bau-Bau", "Konawe", "Kolaka", "Konawe Selatan", "Bombana", "Wakatobi", "Kolaka Utara", "Buton Utara", "Konawe Utara", "Kolaka Timur", "Konawe Kepulauan", "Muna", "Buton", "Muna Barat", "Buton Tengah", "Buton Selatan"],
+    "Maluku": ["Ambon", "Tual", "Maluku Tengah", "Buru", "Kepulauan Aru", "Seram Bagian Barat", "Seram Bagian Timur", "Maluku Tenggara", "Maluku Tenggara Barat", "Buru Selatan"],
+    "Maluku Utara": ["Ternate", "Tidore Kepulauan", "Halmahera Barat", "Halmahera Tengah", "Kepulauan Sula", "Halmahera Selatan", "Halmahera Utara", "Halmahera Timur", "Pulau Morotai", "Pulau Taliabu"],
+    "Papua Barat": ["Manokwari", "Sorong Selatan", "Raja Ampat", "Teluk Bintuni", "Teluk Wondama", "Kaimana", "Tambrauw", "Maybrat", "Manokwari Selatan", "Pegunungan Arfak"],
+    "Papua Tengah": ["Nabire", "Paniai", "Mimika", "Puncak Jaya", "Puncak", "Dogiyai", "Intan Jaya", "Deiyai"],
+    "Papua Pegunungan": ["Jayawijaya", "Pegunungan Bintang", "Yahukimo", "Tolikara", "Mamberamo Tengah", "Yalimo", "Lanny Jaya", "Nduga"],
+    "Papua Selatan": ["Merauke", "Boven Digoel", "Mappi", "Asmat"],
+    "Papua Barat Daya": ["Sorong", "Raja Ampat", "Tambrauw", "Maybrat"]
   };
 
   // Mendapatkan daftar kota berdasarkan provinsi yang dipilih
