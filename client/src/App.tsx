@@ -175,7 +175,7 @@ function Router() {
   }
 
   // Check if current route is onboarding
-  const isOnboardingPage = location === "/onboarding" || location === "/guided-onboarding";
+  const isOnboardingPage = location === "/onboarding" || location === "/guided-onboarding" || location === "/company-onboarding";
 
   return (
     <NotificationProvider>
