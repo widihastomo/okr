@@ -1159,8 +1159,7 @@ export default function CompanyOnboarding() {
       ? 0
       : onboardingData.currentStep === 8
         ? 100 // Show 100% when at the final step (step 8)
-        : (onboardingData.completedSteps.length / ONBOARDING_STEPS.length) *
-          100;
+        : (onboardingData.currentStep / ONBOARDING_STEPS.length) * 100;
 
   // Dynamic color system based on progress
   const getProgressColor = () => {
@@ -1204,16 +1203,19 @@ export default function CompanyOnboarding() {
     }
 
     if (onboardingData.currentStep < 8) {
-      const newCompletedSteps =
-        onboardingData.currentStep === 0
-          ? []
-          : [...onboardingData.completedSteps, onboardingData.currentStep];
+      // Create proper completedSteps array based on currentStep (fixes corruption)
+      const newCurrentStep = onboardingData.currentStep + 1;
+      const newCompletedSteps = newCurrentStep === 1 
+        ? [] // Welcome screen (step 0) doesn't count as completed
+        : Array.from({length: newCurrentStep - 1}, (_, i) => i + 1); // Steps 1 through currentStep-1
+
       const newData = {
         ...onboardingData,
-        currentStep: onboardingData.currentStep + 1,
+        currentStep: newCurrentStep,
         completedSteps: newCompletedSteps,
       };
       setOnboardingData(newData);
+      
       // Only save progress if we're past the welcome screen
       if (onboardingData.currentStep > 0) {
         console.log("Saving progress data:", newData);
@@ -1255,10 +1257,10 @@ export default function CompanyOnboarding() {
 
     const finalData = {
       ...onboardingData,
-      completedSteps: [
+      completedSteps: Array.from(new Set([
         ...onboardingData.completedSteps,
         onboardingData.currentStep,
-      ],
+      ])),
       isCompleted: true,
     };
     
