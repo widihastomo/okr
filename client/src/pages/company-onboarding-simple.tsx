@@ -12,14 +12,27 @@ export default function CompanyOnboardingSimple() {
   const [, navigate] = useLocation();
   const [showCompanyModal, setShowCompanyModal] = useState(false);
 
-  // Check if user needs to complete company details - HIDDEN PER USER REQUEST
+  // Mark onboarding as completed when component loads - NO AUTO REDIRECT
   useEffect(() => {
     if (!isLoading && user) {
-      // Company details modal hidden - skip directly to onboarding completed
+      // Mark onboarding completed in localStorage and server
       localStorage.setItem("onboarding-completed", "true");
-      navigate("/");
+      
+      // Also mark onboarding progress as completed on server
+      fetch("/api/auth/update-onboarding-progress", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          step: "missions_completed"
+        })
+      }).then(() => {
+        console.log("✅ Onboarding marked as completed on server");
+      }).catch(err => {
+        console.error("❌ Failed to mark onboarding completed on server:", err);
+      });
     }
-  }, [user, isLoading, navigate]);
+  }, [user, isLoading]);
 
   // Handle company details completion - redirect to full onboarding
   const handleCompanyDetailsComplete = () => {
@@ -29,10 +42,32 @@ export default function CompanyOnboardingSimple() {
     navigate("/company-onboarding");
   };
 
-  // Handle skip onboarding (temporary)
-  const handleSkipOnboarding = () => {
-    localStorage.setItem("onboarding-completed", "true");
-    navigate("/");
+  // Handle skip onboarding - complete onboarding and redirect
+  const handleSkipOnboarding = async () => {
+    try {
+      // Mark locally
+      localStorage.setItem("onboarding-completed", "true");
+      
+      // Mark onboarding progress as completed on server
+      await fetch("/api/auth/update-onboarding-progress", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          step: "missions_completed"
+        })
+      });
+      
+      console.log("✅ Onboarding completed, redirecting to main app");
+      
+      // Force redirect to main app
+      window.location.href = "/";
+      
+    } catch (error) {
+      console.error("❌ Failed to complete onboarding:", error);
+      // Still redirect even if server update fails
+      navigate("/");
+    }
   };
 
   if (isLoading) {
@@ -128,21 +163,15 @@ export default function CompanyOnboardingSimple() {
         {/* Action Buttons */}
         <div className="text-center space-y-4">
           <Button
-            onClick={() => setShowCompanyModal(true)}
+            onClick={handleSkipOnboarding}
             className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 text-lg"
           >
-            Mulai Setup Organisasi
+            Mulai menggunakan aplikasi
           </Button>
           
-          <div>
-            <Button
-              variant="ghost"
-              onClick={handleSkipOnboarding}
-              className="text-gray-500 hover:text-gray-700 text-sm"
-            >
-              Lewati untuk sekarang
-            </Button>
-          </div>
+          <p className="text-sm text-gray-500">
+            Setup organisasi dapat dilakukan nanti melalui menu Pengaturan
+          </p>
         </div>
       </div>
     </div>

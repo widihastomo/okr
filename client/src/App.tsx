@@ -102,23 +102,30 @@ function Router() {
     }
   }, [isAuthenticated]);
 
-  // Handle onboarding redirect for new users - SIMPLIFIED to avoid infinite loop
+  // Handle onboarding redirect - prioritize server status over localStorage
   useEffect(() => {
     if (isAuthenticated && !isLoading && location === "/") {
-      // Check if user has completed onboarding in localStorage
-      const onboardingCompleted = localStorage.getItem("onboarding-completed") === "true";
-      
-      // If onboarding not completed, redirect immediately to onboarding page
-      if (!onboardingCompleted) {
-        console.log("🎯 New user detected, redirecting to onboarding page immediately");
-        navigate("/onboarding");
-        return;
+      // Check server onboarding status first
+      if (onboardingStatus !== undefined) {
+        const serverOnboardingCompleted = (onboardingStatus as any)?.isCompleted;
+        
+        // If server says onboarding not completed, redirect to onboarding
+        if (!serverOnboardingCompleted) {
+          console.log("🔄 Server onboarding not completed, redirecting to onboarding page");
+          navigate("/onboarding");
+          return;
+        }
+      } else {
+        // Fallback to localStorage if server status not available yet
+        const localOnboardingCompleted = localStorage.getItem("onboarding-completed") === "true";
+        if (!localOnboardingCompleted) {
+          console.log("🎯 Local onboarding not completed, redirecting to onboarding page");
+          navigate("/onboarding");
+          return;
+        }
       }
-      
-      // Skip server-side onboarding status check to avoid infinite loop
-      // User with onboarding-completed=true can stay on main page
     }
-  }, [isAuthenticated, isLoading, location, navigate]);
+  }, [isAuthenticated, isLoading, location, onboardingStatus, navigate]);
 
   const handleMenuToggle = () => {
     setSidebarOpen(!sidebarOpen);
