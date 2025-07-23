@@ -1704,18 +1704,6 @@ export default function CompanyOnboarding() {
               <div className="absolute top-4 right-4 bg-black/50 text-white px-2 py-1 rounded text-sm">
                 🔍 Klik untuk zoom
               </div>
-              
-              {/* Interactive Overlay for Better Understanding */}
-              <div className="absolute inset-0 bg-black/0 hover:bg-black/10 transition-all duration-300 flex items-center justify-center opacity-0 hover:opacity-100">
-                <div className="bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center shadow-lg">
-                  <p className="text-sm font-medium text-gray-800">
-                    📊 Contoh nyata hirarki OKR dalam bisnis
-                  </p>
-                  <p className="text-xs text-gray-600 mt-1">
-                    Goal → Angka Target → Inisiatif → Task
-                  </p>
-                </div>
-              </div>
             </div>
 
             
