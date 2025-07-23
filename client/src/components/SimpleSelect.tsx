@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { createPortal } from 'react-dom';
 
 interface Option {
   value: string;
@@ -28,7 +29,10 @@ export function SimpleSelect({
 }: SimpleSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState('');
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const dropdownContentRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const filteredOptions = options.filter(option =>
@@ -39,19 +43,50 @@ export function SimpleSelect({
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      const target = event.target as Node;
+      if (
+        dropdownRef.current && !dropdownRef.current.contains(target) &&
+        dropdownContentRef.current && !dropdownContentRef.current.contains(target)
+      ) {
         setIsOpen(false);
         setSearch('');
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     if (isOpen && inputRef.current) {
       inputRef.current.focus();
+    }
+  }, [isOpen]);
+
+  // Calculate dropdown position when opened
+  useEffect(() => {
+    if (isOpen && buttonRef.current) {
+      const updatePosition = () => {
+        const rect = buttonRef.current!.getBoundingClientRect();
+        setDropdownPosition({
+          top: rect.bottom + 4,
+          left: rect.left,
+          width: rect.width
+        });
+      };
+      
+      updatePosition();
+      
+      // Update position on scroll and resize
+      window.addEventListener('scroll', updatePosition);
+      window.addEventListener('resize', updatePosition);
+      
+      return () => {
+        window.removeEventListener('scroll', updatePosition);
+        window.removeEventListener('resize', updatePosition);
+      };
     }
   }, [isOpen]);
 
@@ -64,6 +99,7 @@ export function SimpleSelect({
   return (
     <div className="relative z-10" ref={dropdownRef}>
       <button
+        ref={buttonRef}
         type="button"
         disabled={disabled}
         onClick={() => setIsOpen(!isOpen)}
@@ -78,9 +114,18 @@ export function SimpleSelect({
         <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
       </button>
       
-      {isOpen && (
-        <div className="absolute z-[99999] mt-1 w-full rounded-md border bg-white shadow-xl"
-             style={{ zIndex: 99999 }}>
+      {isOpen && typeof document !== 'undefined' && createPortal(
+        <div 
+          ref={dropdownContentRef}
+          className="fixed z-[99999] rounded-md border bg-white shadow-xl"
+          style={{
+            position: 'fixed',
+            top: dropdownPosition.top,
+            left: dropdownPosition.left,
+            width: dropdownPosition.width,
+            zIndex: 99999
+          }}
+        >
           <div className="p-2">
             <input
               ref={inputRef}
@@ -124,7 +169,8 @@ export function SimpleSelect({
               ))
             )}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

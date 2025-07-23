@@ -438,12 +438,14 @@ The system now includes a comprehensive dummy data generation feature that creat
 
 ## Changelog
 ```
-- July 23, 2025. **DROPDOWN Z-INDEX OVERLAP FIX COMPLETED** - Successfully resolved dropdown overlapping with navigation buttons:
-  * FIXED: Increased z-index to 99999 for searchable dropdown components to appear above navigation buttons
-  * ENHANCED: Added proper stacking context with z-10 to dropdown container for better layering
-  * RESOLVED: Dropdown no longer gets overlapped by "Selanjutnya" button in onboarding form
-  * IMPROVED: Enhanced shadow and background styling for better visual separation
-  * RESULT: All searchable dropdowns now display properly above other UI elements without being cut off
+- July 23, 2025. **PORTAL-BASED DROPDOWN SYSTEM IMPLEMENTED** - Successfully resolved persistent dropdown overlap using React Portal technology:
+  * IMPLEMENTED: React Portal (createPortal) to render dropdown directly to document.body bypassing container constraints
+  * ENHANCED: Fixed positioning system that calculates exact button coordinates for precise dropdown placement
+  * ADDED: Dynamic position updates on scroll and window resize events for consistent positioning
+  * RESOLVED: Complete elimination of z-index conflicts and container overflow issues
+  * IMPROVED: Enhanced click-outside detection for both button container and portal content
+  * OPTIMIZED: Responsive positioning system that maintains dropdown alignment across all screen sizes
+  * RESULT: All searchable dropdowns now render above any UI element without overlap or clipping issues
 - July 23, 2025. **COMPANY NAME FIELD MADE EDITABLE** - Successfully converted company name from read-only to fully editable input field:
   * ENHANCED: Company name field now accepts user input instead of being display-only
   * INTEGRATED: Added companyName field to CompanyOnboardingData schema with proper validation
