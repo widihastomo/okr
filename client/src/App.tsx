@@ -113,16 +113,16 @@ function Router() {
         
         // If server says onboarding not completed, redirect to guided onboarding
         if (!serverOnboardingCompleted) {
-          console.log("🔄 Server onboarding not completed, redirecting to guided onboarding page");
-          navigate("/guided-onboarding");
+          console.log("🔄 Server onboarding not completed, redirecting to company onboarding page");
+          navigate("/company-onboarding");
           return;
         }
       } else {
         // Fallback to localStorage if server status not available yet
         const localOnboardingCompleted = localStorage.getItem("onboarding-completed") === "true";
         if (!localOnboardingCompleted) {
-          console.log("🎯 Local onboarding not completed, redirecting to guided onboarding page");
-          navigate("/guided-onboarding");
+          console.log("🎯 Local onboarding not completed, redirecting to company onboarding page");
+          navigate("/company-onboarding");
           return;
         }
       }
@@ -238,7 +238,6 @@ function Router() {
           >
             <Switch>
               <Route path="/onboarding" component={CompanyOnboardingSimple} />
-              <Route path="/guided-onboarding" component={GuidedOnboarding} />
               <Route path="/company-onboarding" component={CompanyOnboarding} />
               <Route path="/organization-setup" component={OrganizationSetup} />
               <Route path="/" component={DailyFocusPage} />
