@@ -27,13 +27,44 @@ import {
 import { useToast } from "@/hooks/use-toast";
 
 const industryOptions = [
-  "Teknologi/Software", "Retail/E-commerce", "Manufaktur", "Jasa Keuangan",
-  "Pendidikan", "Kesehatan", "Konstruksi", "F&B/Restaurant", 
-  "Konsultan", "Kreatif/Marketing", "Lainnya"
+  "Teknologi Informasi",
+  "Manufaktur",
+  "Perdagangan",
+  "Jasa Keuangan",
+  "Pendidikan",
+  "Kesehatan",
+  "Konstruksi",
+  "Transportasi",
+  "Perhotelan & Pariwisata",
+  "Media & Komunikasi",
+  "Energi & Pertambangan",
+  "Pertanian",
+  "Real Estate",
+  "Konsultan",
+  "Pemerintahan",
+  "Non-Profit",
+  "E-commerce",
+  "Startup",
+  "FMCG",
+  "Otomotif",
+  "Farmasi",
+  "Telekomunikasi",
+  "Logistik",
+  "Perbankan",
+  "Asuransi",
+  "Lainnya",
 ];
 
 const roleOptions = [
-  "CEO/Founder", "Direktur", "Manager", "Team Lead", "Supervisor", "Staff", "Lainnya"
+  "CEO/Founder",
+  "Direktur", 
+  "Manager",
+  "Team Lead",
+  "Supervisor", 
+  "Staff",
+  "Konsultan",
+  "Freelancer",
+  "Lainnya"
 ];
 
 const goalAreas = [
@@ -275,9 +306,9 @@ export default function GuidedOnboarding() {
 
   // Enhanced Recommendation Logic
   const getCompanySizeCategory = (companySize: string): string => {
-    if (companySize === "1-5" || companySize === "6-10") return "startup";
-    if (companySize === "11-25" || companySize === "26-50") return "small";
-    if (companySize === "51-100" || companySize === "101-250") return "medium";
+    if (companySize === "1-5 karyawan" || companySize === "6-10 karyawan") return "startup";
+    if (companySize === "11-25 karyawan" || companySize === "26-50 karyawan") return "small";
+    if (companySize === "51-100 karyawan" || companySize === "101-250 karyawan") return "medium";
     return "large";
   };
 
@@ -519,32 +550,36 @@ export default function GuidedOnboarding() {
             className="space-y-3 mt-3"
           >
             <div className="flex items-center space-x-2 p-2 rounded border border-gray-200 hover:bg-gray-50">
-              <RadioGroupItem value="1-5" id="1-5" />
-              <Label htmlFor="1-5" className="font-medium cursor-pointer">1-5 karyawan (Solo/Tim Kecil)</Label>
+              <RadioGroupItem value="1-5 karyawan" id="1-5" />
+              <Label htmlFor="1-5" className="font-medium cursor-pointer">1-5 karyawan</Label>
             </div>
             <div className="flex items-center space-x-2 p-2 rounded border border-gray-200 hover:bg-gray-50">
-              <RadioGroupItem value="6-10" id="6-10" />
-              <Label htmlFor="6-10" className="font-medium cursor-pointer">6-10 karyawan (Startup)</Label>
+              <RadioGroupItem value="6-10 karyawan" id="6-10" />
+              <Label htmlFor="6-10" className="font-medium cursor-pointer">6-10 karyawan</Label>
             </div>
             <div className="flex items-center space-x-2 p-2 rounded border border-gray-200 hover:bg-gray-50">
-              <RadioGroupItem value="11-25" id="11-25" />
-              <Label htmlFor="11-25" className="font-medium cursor-pointer">11-25 karyawan (Tim Menengah)</Label>
+              <RadioGroupItem value="11-25 karyawan" id="11-25" />
+              <Label htmlFor="11-25" className="font-medium cursor-pointer">11-25 karyawan</Label>
             </div>
             <div className="flex items-center space-x-2 p-2 rounded border border-gray-200 hover:bg-gray-50">
-              <RadioGroupItem value="26-50" id="26-50" />
-              <Label htmlFor="26-50" className="font-medium cursor-pointer">26-50 karyawan (Small Business)</Label>
+              <RadioGroupItem value="26-50 karyawan" id="26-50" />
+              <Label htmlFor="26-50" className="font-medium cursor-pointer">26-50 karyawan</Label>
             </div>
             <div className="flex items-center space-x-2 p-2 rounded border border-gray-200 hover:bg-gray-50">
-              <RadioGroupItem value="51-100" id="51-100" />
-              <Label htmlFor="51-100" className="font-medium cursor-pointer">51-100 karyawan (Medium Business)</Label>
+              <RadioGroupItem value="51-100 karyawan" id="51-100" />
+              <Label htmlFor="51-100" className="font-medium cursor-pointer">51-100 karyawan</Label>
             </div>
             <div className="flex items-center space-x-2 p-2 rounded border border-gray-200 hover:bg-gray-50">
-              <RadioGroupItem value="101-250" id="101-250" />
-              <Label htmlFor="101-250" className="font-medium cursor-pointer">101-250 karyawan (Large Business)</Label>
+              <RadioGroupItem value="101-250 karyawan" id="101-250" />
+              <Label htmlFor="101-250" className="font-medium cursor-pointer">101-250 karyawan</Label>
             </div>
             <div className="flex items-center space-x-2 p-2 rounded border border-gray-200 hover:bg-gray-50">
-              <RadioGroupItem value="250+" id="250+" />
-              <Label htmlFor="250+" className="font-medium cursor-pointer">250+ karyawan (Enterprise)</Label>
+              <RadioGroupItem value="251-500 karyawan" id="251-500" />
+              <Label htmlFor="251-500" className="font-medium cursor-pointer">251-500 karyawan</Label>
+            </div>
+            <div className="flex items-center space-x-2 p-2 rounded border border-gray-200 hover:bg-gray-50">
+              <RadioGroupItem value="500+ karyawan" id="500+" />
+              <Label htmlFor="500+" className="font-medium cursor-pointer">500+ karyawan</Label>
             </div>
           </RadioGroup>
         </div>
