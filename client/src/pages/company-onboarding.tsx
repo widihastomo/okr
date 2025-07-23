@@ -3969,17 +3969,17 @@ export default function CompanyOnboarding() {
                             {/* Step 1: Buat Goal */}
                             <div className="flex flex-col items-center flex-1">
                               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-300 ${
-                                onboardingData.currentStep >= 4 ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600'
+                                onboardingData.currentStep >= 4 ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-600'
                               }`}>
                                 1
                               </div>
                               <div className="mt-2 text-center">
                                 <div className="flex items-center justify-center gap-1 mb-1">
                                   <Target className={`w-4 h-4 ${
-                                    onboardingData.currentStep >= 4 ? 'text-green-600' : 'text-gray-400'
+                                    onboardingData.currentStep >= 4 ? 'text-orange-600' : 'text-gray-400'
                                   }`} />
                                   <p className={`text-xs font-medium ${
-                                    onboardingData.currentStep >= 4 ? 'text-green-700' : 'text-gray-500'
+                                    onboardingData.currentStep >= 4 ? 'text-orange-700' : 'text-gray-500'
                                   }`}>
                                     Buat Goal
                                   </p>
@@ -3990,24 +3990,24 @@ export default function CompanyOnboarding() {
                             {/* Arrow 1 */}
                             <div className="flex-shrink-0 mx-1">
                               <ArrowRight className={`w-4 h-4 ${
-                                onboardingData.currentStep >= 5 ? 'text-green-500' : 'text-gray-300'
+                                onboardingData.currentStep >= 5 ? 'text-orange-500' : 'text-gray-300'
                               }`} />
                             </div>
 
                             {/* Step 2: Ukuran Keberhasilan */}
                             <div className="flex flex-col items-center flex-1">
                               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-300 ${
-                                onboardingData.currentStep >= 5 ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600'
+                                onboardingData.currentStep >= 5 ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-600'
                               }`}>
                                 2
                               </div>
                               <div className="mt-2 text-center">
                                 <div className="flex items-center justify-center gap-1 mb-1">
                                   <TrendingUp className={`w-4 h-4 ${
-                                    onboardingData.currentStep >= 5 ? 'text-green-600' : 'text-gray-400'
+                                    onboardingData.currentStep >= 5 ? 'text-orange-600' : 'text-gray-400'
                                   }`} />
                                   <p className={`text-xs font-medium ${
-                                    onboardingData.currentStep >= 5 ? 'text-green-700' : 'text-gray-500'
+                                    onboardingData.currentStep >= 5 ? 'text-orange-700' : 'text-gray-500'
                                   }`}>
                                     Ukuran Keberhasilan
                                   </p>
@@ -4018,24 +4018,24 @@ export default function CompanyOnboarding() {
                             {/* Arrow 2 */}
                             <div className="flex-shrink-0 mx-1">
                               <ArrowRight className={`w-4 h-4 ${
-                                onboardingData.currentStep >= 6 ? 'text-green-500' : 'text-gray-300'
+                                onboardingData.currentStep >= 6 ? 'text-orange-500' : 'text-gray-300'
                               }`} />
                             </div>
 
                             {/* Step 3: Pilih Inisiatif */}
                             <div className="flex flex-col items-center flex-1">
                               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-300 ${
-                                onboardingData.currentStep >= 6 ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600'
+                                onboardingData.currentStep >= 6 ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-600'
                               }`}>
                                 3
                               </div>
                               <div className="mt-2 text-center">
                                 <div className="flex items-center justify-center gap-1 mb-1">
                                   <Lightbulb className={`w-4 h-4 ${
-                                    onboardingData.currentStep >= 6 ? 'text-green-600' : 'text-gray-400'
+                                    onboardingData.currentStep >= 6 ? 'text-orange-600' : 'text-gray-400'
                                   }`} />
                                   <p className={`text-xs font-medium ${
-                                    onboardingData.currentStep >= 6 ? 'text-green-700' : 'text-gray-500'
+                                    onboardingData.currentStep >= 6 ? 'text-orange-700' : 'text-gray-500'
                                   }`}>
                                     Pilih Inisiatif
                                   </p>
@@ -4046,24 +4046,24 @@ export default function CompanyOnboarding() {
                             {/* Arrow 3 */}
                             <div className="flex-shrink-0 mx-1">
                               <ArrowRight className={`w-4 h-4 ${
-                                onboardingData.currentStep >= 7 ? 'text-green-500' : 'text-gray-300'
+                                onboardingData.currentStep >= 7 ? 'text-orange-500' : 'text-gray-300'
                               }`} />
                             </div>
 
                             {/* Step 4: Pilih Task */}
                             <div className="flex flex-col items-center flex-1">
                               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-300 ${
-                                onboardingData.currentStep >= 7 ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600'
+                                onboardingData.currentStep >= 7 ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-600'
                               }`}>
                                 4
                               </div>
                               <div className="mt-2 text-center">
                                 <div className="flex items-center justify-center gap-1 mb-1">
                                   <ListTodo className={`w-4 h-4 ${
-                                    onboardingData.currentStep >= 7 ? 'text-green-600' : 'text-gray-400'
+                                    onboardingData.currentStep >= 7 ? 'text-orange-600' : 'text-gray-400'
                                   }`} />
                                   <p className={`text-xs font-medium ${
-                                    onboardingData.currentStep >= 7 ? 'text-green-700' : 'text-gray-500'
+                                    onboardingData.currentStep >= 7 ? 'text-orange-700' : 'text-gray-500'
                                   }`}>
                                     Pilih Task
                                   </p>
