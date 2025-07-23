@@ -3672,7 +3672,7 @@ export default function CompanyOnboarding() {
       2: selectedObjective
         ? `Perfect! Dengan fokus pada area ${selectedFocus || 'bisnis'}, saya lihat tujuan "${selectedObjective}" sudah ditetapkan untuk ${companyName}. Jika ingin memodifikasi, silakan edit tujuan sesuai kebutuhan perusahaan Anda.`
         : selectedFocus 
-        ? `Bagus! Dengan fokus pada area ${selectedFocus}, mari buat tujuan yang spesifik dan bermakna. Tuliskan goal yang jelas dan dapat diukur untuk meningkatkan area ${selectedFocus} di ${companyName}.`
+        ? `Excellent! Area ${selectedFocus} memang area yang strategis untuk ${companyName}. Sekarang mari buat tujuan yang spesifik dan bermakna untuk meningkatkan performa ${selectedFocus}. Tuliskan goal yang jelas, terukur, dan selaras dengan visi ${companyName}.`
         : "Bagus! Dengan fokus pada area bisnis tersebut, mari buat tujuan yang spesifik dan bermakna. Tuliskan goal yang jelas dan dapat diukur untuk area yang sudah Anda pilih.",
       3: selectedObjective
         ? `Tujuan "${selectedObjective}" sudah bagus! Sekarang mari tentukan angka target yang konkret. Key Results ini akan menjadi ukuran keberhasilan goal Anda. Pastikan angka yang dipilih menantang namun realistis untuk ${companyName}.`
