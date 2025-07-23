@@ -654,31 +654,22 @@ export default function CompanyOnboarding() {
               </p>
             </div>
 
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Nama Perusahaan - dari database */}
-              <div className="space-y-2">
-                <Label htmlFor="companyName" className="flex items-center space-x-2">
-                  <Building className="w-4 h-4 text-blue-600" />
-                  <span>Nama Perusahaan</span>
-                </Label>
+              <div className="space-y-1">
+                <Label htmlFor="companyName">Nama Perusahaan</Label>
                 <Input
                   id="companyName"
                   value={organizationData?.organization?.name || ""}
                   disabled
                   className="bg-gray-50 text-gray-600"
-                  placeholder="Nama perusahaan dari database"
                 />
-                <p className="text-xs text-gray-500">
-                  Nama perusahaan diambil dari database sistem
-                </p>
+                <p className="text-xs text-gray-500">Diambil dari database</p>
               </div>
 
               {/* Alamat Perusahaan */}
-              <div className="space-y-2">
-                <Label htmlFor="companyAddress" className="flex items-center space-x-2">
-                  <Building className="w-4 h-4 text-orange-600" />
-                  <span>Alamat Perusahaan</span>
-                </Label>
+              <div className="space-y-1">
+                <Label htmlFor="companyAddress">Alamat Perusahaan</Label>
                 <Input
                   id="companyAddress"
                   value={onboardingData.companyAddress || ""}
@@ -688,16 +679,13 @@ export default function CompanyOnboarding() {
                       companyAddress: e.target.value,
                     })
                   }
-                  placeholder="Masukkan alamat lengkap perusahaan"
+                  placeholder="Alamat lengkap perusahaan"
                 />
               </div>
 
               {/* Provinsi */}
-              <div className="space-y-2">
-                <Label htmlFor="province" className="flex items-center space-x-2">
-                  <Globe className="w-4 h-4 text-green-600" />
-                  <span>Provinsi</span>
-                </Label>
+              <div className="space-y-1">
+                <Label htmlFor="province">Provinsi</Label>
                 <Input
                   id="province"
                   value={onboardingData.province || ""}
@@ -707,16 +695,13 @@ export default function CompanyOnboarding() {
                       province: e.target.value,
                     })
                   }
-                  placeholder="Masukkan provinsi"
+                  placeholder="Provinsi"
                 />
               </div>
 
               {/* Kota */}
-              <div className="space-y-2">
-                <Label htmlFor="city" className="flex items-center space-x-2">
-                  <Globe className="w-4 h-4 text-purple-600" />
-                  <span>Kota</span>
-                </Label>
+              <div className="space-y-1">
+                <Label htmlFor="city">Kota</Label>
                 <Input
                   id="city"
                   value={onboardingData.city || ""}
@@ -726,16 +711,13 @@ export default function CompanyOnboarding() {
                       city: e.target.value,
                     })
                   }
-                  placeholder="Masukkan kota"
+                  placeholder="Kota"
                 />
               </div>
 
               {/* Industri */}
-              <div className="space-y-2">
-                <Label htmlFor="industryType" className="flex items-center space-x-2">
-                  <Settings className="w-4 h-4 text-blue-600" />
-                  <span>Jenis Industri</span>
-                </Label>
+              <div className="space-y-1">
+                <Label htmlFor="industryType">Jenis Industri</Label>
                 <Input
                   id="industryType"
                   value={onboardingData.industryType || ""}
@@ -745,16 +727,13 @@ export default function CompanyOnboarding() {
                       industryType: e.target.value,
                     })
                   }
-                  placeholder="Masukkan jenis industri (contoh: Teknologi, Retail, Manufaktur)"
+                  placeholder="Contoh: Teknologi, Retail"
                 />
               </div>
 
               {/* Ukuran Perusahaan */}
-              <div className="space-y-2">
-                <Label htmlFor="companySize" className="flex items-center space-x-2">
-                  <Users className="w-4 h-4 text-indigo-600" />
-                  <span>Ukuran Perusahaan</span>
-                </Label>
+              <div className="space-y-1">
+                <Label htmlFor="companySize">Ukuran Perusahaan</Label>
                 <Input
                   id="companySize"
                   value={onboardingData.companySize || ""}
@@ -764,16 +743,13 @@ export default function CompanyOnboarding() {
                       companySize: e.target.value,
                     })
                   }
-                  placeholder="Masukkan jumlah karyawan (contoh: 1-10, 11-50, 50+)"
+                  placeholder="Contoh: 1-10, 11-50, 50+"
                 />
               </div>
 
               {/* Posisi */}
-              <div className="space-y-2">
-                <Label htmlFor="position" className="flex items-center space-x-2">
-                  <Star className="w-4 h-4 text-yellow-600" />
-                  <span>Posisi Anda</span>
-                </Label>
+              <div className="space-y-1">
+                <Label htmlFor="position">Posisi Anda</Label>
                 <Input
                   id="position"
                   value={onboardingData.position || ""}
@@ -783,16 +759,13 @@ export default function CompanyOnboarding() {
                       position: e.target.value,
                     })
                   }
-                  placeholder="Masukkan posisi Anda (contoh: CEO, Manager, Staff)"
+                  placeholder="Contoh: CEO, Manager"
                 />
               </div>
 
               {/* Sumber Referral */}
-              <div className="space-y-2">
-                <Label htmlFor="referralSource" className="flex items-center space-x-2">
-                  <MessageSquare className="w-4 h-4 text-pink-600" />
-                  <span>Tahu Refokus dari</span>
-                </Label>
+              <div className="space-y-1">
+                <Label htmlFor="referralSource">Tahu Refokus dari</Label>
                 <Input
                   id="referralSource"
                   value={onboardingData.referralSource || ""}
@@ -802,7 +775,7 @@ export default function CompanyOnboarding() {
                       referralSource: e.target.value,
                     })
                   }
-                  placeholder="Masukkan sumber informasi (contoh: Google, LinkedIn, Referensi)"
+                  placeholder="Contoh: Google, LinkedIn"
                 />
               </div>
             </div>
@@ -815,15 +788,9 @@ export default function CompanyOnboarding() {
               onboardingData.companySize &&
               onboardingData.position &&
               onboardingData.referralSource) && (
-              <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-                <div className="flex items-center space-x-2 mb-2">
-                  <CheckCircle className="w-5 h-5 text-green-600" />
-                  <p className="text-sm font-medium text-green-800">
-                    Profil perusahaan sudah lengkap!
-                  </p>
-                </div>
-                <p className="text-sm text-green-700">
-                  Sekarang mari kita lanjutkan untuk menentukan fokus bisnis yang ingin ditingkatkan.
+              <div className="p-3 bg-green-50 rounded-lg border border-green-200 mt-4">
+                <p className="text-sm text-green-800 font-medium">
+                  ✓ Profil perusahaan sudah lengkap! Lanjutkan ke fokus bisnis.
                 </p>
               </div>
             )}
