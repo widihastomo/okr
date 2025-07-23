@@ -22,11 +22,13 @@ import {
   Settings,
   Users,
   Zap,
-  BarChart3
+  BarChart3,
+  Search,
+  Briefcase
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-const industryOptions = [
+const industryTypes = [
   "Teknologi Informasi",
   "Manufaktur",
   "Perdagangan",
@@ -55,16 +57,41 @@ const industryOptions = [
   "Lainnya",
 ];
 
-const roleOptions = [
+const positionOptions = [
   "CEO/Founder",
-  "Direktur", 
+  "Direktur",
   "Manager",
   "Team Lead",
-  "Supervisor", 
+  "Supervisor",
   "Staff",
   "Konsultan",
   "Freelancer",
-  "Lainnya"
+  "Lainnya",
+];
+
+const referralSources = [
+  "Google Search",
+  "Media Sosial (Instagram, LinkedIn, Facebook)",
+  "Rekomendasi Teman/Kolega",
+  "Event/Webinar",
+  "YouTube",
+  "Blog/Artikel",
+  "Iklan Online",
+  "Word of Mouth",
+  "Partnership/Kemitraan",
+  "Cold Email/Sales",
+  "Lainnya",
+];
+
+const companySizes = [
+  "1-5 karyawan",
+  "6-10 karyawan",
+  "11-25 karyawan",
+  "26-50 karyawan",
+  "51-100 karyawan",
+  "101-250 karyawan",
+  "251-500 karyawan",
+  "500+ karyawan",
 ];
 
 const goalAreas = [
@@ -291,6 +318,7 @@ export default function GuidedOnboarding() {
     industry: "",
     role: "",
     companySize: "",
+    referralSource: "",
     mainGoal: ""
   });
   
@@ -480,7 +508,7 @@ export default function GuidedOnboarding() {
     }
   };
 
-  const isStep1Valid = profileData.industry && profileData.role && profileData.companySize;
+  const isStep1Valid = profileData.industry && profileData.role && profileData.companySize && profileData.referralSource;
   const isStep2Valid = selectedAreas.length > 0;
   const isStep3Valid = selectedTemplate && customizedGoal.objective;
 
@@ -509,7 +537,7 @@ export default function GuidedOnboarding() {
             onValueChange={(value) => setProfileData({...profileData, industry: value})}
             className="grid grid-cols-2 gap-3 mt-3"
           >
-            {industryOptions.map((industry) => (
+            {industryTypes.map((industry) => (
               <div key={industry} className="flex items-center space-x-2 p-2 rounded border border-gray-200 hover:bg-gray-50">
                 <RadioGroupItem value={industry} id={industry} />
                 <Label htmlFor={industry} className="text-sm font-medium cursor-pointer">{industry}</Label>
@@ -529,7 +557,7 @@ export default function GuidedOnboarding() {
             onValueChange={(value) => setProfileData({...profileData, role: value})}
             className="grid grid-cols-2 gap-3 mt-3"
           >
-            {roleOptions.map((role) => (
+            {positionOptions.map((role) => (
               <div key={role} className="flex items-center space-x-2 p-2 rounded border border-gray-200 hover:bg-gray-50">
                 <RadioGroupItem value={role} id={role} />
                 <Label htmlFor={role} className="text-sm font-medium cursor-pointer">{role}</Label>
@@ -549,38 +577,32 @@ export default function GuidedOnboarding() {
             onValueChange={(value) => setProfileData({...profileData, companySize: value})}
             className="space-y-3 mt-3"
           >
-            <div className="flex items-center space-x-2 p-2 rounded border border-gray-200 hover:bg-gray-50">
-              <RadioGroupItem value="1-5 karyawan" id="1-5" />
-              <Label htmlFor="1-5" className="font-medium cursor-pointer">1-5 karyawan</Label>
-            </div>
-            <div className="flex items-center space-x-2 p-2 rounded border border-gray-200 hover:bg-gray-50">
-              <RadioGroupItem value="6-10 karyawan" id="6-10" />
-              <Label htmlFor="6-10" className="font-medium cursor-pointer">6-10 karyawan</Label>
-            </div>
-            <div className="flex items-center space-x-2 p-2 rounded border border-gray-200 hover:bg-gray-50">
-              <RadioGroupItem value="11-25 karyawan" id="11-25" />
-              <Label htmlFor="11-25" className="font-medium cursor-pointer">11-25 karyawan</Label>
-            </div>
-            <div className="flex items-center space-x-2 p-2 rounded border border-gray-200 hover:bg-gray-50">
-              <RadioGroupItem value="26-50 karyawan" id="26-50" />
-              <Label htmlFor="26-50" className="font-medium cursor-pointer">26-50 karyawan</Label>
-            </div>
-            <div className="flex items-center space-x-2 p-2 rounded border border-gray-200 hover:bg-gray-50">
-              <RadioGroupItem value="51-100 karyawan" id="51-100" />
-              <Label htmlFor="51-100" className="font-medium cursor-pointer">51-100 karyawan</Label>
-            </div>
-            <div className="flex items-center space-x-2 p-2 rounded border border-gray-200 hover:bg-gray-50">
-              <RadioGroupItem value="101-250 karyawan" id="101-250" />
-              <Label htmlFor="101-250" className="font-medium cursor-pointer">101-250 karyawan</Label>
-            </div>
-            <div className="flex items-center space-x-2 p-2 rounded border border-gray-200 hover:bg-gray-50">
-              <RadioGroupItem value="251-500 karyawan" id="251-500" />
-              <Label htmlFor="251-500" className="font-medium cursor-pointer">251-500 karyawan</Label>
-            </div>
-            <div className="flex items-center space-x-2 p-2 rounded border border-gray-200 hover:bg-gray-50">
-              <RadioGroupItem value="500+ karyawan" id="500+" />
-              <Label htmlFor="500+" className="font-medium cursor-pointer">500+ karyawan</Label>
-            </div>
+            {companySizes.map((size) => (
+              <div key={size} className="flex items-center space-x-2 p-2 rounded border border-gray-200 hover:bg-gray-50">
+                <RadioGroupItem value={size} id={size} />
+                <Label htmlFor={size} className="font-medium cursor-pointer">{size}</Label>
+              </div>
+            ))}
+          </RadioGroup>
+        </div>
+
+        {/* Referral Source Selection */}
+        <div className="space-y-2">
+          <Label htmlFor="referralSource" className="flex items-center gap-2">
+            <Search className="h-4 w-4" />
+            Dari mana Anda mengetahui kami? *
+          </Label>
+          <RadioGroup 
+            value={profileData.referralSource} 
+            onValueChange={(value) => setProfileData({...profileData, referralSource: value})}
+            className="grid grid-cols-1 gap-3 mt-3"
+          >
+            {referralSources.map((source) => (
+              <div key={source} className="flex items-center space-x-2 p-2 rounded border border-gray-200 hover:bg-gray-50">
+                <RadioGroupItem value={source} id={source} />
+                <Label htmlFor={source} className="text-sm font-medium cursor-pointer">{source}</Label>
+              </div>
+            ))}
           </RadioGroup>
         </div>
 
