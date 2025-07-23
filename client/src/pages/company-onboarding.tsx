@@ -807,14 +807,10 @@ export default function CompanyOnboarding() {
   ];
 
   const companySizeOptions = [
-    { value: "1-5 karyawan", label: "1-5 karyawan" },
-    { value: "6-10 karyawan", label: "6-10 karyawan" },
-    { value: "11-25 karyawan", label: "11-25 karyawan" },
-    { value: "26-50 karyawan", label: "26-50 karyawan" },
-    { value: "51-100 karyawan", label: "51-100 karyawan" },
-    { value: "101-250 karyawan", label: "101-250 karyawan" },
-    { value: "251-500 karyawan", label: "251-500 karyawan" },
-    { value: "500+ karyawan", label: "500+ karyawan" },
+    { value: "Solo (hanya saya)", label: "Solo (hanya saya)" },
+    { value: "Tim kecil (2-10 orang)", label: "Tim kecil (2-10 orang)" },
+    { value: "Tim menengah (11-50 orang)", label: "Tim menengah (11-50 orang)" },
+    { value: "Perusahaan besar (50+ orang)", label: "Perusahaan besar (50+ orang)" },
   ];
 
   const positionOptions = [
