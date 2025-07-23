@@ -1,19 +1,13 @@
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 
-interface Node {
-  id: string;
-  label: string;
+interface TreeNode {
+  name: string;
   type: 'goal' | 'keyResult' | 'initiative' | 'task';
   icon: string;
   description: string;
   color: string;
-  size: number;
-}
-
-interface Link {
-  source: string;
-  target: string;
+  children?: TreeNode[];
 }
 
 interface D3MindMapProps {
@@ -24,100 +18,126 @@ interface D3MindMapProps {
 const D3MindMap: React.FC<D3MindMapProps> = ({ width = 800, height = 600 }) => {
   const svgRef = useRef<SVGSVGElement>(null);
 
-  const nodes: Node[] = [
-    {
-      id: 'goal',
-      label: 'GOAL',
-      type: 'goal',
-      icon: '🎯',
-      description: 'Meningkatkan pendapatan perusahaan 35%',
-      color: '#f97316', // Orange
-      size: 80
-    },
-    {
-      id: 'kr1',
-      label: 'Penjualan 500M',
-      type: 'keyResult',
-      icon: '📊',
-      description: 'Penjualan Rp 500 juta/bulan',
-      color: '#3b82f6', // Blue
-      size: 60
-    },
-    {
-      id: 'kr2',
-      label: '100 Pelanggan',
-      type: 'keyResult',
-      icon: '🎯',
-      description: '100 pelanggan baru',
-      color: '#3b82f6',
-      size: 60
-    },
-    {
-      id: 'kr3',
-      label: 'Konversi 25%',
-      type: 'keyResult',
-      icon: '📈',
-      description: 'Conversion rate 25%',
-      color: '#3b82f6',
-      size: 60
-    },
-    {
-      id: 'init1',
-      label: 'Kampanye Digital',
-      type: 'initiative',
-      icon: '🚀',
-      description: 'Kampanye digital marketing',
-      color: '#10b981', // Green
-      size: 50
-    },
-    {
-      id: 'init2',
-      label: 'Program Loyalitas',
-      type: 'initiative',
-      icon: '💎',
-      description: 'Program loyalitas pelanggan',
-      color: '#10b981',
-      size: 50
-    },
-    {
-      id: 'task1',
-      label: 'Konten Instagram',
-      type: 'task',
-      icon: '✅',
-      description: 'Buat konten Instagram',
-      color: '#8b5cf6', // Purple
-      size: 40
-    },
-    {
-      id: 'task2',
-      label: 'Telepon Prospek',
-      type: 'task',
-      icon: '📞',
-      description: 'Telepon 5 prospek',
-      color: '#8b5cf6',
-      size: 40
-    },
-    {
-      id: 'task3',
-      label: 'Analisis Kompetitor',
-      type: 'task',
-      icon: '📊',
-      description: 'Analisis kompetitor',
-      color: '#8b5cf6',
-      size: 40
-    }
-  ];
-
-  const links: Link[] = [
-    { source: 'goal', target: 'kr1' },
-    { source: 'goal', target: 'kr2' },
-    { source: 'goal', target: 'kr3' },
-    { source: 'goal', target: 'init1' },
-    { source: 'goal', target: 'init2' },
-    { source: 'goal', target: 'task1' },
-    { source: 'goal', target: 'task2' },
-    { source: 'goal', target: 'task3' }
-  ];
+  // Hierarchical data structure
+  const treeData: TreeNode = {
+    name: 'Meningkatkan Pendapatan 35%',
+    type: 'goal',
+    icon: '🎯',
+    description: 'Goal utama perusahaan',
+    color: '#f97316',
+    children: [
+      {
+        name: 'Penjualan 500M/bulan',
+        type: 'keyResult',
+        icon: '📊',
+        description: 'Target penjualan bulanan',
+        color: '#3b82f6',
+        children: [
+          {
+            name: 'Kampanye Digital Marketing',
+            type: 'initiative',
+            icon: '🚀',
+            description: 'Strategi pemasaran digital',
+            color: '#10b981',
+            children: [
+              {
+                name: 'Buat konten Instagram',
+                type: 'task',
+                icon: '✅',
+                description: 'Konten sosial media',
+                color: '#8b5cf6'
+              },
+              {
+                name: 'Setup Facebook Ads',
+                type: 'task',
+                icon: '📱',
+                description: 'Kampanye iklan Facebook',
+                color: '#8b5cf6'
+              }
+            ]
+          },
+          {
+            name: 'Program Referral',
+            type: 'initiative',
+            icon: '💎',
+            description: 'Sistem rujukan pelanggan',
+            color: '#10b981',
+            children: [
+              {
+                name: 'Design reward system',
+                type: 'task',
+                icon: '🎁',
+                description: 'Sistem hadiah rujukan',
+                color: '#8b5cf6'
+              },
+              {
+                name: 'Launch referral campaign',
+                type: 'task',
+                icon: '📢',
+                description: 'Peluncuran kampanye',
+                color: '#8b5cf6'
+              }
+            ]
+          }
+        ]
+      },
+      {
+        name: '100 Pelanggan Baru',
+        type: 'keyResult',
+        icon: '🎯',
+        description: 'Target akuisisi pelanggan',
+        color: '#3b82f6',
+        children: [
+          {
+            name: 'Outreach Program',
+            type: 'initiative',
+            icon: '📞',
+            description: 'Program penjangkauan pelanggan',
+            color: '#10b981',
+            children: [
+              {
+                name: 'Cold calling prospects',
+                type: 'task',
+                icon: '☎️',
+                description: 'Telepon prospek baru',
+                color: '#8b5cf6'
+              },
+              {
+                name: 'Email marketing campaign',
+                type: 'task',
+                icon: '📧',
+                description: 'Kampanye email marketing',
+                color: '#8b5cf6'
+              }
+            ]
+          },
+          {
+            name: 'Partnership Building',
+            type: 'initiative',
+            icon: '🤝',
+            description: 'Membangun kemitraan strategis',
+            color: '#10b981',
+            children: [
+              {
+                name: 'Identifikasi partner potensial',
+                type: 'task',
+                icon: '🔍',
+                description: 'Riset partner bisnis',
+                color: '#8b5cf6'
+              },
+              {
+                name: 'Negosiasi partnership deals',
+                type: 'task',
+                icon: '📝',
+                description: 'Negosiasi kontrak kemitraan',
+                color: '#8b5cf6'
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
 
   useEffect(() => {
     if (!svgRef.current) return;
@@ -130,23 +150,26 @@ const D3MindMap: React.FC<D3MindMapProps> = ({ width = 800, height = 600 }) => {
       .attr('height', height);
 
     // Create container group
-    const container = svg.append('g');
+    const container = svg.append('g')
+      .attr('transform', 'translate(50, 50)');
 
     // Add zoom behavior
     const zoom = d3.zoom<SVGSVGElement, unknown>()
       .scaleExtent([0.5, 2])
       .on('zoom', (event) => {
-        container.attr('transform', event.transform);
+        container.attr('transform', `translate(50, 50) ${event.transform}`);
       });
 
     svg.call(zoom);
 
-    // Create force simulation
-    const simulation = d3.forceSimulation(nodes as any)
-      .force('link', d3.forceLink(links).id((d: any) => d.id).distance(120))
-      .force('charge', d3.forceManyBody().strength(-800))
-      .force('center', d3.forceCenter(width / 2, height / 2))
-      .force('collision', d3.forceCollide().radius((d: any) => d.size / 2 + 10));
+    // Create tree layout
+    const treeLayout = d3.tree<TreeNode>()
+      .size([width - 100, height - 100])
+      .separation((a, b) => (a.parent === b.parent ? 1 : 2) / a.depth);
+
+    // Convert data to hierarchy
+    const root = d3.hierarchy(treeData);
+    const treeNodes = treeLayout(root);
 
     // Create gradient definitions
     const defs = container.append('defs');
@@ -158,152 +181,169 @@ const D3MindMap: React.FC<D3MindMapProps> = ({ width = 800, height = 600 }) => {
     goalGradient.append('stop').attr('offset', '0%').attr('stop-color', '#f97316');
     goalGradient.append('stop').attr('offset', '100%').attr('stop-color', '#ea580c');
 
-    // Other gradients
-    const blueGradient = defs.append('linearGradient')
-      .attr('id', 'blueGradient')
+    // Key Result gradient
+    const keyResultGradient = defs.append('linearGradient')
+      .attr('id', 'keyResultGradient')
       .attr('gradientUnits', 'objectBoundingBox');
-    blueGradient.append('stop').attr('offset', '0%').attr('stop-color', '#3b82f6');
-    blueGradient.append('stop').attr('offset', '100%').attr('stop-color', '#1d4ed8');
+    keyResultGradient.append('stop').attr('offset', '0%').attr('stop-color', '#3b82f6');
+    keyResultGradient.append('stop').attr('offset', '100%').attr('stop-color', '#1d4ed8');
 
-    // Create links
-    const link = container.selectAll('.link')
-      .data(links)
-      .enter().append('line')
+    // Initiative gradient
+    const initiativeGradient = defs.append('linearGradient')
+      .attr('id', 'initiativeGradient')
+      .attr('gradientUnits', 'objectBoundingBox');
+    initiativeGradient.append('stop').attr('offset', '0%').attr('stop-color', '#10b981');
+    initiativeGradient.append('stop').attr('offset', '100%').attr('stop-color', '#059669');
+
+    // Task gradient
+    const taskGradient = defs.append('linearGradient')
+      .attr('id', 'taskGradient')
+      .attr('gradientUnits', 'objectBoundingBox');
+    taskGradient.append('stop').attr('offset', '0%').attr('stop-color', '#8b5cf6');
+    taskGradient.append('stop').attr('offset', '100%').attr('stop-color', '#7c3aed');
+
+    // Create links (connections between nodes)
+    const links = container.selectAll('.link')
+      .data(treeNodes.links())
+      .enter().append('path')
       .attr('class', 'link')
-      .attr('stroke', 'rgba(255,255,255,0.3)')
-      .attr('stroke-width', 3)
-      .attr('opacity', 0.7);
+      .attr('d', d3.linkHorizontal<any, any>()
+        .x((d: any) => d.y)
+        .y((d: any) => d.x)
+      )
+      .attr('stroke', 'rgba(255,255,255,0.4)')
+      .attr('stroke-width', 2)
+      .attr('fill', 'none')
+      .style('opacity', 0.8);
 
     // Create node groups
-    const nodeGroup = container.selectAll('.node')
-      .data(nodes)
+    const nodeGroups = container.selectAll('.node')
+      .data(treeNodes.descendants())
       .enter().append('g')
       .attr('class', 'node')
+      .attr('transform', (d: any) => `translate(${d.y}, ${d.x})`)
       .style('cursor', 'pointer');
 
-    // Add node circles with gradients
-    nodeGroup.append('circle')
-      .attr('r', (d: Node) => d.size / 2)
-      .attr('fill', (d: Node) => {
-        if (d.type === 'goal') return 'url(#goalGradient)';
-        if (d.type === 'keyResult') return 'url(#blueGradient)';
-        return d.color;
-      })
-      .attr('stroke', 'white')
-      .attr('stroke-width', 3)
-      .style('filter', 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))');
+    // Function to get node size based on type
+    const getNodeSize = (type: string) => {
+      switch (type) {
+        case 'goal': return 25;
+        case 'keyResult': return 20;
+        case 'initiative': return 15;
+        case 'task': return 12;
+        default: return 10;
+      }
+    };
 
-    // Add node labels (icons)
-    nodeGroup.append('text')
+    // Function to get node fill
+    const getNodeFill = (type: string) => {
+      switch (type) {
+        case 'goal': return 'url(#goalGradient)';
+        case 'keyResult': return 'url(#keyResultGradient)';
+        case 'initiative': return 'url(#initiativeGradient)';
+        case 'task': return 'url(#taskGradient)';
+        default: return '#gray';
+      }
+    };
+
+    // Add node circles
+    nodeGroups.append('circle')
+      .attr('r', (d: any) => getNodeSize(d.data.type))
+      .attr('fill', (d: any) => getNodeFill(d.data.type))
+      .attr('stroke', 'white')
+      .attr('stroke-width', 2)
+      .style('filter', 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))');
+
+    // Add node icons
+    nodeGroups.append('text')
       .attr('text-anchor', 'middle')
       .attr('dy', '0.35em')
-      .style('font-size', (d: Node) => `${d.size / 3}px`)
+      .style('font-size', (d: any) => `${getNodeSize(d.data.type) * 0.8}px`)
       .style('pointer-events', 'none')
-      .text((d: Node) => d.icon);
+      .text((d: any) => d.data.icon);
 
-    // Add text labels below nodes
-    nodeGroup.append('text')
-      .attr('text-anchor', 'middle')
-      .attr('dy', (d: Node) => d.size / 2 + 20)
+    // Add node labels
+    nodeGroups.append('text')
+      .attr('text-anchor', 'start')
+      .attr('dx', (d: any) => getNodeSize(d.data.type) + 8)
+      .attr('dy', '0.35em')
       .style('fill', 'white')
-      .style('font-size', '12px')
+      .style('font-size', '11px')
       .style('font-weight', 'bold')
       .style('pointer-events', 'none')
-      .text((d: Node) => d.label);
+      .text((d: any) => d.data.name)
+      .each(function(d: any) {
+        const text = d3.select(this);
+        const words = d.data.name.split(/\s+/);
+        if (words.length > 3) {
+          text.text(words.slice(0, 3).join(' ') + '...');
+        }
+      });
 
     // Add hover effects
-    nodeGroup
-      .on('mouseover', function(event, d) {
+    nodeGroups
+      .on('mouseover', function(event, d: any) {
         d3.select(this).select('circle')
           .transition()
           .duration(200)
-          .attr('r', (d as Node).size / 2 * 1.2);
+          .attr('r', getNodeSize(d.data.type) * 1.3);
         
         // Show tooltip
         const tooltip = container.append('g')
           .attr('class', 'tooltip')
-          .attr('transform', `translate(${(d as any).x}, ${(d as any).y - d.size / 2 - 20})`);
+          .attr('transform', `translate(${d.y + getNodeSize(d.data.type) + 10}, ${d.x - 20})`);
         
         const rect = tooltip.append('rect')
-          .attr('fill', 'rgba(0,0,0,0.8)')
+          .attr('fill', 'rgba(0,0,0,0.9)')
           .attr('rx', 4)
-          .attr('ry', 4);
+          .attr('ry', 4)
+          .attr('stroke', 'white')
+          .attr('stroke-width', 1);
         
         const text = tooltip.append('text')
           .attr('fill', 'white')
-          .attr('text-anchor', 'middle')
-          .attr('dy', '0.35em')
+          .attr('text-anchor', 'start')
+          .attr('dx', 8)
+          .attr('dy', '1.2em')
           .style('font-size', '10px')
-          .text(d.description);
+          .text(d.data.description);
         
         const bbox = (text.node() as any).getBBox();
-        rect.attr('x', bbox.x - 4)
-          .attr('y', bbox.y - 2)
-          .attr('width', bbox.width + 8)
-          .attr('height', bbox.height + 4);
+        rect.attr('x', 0)
+          .attr('y', bbox.y - 4)
+          .attr('width', bbox.width + 16)
+          .attr('height', bbox.height + 8);
       })
-      .on('mouseout', function(event, d) {
+      .on('mouseout', function(event, d: any) {
         d3.select(this).select('circle')
           .transition()
           .duration(200)
-          .attr('r', (d as Node).size / 2);
+          .attr('r', getNodeSize(d.data.type));
         
         container.select('.tooltip').remove();
       });
 
-    // Add drag behavior
-    const drag = d3.drag<any, any>()
-      .on('start', (event, d) => {
-        if (!event.active) simulation.alphaTarget(0.3).restart();
-        d.fx = d.x;
-        d.fy = d.y;
-      })
-      .on('drag', (event, d) => {
-        d.fx = event.x;
-        d.fy = event.y;
-      })
-      .on('end', (event, d) => {
-        if (!event.active) simulation.alphaTarget(0);
-        d.fx = null;
-        d.fy = null;
-      });
+    // Animate links
+    links.style('opacity', 0)
+      .transition()
+      .duration(800)
+      .style('opacity', 0.8);
 
-    nodeGroup.call(drag);
+    // Animate nodes
+    nodeGroups.style('opacity', 0)
+      .transition()
+      .duration(1000)
+      .delay((d: any, i: number) => i * 100)
+      .style('opacity', 1);
 
-    // Update positions on simulation tick
-    simulation.on('tick', () => {
-      link
-        .attr('x1', (d: any) => d.source.x)
-        .attr('y1', (d: any) => d.source.y)
-        .attr('x2', (d: any) => d.target.x)
-        .attr('y2', (d: any) => d.target.y);
-
-      nodeGroup
-        .attr('transform', (d: any) => `translate(${d.x},${d.y})`);
-    });
-
-    // Add animated pulse to connections
-    const animateLinks = () => {
-      link.style('opacity', 0.3)
-        .transition()
-        .duration(1500)
-        .style('opacity', 0.7)
-        .transition()
-        .duration(1500)
-        .style('opacity', 0.3);
-    };
-
-    animateLinks();
-    setInterval(animateLinks, 3000);
-
-  }, [width, height]);
+  }, [width, height, treeData]);
 
   return (
     <div className="relative bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 rounded-xl p-4 overflow-hidden">
       {/* Header */}
       <div className="text-center mb-4">
-        <h3 className="text-xl font-bold text-white mb-2">OKR Interactive Mindmap</h3>
-        <p className="text-gray-300 text-sm">Drag nodes to explore • Hover for details • Zoom with mouse wheel</p>
+        <h3 className="text-xl font-bold text-white mb-2">OKR Tree Structure</h3>
+        <p className="text-gray-300 text-sm">Hover nodes for details • Zoom with mouse wheel • Hierarchical goal breakdown</p>
       </div>
       
       {/* D3 SVG */}
@@ -335,6 +375,13 @@ const D3MindMap: React.FC<D3MindMapProps> = ({ width = 800, height = 600 }) => {
             <span>Tasks</span>
           </div>
         </div>
+      </div>
+      
+      {/* Hierarchy Info */}
+      <div className="mt-4 text-center">
+        <p className="text-white/60 text-xs">
+          Goal → Key Results → Initiatives → Tasks | Struktur hierarkis yang saling terhubung
+        </p>
       </div>
     </div>
   );
