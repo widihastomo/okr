@@ -183,15 +183,13 @@ function Router() {
         {/* Trial Status Header - Shows above main header - Hide on onboarding */}
         {!isOnboardingPage && <TrialStatusHeader />}
 
-        {/* Global Header - Hide on onboarding */}
-        {!isOnboardingPage && (
-          <GlobalHeader
-            onMenuToggle={handleMenuToggle}
-            sidebarOpen={sidebarOpen}
-            sidebarCollapsed={sidebarCollapsed}
-            onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
-          />
-        )}
+        {/* Global Header - Always show */}
+        <GlobalHeader
+          onMenuToggle={handleMenuToggle}
+          sidebarOpen={sidebarOpen}
+          sidebarCollapsed={sidebarCollapsed}
+          onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+        />
 
         {/* Sidebar - Hide on onboarding */}
         {!isOnboardingPage && (
@@ -230,7 +228,7 @@ function Router() {
               "flex-1 min-h-[calc(100vh-6rem)] py-3 overflow-x-hidden",
               // Different padding for onboarding page and trial status
               isOnboardingPage
-                ? "pt-0 px-0"
+                ? "pt-[64px] px-0" // Just header space for onboarding
                 : (trialStatus as any)?.isTrialActive && !(user as any)?.isSystemOwner
                   ? "pt-[130px] sm:pt-[130px] px-3 sm:px-6" // Header (64px) + Trial Header (44px)
                   : "pt-[64px] sm:pt-[64px] px-3 sm:px-6", // Just header
