@@ -3733,17 +3733,10 @@ export default function CompanyOnboarding() {
         </div>
       )}
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 pt-4 pb-8">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
-          <div className="text-center mb-8">
-            <div className="flex justify-center mb-4">
-              <img
-                src={refokusLogo}
-                alt="Refokus Logo"
-                className="h-12 w-auto"
-              />
-            </div>
+          <div className="text-center mb-6">
 
             {/* Welcome Screen Visual - Only show on step 0 */}
             {onboardingData.currentStep === 0 && (
