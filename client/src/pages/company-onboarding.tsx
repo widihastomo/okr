@@ -171,6 +171,12 @@ export default function CompanyOnboarding() {
   const [endDateOpen, setEndDateOpen] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const { startTour } = useTour();
+
+  // Fetch organization data for company details
+  const { data: organizationData } = useQuery({
+    queryKey: ["/api/my-organization-with-role"],
+    enabled: !!user,
+  });
   const [onboardingData, setOnboardingData] = useState<OnboardingData>({
     currentStep: 0, // Start at welcome screen
     completedSteps: [],
@@ -591,6 +597,64 @@ export default function CompanyOnboarding() {
       case 1: // Fokus Tim
         return (
           <div className="space-y-6">
+            {/* Company Profile Section */}
+            {user && organizationData && (
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-lg border border-blue-200">
+                <div className="flex items-center space-x-2 mb-4">
+                  <Building className="w-5 h-5 text-blue-600" />
+                  <h3 className="text-lg font-semibold text-blue-800">
+                    Profil Perusahaan Anda
+                  </h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                  <div className="space-y-2">
+                    <div className="flex items-center space-x-2">
+                      <Globe className="w-4 h-4 text-blue-600" />
+                      <span className="font-medium">Nama Perusahaan:</span>
+                      <span className="text-gray-700">{organizationData.organization?.name || "Tidak tersedia"}</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Building className="w-4 h-4 text-blue-600" />
+                      <span className="font-medium">Alamat:</span>
+                      <span className="text-gray-700">{user.companyAddress || "Tidak tersedia"}</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Globe className="w-4 h-4 text-blue-600" />
+                      <span className="font-medium">Provinsi:</span>
+                      <span className="text-gray-700">{user.province || "Tidak tersedia"}</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Globe className="w-4 h-4 text-blue-600" />
+                      <span className="font-medium">Kota:</span>
+                      <span className="text-gray-700">{user.city || "Tidak tersedia"}</span>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center space-x-2">
+                      <Building className="w-4 h-4 text-blue-600" />
+                      <span className="font-medium">Industri:</span>
+                      <span className="text-gray-700">{user.industryType || "Tidak tersedia"}</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Users className="w-4 h-4 text-blue-600" />
+                      <span className="font-medium">Ukuran Perusahaan:</span>
+                      <span className="text-gray-700">{user.companySize || "Tidak tersedia"}</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Star className="w-4 h-4 text-blue-600" />
+                      <span className="font-medium">Posisi:</span>
+                      <span className="text-gray-700">{user.position || "Tidak tersedia"}</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <MessageSquare className="w-4 h-4 text-blue-600" />
+                      <span className="font-medium">Tahu Refokus dari:</span>
+                      <span className="text-gray-700">{user.referralSource || "Tidak tersedia"}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="space-y-2">
               <Label className="text-lg font-semibold">
                 Pilih fokus bisnis Anda:
