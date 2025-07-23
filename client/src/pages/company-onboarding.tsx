@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useLocation } from "wouter";
 import refokusLogo from "@assets/refokus_1751810711179.png";
+import strategyMappingImage from "@assets/strategy-mapping-refokus_1753287904335.png";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -1670,7 +1671,7 @@ export default function CompanyOnboarding() {
             {/* Strategy Mapping Visual */}
             <div className="relative rounded-xl overflow-hidden shadow-2xl">
               <img 
-                src="@assets/strategy-mapping-refokus_1753287904335.png" 
+                src={strategyMappingImage} 
                 alt="Strategy Mapping - Hirarki OKR dari Goal ke Target ke Inisiatif ke Task"
                 className="w-full h-auto object-contain bg-gradient-to-br from-purple-600 to-indigo-800"
                 style={{
