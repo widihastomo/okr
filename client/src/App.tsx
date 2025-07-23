@@ -102,21 +102,23 @@ function Router() {
     }
   }, [isAuthenticated]);
 
-  // Handle onboarding redirect for new users
+  // Handle onboarding redirect for new users - immediate redirect without waiting for API
   useEffect(() => {
-    if (
-      isAuthenticated &&
-      !isLoading &&
-      location === "/" &&
-      onboardingStatus &&
-      !(onboardingStatus as any)?.isCompleted
-    ) {
-      // Check if user has completed onboarding
+    if (isAuthenticated && !isLoading && location === "/") {
+      // Check if user has completed onboarding in localStorage
       const onboardingCompleted = localStorage.getItem("onboarding-completed") === "true";
       
-      // Redirect new users to onboarding page first
+      // If onboarding not completed, redirect immediately to onboarding page
       if (!onboardingCompleted) {
-        console.log("🎯 New user detected, redirecting to onboarding page");
+        console.log("🎯 New user detected, redirecting to onboarding page immediately");
+        navigate("/onboarding");
+        return;
+      }
+      
+      // For users who completed onboarding, check server status
+      if (onboardingStatus && !(onboardingStatus as any)?.isCompleted && onboardingCompleted) {
+        // User completed onboarding locally but not on server, redirect to onboarding
+        console.log("🔄 Onboarding completed locally but not on server, redirecting to onboarding");
         navigate("/onboarding");
       }
     }
