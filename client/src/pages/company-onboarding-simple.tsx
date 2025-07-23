@@ -12,20 +12,12 @@ export default function CompanyOnboardingSimple() {
   const [, navigate] = useLocation();
   const [showCompanyModal, setShowCompanyModal] = useState(false);
 
-  // Check if user needs to complete company details
+  // Check if user needs to complete company details - HIDDEN PER USER REQUEST
   useEffect(() => {
     if (!isLoading && user) {
-      const hasCompleteCompanyDetails = 
-        (user as any).companyAddress && 
-        (user as any).province && 
-        (user as any).city;
-
-      if (!hasCompleteCompanyDetails) {
-        setShowCompanyModal(true);
-      } else {
-        // If company details are complete, proceed to full onboarding
-        navigate("/company-onboarding");
-      }
+      // Company details modal hidden - skip directly to onboarding completed
+      localStorage.setItem("onboarding-completed", "true");
+      navigate("/");
     }
   }, [user, isLoading, navigate]);
 

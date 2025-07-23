@@ -866,8 +866,9 @@ export default function DailyFocusPage() {
       });
     }
     
+    // Company details modal HIDDEN per user request
     // Only show modal if we have loaded organization data and company details are incomplete
-    if (organizationData && !isOrgDataLoading && !hasCompleteCompanyDetails) {
+    if (false && organizationData && !isOrgDataLoading && !hasCompleteCompanyDetails) {
       console.log("📝 Showing company details modal - missing required fields");
       setShowCompanyDetailsModal(true);
       return;
