@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { 
@@ -526,84 +527,96 @@ export default function GuidedOnboarding() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Industry Selection */}
+        {/* Industry Type */}
         <div className="space-y-2">
-          <Label htmlFor="industry" className="flex items-center gap-2">
-            <Building2 className="h-4 w-4" />
-            Industri/Bidang Usaha *
+          <Label htmlFor="industryType" className="flex items-center gap-2">
+            <Briefcase className="h-4 w-4" />
+            Jenis Industri *
           </Label>
-          <RadioGroup 
-            value={profileData.industry} 
+          <Select
+            value={profileData.industry}
             onValueChange={(value) => setProfileData({...profileData, industry: value})}
-            className="grid grid-cols-2 gap-3 mt-3"
           >
-            {industryTypes.map((industry) => (
-              <div key={industry} className="flex items-center space-x-2 p-2 rounded border border-gray-200 hover:bg-gray-50">
-                <RadioGroupItem value={industry} id={industry} />
-                <Label htmlFor={industry} className="text-sm font-medium cursor-pointer">{industry}</Label>
-              </div>
-            ))}
-          </RadioGroup>
+            <SelectTrigger className="bg-gray-50 border-gray-300">
+              <SelectValue placeholder="Pilih jenis industri" />
+            </SelectTrigger>
+            <SelectContent>
+              {industryTypes.map((industry) => (
+                <SelectItem key={industry} value={industry}>
+                  {industry}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
-        {/* Role Selection */}
-        <div className="space-y-2">
-          <Label htmlFor="role" className="flex items-center gap-2">
-            <Users className="h-4 w-4" />
-            Peran/Posisi Anda *
-          </Label>
-          <RadioGroup 
-            value={profileData.role} 
-            onValueChange={(value) => setProfileData({...profileData, role: value})}
-            className="grid grid-cols-2 gap-3 mt-3"
-          >
-            {positionOptions.map((role) => (
-              <div key={role} className="flex items-center space-x-2 p-2 rounded border border-gray-200 hover:bg-gray-50">
-                <RadioGroupItem value={role} id={role} />
-                <Label htmlFor={role} className="text-sm font-medium cursor-pointer">{role}</Label>
-              </div>
-            ))}
-          </RadioGroup>
-        </div>
-
-        {/* Company Size Selection */}
+        {/* Company Size */}
         <div className="space-y-2">
           <Label htmlFor="companySize" className="flex items-center gap-2">
-            <Settings className="h-4 w-4" />
-            Ukuran Tim/Perusahaan *
+            <Users className="h-4 w-4" />
+            Ukuran Perusahaan *
           </Label>
-          <RadioGroup 
-            value={profileData.companySize} 
+          <Select
+            value={profileData.companySize}
             onValueChange={(value) => setProfileData({...profileData, companySize: value})}
-            className="space-y-3 mt-3"
           >
-            {companySizes.map((size) => (
-              <div key={size} className="flex items-center space-x-2 p-2 rounded border border-gray-200 hover:bg-gray-50">
-                <RadioGroupItem value={size} id={size} />
-                <Label htmlFor={size} className="font-medium cursor-pointer">{size}</Label>
-              </div>
-            ))}
-          </RadioGroup>
+            <SelectTrigger className="bg-gray-50 border-gray-300">
+              <SelectValue placeholder="Pilih ukuran perusahaan" />
+            </SelectTrigger>
+            <SelectContent>
+              {companySizes.map((size) => (
+                <SelectItem key={size} value={size}>
+                  {size}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
-        {/* Referral Source Selection */}
+        {/* Position */}
+        <div className="space-y-2">
+          <Label htmlFor="position" className="flex items-center gap-2">
+            <User className="h-4 w-4" />
+            Posisi/Jabatan *
+          </Label>
+          <Select
+            value={profileData.role}
+            onValueChange={(value) => setProfileData({...profileData, role: value})}
+          >
+            <SelectTrigger className="bg-gray-50 border-gray-300">
+              <SelectValue placeholder="Pilih posisi Anda" />
+            </SelectTrigger>
+            <SelectContent>
+              {positionOptions.map((position) => (
+                <SelectItem key={position} value={position}>
+                  {position}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Referral Source */}
         <div className="space-y-2">
           <Label htmlFor="referralSource" className="flex items-center gap-2">
             <Search className="h-4 w-4" />
             Dari mana Anda mengetahui kami? *
           </Label>
-          <RadioGroup 
-            value={profileData.referralSource} 
+          <Select
+            value={profileData.referralSource}
             onValueChange={(value) => setProfileData({...profileData, referralSource: value})}
-            className="grid grid-cols-1 gap-3 mt-3"
           >
-            {referralSources.map((source) => (
-              <div key={source} className="flex items-center space-x-2 p-2 rounded border border-gray-200 hover:bg-gray-50">
-                <RadioGroupItem value={source} id={source} />
-                <Label htmlFor={source} className="text-sm font-medium cursor-pointer">{source}</Label>
-              </div>
-            ))}
-          </RadioGroup>
+            <SelectTrigger className="bg-gray-50 border-gray-300">
+              <SelectValue placeholder="Pilih sumber referral" />
+            </SelectTrigger>
+            <SelectContent>
+              {referralSources.map((source) => (
+                <SelectItem key={source} value={source}>
+                  {source}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Main Goal */}
