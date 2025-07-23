@@ -438,6 +438,14 @@ The system now includes a comprehensive dummy data generation feature that creat
 
 ## Changelog
 ```
+- July 23, 2025. **PAPUA PROVINCES CITY DATA EXPANSION COMPLETED** - Successfully added comprehensive city data for Papua Tengah and Papua Selatan provinces:
+  * PAPUA_TENGAH: Added 8 cities including Nabire, Paniai, Puncak Jaya, Puncak, Dogiyai, Intan Jaya, Deiyai, Mimika
+  * PAPUA_SELATAN: Added 4 cities including Merauke, Boven Digoel, Mappi, Asmat
+  * CONSISTENCY: Updated both company-onboarding.tsx and CompanyDetailsModal.tsx for complete consistency
+  * GEOGRAPHICAL: Added all 6 Papua provinces with comprehensive administrative division coverage
+  * RESOLVED: Fixed duplicate key "Papua" error by removing outdated definition and keeping complete data structure
+  * COMPREHENSIVE: Complete Indonesian province-city dependency system now covers all 38 provinces including newest administrative divisions
+  * RESULT: Users can now select cities for Papua Tengah and Papua Selatan in company profile forms
 - July 23, 2025. **VIRTUAL ASSISTANT PERSONALIZATION COMPLETED** - Successfully enhanced virtual assistant with contextual and personalized messaging:
   * PERSONALIZED: Assistant messages now incorporate company name, selected focus area, and chosen objectives for relevant guidance
   * CONTEXTUAL: Each step message specifically references user's previous selections and provides targeted advice
