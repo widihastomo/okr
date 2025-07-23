@@ -1791,56 +1791,7 @@ export default function CompanyOnboarding() {
               </div>
             </div>
 
-            {/* Interactive Benefits Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl p-5 text-white transform hover:scale-105 transition-all duration-300 shadow-xl">
-                <div className="flex items-center space-x-3 mb-3">
-                  <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-                    <Target className="w-4 h-4 text-white" />
-                  </div>
-                  <h4 className="font-bold">Fokus Terarah</h4>
-                </div>
-                <p className="text-emerald-100 text-sm">
-                  Dari visi besar ke tindakan harian yang jelas dan terstruktur
-                </p>
-              </div>
-
-              <div className="bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl p-5 text-white transform hover:scale-105 transition-all duration-300 shadow-xl">
-                <div className="flex items-center space-x-3 mb-3">
-                  <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-                    <BarChart className="w-4 h-4 text-white" />
-                  </div>
-                  <h4 className="font-bold">Terukur</h4>
-                </div>
-                <p className="text-blue-100 text-sm">
-                  Setiap level memiliki metrik yang dapat dipantau secara real-time
-                </p>
-              </div>
-
-              <div className="bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl p-5 text-white transform hover:scale-105 transition-all duration-300 shadow-xl">
-                <div className="flex items-center space-x-3 mb-3">
-                  <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-                    <Settings className="w-4 h-4 text-white" />
-                  </div>
-                  <h4 className="font-bold">Terstruktur</h4>
-                </div>
-                <p className="text-purple-100 text-sm">
-                  Memudahkan pelacakan progress dan evaluasi berkala
-                </p>
-              </div>
-
-              <div className="bg-gradient-to-br from-orange-500 to-red-600 rounded-xl p-5 text-white transform hover:scale-105 transition-all duration-300 shadow-xl">
-                <div className="flex items-center space-x-3 mb-3">
-                  <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-                    <CheckCircle className="w-4 h-4 text-white" />
-                  </div>
-                  <h4 className="font-bold">Actionable</h4>
-                </div>
-                <p className="text-orange-100 text-sm">
-                  Setiap orang tahu persis apa yang harus dikerjakan hari ini
-                </p>
-              </div>
-            </div>
+            
 
             <div className="text-center">
               <p className="text-sm text-gray-600">
