@@ -443,8 +443,10 @@ The system now includes a comprehensive dummy data generation feature that creat
   * FIXED: completedSteps array corruption - reduced from 18 duplicate entries to proper single-step tracking
   * ENHANCED: handleNext function now uses Array.from({length: newCurrentStep - 1}) for deterministic completedSteps generation
   * IMPROVED: Progress calculation now uses currentStep directly instead of corrupted completedSteps.length
-  * VERIFIED: Organization onboarding data now shows correct completedSteps: [1] instead of corrupted array
-  * RESULT: Onboarding system now tracks progress accurately without corruption, step navigation works correctly
+  * ENHANCED: Virtual assistant messaging completely revamped with step-specific, contextual guidance based on current user data
+  * IMPLEMENTED: Smart detection system for existing data (hasKeyResults, hasInitiatives, hasTasks) to provide appropriate messaging
+  * VERIFIED: Organization onboarding data now shows correct completedSteps: [1, 2] tracking without duplicates
+  * RESULT: Onboarding system now tracks progress accurately, provides contextual guidance, and works without any corruption
 - July 23, 2025. **PAPUA PROVINCES CITY DATA EXPANSION COMPLETED** - Successfully added comprehensive city data for Papua Tengah and Papua Selatan provinces:
   * PAPUA_TENGAH: Added 8 cities including Nabire, Paniai, Puncak Jaya, Puncak, Dogiyai, Intan Jaya, Deiyai, Mimika
   * PAPUA_SELATAN: Added 4 cities including Merauke, Boven Digoel, Mappi, Asmat
