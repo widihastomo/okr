@@ -102,7 +102,7 @@ function Router() {
     }
   }, [isAuthenticated]);
 
-  // Handle onboarding redirect for new users - immediate redirect without waiting for API
+  // Handle onboarding redirect for new users - SIMPLIFIED to avoid infinite loop
   useEffect(() => {
     if (isAuthenticated && !isLoading && location === "/") {
       // Check if user has completed onboarding in localStorage
@@ -115,14 +115,10 @@ function Router() {
         return;
       }
       
-      // For users who completed onboarding, check server status
-      if (onboardingStatus && !(onboardingStatus as any)?.isCompleted && onboardingCompleted) {
-        // User completed onboarding locally but not on server, redirect to onboarding
-        console.log("🔄 Onboarding completed locally but not on server, redirecting to onboarding");
-        navigate("/onboarding");
-      }
+      // Skip server-side onboarding status check to avoid infinite loop
+      // User with onboarding-completed=true can stay on main page
     }
-  }, [isAuthenticated, isLoading, location, onboardingStatus, navigate]);
+  }, [isAuthenticated, isLoading, location, navigate]);
 
   const handleMenuToggle = () => {
     setSidebarOpen(!sidebarOpen);
