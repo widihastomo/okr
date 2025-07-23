@@ -1595,6 +1595,15 @@ export type UpdateOnboardingProgress = z.infer<typeof updateOnboardingProgressSc
 export const companyOnboardingDataSchema = z.object({
   currentStep: z.number().min(0).max(10).default(0), // Allow 0 for welcome screen
   completedSteps: z.array(z.number()).default([]),
+  // Company profile fields
+  companyAddress: z.string().optional(),
+  province: z.string().optional(),
+  city: z.string().optional(),
+  industryType: z.string().optional(),
+  companySize: z.string().optional(),
+  position: z.string().optional(),
+  referralSource: z.string().optional(),
+  // Business focus and goals
   teamFocus: z.string().optional(),
   cycleDuration: z.string().optional(),
   cycleStartDate: z.string().optional(),

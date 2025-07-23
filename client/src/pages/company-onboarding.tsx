@@ -323,7 +323,49 @@ export default function CompanyOnboarding() {
   ): { isValid: boolean; message?: string } => {
     switch (step) {
       case 1:
-        // Step 1 is now company profile introduction - no validation needed
+        // Step 1 is now company profile form - validate all required fields
+        if (!data.companyAddress?.trim()) {
+          return {
+            isValid: false,
+            message: "Silakan isi alamat perusahaan",
+          };
+        }
+        if (!data.province?.trim()) {
+          return {
+            isValid: false,
+            message: "Silakan isi provinsi",
+          };
+        }
+        if (!data.city?.trim()) {
+          return {
+            isValid: false,
+            message: "Silakan isi kota",
+          };
+        }
+        if (!data.industryType?.trim()) {
+          return {
+            isValid: false,
+            message: "Silakan isi jenis industri",
+          };
+        }
+        if (!data.companySize?.trim()) {
+          return {
+            isValid: false,
+            message: "Silakan isi ukuran perusahaan",
+          };
+        }
+        if (!data.position?.trim()) {
+          return {
+            isValid: false,
+            message: "Silakan isi posisi Anda",
+          };
+        }
+        if (!data.referralSource?.trim()) {
+          return {
+            isValid: false,
+            message: "Silakan isi dari mana Anda tahu Refokus",
+          };
+        }
         break;
       case 2:
         if (!data.teamFocus) {
@@ -600,78 +642,191 @@ export default function CompanyOnboarding() {
     switch (onboardingData.currentStep) {
       case 0: // Welcome Screen
         return <div className="space-y-6"></div>;
-      case 1: // Perkenalan - Company Profile
+      case 1: // Perkenalan - Company Profile Form
         return (
           <div className="space-y-6">
-            {/* Company Profile Section */}
-            {user && organizationData && (
-              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-lg border border-blue-200">
-                <div className="flex items-center space-x-2 mb-4">
-                  <Building className="w-5 h-5 text-blue-600" />
-                  <h3 className="text-lg font-semibold text-blue-800">
-                    Profil Perusahaan Anda
-                  </h3>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                  <div className="space-y-2">
-                    <div className="flex items-center space-x-2">
-                      <Globe className="w-4 h-4 text-blue-600" />
-                      <span className="font-medium">Nama Perusahaan:</span>
-                      <span className="text-gray-700">{organizationData.organization?.name || "Tidak tersedia"}</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Building className="w-4 h-4 text-blue-600" />
-                      <span className="font-medium">Alamat:</span>
-                      <span className="text-gray-700">{user.companyAddress || "Tidak tersedia"}</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Globe className="w-4 h-4 text-blue-600" />
-                      <span className="font-medium">Provinsi:</span>
-                      <span className="text-gray-700">{user.province || "Tidak tersedia"}</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Globe className="w-4 h-4 text-blue-600" />
-                      <span className="font-medium">Kota:</span>
-                      <span className="text-gray-700">{user.city || "Tidak tersedia"}</span>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex items-center space-x-2">
-                      <Building className="w-4 h-4 text-blue-600" />
-                      <span className="font-medium">Industri:</span>
-                      <span className="text-gray-700">{user.industryType || "Tidak tersedia"}</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Users className="w-4 h-4 text-blue-600" />
-                      <span className="font-medium">Ukuran Perusahaan:</span>
-                      <span className="text-gray-700">{user.companySize || "Tidak tersedia"}</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Star className="w-4 h-4 text-blue-600" />
-                      <span className="font-medium">Posisi:</span>
-                      <span className="text-gray-700">{user.position || "Tidak tersedia"}</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <MessageSquare className="w-4 h-4 text-blue-600" />
-                      <span className="font-medium">Tahu Refokus dari:</span>
-                      <span className="text-gray-700">{user.referralSource || "Tidak tersedia"}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            <div className="mt-6 p-4 bg-green-50 rounded-lg border border-green-200">
-              <div className="flex items-center space-x-2 mb-2">
-                <CheckCircle className="w-5 h-5 text-green-600" />
-                <p className="text-sm font-medium text-green-800">
-                  Profil perusahaan Anda sudah lengkap!
-                </p>
-              </div>
-              <p className="text-sm text-green-700">
-                Sekarang mari kita lanjutkan untuk menentukan fokus bisnis yang ingin ditingkatkan.
+            <div className="space-y-2">
+              <Label className="text-lg font-semibold">
+                Lengkapi Profil Perusahaan Anda
+              </Label>
+              <p className="text-sm text-gray-600">
+                Isi data perusahaan untuk memulai setup sistem OKR yang tepat.
               </p>
             </div>
+
+            <div className="space-y-4">
+              {/* Nama Perusahaan - dari database */}
+              <div className="space-y-2">
+                <Label htmlFor="companyName" className="flex items-center space-x-2">
+                  <Building className="w-4 h-4 text-blue-600" />
+                  <span>Nama Perusahaan</span>
+                </Label>
+                <Input
+                  id="companyName"
+                  value={organizationData?.organization?.name || ""}
+                  disabled
+                  className="bg-gray-50 text-gray-600"
+                  placeholder="Nama perusahaan dari database"
+                />
+                <p className="text-xs text-gray-500">
+                  Nama perusahaan diambil dari database sistem
+                </p>
+              </div>
+
+              {/* Alamat Perusahaan */}
+              <div className="space-y-2">
+                <Label htmlFor="companyAddress" className="flex items-center space-x-2">
+                  <Building className="w-4 h-4 text-orange-600" />
+                  <span>Alamat Perusahaan</span>
+                </Label>
+                <Input
+                  id="companyAddress"
+                  value={onboardingData.companyAddress || ""}
+                  onChange={(e) =>
+                    setOnboardingData({
+                      ...onboardingData,
+                      companyAddress: e.target.value,
+                    })
+                  }
+                  placeholder="Masukkan alamat lengkap perusahaan"
+                />
+              </div>
+
+              {/* Provinsi */}
+              <div className="space-y-2">
+                <Label htmlFor="province" className="flex items-center space-x-2">
+                  <Globe className="w-4 h-4 text-green-600" />
+                  <span>Provinsi</span>
+                </Label>
+                <Input
+                  id="province"
+                  value={onboardingData.province || ""}
+                  onChange={(e) =>
+                    setOnboardingData({
+                      ...onboardingData,
+                      province: e.target.value,
+                    })
+                  }
+                  placeholder="Masukkan provinsi"
+                />
+              </div>
+
+              {/* Kota */}
+              <div className="space-y-2">
+                <Label htmlFor="city" className="flex items-center space-x-2">
+                  <Globe className="w-4 h-4 text-purple-600" />
+                  <span>Kota</span>
+                </Label>
+                <Input
+                  id="city"
+                  value={onboardingData.city || ""}
+                  onChange={(e) =>
+                    setOnboardingData({
+                      ...onboardingData,
+                      city: e.target.value,
+                    })
+                  }
+                  placeholder="Masukkan kota"
+                />
+              </div>
+
+              {/* Industri */}
+              <div className="space-y-2">
+                <Label htmlFor="industryType" className="flex items-center space-x-2">
+                  <Settings className="w-4 h-4 text-blue-600" />
+                  <span>Jenis Industri</span>
+                </Label>
+                <Input
+                  id="industryType"
+                  value={onboardingData.industryType || ""}
+                  onChange={(e) =>
+                    setOnboardingData({
+                      ...onboardingData,
+                      industryType: e.target.value,
+                    })
+                  }
+                  placeholder="Masukkan jenis industri (contoh: Teknologi, Retail, Manufaktur)"
+                />
+              </div>
+
+              {/* Ukuran Perusahaan */}
+              <div className="space-y-2">
+                <Label htmlFor="companySize" className="flex items-center space-x-2">
+                  <Users className="w-4 h-4 text-indigo-600" />
+                  <span>Ukuran Perusahaan</span>
+                </Label>
+                <Input
+                  id="companySize"
+                  value={onboardingData.companySize || ""}
+                  onChange={(e) =>
+                    setOnboardingData({
+                      ...onboardingData,
+                      companySize: e.target.value,
+                    })
+                  }
+                  placeholder="Masukkan jumlah karyawan (contoh: 1-10, 11-50, 50+)"
+                />
+              </div>
+
+              {/* Posisi */}
+              <div className="space-y-2">
+                <Label htmlFor="position" className="flex items-center space-x-2">
+                  <Star className="w-4 h-4 text-yellow-600" />
+                  <span>Posisi Anda</span>
+                </Label>
+                <Input
+                  id="position"
+                  value={onboardingData.position || ""}
+                  onChange={(e) =>
+                    setOnboardingData({
+                      ...onboardingData,
+                      position: e.target.value,
+                    })
+                  }
+                  placeholder="Masukkan posisi Anda (contoh: CEO, Manager, Staff)"
+                />
+              </div>
+
+              {/* Sumber Referral */}
+              <div className="space-y-2">
+                <Label htmlFor="referralSource" className="flex items-center space-x-2">
+                  <MessageSquare className="w-4 h-4 text-pink-600" />
+                  <span>Tahu Refokus dari</span>
+                </Label>
+                <Input
+                  id="referralSource"
+                  value={onboardingData.referralSource || ""}
+                  onChange={(e) =>
+                    setOnboardingData({
+                      ...onboardingData,
+                      referralSource: e.target.value,
+                    })
+                  }
+                  placeholder="Masukkan sumber informasi (contoh: Google, LinkedIn, Referensi)"
+                />
+              </div>
+            </div>
+
+            {/* Validation Message */}
+            {(onboardingData.companyAddress && 
+              onboardingData.province && 
+              onboardingData.city && 
+              onboardingData.industryType &&
+              onboardingData.companySize &&
+              onboardingData.position &&
+              onboardingData.referralSource) && (
+              <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                <div className="flex items-center space-x-2 mb-2">
+                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  <p className="text-sm font-medium text-green-800">
+                    Profil perusahaan sudah lengkap!
+                  </p>
+                </div>
+                <p className="text-sm text-green-700">
+                  Sekarang mari kita lanjutkan untuk menentukan fokus bisnis yang ingin ditingkatkan.
+                </p>
+              </div>
+            )}
           </div>
         );
 
