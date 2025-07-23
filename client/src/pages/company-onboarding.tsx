@@ -739,14 +739,7 @@ export default function CompanyOnboarding() {
       case 1: // Perkenalan - Company Profile Form
         return (
           <div className="space-y-6">
-            <div className="space-y-2">
-              <Label className="text-lg font-semibold">
-                Lengkapi Profil Perusahaan Anda
-              </Label>
-              <p className="text-sm text-gray-600">
-                Isi data perusahaan untuk memulai setup sistem OKR yang tepat.
-              </p>
-            </div>
+            
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Nama Perusahaan - dari database */}
