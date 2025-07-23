@@ -149,23 +149,23 @@ const D3MindMap: React.FC<D3MindMapProps> = ({ width = 800, height = 600 }) => {
       .attr('width', width)
       .attr('height', height);
 
-    // Create container group
+    // Create container group with better positioning for cards
     const container = svg.append('g')
-      .attr('transform', 'translate(50, 50)');
+      .attr('transform', 'translate(100, 75)');
 
     // Add zoom behavior
     const zoom = d3.zoom<SVGSVGElement, unknown>()
       .scaleExtent([0.5, 2])
       .on('zoom', (event) => {
-        container.attr('transform', `translate(50, 50) ${event.transform}`);
+        container.attr('transform', `translate(100, 75) ${event.transform}`);
       });
 
     svg.call(zoom);
 
-    // Create tree layout (vertical orientation)
+    // Create tree layout (vertical orientation) with increased spacing for cards
     const treeLayout = d3.tree<TreeNode>()
-      .size([width - 100, height - 100])
-      .separation((a, b) => (a.parent === b.parent ? 1 : 2) / a.depth);
+      .size([width - 200, height - 150])
+      .separation((a, b) => (a.parent === b.parent ? 2.5 : 3) / a.depth);
 
     // Convert data to hierarchy
     const root = d3.hierarchy(treeData);
@@ -224,14 +224,14 @@ const D3MindMap: React.FC<D3MindMapProps> = ({ width = 800, height = 600 }) => {
       .attr('transform', (d: any) => `translate(${d.x}, ${d.y})`)
       .style('cursor', 'pointer');
 
-    // Function to get node size based on type
-    const getNodeSize = (type: string) => {
+    // Function to get card dimensions based on type
+    const getCardDimensions = (type: string) => {
       switch (type) {
-        case 'goal': return 25;
-        case 'keyResult': return 20;
-        case 'initiative': return 15;
-        case 'task': return 12;
-        default: return 10;
+        case 'goal': return { width: 200, height: 80 };
+        case 'keyResult': return { width: 170, height: 70 };
+        case 'initiative': return { width: 150, height: 60 };
+        case 'task': return { width: 130, height: 50 };
+        default: return { width: 100, height: 40 };
       }
     };
 
@@ -246,67 +246,82 @@ const D3MindMap: React.FC<D3MindMapProps> = ({ width = 800, height = 600 }) => {
       }
     };
 
-    // Add node circles
-    nodeGroups.append('circle')
-      .attr('r', (d: any) => getNodeSize(d.data.type))
+    // Add card backgrounds
+    nodeGroups.append('rect')
+      .attr('x', (d: any) => -getCardDimensions(d.data.type).width / 2)
+      .attr('y', (d: any) => -getCardDimensions(d.data.type).height / 2)
+      .attr('width', (d: any) => getCardDimensions(d.data.type).width)
+      .attr('height', (d: any) => getCardDimensions(d.data.type).height)
+      .attr('rx', 8)
+      .attr('ry', 8)
       .attr('fill', (d: any) => getNodeFill(d.data.type))
       .attr('stroke', 'white')
       .attr('stroke-width', 2)
-      .style('filter', 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))');
+      .style('filter', 'drop-shadow(0 4px 8px rgba(0,0,0,0.2))');
 
-    // Add node icons
+    // Add card title
     nodeGroups.append('text')
       .attr('text-anchor', 'middle')
-      .attr('dy', '0.35em')
-      .style('font-size', (d: any) => `${getNodeSize(d.data.type) * 0.8}px`)
-      .style('pointer-events', 'none')
-      .text((d: any) => d.data.icon);
-
-    // Add node labels - vertical layout
-    nodeGroups.append('text')
-      .attr('text-anchor', 'middle')
-      .attr('dx', 0)
-      .attr('dy', (d: any) => getNodeSize(d.data.type) + 18)
+      .attr('dy', '-0.8em')
       .style('fill', 'white')
-      .style('font-size', '11px')
+      .style('font-size', '12px')
       .style('font-weight', 'bold')
       .style('pointer-events', 'none')
-      .text((d: any) => d.data.name)
-      .each(function(d: any) {
-        const text = d3.select(this);
+      .text((d: any) => {
         const words = d.data.name.split(/\s+/);
-        if (words.length > 3) {
-          text.text(words.slice(0, 3).join(' ') + '...');
-        }
+        return words.length > 4 ? words.slice(0, 4).join(' ') + '...' : d.data.name;
       });
+
+    // Add card description
+    nodeGroups.append('text')
+      .attr('text-anchor', 'middle')
+      .attr('dy', '0.8em')
+      .style('fill', 'rgba(255,255,255,0.9)')
+      .style('font-size', '10px')
+      .style('pointer-events', 'none')
+      .text((d: any) => {
+        const words = d.data.description.split(/\s+/);
+        return words.length > 3 ? words.slice(0, 3).join(' ') + '...' : d.data.description;
+      });
+
+    // Add card icon
+    nodeGroups.append('text')
+      .attr('text-anchor', 'start')
+      .attr('dx', (d: any) => -getCardDimensions(d.data.type).width / 2 + 8)
+      .attr('dy', '-0.5em')
+      .style('font-size', '16px')
+      .style('pointer-events', 'none')
+      .text((d: any) => d.data.icon);
 
     // Add hover effects
     nodeGroups
       .on('mouseover', function(event, d: any) {
-        d3.select(this).select('circle')
+        d3.select(this).select('rect')
           .transition()
           .duration(200)
-          .attr('r', getNodeSize(d.data.type) * 1.3);
+          .attr('stroke-width', 4)
+          .style('filter', 'drop-shadow(0 6px 12px rgba(0,0,0,0.3))');
         
-        // Show tooltip - vertical layout
+        // Show detailed tooltip - vertical layout
         const tooltip = container.append('g')
           .attr('class', 'tooltip')
-          .attr('transform', `translate(${d.x - 60}, ${d.y + getNodeSize(d.data.type) + 30})`);
+          .attr('transform', `translate(${d.x - 80}, ${d.y + getCardDimensions(d.data.type).height / 2 + 20})`);
         
         const rect = tooltip.append('rect')
           .attr('fill', 'rgba(0,0,0,0.9)')
-          .attr('rx', 4)
-          .attr('ry', 4)
+          .attr('rx', 6)
+          .attr('ry', 6)
           .attr('stroke', 'white')
           .attr('stroke-width', 1);
         
         const text = tooltip.append('text')
           .attr('fill', 'white')
           .attr('text-anchor', 'middle')
-          .attr('dx', 60)
+          .attr('dx', 80)
           .attr('dy', '1.2em')
-          .style('font-size', '10px')
-          .text(d.data.description);
+          .style('font-size', '12px')
+          .style('font-weight', 'bold')
+          .text(`${d.data.name} - ${d.data.description}`);
         
         const bbox = (text.node() as any).getBBox();
         rect.attr('x', bbox.x - 8)
@@ -315,10 +330,11 @@ const D3MindMap: React.FC<D3MindMapProps> = ({ width = 800, height = 600 }) => {
           .attr('height', bbox.height + 8);
       })
       .on('mouseout', function(event, d: any) {
-        d3.select(this).select('circle')
+        d3.select(this).select('rect')
           .transition()
           .duration(200)
-          .attr('r', getNodeSize(d.data.type));
+          .attr('stroke-width', 2)
+          .style('filter', 'drop-shadow(0 4px 8px rgba(0,0,0,0.2))');
         
         container.select('.tooltip').remove();
       });
