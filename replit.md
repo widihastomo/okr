@@ -438,6 +438,19 @@ The system now includes a comprehensive dummy data generation feature that creat
 
 ## Changelog
 ```
+- July 23, 2025. **DROPDOWN Z-INDEX OVERLAP FIX COMPLETED** - Successfully resolved dropdown overlapping with navigation buttons:
+  * FIXED: Increased z-index to 99999 for searchable dropdown components to appear above navigation buttons
+  * ENHANCED: Added proper stacking context with z-10 to dropdown container for better layering
+  * RESOLVED: Dropdown no longer gets overlapped by "Selanjutnya" button in onboarding form
+  * IMPROVED: Enhanced shadow and background styling for better visual separation
+  * RESULT: All searchable dropdowns now display properly above other UI elements without being cut off
+- July 23, 2025. **COMPANY NAME FIELD MADE EDITABLE** - Successfully converted company name from read-only to fully editable input field:
+  * ENHANCED: Company name field now accepts user input instead of being display-only
+  * INTEGRATED: Added companyName field to CompanyOnboardingData schema with proper validation
+  * IMPLEMENTED: Form validation ensures company name is filled before proceeding to next step
+  * MAINTAINED: Organization name from database as default value with ability to edit
+  * ADDED: Proper state management and onChange handling for company name updates
+  * RESULT: Users can now customize company name while maintaining database fallback functionality
 - July 23, 2025. **COMPANY PROFILE FORM CONVERSION COMPLETED** - Successfully converted company profile display to compact interactive form:
   * CONVERTED: Step 1 from static display to 2-column grid form layout for better space utilization
   * SIMPLIFIED: Removed all decorative icons from form fields for cleaner, more focused interface

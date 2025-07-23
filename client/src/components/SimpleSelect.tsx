@@ -62,7 +62,7 @@ export function SimpleSelect({
   };
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className="relative z-10" ref={dropdownRef}>
       <button
         type="button"
         disabled={disabled}
@@ -79,7 +79,8 @@ export function SimpleSelect({
       </button>
       
       {isOpen && (
-        <div className="absolute z-50 mt-1 w-full rounded-md border bg-popover shadow-md">
+        <div className="absolute z-[99999] mt-1 w-full rounded-md border bg-white shadow-xl"
+             style={{ zIndex: 99999 }}>
           <div className="p-2">
             <input
               ref={inputRef}
