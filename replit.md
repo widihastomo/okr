@@ -438,6 +438,14 @@ The system now includes a comprehensive dummy data generation feature that creat
 
 ## Changelog
 ```
+- July 23, 2025. **PROVINCE-CITY DEPENDENCY SYSTEM IMPLEMENTED** - Successfully implemented province-city relationship in company onboarding form:
+  * ADDED: Complete citiesByProvince data structure with comprehensive Indonesian city coverage for all 38 provinces
+  * IMPLEMENTED: Dynamic city options that filter based on selected province (Jakarta cities show only when Jakarta province selected)
+  * ENHANCED: Province selection automatically resets city field when changed to maintain data consistency
+  * IMPROVED: City field disabled state with helpful placeholder "Pilih provinsi terlebih dahulu" when no province selected
+  * INTEGRATED: Same data structure and logic as CompanyDetailsModal for consistency across application
+  * OPTIMIZED: getCityOptions function dynamically generates city options based on province selection
+  * RESULT: Complete province-city dependency ensuring accurate geographical data collection during onboarding
 - July 23, 2025. **SMART VIEWPORT-AWARE DROPDOWN SYSTEM COMPLETED** - Successfully implemented intelligent dropdown positioning with viewport boundary detection:
   * IMPLEMENTED: React Portal (createPortal) to render dropdown directly to document.body bypassing container constraints
   * ENHANCED: Smart positioning algorithm that detects viewport boundaries and positions dropdown above button when needed
