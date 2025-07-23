@@ -190,8 +190,12 @@ export default function GlobalHeader({
     };
   }, []);
 
-  // Calculate header position based on trial status (excluding system owners)
-  const hasTrialStatus = trialStatus?.isTrialActive && !(user as any)?.isSystemOwner;
+  // Get current location for onboarding page detection
+  const [location] = useLocation();
+  const isOnboardingPage = location === "/onboarding" || location === "/guided-onboarding" || location === "/company-onboarding";
+  
+  // Calculate header position based on trial status (excluding system owners) and onboarding state
+  const hasTrialStatus = trialStatus?.isTrialActive && !(user as any)?.isSystemOwner && !isOnboardingPage;
   const headerTop = hasTrialStatus ? '44px' : '0px';
 
   return (
