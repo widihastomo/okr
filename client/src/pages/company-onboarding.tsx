@@ -44,6 +44,7 @@ import {
   Clock,
   UserPlus,
   CheckCircle,
+  CheckSquare,
   ArrowRight,
   ArrowDown,
   Sparkles,
