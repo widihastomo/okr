@@ -29,7 +29,7 @@ export function SimpleSelect({
 }: SimpleSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState('');
-  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0, maxHeight: 200 });
   const dropdownRef = useRef<HTMLDivElement>(null);
   const dropdownContentRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -70,10 +70,34 @@ export function SimpleSelect({
     if (isOpen && buttonRef.current) {
       const updatePosition = () => {
         const rect = buttonRef.current!.getBoundingClientRect();
+        const dropdownHeight = 280; // Max dropdown height (search + max-h-[200px] + padding)
+        const viewportHeight = window.innerHeight;
+        const viewportWidth = window.innerWidth;
+        const spaceBelow = viewportHeight - rect.bottom;
+        const spaceAbove = rect.top;
+        
+        // Position dropdown above if not enough space below
+        const shouldPositionAbove = spaceBelow < dropdownHeight && spaceAbove > spaceBelow;
+        
+        // Ensure dropdown doesn't go outside viewport horizontally
+        let leftPosition = rect.left;
+        if (leftPosition + rect.width > viewportWidth) {
+          leftPosition = viewportWidth - rect.width - 10;
+        }
+        if (leftPosition < 10) {
+          leftPosition = 10;
+        }
+        
+        // Calculate available space for dropdown content
+        const availableHeight = shouldPositionAbove 
+          ? Math.min(200, spaceAbove - 80) // Leave some margin from top
+          : Math.min(200, spaceBelow - 80); // Leave some margin from bottom
+        
         setDropdownPosition({
-          top: rect.bottom + 4,
-          left: rect.left,
-          width: rect.width
+          top: shouldPositionAbove ? Math.max(10, rect.top - dropdownHeight - 4) : rect.bottom + 4,
+          left: leftPosition,
+          width: Math.min(rect.width, viewportWidth - 20),
+          maxHeight: Math.max(150, availableHeight) // Minimum 150px height
         });
       };
       
@@ -138,8 +162,9 @@ export function SimpleSelect({
           </div>
           
           <div 
-            className="max-h-[200px] overflow-y-auto p-1"
+            className="overflow-y-auto p-1"
             style={{ 
+              maxHeight: `${dropdownPosition.maxHeight}px`,
               scrollbarWidth: 'thin',
               scrollbarColor: 'rgb(203 213 225) transparent'
             }}
