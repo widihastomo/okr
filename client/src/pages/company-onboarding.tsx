@@ -1661,10 +1661,10 @@ export default function CompanyOnboarding() {
                 <Lightbulb className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-xl font-semibold text-gray-800">
-                Memahami Struktur OKR Mindmap
+                Memahami Struktur OKR Tree
               </h3>
               <p className="text-gray-600 max-w-2xl mx-auto">
-                Sebelum membuat goal, mari pahami bagaimana Goal menjadi pusat yang menghubungkan Key Results, Initiatives, dan Tasks dalam struktur mindmap yang terintegrasi.
+                Sebelum membuat goal, mari pahami struktur hierarki vertikal OKR: Goal di atas → Key Results → Initiatives → Tasks dalam alur yang berurutan.
               </p>
             </div>
 
@@ -1675,7 +1675,7 @@ export default function CompanyOnboarding() {
 
             <div className="text-center">
               <p className="text-sm text-gray-600">
-                Selanjutnya, kita akan membuat goal berdasarkan fokus bisnis yang sudah Anda pilih: 
+                Tree ini menunjukkan alur vertikal dari atas ke bawah. Selanjutnya, kita akan membuat goal berdasarkan fokus bisnis yang sudah Anda pilih: 
                 <span className="font-medium text-orange-600"> {onboardingData.teamFocus === "penjualan"
                   ? "Tingkatkan Pendapatan"
                   : onboardingData.teamFocus === "operasional"

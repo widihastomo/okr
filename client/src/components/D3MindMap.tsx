@@ -162,7 +162,7 @@ const D3MindMap: React.FC<D3MindMapProps> = ({ width = 800, height = 600 }) => {
 
     svg.call(zoom);
 
-    // Create tree layout
+    // Create tree layout (vertical orientation)
     const treeLayout = d3.tree<TreeNode>()
       .size([width - 100, height - 100])
       .separation((a, b) => (a.parent === b.parent ? 1 : 2) / a.depth);
@@ -202,26 +202,26 @@ const D3MindMap: React.FC<D3MindMapProps> = ({ width = 800, height = 600 }) => {
     taskGradient.append('stop').attr('offset', '0%').attr('stop-color', '#8b5cf6');
     taskGradient.append('stop').attr('offset', '100%').attr('stop-color', '#7c3aed');
 
-    // Create links (connections between nodes)
+    // Create links (connections between nodes) - vertical layout
     const links = container.selectAll('.link')
       .data(treeNodes.links())
       .enter().append('path')
       .attr('class', 'link')
-      .attr('d', d3.linkHorizontal<any, any>()
-        .x((d: any) => d.y)
-        .y((d: any) => d.x)
+      .attr('d', d3.linkVertical<any, any>()
+        .x((d: any) => d.x)
+        .y((d: any) => d.y)
       )
       .attr('stroke', 'rgba(255,255,255,0.4)')
       .attr('stroke-width', 2)
       .attr('fill', 'none')
       .style('opacity', 0.8);
 
-    // Create node groups
+    // Create node groups - vertical layout
     const nodeGroups = container.selectAll('.node')
       .data(treeNodes.descendants())
       .enter().append('g')
       .attr('class', 'node')
-      .attr('transform', (d: any) => `translate(${d.y}, ${d.x})`)
+      .attr('transform', (d: any) => `translate(${d.x}, ${d.y})`)
       .style('cursor', 'pointer');
 
     // Function to get node size based on type
@@ -262,11 +262,11 @@ const D3MindMap: React.FC<D3MindMapProps> = ({ width = 800, height = 600 }) => {
       .style('pointer-events', 'none')
       .text((d: any) => d.data.icon);
 
-    // Add node labels
+    // Add node labels - vertical layout
     nodeGroups.append('text')
-      .attr('text-anchor', 'start')
-      .attr('dx', (d: any) => getNodeSize(d.data.type) + 8)
-      .attr('dy', '0.35em')
+      .attr('text-anchor', 'middle')
+      .attr('dx', 0)
+      .attr('dy', (d: any) => getNodeSize(d.data.type) + 18)
       .style('fill', 'white')
       .style('font-size', '11px')
       .style('font-weight', 'bold')
@@ -288,10 +288,10 @@ const D3MindMap: React.FC<D3MindMapProps> = ({ width = 800, height = 600 }) => {
           .duration(200)
           .attr('r', getNodeSize(d.data.type) * 1.3);
         
-        // Show tooltip
+        // Show tooltip - vertical layout
         const tooltip = container.append('g')
           .attr('class', 'tooltip')
-          .attr('transform', `translate(${d.y + getNodeSize(d.data.type) + 10}, ${d.x - 20})`);
+          .attr('transform', `translate(${d.x - 60}, ${d.y + getNodeSize(d.data.type) + 30})`);
         
         const rect = tooltip.append('rect')
           .attr('fill', 'rgba(0,0,0,0.9)')
@@ -302,14 +302,14 @@ const D3MindMap: React.FC<D3MindMapProps> = ({ width = 800, height = 600 }) => {
         
         const text = tooltip.append('text')
           .attr('fill', 'white')
-          .attr('text-anchor', 'start')
-          .attr('dx', 8)
+          .attr('text-anchor', 'middle')
+          .attr('dx', 60)
           .attr('dy', '1.2em')
           .style('font-size', '10px')
           .text(d.data.description);
         
         const bbox = (text.node() as any).getBBox();
-        rect.attr('x', 0)
+        rect.attr('x', bbox.x - 8)
           .attr('y', bbox.y - 4)
           .attr('width', bbox.width + 16)
           .attr('height', bbox.height + 8);
