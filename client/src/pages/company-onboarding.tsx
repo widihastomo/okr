@@ -741,34 +741,35 @@ export default function CompanyOnboarding() {
           <div className="space-y-6">
             
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Nama Perusahaan - dari database */}
-              <div className="space-y-1">
-                <Label htmlFor="companyName">Nama Perusahaan</Label>
-                <Input
-                  id="companyName"
-                  value={organizationData?.organization?.name || ""}
-                  disabled
-                  className="bg-gray-50 text-gray-600"
-                />
-                <p className="text-xs text-gray-500">Diambil dari database</p>
-              </div>
+            {/* Nama Perusahaan - full width row */}
+            <div className="space-y-1">
+              <Label htmlFor="companyName">Nama Perusahaan</Label>
+              <Input
+                id="companyName"
+                value={organizationData?.organization?.name || ""}
+                disabled
+                className="bg-gray-50 text-gray-600"
+              />
+              <p className="text-xs text-gray-500">Diambil dari database</p>
+            </div>
 
-              {/* Alamat Perusahaan */}
-              <div className="space-y-1">
-                <Label htmlFor="companyAddress">Alamat Perusahaan</Label>
-                <Input
-                  id="companyAddress"
-                  value={onboardingData.companyAddress || ""}
-                  onChange={(e) =>
-                    setOnboardingData({
-                      ...onboardingData,
-                      companyAddress: e.target.value,
-                    })
-                  }
-                  placeholder="Alamat lengkap perusahaan"
-                />
-              </div>
+            {/* Alamat Perusahaan - full width row */}
+            <div className="space-y-1">
+              <Label htmlFor="companyAddress">Alamat Perusahaan</Label>
+              <Input
+                id="companyAddress"
+                value={onboardingData.companyAddress || ""}
+                onChange={(e) =>
+                  setOnboardingData({
+                    ...onboardingData,
+                    companyAddress: e.target.value,
+                  })
+                }
+                placeholder="Alamat lengkap perusahaan"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
               {/* Provinsi */}
               <div className="space-y-1">
