@@ -59,6 +59,149 @@ const industryTypes = [
   "Lainnya",
 ];
 
+const provinces = [
+  "Aceh",
+  "Sumatera Utara",
+  "Sumatera Barat",
+  "Riau",
+  "Kepulauan Riau",
+  "Jambi",
+  "Bengkulu",
+  "Sumatera Selatan",
+  "Bangka Belitung",
+  "Lampung",
+  "DKI Jakarta",
+  "Jawa Barat",
+  "Banten",
+  "Jawa Tengah",
+  "DI Yogyakarta",
+  "Jawa Timur",
+  "Bali",
+  "Nusa Tenggara Barat",
+  "Nusa Tenggara Timur",
+  "Kalimantan Barat",
+  "Kalimantan Tengah",
+  "Kalimantan Selatan",
+  "Kalimantan Timur",
+  "Kalimantan Utara",
+  "Sulawesi Utara",
+  "Gorontalo",
+  "Sulawesi Tengah",
+  "Sulawesi Barat",
+  "Sulawesi Selatan",
+  "Sulawesi Tenggara",
+  "Maluku",
+  "Maluku Utara",
+  "Papua Barat",
+  "Papua",
+  "Papua Tengah",
+  "Papua Pegunungan",
+  "Papua Selatan",
+  "Papua Barat Daya",
+];
+
+const citiesByProvince: Record<string, string[]> = {
+  "Aceh": [
+    "Kota Banda Aceh",
+    "Kota Sabang",
+    "Kota Langsa",
+    "Kota Lhokseumawe",
+    "Kota Subulussalam",
+    "Kabupaten Aceh Barat",
+    "Kabupaten Aceh Barat Daya",
+    "Kabupaten Aceh Besar",
+    "Kabupaten Aceh Jaya",
+    "Kabupaten Aceh Selatan",
+    "Kabupaten Aceh Singkil",
+    "Kabupaten Aceh Tamiang",
+    "Kabupaten Aceh Tengah",
+    "Kabupaten Aceh Tenggara",
+    "Kabupaten Aceh Timur",
+    "Kabupaten Aceh Utara",
+    "Kabupaten Bener Meriah",
+    "Kabupaten Bireuen",
+    "Kabupaten Gayo Lues",
+    "Kabupaten Nagan Raya",
+    "Kabupaten Pidie",
+    "Kabupaten Pidie Jaya",
+    "Kabupaten Simeulue"
+  ],
+  "DKI Jakarta": [
+    "Kota Jakarta Pusat",
+    "Kota Jakarta Utara",
+    "Kota Jakarta Barat",
+    "Kota Jakarta Selatan",
+    "Kota Jakarta Timur",
+    "Kabupaten Kepulauan Seribu"
+  ],
+  "Jawa Barat": [
+    "Kota Bandung",
+    "Kota Bogor",
+    "Kota Sukabumi",
+    "Kota Cirebon",
+    "Kota Bekasi",
+    "Kota Depok",
+    "Kota Cimahi",
+    "Kota Tasikmalaya",
+    "Kota Banjar",
+    "Kabupaten Bogor",
+    "Kabupaten Sukabumi",
+    "Kabupaten Cianjur",
+    "Kabupaten Bandung",
+    "Kabupaten Garut",
+    "Kabupaten Tasikmalaya",
+    "Kabupaten Ciamis",
+    "Kabupaten Kuningan",
+    "Kabupaten Cirebon",
+    "Kabupaten Majalengka",
+    "Kabupaten Sumedang",
+    "Kabupaten Indramayu",
+    "Kabupaten Subang",
+    "Kabupaten Purwakarta",
+    "Kabupaten Karawang",
+    "Kabupaten Bekasi",
+    "Kabupaten Bandung Barat",
+    "Kabupaten Pangandaran"
+  ],
+  "Jawa Tengah": [
+    "Kota Semarang",
+    "Kota Surakarta",
+    "Kota Salatiga",
+    "Kota Pekalongan",
+    "Kota Tegal",
+    "Kota Magelang",
+    "Kabupaten Cilacap",
+    "Kabupaten Banyumas",
+    "Kabupaten Purbalingga",
+    "Kabupaten Banjarnegara",
+    "Kabupaten Kebumen",
+    "Kabupaten Purworejo",
+    "Kabupaten Wonosobo",
+    "Kabupaten Magelang",
+    "Kabupaten Boyolali",
+    "Kabupaten Klaten",
+    "Kabupaten Sukoharjo",
+    "Kabupaten Wonogiri",
+    "Kabupaten Karanganyar",
+    "Kabupaten Sragen",
+    "Kabupaten Grobogan",
+    "Kabupaten Blora",
+    "Kabupaten Rembang",
+    "Kabupaten Pati",
+    "Kabupaten Kudus",
+    "Kabupaten Jepara",
+    "Kabupaten Demak",
+    "Kabupaten Semarang",
+    "Kabupaten Temanggung",
+    "Kabupaten Kendal",
+    "Kabupaten Batang",
+    "Kabupaten Pekalongan",
+    "Kabupaten Pemalang",
+    "Kabupaten Tegal",
+    "Kabupaten Brebes"
+  ]
+};
+
 const positionOptions = [
   "CEO/Founder",
   "Direktur",
@@ -319,6 +462,8 @@ export default function GuidedOnboarding() {
   const [profileData, setProfileData] = useState({
     companyName: "",
     companyAddress: "",
+    province: "",
+    city: "",
     industry: "",
     role: "",
     companySize: "",
@@ -512,7 +657,7 @@ export default function GuidedOnboarding() {
     }
   };
 
-  const isStep1Valid = profileData.companyName && profileData.companyAddress && profileData.industry && profileData.role && profileData.companySize && profileData.referralSource;
+  const isStep1Valid = profileData.companyName && profileData.companyAddress && profileData.province && profileData.city && profileData.industry && profileData.role && profileData.companySize && profileData.referralSource;
   const isStep2Valid = selectedAreas.length > 0;
   const isStep3Valid = selectedTemplate && customizedGoal.objective;
 
@@ -558,6 +703,62 @@ export default function GuidedOnboarding() {
             onChange={(e) => setProfileData({...profileData, companyAddress: e.target.value})}
             className="bg-gray-50 border-gray-300"
           />
+        </div>
+
+        {/* Province and City */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Province */}
+          <div className="space-y-2">
+            <Label htmlFor="province" className="flex items-center gap-2">
+              <MapPin className="h-4 w-4" />
+              Provinsi *
+            </Label>
+            <Select
+              value={profileData.province}
+              onValueChange={(value) => {
+                setProfileData({
+                  ...profileData, 
+                  province: value,
+                  city: "" // Reset city when province changes
+                });
+              }}
+            >
+              <SelectTrigger className="bg-gray-50 border-gray-300">
+                <SelectValue placeholder="Pilih provinsi..." />
+              </SelectTrigger>
+              <SelectContent>
+                {provinces.map((province) => (
+                  <SelectItem key={province} value={province}>
+                    {province}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* City */}
+          <div className="space-y-2">
+            <Label htmlFor="city" className="flex items-center gap-2">
+              <MapPin className="h-4 w-4" />
+              Kota/Kabupaten *
+            </Label>
+            <Select
+              value={profileData.city}
+              onValueChange={(value) => setProfileData({...profileData, city: value})}
+              disabled={!profileData.province}
+            >
+              <SelectTrigger className="bg-gray-50 border-gray-300">
+                <SelectValue placeholder={profileData.province ? "Pilih kota/kabupaten..." : "Pilih provinsi terlebih dahulu"} />
+              </SelectTrigger>
+              <SelectContent>
+                {profileData.province && citiesByProvince[profileData.province]?.map((city) => (
+                  <SelectItem key={city} value={city}>
+                    {city}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         {/* Industry Type */}
