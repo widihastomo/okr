@@ -187,6 +187,14 @@ export default function CompanyOnboarding() {
   const [onboardingData, setOnboardingData] = useState<OnboardingData>({
     currentStep: 0, // Start at welcome screen
     completedSteps: [],
+    companyName: "",
+    companyAddress: "",
+    province: "",
+    city: "",
+    industryType: "",
+    companySize: "",
+    position: "",
+    referralSource: "",
     teamFocus: "",
     cycleDuration: "",
     cycleStartDate: "",
@@ -418,6 +426,12 @@ export default function CompanyOnboarding() {
     switch (step) {
       case 1:
         // Step 1 is now company profile form - validate all required fields
+        if (!data.companyName?.trim()) {
+          return {
+            isValid: false,
+            message: "Silakan isi nama perusahaan",
+          };
+        }
         if (!data.companyAddress?.trim()) {
           return {
             isValid: false,
@@ -746,11 +760,15 @@ export default function CompanyOnboarding() {
               <Label htmlFor="companyName">Nama Perusahaan</Label>
               <Input
                 id="companyName"
-                value={organizationData?.organization?.name || ""}
-                disabled
-                className="bg-gray-50 text-gray-600"
+                value={onboardingData.companyName || organizationData?.organization?.name || ""}
+                onChange={(e) =>
+                  setOnboardingData({
+                    ...onboardingData,
+                    companyName: e.target.value,
+                  })
+                }
+                placeholder="Masukkan nama perusahaan"
               />
-              <p className="text-xs text-gray-500">Diambil dari database</p>
             </div>
 
             {/* Alamat Perusahaan - full width row */}
@@ -875,7 +893,8 @@ export default function CompanyOnboarding() {
             </div>
 
             {/* Validation Message */}
-            {(onboardingData.companyAddress && 
+            {(onboardingData.companyName &&
+              onboardingData.companyAddress && 
               onboardingData.province && 
               onboardingData.city && 
               onboardingData.industryType &&

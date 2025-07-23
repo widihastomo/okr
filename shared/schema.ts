@@ -1596,6 +1596,7 @@ export const companyOnboardingDataSchema = z.object({
   currentStep: z.number().min(0).max(10).default(0), // Allow 0 for welcome screen
   completedSteps: z.array(z.number()).default([]),
   // Company profile fields
+  companyName: z.string().optional(),
   companyAddress: z.string().optional(),
   province: z.string().optional(),
   city: z.string().optional(),
