@@ -1626,13 +1626,13 @@ export default function CompanyOnboarding() {
                   <p className="text-sm text-orange-800">
                     <strong>Fokus terpilih:</strong>{" "}
                     {onboardingData.teamFocus === "penjualan"
-                      ? "Penjualan"
+                      ? "Tingkatkan Pendapatan"
                       : onboardingData.teamFocus === "operasional"
-                        ? "Operasional"
+                        ? "Rapikan Operasional"
                         : onboardingData.teamFocus === "customer_service"
-                          ? "Customer Service"
+                          ? "Kembangkan Tim"
                           : onboardingData.teamFocus === "marketing"
-                            ? "Marketing"
+                            ? "Ekspansi Bisnis"
                             : ""}
                   </p>
                 </div>
