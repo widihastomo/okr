@@ -1667,201 +1667,27 @@ export default function CompanyOnboarding() {
               </p>
             </div>
 
-            {/* Visual Hierarchy Pyramid */}
-            <div className="relative bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 rounded-xl p-8 overflow-hidden">
-              {/* Background decoration */}
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 via-purple-600/20 to-pink-600/20 rounded-xl"></div>
-              <div className="absolute top-4 right-4 opacity-30">
-                <Star className="w-12 h-12 text-white animate-pulse" />
-              </div>
+            {/* Strategy Mapping Visual */}
+            <div className="relative rounded-xl overflow-hidden shadow-2xl">
+              <img 
+                src="@assets/strategy-mapping-refokus_1753287904335.png" 
+                alt="Strategy Mapping - Hirarki OKR dari Goal ke Target ke Inisiatif ke Task"
+                className="w-full h-auto object-contain bg-gradient-to-br from-purple-600 to-indigo-800"
+                style={{
+                  maxHeight: '600px',
+                  width: '100%'
+                }}
+              />
               
-              <div className="relative space-y-0">
-                {/* Pyramid Level 1: Goal - Widest */}
-                <div className="flex justify-center mb-4">
-                  <div className="w-full max-w-2xl bg-gradient-to-r from-orange-500 to-red-500 rounded-xl p-5 shadow-xl transform hover:scale-105 transition-all duration-300 border-2 border-orange-300">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
-                        <Target className="w-7 h-7 text-white" />
-                      </div>
-                      <div className="flex-1 text-white">
-                        <h3 className="text-xl font-bold mb-1">Goal (Tujuan Utama)</h3>
-                        <p className="text-orange-100 text-sm mb-2">Visi besar yang ingin dicapai</p>
-                        <div className="bg-white/10 rounded-lg p-2 backdrop-blur-sm">
-                          <p className="text-white font-medium text-sm">
-                            💡 "Mencapai pertumbuhan penjualan 50% dalam 6 bulan"
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Animated Connector */}
-                <div className="flex justify-center py-2">
-                  <div className="flex flex-col items-center space-y-1">
-                    <ArrowDown className="w-6 h-6 text-white animate-bounce" />
-                    <div className="w-1 h-8 bg-gradient-to-b from-white to-transparent opacity-50"></div>
-                  </div>
-                </div>
-
-                {/* Pyramid Level 2: Key Results - Medium */}
-                <div className="flex justify-center mb-4">
-                  <div className="w-full max-w-xl bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl p-4 shadow-xl transform hover:scale-105 transition-all duration-300 border-2 border-blue-300">
-                    <div className="space-y-3">
-                      {/* Header */}
-                      <div className="flex items-center space-x-3">
-                        <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
-                          <TrendingUp className="w-6 h-6 text-white" />
-                        </div>
-                        <div className="flex-1 text-white">
-                          <h3 className="text-lg font-bold mb-1">Angka Target (Key Results)</h3>
-                          <p className="text-blue-100 text-sm">Metrik kuantitatif yang terukur</p>
-                        </div>
-                      </div>
-                      
-                      {/* Key Results Components */}
-                      <div className="space-y-2">
-                        <div className="bg-white/10 rounded-lg p-2 backdrop-blur-sm border border-white/20">
-                          <div className="flex items-center space-x-2">
-                            <div className="w-3 h-3 bg-emerald-400 rounded-full"></div>
-                            <p className="text-white font-medium text-xs">
-                              📊 "Penjualan Rp 500 juta/bulan"
-                            </p>
-                          </div>
-                        </div>
-                        
-                        <div className="bg-white/10 rounded-lg p-2 backdrop-blur-sm border border-white/20">
-                          <div className="flex items-center space-x-2">
-                            <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
-                            <p className="text-white font-medium text-xs">
-                              🎯 "100 pelanggan baru"
-                            </p>
-                          </div>
-                        </div>
-                        
-                        <div className="bg-white/10 rounded-lg p-2 backdrop-blur-sm border border-white/20">
-                          <div className="flex items-center space-x-2">
-                            <div className="w-3 h-3 bg-pink-400 rounded-full"></div>
-                            <p className="text-white font-medium text-xs">
-                              📈 "Conversion rate 25%"
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Animated Connector */}
-                <div className="flex justify-center py-2">
-                  <div className="flex flex-col items-center space-y-1">
-                    <ArrowDown className="w-5 h-5 text-white animate-bounce delay-100" />
-                    <div className="w-1 h-6 bg-gradient-to-b from-white to-transparent opacity-50"></div>
-                  </div>
-                </div>
-
-                {/* Pyramid Level 3: Initiatives - Smaller */}
-                <div className="flex justify-center mb-4">
-                  <div className="w-full max-w-lg bg-gradient-to-r from-green-500 to-teal-500 rounded-xl p-4 shadow-xl transform hover:scale-105 transition-all duration-300 border-2 border-green-300">
-                    <div className="space-y-3">
-                      {/* Header */}
-                      <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
-                          <Lightbulb className="w-5 h-5 text-white" />
-                        </div>
-                        <div className="flex-1 text-white">
-                          <h3 className="text-lg font-bold mb-1">Inisiatif (Strategi)</h3>
-                          <p className="text-green-100 text-sm">Program strategis untuk mencapai target</p>
-                        </div>
-                      </div>
-                      
-                      {/* Initiative Components */}
-                      <div className="grid grid-cols-1 gap-2">
-                        <div className="bg-white/10 rounded-lg p-2 backdrop-blur-sm border border-white/20">
-                          <div className="flex items-center space-x-2">
-                            <div className="w-2 h-2 bg-orange-400 rounded-full animate-pulse"></div>
-                            <p className="text-white font-medium text-xs">
-                              🚀 "Kampanye digital marketing"
-                            </p>
-                          </div>
-                        </div>
-                        
-                        <div className="bg-white/10 rounded-lg p-2 backdrop-blur-sm border border-white/20">
-                          <div className="flex items-center space-x-2">
-                            <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse delay-100"></div>
-                            <p className="text-white font-medium text-xs">
-                              💎 "Program loyalitas pelanggan"
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Animated Connector */}
-                <div className="flex justify-center py-2">
-                  <div className="flex flex-col items-center space-y-1">
-                    <ArrowDown className="w-4 h-4 text-white animate-bounce delay-200" />
-                    <div className="w-1 h-4 bg-gradient-to-b from-white to-transparent opacity-50"></div>
-                  </div>
-                </div>
-
-                {/* Pyramid Level 4: Tasks - Smallest */}
-                <div className="flex justify-center">
-                  <div className="w-full max-w-md bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl p-3 shadow-xl transform hover:scale-105 transition-all duration-300 border-2 border-purple-300">
-                    <div className="space-y-3">
-                      {/* Header */}
-                      <div className="flex items-center space-x-3">
-                        <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
-                          <CheckSquare className="w-4 h-4 text-white" />
-                        </div>
-                        <div className="flex-1 text-white">
-                          <h3 className="font-bold mb-1">Task (Langkah Konkret)</h3>
-                          <p className="text-purple-100 text-xs">Tindakan harian yang spesifik</p>
-                        </div>
-                      </div>
-                      
-                      {/* Task Components */}
-                      <div className="space-y-1">
-                        <div className="bg-white/10 rounded-lg p-1.5 backdrop-blur-sm border border-white/20">
-                          <div className="flex items-center space-x-2">
-                            <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-ping"></div>
-                            <p className="text-white font-medium text-xs">
-                              ✅ "Buat konten Instagram"
-                            </p>
-                          </div>
-                        </div>
-                        
-                        <div className="bg-white/10 rounded-lg p-1.5 backdrop-blur-sm border border-white/20">
-                          <div className="flex items-center space-x-2">
-                            <div className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-ping delay-75"></div>
-                            <p className="text-white font-medium text-xs">
-                              📞 "Telepon 5 prospek"
-                            </p>
-                          </div>
-                        </div>
-                        
-                        <div className="bg-white/10 rounded-lg p-1.5 backdrop-blur-sm border border-white/20">
-                          <div className="flex items-center space-x-2">
-                            <div className="w-1.5 h-1.5 bg-yellow-400 rounded-full animate-ping delay-150"></div>
-                            <p className="text-white font-medium text-xs">
-                              📊 "Analisis kompetitor"
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Decorative elements */}
-              <div className="absolute bottom-4 left-4 opacity-20">
-                <div className="flex space-x-1">
-                  <div className="w-2 h-2 bg-white rounded-full animate-ping"></div>
-                  <div className="w-2 h-2 bg-white rounded-full animate-ping delay-100"></div>
-                  <div className="w-2 h-2 bg-white rounded-full animate-ping delay-200"></div>
+              {/* Interactive Overlay for Better Understanding */}
+              <div className="absolute inset-0 bg-black/0 hover:bg-black/10 transition-all duration-300 flex items-center justify-center opacity-0 hover:opacity-100">
+                <div className="bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center shadow-lg">
+                  <p className="text-sm font-medium text-gray-800">
+                    📊 Contoh nyata hirarki OKR dalam bisnis
+                  </p>
+                  <p className="text-xs text-gray-600 mt-1">
+                    Goal → Angka Target → Inisiatif → Task
+                  </p>
                 </div>
               </div>
             </div>
