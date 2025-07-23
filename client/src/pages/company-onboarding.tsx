@@ -3673,37 +3673,37 @@ export default function CompanyOnboarding() {
 
     // Message should explain the CURRENT step content, not guide to next step
     const stepMessages: Record<number, string> = {
-      // Step 1: Business Focus Selection - Explain what this step is about
-      1: `Pada halaman ini, Anda akan memilih fokus utama bisnis untuk ${companyName}. Ada 5 area bisnis yang bisa dipilih: Marketing, Sales, Operasional, Customer Service, dan Pengembangan Produk. Setiap area memiliki template goal yang berbeda dan sesuai dengan kebutuhan bisnis.`,
+      // Step 1: Company Profile Introduction - Explain what this step is about
+      1: `Halaman ini menampilkan profil perusahaan ${companyName} yang sudah Anda isi sebelumnya. Anda dapat melihat dan mengedit informasi seperti nama perusahaan, alamat, provinsi, kota, jenis industri, ukuran perusahaan, posisi, dan sumber referral. Data ini akan digunakan untuk rekomendasi goal yang sesuai dengan profil bisnis Anda.`,
       
-      // Step 2: Objective Creation - Explain what this step is about
-      2: selectedFocus 
-        ? `Halaman ini untuk membuat tujuan utama berdasarkan fokus ${selectedFocus} yang sudah dipilih. Anda akan merumuskan goal yang spesifik dan terukur untuk ${companyName}. Goal ini akan menjadi arah utama yang ingin dicapai dalam periode tertentu.`
+      // Step 2: Business Focus Selection - Explain what this step is about  
+      2: `Halaman ini untuk memilih fokus utama bisnis ${companyName}. Ada 5 area bisnis yang bisa dipilih: Marketing, Sales, Operasional, Customer Service, dan Pengembangan Produk. Setiap area memiliki template goal yang berbeda dan sesuai dengan kebutuhan bisnis. Pilih satu area yang paling berdampak dan mendesak untuk ditingkatkan.`,
+      
+      // Step 3: Objective Creation - Explain what this step is about
+      3: selectedFocus 
+        ? `Halaman ini untuk membuat tujuan utama berdasarkan fokus ${selectedFocus} yang sudah dipilih. Anda akan merumuskan goal yang spesifik dan terukur untuk ${companyName}. Goal ini akan menjadi arah utama yang ingin dicapai dalam periode tertentu. Sistem akan memberikan rekomendasi goal yang sesuai dengan profil perusahaan.`
         : "Halaman ini untuk membuat tujuan utama berdasarkan fokus bisnis yang sudah dipilih. Anda akan merumuskan goal yang spesifik dan terukur untuk perusahaan. Goal ini akan menjadi arah utama yang ingin dicapai dalam periode tertentu.",
       
-      // Step 3: Key Results Definition - Explain what this step is about
-      3: selectedObjective
-        ? `Halaman ini untuk menentukan Key Results dari tujuan "${selectedObjective}". Key Results adalah metrik konkret yang mengukur keberhasilan goal Anda. Setiap Key Result memiliki angka target yang spesifik dan terukur untuk ${companyName}.`
+      // Step 4: Key Results Definition - Explain what this step is about
+      4: selectedObjective
+        ? `Halaman ini untuk menentukan Key Results dari tujuan "${selectedObjective}". Key Results adalah metrik konkret yang mengukur keberhasilan goal Anda. Setiap Key Result memiliki angka target yang spesifik dan terukur untuk ${companyName}. Sistem memberikan rekomendasi target berdasarkan fokus bisnis yang dipilih.`
         : "Halaman ini untuk menentukan Key Results dari tujuan yang sudah dibuat. Key Results adalah metrik konkret yang mengukur keberhasilan goal Anda. Setiap Key Result memiliki angka target yang spesifik dan terukur.",
       
-      // Step 4: Initiatives Selection - Explain what this step is about
-      4: selectedObjective
-        ? `Halaman ini untuk memilih inisiatif strategis yang akan membantu mencapai "${selectedObjective}". Inisiatif adalah langkah-langkah besar atau proyek yang akan dilakukan untuk mencapai target ${selectedFocus} di ${companyName}. Anda bisa memilih beberapa inisiatif yang paling efektif.`
+      // Step 5: Initiatives Selection - Explain what this step is about
+      5: selectedObjective
+        ? `Halaman ini untuk memilih inisiatif strategis yang akan membantu mencapai "${selectedObjective}". Inisiatif adalah langkah-langkah besar atau proyek yang akan dilakukan untuk mencapai target ${selectedFocus} di ${companyName}. Anda bisa memilih beberapa inisiatif yang paling efektif dari rekomendasi sistem.`
         : "Halaman ini untuk memilih inisiatif strategis yang akan membantu mencapai tujuan yang sudah ditetapkan. Inisiatif adalah langkah-langkah besar atau proyek yang akan dilakukan untuk mencapai target bisnis. Anda bisa memilih beberapa inisiatif yang paling efektif.",
       
-      // Step 5: Tasks Breakdown - Explain what this step is about
-      5: hasInitiatives
+      // Step 6: Tasks Breakdown - Explain what this step is about
+      6: hasInitiatives
         ? `Halaman ini untuk membuat tugas-tugas konkret dari inisiatif yang sudah dipilih. Setiap inisiatif akan dipecah menjadi action items yang dapat dikerjakan tim ${companyName}. Tugas-tugas ini akan memiliki deadline dan person in charge yang jelas.`
         : "Halaman ini untuk membuat tugas-tugas konkret dari inisiatif yang sudah dipilih. Setiap inisiatif akan dipecah menjadi action items yang dapat dikerjakan tim. Tugas-tugas ini akan memiliki deadline dan person in charge yang jelas.",
       
-      // Step 6: Progress Cadence - Explain what this step is about
-      6: `Halaman ini untuk mengatur ritme check-in progress untuk ${companyName}. Anda akan menentukan seberapa sering tim melaporkan kemajuan (harian, mingguan, bulanan) dan waktu reminder otomatis. Setting ini penting untuk menjaga momentum dan accountability tim.`,
+      // Step 7: Progress Cadence - Explain what this step is about
+      7: `Halaman ini untuk mengatur ritme check-in progress untuk ${companyName}. Anda akan menentukan seberapa sering tim melaporkan kemajuan (harian, mingguan, bulanan) dan waktu reminder otomatis. Setting ini penting untuk menjaga momentum dan accountability tim.`,
       
-      // Step 7: Summary Review - Explain what this step is about
-      7: `Halaman ini menampilkan ringkasan lengkap setup OKR yang sudah dibuat untuk ${companyName}. Anda bisa melihat semua goal, key results, inisiatif, tugas, dan setting reminder yang telah dikonfigurasi. Ini adalah review terakhir sebelum sistem mulai berjalan.`,
-      
-      // Step 8: Completion - Explain completion
-      8: `Selamat! Onboarding untuk ${companyName} sudah selesai. Semua goal, target, inisiatif, dan tugas telah siap dijalankan. Sistem OKR sudah dikonfigurasi dengan lengkap dan siap membantu mengukur progress serta mencapai target yang ditetapkan.`,
+      // Step 8: Summary Review - Explain what this step is about
+      8: `Halaman ini menampilkan ringkasan lengkap setup OKR yang sudah dibuat untuk ${companyName}. Anda bisa melihat semua goal, key results, inisiatif, tugas, dan setting reminder yang telah dikonfigurasi. Ini adalah review terakhir sebelum sistem mulai berjalan dan klik "Mulai Tur" untuk melihat dashboard.`,
     };
 
     return (

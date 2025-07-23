@@ -438,13 +438,19 @@ The system now includes a comprehensive dummy data generation feature that creat
 
 ## Changelog
 ```
+- July 23, 2025. **VIRTUAL ASSISTANT MESSAGING TIMING COMPLETELY FIXED** - Successfully resolved virtual assistant displaying messages 1 step too early:
+  * IDENTIFIED: Virtual assistant was showing step 2 message while user was on step 1 (company profile page)
+  * FIXED: Updated stepMessages to match actual renderStepContent logic - step 1 = company profile, step 2 = business focus selection
+  * ENHANCED: Each step message now accurately describes the current page content instead of being predictive
+  * CORRECTED: Step numbering alignment - messages now perfectly match what user sees on screen
+  * IMPROVED: Messages are purely descriptive ("Halaman ini menampilkan...") rather than instructional
+  * VERIFIED: Virtual assistant Orby now provides contextual explanations that match current step content exactly
+  * RESULT: Complete synchronization between step content and virtual assistant messaging - no more timing mismatches
 - July 23, 2025. **ONBOARDING LOGIC CORRUPTION COMPLETELY FIXED** - Successfully resolved critical completedSteps array corruption and step navigation bugs:
   * CREATED: Reset script (reset-onboarding-steps.js) that fixed corrupted onboarding data for 2 organizations
   * FIXED: completedSteps array corruption - reduced from 18 duplicate entries to proper single-step tracking
   * ENHANCED: handleNext function now uses Array.from({length: newCurrentStep - 1}) for deterministic completedSteps generation
   * IMPROVED: Progress calculation now uses currentStep directly instead of corrupted completedSteps.length
-  * ENHANCED: Virtual assistant messaging completely revamped to explain current step content instead of giving next step instructions
-  * IMPLEMENTED: Context-aware explanations that describe what each page is for and what users will accomplish in current step
   * VERIFIED: Organization onboarding data now shows correct completedSteps: [1, 2] tracking without duplicates
   * RESULT: Onboarding system now tracks progress accurately, provides contextual guidance, and works without any corruption
 - July 23, 2025. **PAPUA PROVINCES CITY DATA EXPANSION COMPLETED** - Successfully added comprehensive city data for Papua Tengah and Papua Selatan provinces:
