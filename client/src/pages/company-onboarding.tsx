@@ -1668,17 +1668,42 @@ export default function CompanyOnboarding() {
               </p>
             </div>
 
-            {/* Strategy Mapping Visual */}
-            <div className="relative rounded-xl overflow-hidden shadow-2xl">
+            {/* Strategy Mapping Visual with Zoom */}
+            <div className="relative rounded-xl overflow-hidden shadow-2xl bg-gradient-to-br from-purple-600 to-indigo-800">
               <img 
                 src={strategyMappingImage} 
                 alt="Strategy Mapping - Hirarki OKR dari Goal ke Target ke Inisiatif ke Task"
-                className="w-full h-auto object-contain bg-gradient-to-br from-purple-600 to-indigo-800"
+                className="w-full h-auto object-contain cursor-zoom-in transition-transform duration-300 hover:scale-110"
                 style={{
-                  maxHeight: '600px',
-                  width: '100%'
+                  width: '100%',
+                  minHeight: '400px'
+                }}
+                onClick={(e) => {
+                  const img = e.target as HTMLImageElement;
+                  const modal = document.createElement('div');
+                  modal.className = 'fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4';
+                  modal.onclick = () => modal.remove();
+                  
+                  const zoomedImg = document.createElement('img');
+                  zoomedImg.src = img.src;
+                  zoomedImg.className = 'max-w-full max-h-full object-contain cursor-zoom-out';
+                  zoomedImg.alt = img.alt;
+                  
+                  const closeBtn = document.createElement('button');
+                  closeBtn.innerHTML = '✕';
+                  closeBtn.className = 'absolute top-4 right-4 text-white text-2xl bg-black/50 rounded-full w-10 h-10 flex items-center justify-center hover:bg-black/70';
+                  closeBtn.onclick = () => modal.remove();
+                  
+                  modal.appendChild(zoomedImg);
+                  modal.appendChild(closeBtn);
+                  document.body.appendChild(modal);
                 }}
               />
+              
+              {/* Zoom Indicator */}
+              <div className="absolute top-4 right-4 bg-black/50 text-white px-2 py-1 rounded text-sm">
+                🔍 Klik untuk zoom
+              </div>
               
               {/* Interactive Overlay for Better Understanding */}
               <div className="absolute inset-0 bg-black/0 hover:bg-black/10 transition-all duration-300 flex items-center justify-center opacity-0 hover:opacity-100">
