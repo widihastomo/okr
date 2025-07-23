@@ -64,6 +64,7 @@ import ReferralCodes from "@/pages/referral-codes";
 
 import CompanyOnboardingSimple from "@/pages/company-onboarding-simple";
 import OrganizationSetup from "@/pages/organization-setup";
+import GuidedOnboarding from "@/pages/guided-onboarding";
 import CompanyOnboarding from "@/pages/company-onboarding";
 
 import ClientStatusMapping from "@/pages/client-status-mapping";
@@ -110,18 +111,18 @@ function Router() {
       if (onboardingStatus !== undefined) {
         const serverOnboardingCompleted = (onboardingStatus as any)?.isCompleted;
         
-        // If server says onboarding not completed, redirect to onboarding
+        // If server says onboarding not completed, redirect to guided onboarding
         if (!serverOnboardingCompleted) {
-          console.log("🔄 Server onboarding not completed, redirecting to onboarding page");
-          navigate("/onboarding");
+          console.log("🔄 Server onboarding not completed, redirecting to guided onboarding page");
+          navigate("/guided-onboarding");
           return;
         }
       } else {
         // Fallback to localStorage if server status not available yet
         const localOnboardingCompleted = localStorage.getItem("onboarding-completed") === "true";
         if (!localOnboardingCompleted) {
-          console.log("🎯 Local onboarding not completed, redirecting to onboarding page");
-          navigate("/onboarding");
+          console.log("🎯 Local onboarding not completed, redirecting to guided onboarding page");
+          navigate("/guided-onboarding");
           return;
         }
       }
@@ -174,7 +175,7 @@ function Router() {
   }
 
   // Check if current route is onboarding
-  const isOnboardingPage = location === "/onboarding";
+  const isOnboardingPage = location === "/onboarding" || location === "/guided-onboarding";
 
   return (
     <NotificationProvider>
@@ -237,6 +238,7 @@ function Router() {
           >
             <Switch>
               <Route path="/onboarding" component={CompanyOnboardingSimple} />
+              <Route path="/guided-onboarding" component={GuidedOnboarding} />
               <Route path="/company-onboarding" component={CompanyOnboarding} />
               <Route path="/organization-setup" component={OrganizationSetup} />
               <Route path="/" component={DailyFocusPage} />

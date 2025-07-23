@@ -932,6 +932,115 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
+
+  // Complete guided onboarding
+  app.post("/api/auth/complete-guided-onboarding", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      const { profileData, selectedAreas, goalTemplate, customizedGoal } = req.body;
+      
+      console.log(`🎯 Completing guided onboarding for user ${currentUser.id}:`, {
+        profileData,
+        selectedAreas,
+        goalTemplate,
+        customizedGoal
+      });
+
+      // Create the first objective based on the guided onboarding
+      if (customizedGoal && customizedGoal.objective) {
+        // Get or create default team and cycle
+        const teams = await storage.getTeams(currentUser.organizationId);
+        let teamId = teams.length > 0 ? teams[0].id : null;
+        
+        if (!teamId) {
+          // Create default team
+          const defaultTeam = await storage.createTeam({
+            name: "Tim Utama",
+            description: "Tim utama organisasi",
+            organizationId: currentUser.organizationId,
+            ownerId: currentUser.id,
+            createdBy: currentUser.id,
+            lastUpdateBy: currentUser.id
+          });
+          teamId = defaultTeam.id;
+        }
+
+        const cycles = await storage.getCycles(currentUser.organizationId);
+        let cycleId = cycles.length > 0 ? cycles[0].id : null;
+        
+        if (!cycleId) {
+          // Create default cycle
+          const defaultCycle = await storage.createCycle({
+            name: "Q1 2025",
+            description: "Kuartal pertama 2025",
+            startDate: new Date(),
+            endDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000), // 90 days from now
+            organizationId: currentUser.organizationId,
+            createdBy: currentUser.id,
+            lastUpdateBy: currentUser.id
+          });
+          cycleId = defaultCycle.id;
+        }
+
+        // Create objective
+        const objective = await storage.createObjective({
+          title: customizedGoal.objective,
+          description: `Goal yang dibuat dari onboarding guided - Fokus area: ${selectedAreas.join(", ")}`,
+          organizationId: currentUser.organizationId,
+          teamId: teamId,
+          cycleId: cycleId,
+          ownerId: currentUser.id,
+          createdBy: currentUser.id,
+          lastUpdateBy: currentUser.id,
+          status: "active"
+        });
+
+        // Create key results
+        for (let i = 0; i < customizedGoal.keyResults.length; i++) {
+          const keyResult = customizedGoal.keyResults[i];
+          if (keyResult && keyResult.trim()) {
+            await storage.createKeyResult({
+              title: keyResult,
+              organizationId: currentUser.organizationId,
+              objectiveId: objective.id,
+              targetValue: "100",
+              currentValue: "0",
+              unit: "persen",
+              keyResultType: "increase_to",
+              assignedTo: currentUser.id,
+              createdBy: currentUser.id,
+              lastUpdateBy: currentUser.id
+            });
+          }
+        }
+      }
+
+      // Mark onboarding as completed
+      await storage.updateOnboardingProgress(currentUser.id, {
+        step: "guided_onboarding_completed",
+        data: {
+          profileData,
+          selectedAreas,
+          goalTemplate,
+          customizedGoal,
+          completedAt: new Date().toISOString()
+        }
+      });
+
+      console.log(`✅ Guided onboarding completed for user ${currentUser.id}`);
+      res.json({ 
+        message: "Onboarding guided berhasil diselesaikan",
+        success: true
+      });
+
+    } catch (error) {
+      console.error("Error completing guided onboarding:", error);
+      res.status(500).json({ 
+        message: "Gagal menyelesaikan onboarding guided",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
   
   // Reminder System API Routes
   app.get("/api/reminders/config", requireAuth, async (req, res) => {
