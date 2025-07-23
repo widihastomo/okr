@@ -3591,18 +3591,30 @@ export default function CompanyOnboarding() {
 
   // Get virtual assistant message based on current step
   const getVirtualAssistantMessage = () => {
+    const companyName = onboardingData.companyName || (user as any)?.organization?.name || "perusahaan Anda";
+    const selectedFocus = onboardingData.teamFocus;
+    const selectedObjective = onboardingData.objective;
+    
     if (onboardingData.currentStep === 0) {
-      return "Halo! Saya Orby, asisten virtual yang akan membantu Anda menyusun goal yang tepat dan terukur. Proses onboarding ini dirancang khusus agar Anda dan tim dapat bekerja lebih fokus, selaras, dan berdampak nyata bersama Refokus. 🚀";
+      return "Halo! Saya Orby, asisten virtual yang akan membantu menyusun goal yang tepat dan terukur. Mari mulai dengan mengenal profil perusahaan Anda terlebih dahulu.";
     }
 
-    const stepMessages = {
-      1: "Setiap bisnis pasti punya tantangan. Ada yang tertinggal omzetnya, ada yang timnya belum sinkron. Tapi semua perubahan dimulai dari fokus. Sekarang, mari tentukan satu area yang paling penting untuk Anda perbaiki dulu. Kita tidak perlu sempurna di semua hal, cukup jadi luar biasa di satu hal.",
-      2: "Banyak pemilik usaha terseret ke rutinitas harian dan kehilangan arah. Goal adalah titik utara — kompas yang menjaga Anda tetap di jalur. Mari tuliskan tujuan yang benar-benar Anda pedulikan. Bukan sekadar target, tapi alasan kenapa Anda bangun tiap pagi dan tetap berjuang.",
-      3: "Pernah merasa sudah sibuk setiap hari tapi tak yakin ada hasilnya? Di sinilah pentingnya ukuran keberhasilan. Kita ubah tujuan jadi angka, agar Anda tahu persis kapan Anda berhasil, dan kapan perlu ganti cara. Ukuran ini bukan soal angka — tapi bukti bahwa kerja Anda bermakna.",
-      4: "Kebanyakan strategi gagal bukan karena kurang ide, tapi karena terlalu banyak dan tak tahu mana yang penting. Inisiatif adalah langkah nyata. Kita pilih yang sederhana, bisa langsung dikerjakan, dan berdampak besar. Fokus pada satu tembakan yang paling kena sasaran.",
-      5: "Inisiatif ibarat jalan menuju tujuan — tapi kita tetap butuh langkah konkret agar sampai ke sana. Di sini, Anda bisa memecah inisiatif menjadi tugas-tugas kecil yang bisa segera dikerjakan.",
-      6: "Ritme adalah kunci konsistensi. Seperti olahraga, lebih baik dilakukan rutin meski ringan. Dengan ritme update yang pas, Anda tidak akan kehilangan momentum. Bayangkan sistem ini seperti partner yang selalu mengingatkan, bukan menghakimi.",
-      7: "Selamat! Anda sudah siap untuk memulai perjalanan goal management yang terstruktur. Lihat ringkasan lengkap setup Anda dan sistem akan membantu melacak progress dengan reminder otomatis serta insight yang berguna untuk perbaikan berkelanjutan.",
+    const stepMessages: Record<number, string> = {
+      1: `Selamat datang, ${companyName}! Berdasarkan profil perusahaan yang sudah Anda isi, sekarang saatnya fokus pada area bisnis yang ingin ditingkatkan. Pilih satu fokus utama yang paling berdampak untuk ${companyName} saat ini.`,
+      2: selectedFocus 
+        ? `Bagus! Dengan fokus pada area ${selectedFocus}, mari buat tujuan yang spesifik dan bermakna. Tuliskan goal yang jelas dan dapat diukur untuk meningkatkan area ${selectedFocus} di ${companyName}.`
+        : "Bagus! Dengan fokus pada area bisnis tersebut, mari buat tujuan yang spesifik dan bermakna. Tuliskan goal yang jelas dan dapat diukur untuk area yang sudah Anda pilih.",
+      3: selectedObjective
+        ? `Tujuan "${selectedObjective}" sudah bagus! Sekarang mari tentukan angka target yang konkret. Key Results ini akan menjadi ukuran keberhasilan goal Anda. Pastikan angka yang dipilih menantang namun realistis untuk dicapai ${companyName}.`
+        : "Sekarang mari tentukan angka target yang konkret. Key Results ini akan menjadi ukuran keberhasilan goal Anda. Pastikan angka yang dipilih menantang namun realistis untuk dicapai.",
+      4: selectedObjective
+        ? `Excellent! Untuk mencapai "${selectedObjective}", sekarang pilih inisiatif strategis yang paling efektif. Fokus pada langkah-langkah yang dapat memberikan dampak besar pada ${selectedFocus} di ${companyName}.`
+        : "Sangat baik! Sekarang pilih inisiatif strategis yang akan membantu mencapai target tersebut. Fokus pada langkah-langkah yang paling efektif dan dapat memberikan dampak besar.",
+      5: onboardingData.initiatives?.length > 0
+        ? `Mari pecah inisiatif yang sudah dipilih menjadi tugas-tugas konkret yang dapat dikerjakan tim ${companyName}. Pastikan setiap tugas jelas, spesifik, dan memiliki timeline yang realistis.`
+        : "Mari pecah inisiatif menjadi tugas-tugas konkret yang dapat dikerjakan tim. Pastikan setiap tugas jelas, spesifik, dan memiliki timeline yang realistis.",
+      6: `Hampir selesai! Tentukan ritme update progress yang cocok untuk tim ${companyName}. Ritme yang konsisten akan membantu menjaga momentum dan memastikan goal tercapai tepat waktu.`,
+      7: `Sempurna! Setup OKR untuk ${companyName} sudah lengkap. Mari tinjau ringkasan dan sistem akan membantu melacak progress dengan reminder otomatis serta insight untuk perbaikan berkelanjutan.`,
     };
 
     return (
