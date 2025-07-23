@@ -443,8 +443,8 @@ The system now includes a comprehensive dummy data generation feature that creat
   * FIXED: completedSteps array corruption - reduced from 18 duplicate entries to proper single-step tracking
   * ENHANCED: handleNext function now uses Array.from({length: newCurrentStep - 1}) for deterministic completedSteps generation
   * IMPROVED: Progress calculation now uses currentStep directly instead of corrupted completedSteps.length
-  * ENHANCED: Virtual assistant messaging completely revamped with step-specific, contextual guidance based on current user data
-  * IMPLEMENTED: Smart detection system for existing data (hasKeyResults, hasInitiatives, hasTasks) to provide appropriate messaging
+  * ENHANCED: Virtual assistant messaging completely revamped to explain current step content instead of giving next step instructions
+  * IMPLEMENTED: Context-aware explanations that describe what each page is for and what users will accomplish in current step
   * VERIFIED: Organization onboarding data now shows correct completedSteps: [1, 2] tracking without duplicates
   * RESULT: Onboarding system now tracks progress accurately, provides contextual guidance, and works without any corruption
 - July 23, 2025. **PAPUA PROVINCES CITY DATA EXPANSION COMPLETED** - Successfully added comprehensive city data for Papua Tengah and Papua Selatan provinces:
