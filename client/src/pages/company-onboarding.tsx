@@ -45,6 +45,7 @@ import {
   UserPlus,
   CheckCircle,
   ArrowRight,
+  ArrowDown,
   Sparkles,
   Building,
   BarChart,
