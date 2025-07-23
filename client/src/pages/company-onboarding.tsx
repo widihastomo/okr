@@ -3671,49 +3671,38 @@ export default function CompanyOnboarding() {
       return "Halo! Saya Orby, asisten virtual yang akan membantu menyusun goal yang tepat dan terukur. Mari mulai dengan mengenal profil perusahaan Anda terlebih dahulu.";
     }
 
+    // Message should match the CURRENT step, not based on completed data
     const stepMessages: Record<number, string> = {
-      // Step 1: Business Focus Selection
-      1: selectedFocus 
-        ? `Selamat datang, ${companyName}! Saya lihat Anda sudah memilih fokus pada area ${selectedFocus}. Jika sesuai dengan prioritas saat ini, klik "Selanjutnya" untuk melanjutkan, atau pilih area bisnis lain yang ingin diprioritaskan.`
-        : `Selamat datang, ${companyName}! Berdasarkan profil perusahaan yang sudah Anda isi, sekarang mari tentukan fokus utama. Pilih satu area bisnis yang paling berdampak dan mendesak untuk ditingkatkan di ${companyName} saat ini.`,
+      // Step 1: Business Focus Selection - Always guide user to select focus area
+      1: `Selamat datang, ${companyName}! Berdasarkan profil perusahaan yang sudah Anda isi, sekarang mari tentukan fokus utama bisnis. Pilih satu area yang paling berdampak dan mendesak untuk ditingkatkan di ${companyName} saat ini.`,
       
-      // Step 2: Objective Creation  
-      2: selectedObjective
-        ? `Perfect! Tujuan "${selectedObjective}" sudah ditetapkan untuk area ${selectedFocus || 'bisnis'} di ${companyName}. Jika sudah sesuai dengan visi perusahaan, silakan lanjutkan ke step berikutnya, atau edit jika perlu penyesuaian.`
-        : selectedFocus 
-        ? `Excellent! Area ${selectedFocus} memang strategis untuk ${companyName}. Sekarang mari buat tujuan yang spesifik dan terukur. Tuliskan goal yang jelas, ambisius namun realistis, dan selaras dengan visi ${companyName}.`
-        : "Bagus! Sekarang mari buat tujuan yang spesifik dan bermakna untuk area bisnis yang sudah dipilih. Pastikan goal yang ditulis jelas, terukur, dan dapat dicapai tim Anda.",
+      // Step 2: Objective Creation - Guide to create objective for chosen focus
+      2: selectedFocus 
+        ? `Excellent! Area ${selectedFocus} memang strategis untuk ${companyName}. Sekarang mari buat tujuan yang spesifik dan terukur untuk meningkatkan performa ${selectedFocus}. Tuliskan goal yang jelas, ambisius namun realistis, dan selaras dengan visi ${companyName}.`
+        : "Sekarang mari buat tujuan yang spesifik dan bermakna untuk area bisnis yang sudah dipilih. Pastikan goal yang ditulis jelas, terukur, dan dapat dicapai tim Anda.",
       
-      // Step 3: Key Results Definition
-      3: hasKeyResults
-        ? `Bagus! ${onboardingData.keyResults?.length || 0} Key Results sudah ditetapkan untuk mengukur keberhasilan "${selectedObjective}". Pastikan angka target menantang namun realistis untuk ${companyName}. Anda bisa menambah atau edit jika diperlukan.`
-        : selectedObjective
-        ? `Tujuan "${selectedObjective}" sudah bagus! Sekarang mari tentukan angka target yang konkret. Key Results ini akan menjadi ukuran keberhasilan goal Anda. Buat 2-3 metrik yang spesifik, terukur, dan menantang untuk ${companyName}.`
+      // Step 3: Key Results Definition - Guide to create metrics
+      3: selectedObjective
+        ? `Tujuan "${selectedObjective}" sudah bagus! Sekarang mari tentukan angka target yang konkret untuk mengukur keberhasilan. Key Results ini akan menjadi metrik utama goal Anda. Buat 2-3 target yang spesifik, terukur, dan menantang untuk ${companyName}.`
         : "Sekarang mari tentukan angka target yang konkret. Key Results ini akan menjadi ukuran keberhasilan goal Anda. Buat 2-3 metrik yang spesifik, terukur, dan dapat dilacak progressnya.",
       
-      // Step 4: Initiatives Selection
-      4: hasInitiatives
-        ? `Excellent! ${onboardingData.initiatives?.length || 0} inisiatif strategis sudah dipilih untuk mencapai "${selectedObjective}". Inisiatif ini akan menjadi langkah besar yang fokus pada ${selectedFocus} di ${companyName}. Tambah atau edit jika ada yang ingin disesuaikan.`
-        : selectedObjective
+      // Step 4: Initiatives Selection - Guide to choose strategic initiatives
+      4: selectedObjective
         ? `Excellent! Untuk mencapai "${selectedObjective}", sekarang pilih inisiatif strategis yang paling efektif. Fokus pada 2-3 langkah besar yang dapat memberikan dampak signifikan pada ${selectedFocus} di ${companyName}.`
         : "Sangat baik! Sekarang pilih inisiatif strategis yang akan membantu mencapai target tersebut. Pilih 2-3 langkah besar yang paling efektif dan dapat memberikan dampak maksimal.",
       
-      // Step 5: Tasks Breakdown
-      5: hasTasks
-        ? `Perfect! ${onboardingData.tasks?.length || 0} tugas konkret sudah dibuat dari inisiatif yang dipilih. Tugas-tugas ini akan menjadi action items yang dapat dikerjakan tim ${companyName}. Pastikan setiap tugas jelas dan memiliki timeline yang realistis.`
-        : hasInitiatives
+      // Step 5: Tasks Breakdown - Guide to break down initiatives into tasks
+      5: hasInitiatives
         ? `Mari pecah inisiatif yang sudah dipilih menjadi tugas-tugas konkret yang dapat dikerjakan tim ${companyName}. Buat 3-5 tugas spesifik per inisiatif dengan deadline dan PIC yang jelas.`
         : "Mari pecah inisiatif menjadi tugas-tugas konkret yang dapat dikerjakan tim. Pastikan setiap tugas jelas, spesifik, dan memiliki timeline yang realistis untuk diselesaikan.",
       
-      // Step 6: Progress Cadence
-      6: onboardingData.cadence
-        ? `Bagus! Ritme check-in "${onboardingData.cadence}" sudah dipilih untuk tim ${companyName}. Ini akan membantu menjaga momentum dan memastikan goal tercapai tepat waktu. Atur waktu reminder sesuai preferensi tim.`
-        : `Hampir selesai! Tentukan ritme update progress yang cocok untuk tim ${companyName}. Pilih frekuensi yang konsisten dan realistis - ini akan membantu menjaga momentum dan accountability tim.`,
+      // Step 6: Progress Cadence - Guide to set check-in frequency
+      6: `Hampir selesai! Tentukan ritme update progress yang cocok untuk tim ${companyName}. Pilih frekuensi yang konsisten dan realistis - ini akan membantu menjaga momentum dan accountability tim.`,
       
-      // Step 7: Summary Review
+      // Step 7: Summary Review - Guide to review all settings
       7: `Sempurna! Setup OKR untuk ${companyName} sudah lengkap dan siap dijalankan. Tinjau ringkasan di bawah untuk memastikan semua sudah sesuai. Sistem akan membantu melacak progress dengan reminder otomatis dan insight untuk perbaikan berkelanjutan.`,
       
-      // Step 8: Completion
+      // Step 8: Completion - Final congratulations
       8: `Congratulations, ${companyName}! Onboarding sudah selesai dan goal pertama siap dijalankan. Klik "Mulai Tur" untuk melihat dashboard dan mulai perjalanan mencapai target yang sudah ditetapkan bersama tim.`,
     };
 
