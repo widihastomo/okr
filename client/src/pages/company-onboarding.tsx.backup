@@ -386,6 +386,9 @@ export default function CompanyOnboarding() {
           };
         }
         break;
+      case 8:
+        // Step 8 is now just a summary page - no validation needed
+        break;
       default:
         break;
     }
@@ -1848,6 +1851,7 @@ export default function CompanyOnboarding() {
           </div>
         );
 
+      case 6: // Task untuk Inisiatif
         // Define taskMapping outside functions so it can be reused
         const taskMapping = {
           // Penjualan & Marketing Tasks
@@ -2870,6 +2874,133 @@ export default function CompanyOnboarding() {
           </div>
         );
 
+      case 8: // Dashboard Ringkas
+        return (
+          <div className="space-y-4">
+            <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
+              <div className="flex items-center space-x-2 mb-4">
+                <Trophy className="w-6 h-6 text-orange-600" />
+                <h3 className="font-semibold text-lg text-blue-900">
+                  📊 Rekap Data Onboarding Anda
+                </h3>
+              </div>
+
+              {/* Summary Cards */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div className="bg-white p-3 rounded-lg border border-gray-200 text-center">
+                  <div className="flex items-center justify-center mb-2">
+                    <Target className="w-4 h-4 text-blue-600 mr-1" />
+                    <div className="text-2xl font-bold text-blue-600">1</div>
+                  </div>
+                  <div className="text-sm text-gray-600">Goal</div>
+                </div>
+                <div className="bg-white p-3 rounded-lg border border-gray-200 text-center">
+                  <div className="flex items-center justify-center mb-2">
+                    <TrendingUp className="w-4 h-4 text-green-600 mr-1" />
+                    <div className="text-2xl font-bold text-green-600">
+                      {onboardingData.keyResults.length}
+                    </div>
+                  </div>
+                  <div className="text-sm text-gray-600">Key Results</div>
+                </div>
+                <div className="bg-white p-3 rounded-lg border border-gray-200 text-center">
+                  <div className="flex items-center justify-center mb-2">
+                    <Lightbulb className="w-4 h-4 text-purple-600 mr-1" />
+                    <div className="text-2xl font-bold text-purple-600">
+                      {onboardingData.initiatives.length}
+                    </div>
+                  </div>
+                  <div className="text-sm text-gray-600">Inisiatif</div>
+                </div>
+                <div className="bg-white p-3 rounded-lg border border-gray-200 text-center">
+                  <div className="flex items-center justify-center mb-2">
+                    <ListTodo className="w-4 h-4 text-orange-600 mr-1" />
+                    <div className="text-2xl font-bold text-orange-600">
+                      {onboardingData.tasks ? onboardingData.tasks.length : 0}
+                    </div>
+                  </div>
+                  <div className="text-sm text-gray-600">Tasks</div>
+                </div>
+              </div>
+
+              {/* Reminder Settings Display */}
+              <div className="bg-white p-4 rounded-lg border border-gray-200">
+                <div className="flex items-center space-x-2 mb-3">
+                  <BellRing className="w-4 h-4 text-orange-600" />
+                  <h4 className="font-semibold text-gray-800">
+                    Pengaturan Reminder
+                  </h4>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-700">
+                  <div className="space-y-2">
+                    <p>
+                      <strong>Frekuensi:</strong>{" "}
+                      <span className="inline-block bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs">
+                        {onboardingData.cadence === "harian"
+                          ? "Setiap Hari"
+                          : onboardingData.cadence === "mingguan"
+                            ? "Setiap Minggu"
+                            : onboardingData.cadence === "bulanan"
+                              ? "Setiap Bulan"
+                              : "Belum dipilih"}
+                      </span>
+                    </p>
+                    <p>
+                      <strong>Waktu:</strong>{" "}
+                      <span className="text-gray-900 font-mono">
+                        {onboardingData.reminderTime || "Belum diatur"}
+                      </span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+              <h4 className="font-semibold text-yellow-800 mb-2">
+                💡 Yang Akan Terjadi Selanjutnya
+              </h4>
+              <ul className="text-sm text-yellow-700 space-y-1">
+                <li>
+                  • Goal pertama akan dibuat otomatis di sistem berdasarkan
+                  pilihan anda
+                </li>
+                <li>• Anggota tim akan diundang untuk berkolaborasi</li>
+                <li>
+                  • Reminder otomatis akan dimulai sesuai ketentuan yang sudah
+                  dimasukkan
+                </li>
+                <li>
+                  • Anda dapat menambah / merubah konfigurasi setelah onboarding
+                  selesai
+                </li>
+              </ul>
+            </div>
+
+            {/* Start Tour Button */}
+            <div className="flex justify-center mt-6">
+              <Button
+                onClick={handleCompleteOnboarding}
+                className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105 shadow-lg"
+                disabled={isCompletingOnboarding}
+              >
+                {isCompletingOnboarding ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                    Memproses...
+                  </>
+                ) : (
+                  <>
+                    <PlayCircle className="w-5 h-5 mr-2" />
+                    Mulai Tur
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        );
+
+      default:
         return null;
     }
   };
