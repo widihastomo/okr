@@ -66,7 +66,6 @@ import {
   Globe,
   Lightbulb,
   TrendingDown,
-  Trophy,
 } from "lucide-react";
 import { ReminderSettings } from "@/components/ReminderSettings";
 import { SimpleSelect } from "@/components/SimpleSelect";
@@ -882,59 +881,13 @@ export default function CompanyOnboarding() {
     refetchInterval: false, // Don't auto-refetch
   });
 
-  // Function to determine correct step based on data
-  const determineCurrentStep = (data: any) => {
-    if (!data) return 0;
-    
-    // Check if we have basic company info (step 1)
-    if (!data.companyName || !data.companyAddress || !data.province || 
-        !data.city || !data.industryType || !data.companySize || 
-        !data.position || !data.referralSource) {
-      return 1;
-    }
-    
-    // Check if we have team focus (step 2)
-    if (!data.teamFocus) {
-      return 2;
-    }
-    
-    // Check if we have objective (step 3)
-    if (!data.objective) {
-      return 3;
-    }
-    
-    // Check if we have key results (step 4)
-    if (!data.keyResults || data.keyResults.length === 0) {
-      return 4;
-    }
-    
-    // Check if we have initiatives (step 5)
-    if (!data.initiatives || data.initiatives.length === 0) {
-      return 5;
-    }
-    
-    // Check if we have tasks (step 6)
-    if (!data.tasks || data.tasks.length === 0) {
-      return 6;
-    }
-    
-    // Check if we have cadence (step 7)
-    if (!data.cadence) {
-      return 7;
-    }
-    
-    // All data complete, go to summary (step 8)
-    return 8;
-  };
-
   // Update local state when progress data is loaded
   useEffect(() => {
     if (progress) {
-      const correctStep = determineCurrentStep(progress);
       setOnboardingData((prevData) => ({
         ...prevData,
         ...progress,
-        currentStep: correctStep, // Use auto-detected step based on data
+        currentStep: progress.currentStep || 0, // Ensure it starts at 0 if no progress
       }));
     }
   }, [progress]);
