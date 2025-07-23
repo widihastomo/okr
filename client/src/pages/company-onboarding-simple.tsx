@@ -163,15 +163,21 @@ export default function CompanyOnboardingSimple() {
         {/* Action Buttons */}
         <div className="text-center space-y-4">
           <Button
-            onClick={handleSkipOnboarding}
+            onClick={() => navigate('/organization-setup')}
             className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 text-lg"
           >
-            Mulai menggunakan aplikasi
+            Mulai Setup Organisasi
           </Button>
           
-          <p className="text-sm text-gray-500">
-            Setup organisasi dapat dilakukan nanti melalui menu Pengaturan
-          </p>
+          <div>
+            <Button
+              variant="ghost"
+              onClick={handleSkipOnboarding}
+              className="text-gray-500 hover:text-gray-700 text-sm"
+            >
+              Lewati untuk sekarang
+            </Button>
+          </div>
         </div>
       </div>
     </div>

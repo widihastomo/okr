@@ -738,6 +738,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
+
+  // Organization setup endpoint
+  app.post("/api/organization/setup", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as User;
+      const {
+        companyName,
+        companyAddress,
+        province,
+        city,
+        postalCode,
+        phone,
+        email,
+        website,
+        industryType,
+        companySize,
+        description,
+        establishedYear
+      } = req.body;
+      
+      console.log("🏢 Organization setup request:", {
+        userId: user.id,
+        organizationId: user.organizationId,
+        companyName,
+        province,
+        city,
+        industryType,
+        companySize
+      });
+      
+      if (!user.organizationId) {
+        return res.status(400).json({ 
+          message: "Organization ID diperlukan untuk setup" 
+        });
+      }
+      
+      // Update organization with comprehensive setup data
+      await storage.updateOrganization(user.organizationId, {
+        name: companyName || undefined,
+        description: description || undefined,
+        updatedAt: new Date(),
+      });
+
+      // Update organization company details  
+      await storage.updateOrganizationCompanyDetails(user.organizationId, {
+        companyAddress: companyAddress || null,
+        province: province || null,
+        city: city || null,
+        industryType: industryType || null,
+        size: companySize || null,
+      });
+
+      console.log("✅ Organization setup completed for organization:", user.organizationId);
+      
+      res.json({
+        message: "Setup organisasi berhasil disimpan",
+        success: true,
+      });
+      
+    } catch (error) {
+      console.error("Organization setup error:", error);
+      res.status(500).json({ 
+        message: "Gagal menyimpan setup organisasi. Silakan coba lagi." 
+      });
+    }
+  });
   
   // Reset Password endpoint
   app.post("/api/auth/reset-password", async (req, res) => {
