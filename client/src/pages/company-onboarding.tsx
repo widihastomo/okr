@@ -52,6 +52,20 @@ import {
   Zap,
   CalendarIcon,
   Loader2,
+  DollarSign,
+  Settings,
+  HeartHandshake,
+  Megaphone,
+  FileCheck,
+  ListTodo,
+  PlayCircle,
+  BellRing,
+  Award,
+  Rocket,
+  Star,
+  Globe,
+  Lightbulb,
+  TrendingDown,
 } from "lucide-react";
 import { ReminderSettings } from "@/components/ReminderSettings";
 import { type CompanyOnboardingData } from "@shared/schema";
@@ -614,17 +628,16 @@ export default function CompanyOnboarding() {
                   />
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-2">
-                      <TrendingUp className="w-5 h-5 text-orange-600" />
+                      <DollarSign className="w-5 h-5 text-green-600" />
                       <Label
                         htmlFor="penjualan"
                         className="font-medium cursor-pointer"
                       >
-                        Penjualan
+                        Tingkatkan Pendapatan
                       </Label>
                     </div>
                     <p className="text-sm text-gray-600">
-                      Tingkatkan performa penjualan, konversi, dan pertumbuhan
-                      revenue
+                      Fokus pada peningkatan omzet dan penjualan
                     </p>
                   </div>
                 </div>
@@ -651,16 +664,16 @@ export default function CompanyOnboarding() {
                   />
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-2">
-                      <BarChart className="w-5 h-5 text-orange-600" />
+                      <Settings className="w-5 h-5 text-blue-600" />
                       <Label
                         htmlFor="operasional"
                         className="font-medium cursor-pointer"
                       >
-                        Operasional
+                        Rapikan Operasional
                       </Label>
                     </div>
                     <p className="text-sm text-gray-600">
-                      Optimalisasi proses, efisiensi, dan produktivitas
+                      Optimalisasi proses, dan produktivitas
                       operasional
                     </p>
                   </div>
@@ -688,16 +701,16 @@ export default function CompanyOnboarding() {
                   />
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-2">
-                      <Users className="w-5 h-5 text-orange-600" />
+                      <HeartHandshake className="w-5 h-5 text-purple-600" />
                       <Label
                         htmlFor="customer_service"
                         className="font-medium cursor-pointer"
                       >
-                        Customer Service
+                        Kembangkan Tim
                       </Label>
                     </div>
                     <p className="text-sm text-gray-600">
-                      Tingkatkan kepuasan pelanggan, respon time, dan loyalitas
+                      Peningkatan Kapasitas dan kinerja tim
                     </p>
                   </div>
                 </div>
@@ -724,16 +737,16 @@ export default function CompanyOnboarding() {
                   />
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-2">
-                      <Target className="w-5 h-5 text-orange-600" />
+                      <Rocket className="w-5 h-5 text-red-600" />
                       <Label
                         htmlFor="marketing"
                         className="font-medium cursor-pointer"
                       >
-                        Marketing
+                        Ekspansi Bisnis
                       </Label>
                     </div>
                     <p className="text-sm text-gray-600">
-                      Perluas jangkauan, engagement, dan brand awareness
+                      Perluas pasar dan pengembangan produk
                     </p>
                   </div>
                 </div>
@@ -816,12 +829,15 @@ export default function CompanyOnboarding() {
                         id={`objective-${index}`}
                         className="mt-1"
                       />
-                      <Label
-                        htmlFor={`objective-${index}`}
-                        className="flex-1 cursor-pointer leading-relaxed"
-                      >
-                        {option}
-                      </Label>
+                      <div className="flex items-start space-x-2 flex-1">
+                        <Target className="w-4 h-4 text-orange-600 mt-0.5 flex-shrink-0" />
+                        <Label
+                          htmlFor={`objective-${index}`}
+                          className="cursor-pointer leading-relaxed"
+                        >
+                          {option}
+                        </Label>
+                      </div>
                     </div>
                   ))}
                 </RadioGroup>
@@ -967,12 +983,15 @@ export default function CompanyOnboarding() {
                           });
                         }}
                       />
-                      <Label
-                        htmlFor={`keyresult-${index}`}
-                        className="flex-1 cursor-pointer leading-relaxed"
-                      >
-                        {option}
-                      </Label>
+                      <div className="flex items-start space-x-2 flex-1">
+                        <TrendingUp className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                        <Label
+                          htmlFor={`keyresult-${index}`}
+                          className="cursor-pointer leading-relaxed"
+                        >
+                          {option}
+                        </Label>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -981,12 +1000,18 @@ export default function CompanyOnboarding() {
 
             {selectedKeyResults.length > 0 && (
               <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
-                <p className="text-sm text-blue-800 mb-2">
-                  <strong>Angka target terpilih:</strong>
-                </p>
+                <div className="flex items-center space-x-2 mb-2">
+                  <Award className="w-4 h-4 text-blue-600" />
+                  <p className="text-sm text-blue-800 font-medium">
+                    Angka target terpilih:
+                  </p>
+                </div>
                 <ul className="text-sm text-blue-700 space-y-1">
                   {selectedKeyResults.map((kr: string, index: number) => (
-                    <li key={index}>• {kr}</li>
+                    <li key={index} className="flex items-start space-x-2">
+                      <Star className="w-3 h-3 text-blue-500 mt-1 flex-shrink-0" />
+                      <span>{kr}</span>
+                    </li>
                   ))}
                 </ul>
               </div>
@@ -1027,7 +1052,7 @@ export default function CompanyOnboarding() {
                   <RadioGroupItem value="harian" id="harian" className="mt-1" />
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-2">
-                      <Clock className="w-5 h-5 text-orange-600" />
+                      <BellRing className="w-5 h-5 text-red-600" />
                       <Label
                         htmlFor="harian"
                         className="font-medium cursor-pointer"
@@ -1061,7 +1086,7 @@ export default function CompanyOnboarding() {
                   />
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-2">
-                      <Calendar className="w-5 h-5 text-orange-600" />
+                      <Calendar className="w-5 h-5 text-blue-600" />
                       <Label
                         htmlFor="mingguan"
                         className="font-medium cursor-pointer"
@@ -1095,7 +1120,7 @@ export default function CompanyOnboarding() {
                   />
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-2">
-                      <CalendarIcon className="w-5 h-5 text-orange-600" />
+                      <CalendarIcon className="w-5 h-5 text-green-600" />
                       <Label
                         htmlFor="bulanan"
                         className="font-medium cursor-pointer"
@@ -1362,7 +1387,7 @@ export default function CompanyOnboarding() {
                 {onboardingData.reminderTime && (
                   <div className="p-3 bg-orange-50 rounded-lg border border-orange-200">
                     <div className="flex items-center space-x-2">
-                      <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                      <BellRing className="w-4 h-4 text-orange-600" />
                       <p className="text-sm text-orange-800">
                         <strong>Pengaturan reminder:</strong>{" "}
                         {onboardingData.cadence === "harian" && (
@@ -2383,29 +2408,44 @@ export default function CompanyOnboarding() {
         return (
           <div className="space-y-4">
             <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
-              <h3 className="font-semibold text-lg mb-4 text-blue-900">
-                📊 Rekap Data Onboarding Anda
-              </h3>
+              <div className="flex items-center space-x-2 mb-4">
+                <Trophy className="w-6 h-6 text-blue-900" />
+                <h3 className="font-semibold text-lg text-blue-900">
+                  Rekap Data Onboarding Anda
+                </h3>
+              </div>
 
               {/* Summary Cards */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 <div className="bg-white p-3 rounded-lg border border-gray-200 text-center">
+                  <div className="flex justify-center mb-2">
+                    <Target className="w-6 h-6 text-blue-600" />
+                  </div>
                   <div className="text-2xl font-bold text-blue-600">1</div>
                   <div className="text-sm text-gray-600">Goal</div>
                 </div>
                 <div className="bg-white p-3 rounded-lg border border-gray-200 text-center">
+                  <div className="flex justify-center mb-2">
+                    <TrendingUp className="w-6 h-6 text-green-600" />
+                  </div>
                   <div className="text-2xl font-bold text-green-600">
                     {onboardingData.keyResults.length}
                   </div>
                   <div className="text-sm text-gray-600">Angka Target</div>
                 </div>
                 <div className="bg-white p-3 rounded-lg border border-gray-200 text-center">
+                  <div className="flex justify-center mb-2">
+                    <Lightbulb className="w-6 h-6 text-purple-600" />
+                  </div>
                   <div className="text-2xl font-bold text-purple-600">
                     {onboardingData.initiatives.length}
                   </div>
                   <div className="text-sm text-gray-600">Inisiatif</div>
                 </div>
                 <div className="bg-white p-3 rounded-lg border border-gray-200 text-center">
+                  <div className="flex justify-center mb-2">
+                    <ListTodo className="w-6 h-6 text-orange-600" />
+                  </div>
                   <div className="text-2xl font-bold text-orange-600">
                     {onboardingData.tasks ? onboardingData.tasks.length : 0}
                   </div>
@@ -3237,8 +3277,10 @@ export default function CompanyOnboarding() {
                     className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 transition-all duration-300 transform hover:scale-105 hover:shadow-lg disabled:hover:scale-100 disabled:hover:shadow-none disabled:opacity-70 min-w-[140px] relative overflow-hidden"
                   >
                     <div className="flex items-center justify-center gap-2">
-                      {(completeOnboardingMutation.isPending || isRedirecting) && (
+                      {(completeOnboardingMutation.isPending || isRedirecting) ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <PlayCircle className="w-4 h-4" />
                       )}
                       <span className="transition-all duration-300">
                         {completeOnboardingMutation.isPending
