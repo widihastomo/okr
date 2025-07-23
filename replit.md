@@ -444,6 +444,8 @@ The system now includes a comprehensive dummy data generation feature that creat
   * DYNAMIC: Messages adapt based on onboarding progress and user data (company name, focus area, objectives, initiatives)
   * RELEVANT: Step-specific guidance that directly relates to current task instead of generic motivational content
   * PROGRESSIVE: Messages build upon previous selections creating coherent conversational flow throughout onboarding
+  * SMART_DETECTION: Assistant detects when user already has data filled and provides appropriate guidance for modification vs. initial setup
+  * STEP_AWARE: Messages properly reflect actual step content and user progress state for accurate contextual guidance
   * RESULT: Virtual assistant Orby now provides personalized, relevant guidance that adapts to each company's specific context and choices
 - July 23, 2025. **PROVINCE-CITY DEPENDENCY SYSTEM IMPLEMENTED** - Successfully implemented province-city relationship in company onboarding form:
   * ADDED: Complete citiesByProvince data structure with comprehensive Indonesian city coverage for all 38 provinces

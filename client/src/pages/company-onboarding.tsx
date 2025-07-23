@@ -3600,12 +3600,16 @@ export default function CompanyOnboarding() {
     }
 
     const stepMessages: Record<number, string> = {
-      1: `Selamat datang, ${companyName}! Berdasarkan profil perusahaan yang sudah Anda isi, sekarang saatnya fokus pada area bisnis yang ingin ditingkatkan. Pilih satu fokus utama yang paling berdampak untuk ${companyName} saat ini.`,
-      2: selectedFocus 
+      1: selectedFocus 
+        ? `Selamat datang, ${companyName}! Saya lihat Anda sudah memilih fokus pada area ${selectedFocus}. Jika ingin mengubah pilihan, silakan pilih area bisnis lain yang ingin ditingkatkan untuk ${companyName}.`
+        : `Selamat datang, ${companyName}! Berdasarkan profil perusahaan yang sudah Anda isi, sekarang saatnya fokus pada area bisnis yang ingin ditingkatkan. Pilih satu fokus utama yang paling berdampak untuk ${companyName} saat ini.`,
+      2: selectedObjective
+        ? `Perfect! Dengan fokus pada area ${selectedFocus || 'bisnis'}, saya lihat tujuan "${selectedObjective}" sudah ditetapkan untuk ${companyName}. Jika ingin memodifikasi, silakan edit tujuan sesuai kebutuhan perusahaan Anda.`
+        : selectedFocus 
         ? `Bagus! Dengan fokus pada area ${selectedFocus}, mari buat tujuan yang spesifik dan bermakna. Tuliskan goal yang jelas dan dapat diukur untuk meningkatkan area ${selectedFocus} di ${companyName}.`
         : "Bagus! Dengan fokus pada area bisnis tersebut, mari buat tujuan yang spesifik dan bermakna. Tuliskan goal yang jelas dan dapat diukur untuk area yang sudah Anda pilih.",
       3: selectedObjective
-        ? `Tujuan "${selectedObjective}" sudah bagus! Sekarang mari tentukan angka target yang konkret. Key Results ini akan menjadi ukuran keberhasilan goal Anda. Pastikan angka yang dipilih menantang namun realistis untuk dicapai ${companyName}.`
+        ? `Tujuan "${selectedObjective}" sudah bagus! Sekarang mari tentukan angka target yang konkret. Key Results ini akan menjadi ukuran keberhasilan goal Anda. Pastikan angka yang dipilih menantang namun realistis untuk ${companyName}.`
         : "Sekarang mari tentukan angka target yang konkret. Key Results ini akan menjadi ukuran keberhasilan goal Anda. Pastikan angka yang dipilih menantang namun realistis untuk dicapai.",
       4: selectedObjective
         ? `Excellent! Untuk mencapai "${selectedObjective}", sekarang pilih inisiatif strategis yang paling efektif. Fokus pada langkah-langkah yang dapat memberikan dampak besar pada ${selectedFocus} di ${companyName}.`
