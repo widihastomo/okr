@@ -68,6 +68,7 @@ import {
   TrendingDown,
 } from "lucide-react";
 import { ReminderSettings } from "@/components/ReminderSettings";
+import { SimpleSelect } from "@/components/SimpleSelect";
 import { type CompanyOnboardingData } from "@shared/schema";
 import { useTour } from "@/hooks/useTour";
 
@@ -202,6 +203,99 @@ export default function CompanyOnboarding() {
     firstCheckIn: "",
     isCompleted: false,
   });
+
+  // Options for searchable select boxes
+  const provinceOptions = [
+    { value: "DKI Jakarta", label: "DKI Jakarta" },
+    { value: "Jawa Barat", label: "Jawa Barat" },
+    { value: "Jawa Tengah", label: "Jawa Tengah" },
+    { value: "Jawa Timur", label: "Jawa Timur" },
+    { value: "Banten", label: "Banten" },
+    { value: "Bali", label: "Bali" },
+    { value: "Sumatera Utara", label: "Sumatera Utara" },
+    { value: "Sumatera Barat", label: "Sumatera Barat" },
+    { value: "Sumatera Selatan", label: "Sumatera Selatan" },
+    { value: "Riau", label: "Riau" },
+    { value: "Kalimantan Timur", label: "Kalimantan Timur" },
+    { value: "Kalimantan Selatan", label: "Kalimantan Selatan" },
+    { value: "Sulawesi Selatan", label: "Sulawesi Selatan" },
+    { value: "Sulawesi Utara", label: "Sulawesi Utara" },
+    { value: "Papua", label: "Papua" },
+    { value: "Lainnya", label: "Lainnya" },
+  ];
+
+  const cityOptions = [
+    { value: "Jakarta Pusat", label: "Jakarta Pusat" },
+    { value: "Jakarta Selatan", label: "Jakarta Selatan" },
+    { value: "Jakarta Utara", label: "Jakarta Utara" },
+    { value: "Jakarta Barat", label: "Jakarta Barat" },
+    { value: "Jakarta Timur", label: "Jakarta Timur" },
+    { value: "Bandung", label: "Bandung" },
+    { value: "Surabaya", label: "Surabaya" },
+    { value: "Medan", label: "Medan" },
+    { value: "Semarang", label: "Semarang" },
+    { value: "Yogyakarta", label: "Yogyakarta" },
+    { value: "Malang", label: "Malang" },
+    { value: "Denpasar", label: "Denpasar" },
+    { value: "Lainnya", label: "Lainnya" },
+  ];
+
+  const industryOptions = [
+    { value: "Teknologi Informasi", label: "Teknologi Informasi" },
+    { value: "E-commerce", label: "E-commerce" },
+    { value: "Fintech", label: "Fintech" },
+    { value: "Pendidikan", label: "Pendidikan" },
+    { value: "Kesehatan", label: "Kesehatan" },
+    { value: "Manufaktur", label: "Manufaktur" },
+    { value: "Retail", label: "Retail" },
+    { value: "F&B", label: "F&B" },
+    { value: "Properti", label: "Properti" },
+    { value: "Otomotif", label: "Otomotif" },
+    { value: "Media & Kreatif", label: "Media & Kreatif" },
+    { value: "Konsultan", label: "Konsultan" },
+    { value: "Perbankan", label: "Perbankan" },
+    { value: "Asuransi", label: "Asuransi" },
+    { value: "Lainnya", label: "Lainnya" },
+  ];
+
+  const companySizeOptions = [
+    { value: "1-5 karyawan", label: "1-5 karyawan" },
+    { value: "6-10 karyawan", label: "6-10 karyawan" },
+    { value: "11-25 karyawan", label: "11-25 karyawan" },
+    { value: "26-50 karyawan", label: "26-50 karyawan" },
+    { value: "51-100 karyawan", label: "51-100 karyawan" },
+    { value: "101-250 karyawan", label: "101-250 karyawan" },
+    { value: "251-500 karyawan", label: "251-500 karyawan" },
+    { value: "500+ karyawan", label: "500+ karyawan" },
+  ];
+
+  const positionOptions = [
+    { value: "CEO/Founder", label: "CEO/Founder" },
+    { value: "CTO/VP Engineering", label: "CTO/VP Engineering" },
+    { value: "CMO/VP Marketing", label: "CMO/VP Marketing" },
+    { value: "COO/VP Operations", label: "COO/VP Operations" },
+    { value: "Manager", label: "Manager" },
+    { value: "Team Lead", label: "Team Lead" },
+    { value: "Senior Staff", label: "Senior Staff" },
+    { value: "Staff", label: "Staff" },
+    { value: "Konsultan", label: "Konsultan" },
+    { value: "Freelancer", label: "Freelancer" },
+    { value: "Lainnya", label: "Lainnya" },
+  ];
+
+  const referralOptions = [
+    { value: "Google Search", label: "Google Search" },
+    { value: "Media Sosial", label: "Media Sosial (Instagram, LinkedIn)" },
+    { value: "Rekomendasi Teman", label: "Rekomendasi Teman/Kolega" },
+    { value: "Event/Webinar", label: "Event/Webinar" },
+    { value: "YouTube", label: "YouTube" },
+    { value: "Blog/Artikel", label: "Blog/Artikel" },
+    { value: "Iklan Online", label: "Iklan Online" },
+    { value: "Word of Mouth", label: "Word of Mouth" },
+    { value: "Partnership", label: "Partnership/Kemitraan" },
+    { value: "Cold Email", label: "Cold Email/Sales" },
+    { value: "Lainnya", label: "Lainnya" },
+  ];
 
   // Error handling for ResizeObserver and other common errors
   useEffect(() => {
@@ -685,97 +779,103 @@ export default function CompanyOnboarding() {
 
               {/* Provinsi */}
               <div className="space-y-1">
-                <Label htmlFor="province">Provinsi</Label>
-                <Input
-                  id="province"
+                <Label>Provinsi</Label>
+                <SimpleSelect
+                  options={provinceOptions}
                   value={onboardingData.province || ""}
-                  onChange={(e) =>
+                  placeholder="Pilih provinsi"
+                  searchPlaceholder="Cari provinsi..."
+                  onSelect={(value) =>
                     setOnboardingData({
                       ...onboardingData,
-                      province: e.target.value,
+                      province: value,
                     })
                   }
-                  placeholder="Provinsi"
                 />
               </div>
 
               {/* Kota */}
               <div className="space-y-1">
-                <Label htmlFor="city">Kota</Label>
-                <Input
-                  id="city"
+                <Label>Kota</Label>
+                <SimpleSelect
+                  options={cityOptions}
                   value={onboardingData.city || ""}
-                  onChange={(e) =>
+                  placeholder="Pilih kota"
+                  searchPlaceholder="Cari kota..."
+                  onSelect={(value) =>
                     setOnboardingData({
                       ...onboardingData,
-                      city: e.target.value,
+                      city: value,
                     })
                   }
-                  placeholder="Kota"
                 />
               </div>
 
               {/* Industri */}
               <div className="space-y-1">
-                <Label htmlFor="industryType">Jenis Industri</Label>
-                <Input
-                  id="industryType"
+                <Label>Jenis Industri</Label>
+                <SimpleSelect
+                  options={industryOptions}
                   value={onboardingData.industryType || ""}
-                  onChange={(e) =>
+                  placeholder="Pilih jenis industri"
+                  searchPlaceholder="Cari industri..."
+                  onSelect={(value) =>
                     setOnboardingData({
                       ...onboardingData,
-                      industryType: e.target.value,
+                      industryType: value,
                     })
                   }
-                  placeholder="Contoh: Teknologi, Retail"
                 />
               </div>
 
               {/* Ukuran Perusahaan */}
               <div className="space-y-1">
-                <Label htmlFor="companySize">Ukuran Perusahaan</Label>
-                <Input
-                  id="companySize"
+                <Label>Ukuran Perusahaan</Label>
+                <SimpleSelect
+                  options={companySizeOptions}
                   value={onboardingData.companySize || ""}
-                  onChange={(e) =>
+                  placeholder="Pilih ukuran perusahaan"
+                  searchPlaceholder="Cari ukuran..."
+                  onSelect={(value) =>
                     setOnboardingData({
                       ...onboardingData,
-                      companySize: e.target.value,
+                      companySize: value,
                     })
                   }
-                  placeholder="Contoh: 1-10, 11-50, 50+"
                 />
               </div>
 
               {/* Posisi */}
               <div className="space-y-1">
-                <Label htmlFor="position">Posisi Anda</Label>
-                <Input
-                  id="position"
+                <Label>Posisi Anda</Label>
+                <SimpleSelect
+                  options={positionOptions}
                   value={onboardingData.position || ""}
-                  onChange={(e) =>
+                  placeholder="Pilih posisi Anda"
+                  searchPlaceholder="Cari posisi..."
+                  onSelect={(value) =>
                     setOnboardingData({
                       ...onboardingData,
-                      position: e.target.value,
+                      position: value,
                     })
                   }
-                  placeholder="Contoh: CEO, Manager"
                 />
               </div>
 
               {/* Sumber Referral */}
               <div className="space-y-1">
-                <Label htmlFor="referralSource">Tahu Refokus dari</Label>
-                <Input
-                  id="referralSource"
+                <Label>Tahu Refokus dari</Label>
+                <SimpleSelect
+                  options={referralOptions}
                   value={onboardingData.referralSource || ""}
-                  onChange={(e) =>
+                  placeholder="Pilih sumber referral"
+                  searchPlaceholder="Cari sumber..."
+                  onSelect={(value) =>
                     setOnboardingData({
                       ...onboardingData,
-                      referralSource: e.target.value,
+                      referralSource: value,
                     })
                   }
-                  placeholder="Contoh: Google, LinkedIn"
                 />
               </div>
             </div>
