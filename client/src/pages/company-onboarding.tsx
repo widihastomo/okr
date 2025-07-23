@@ -91,8 +91,8 @@ const ONBOARDING_STEPS = [
   },
   {
     id: 3,
-    title: "Konsep Hirarki",
-    description: "Memahami struktur Goal → Target → Inisiatif → Task",
+    title: "Memahami Struktur Untuk Merubah Strategi Jadi Aksi",
+    description: "Sebelum membuat goal, mari pahami bagaimana sistem ini bekerja secara hierarkis untuk membantu Anda mencapai tujuan bisnis.",
     icon: Star,
   },
   {
@@ -1656,24 +1656,13 @@ export default function CompanyOnboarding() {
       case 3: // Pengenalan Konsep Hirarki
         return (
           <div className="space-y-6">
-            <div className="text-center space-y-3">
-              <div className="mx-auto w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                <Lightbulb className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-800">
-                Memahami Struktur Goal Management
-              </h3>
-              <p className="text-gray-600 max-w-2xl mx-auto">
-                Sebelum membuat goal, mari pahami bagaimana sistem ini bekerja secara hierarkis untuk membantu Anda mencapai tujuan bisnis.
-              </p>
-            </div>
 
             {/* Strategy Mapping Visual with Zoom */}
             <div className="relative rounded-xl overflow-hidden shadow-2xl bg-gradient-to-br from-purple-600 to-indigo-800">
               <img 
                 src={strategyMappingImage} 
                 alt="Strategy Mapping - Hirarki OKR dari Goal ke Target ke Inisiatif ke Task"
-                className="w-full h-auto object-contain cursor-zoom-in transition-transform duration-300 hover:scale-110"
+                className="w-full h-auto md:h-auto sm:h-screen object-contain cursor-zoom-in transition-transform duration-300 hover:scale-110"
                 style={{
                   width: '100%',
                   minHeight: '400px'
