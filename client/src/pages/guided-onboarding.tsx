@@ -25,7 +25,8 @@ import {
   Zap,
   BarChart3,
   Search,
-  Briefcase
+  Briefcase,
+  MapPin
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -316,6 +317,8 @@ export default function GuidedOnboarding() {
   
   // Step 1: Mini Profiling
   const [profileData, setProfileData] = useState({
+    companyName: "",
+    companyAddress: "",
     industry: "",
     role: "",
     companySize: "",
@@ -509,7 +512,7 @@ export default function GuidedOnboarding() {
     }
   };
 
-  const isStep1Valid = profileData.industry && profileData.role && profileData.companySize && profileData.referralSource;
+  const isStep1Valid = profileData.companyName && profileData.companyAddress && profileData.industry && profileData.role && profileData.companySize && profileData.referralSource;
   const isStep2Valid = selectedAreas.length > 0;
   const isStep3Valid = selectedTemplate && customizedGoal.objective;
 
@@ -527,6 +530,36 @@ export default function GuidedOnboarding() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
+        {/* Company Name */}
+        <div className="space-y-2">
+          <Label htmlFor="companyName" className="flex items-center gap-2">
+            <Building2 className="h-4 w-4" />
+            Nama Perusahaan *
+          </Label>
+          <Input
+            id="companyName"
+            placeholder="Masukkan nama perusahaan..."
+            value={profileData.companyName}
+            onChange={(e) => setProfileData({...profileData, companyName: e.target.value})}
+            className="bg-gray-50 border-gray-300"
+          />
+        </div>
+
+        {/* Company Address */}
+        <div className="space-y-2">
+          <Label htmlFor="companyAddress" className="flex items-center gap-2">
+            <MapPin className="h-4 w-4" />
+            Alamat Perusahaan *
+          </Label>
+          <Input
+            id="companyAddress"
+            placeholder="Masukkan alamat lengkap perusahaan..."
+            value={profileData.companyAddress}
+            onChange={(e) => setProfileData({...profileData, companyAddress: e.target.value})}
+            className="bg-gray-50 border-gray-300"
+          />
+        </div>
+
         {/* Industry Type */}
         <div className="space-y-2">
           <Label htmlFor="industryType" className="flex items-center gap-2">
