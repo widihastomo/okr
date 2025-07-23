@@ -3962,6 +3962,110 @@ export default function CompanyOnboarding() {
                     className="shadow-lg transition-all duration-500 ease-in-out transform hover:shadow-xl animate-in fade-in slide-in-from-bottom-4"
                   >
                     <CardHeader className="transition-all duration-300">
+                      {/* 4-Step Process Visualization */}
+                      {(onboardingData.currentStep === 4 || onboardingData.currentStep === 5 || onboardingData.currentStep === 6 || onboardingData.currentStep === 7) && (
+                        <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+                          <div className="flex items-center justify-between relative">
+                            {/* Step 1: Buat Goal */}
+                            <div className="flex flex-col items-center flex-1">
+                              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-300 ${
+                                onboardingData.currentStep >= 4 ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600'
+                              }`}>
+                                1
+                              </div>
+                              <div className="mt-2 text-center">
+                                <p className={`text-xs font-medium ${
+                                  onboardingData.currentStep >= 4 ? 'text-green-700' : 'text-gray-500'
+                                }`}>
+                                  Buat Goal
+                                </p>
+                                <Target className={`w-4 h-4 mx-auto mt-1 ${
+                                  onboardingData.currentStep >= 4 ? 'text-green-600' : 'text-gray-400'
+                                }`} />
+                              </div>
+                            </div>
+
+                            {/* Arrow 1 */}
+                            <div className="flex-shrink-0 mx-1">
+                              <ArrowRight className={`w-4 h-4 ${
+                                onboardingData.currentStep >= 5 ? 'text-green-500' : 'text-gray-300'
+                              }`} />
+                            </div>
+
+                            {/* Step 2: Ukuran Keberhasilan */}
+                            <div className="flex flex-col items-center flex-1">
+                              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-300 ${
+                                onboardingData.currentStep >= 5 ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600'
+                              }`}>
+                                2
+                              </div>
+                              <div className="mt-2 text-center">
+                                <p className={`text-xs font-medium ${
+                                  onboardingData.currentStep >= 5 ? 'text-green-700' : 'text-gray-500'
+                                }`}>
+                                  Ukuran Keberhasilan
+                                </p>
+                                <TrendingUp className={`w-4 h-4 mx-auto mt-1 ${
+                                  onboardingData.currentStep >= 5 ? 'text-green-600' : 'text-gray-400'
+                                }`} />
+                              </div>
+                            </div>
+
+                            {/* Arrow 2 */}
+                            <div className="flex-shrink-0 mx-1">
+                              <ArrowRight className={`w-4 h-4 ${
+                                onboardingData.currentStep >= 6 ? 'text-green-500' : 'text-gray-300'
+                              }`} />
+                            </div>
+
+                            {/* Step 3: Pilih Inisiatif */}
+                            <div className="flex flex-col items-center flex-1">
+                              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-300 ${
+                                onboardingData.currentStep >= 6 ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600'
+                              }`}>
+                                3
+                              </div>
+                              <div className="mt-2 text-center">
+                                <p className={`text-xs font-medium ${
+                                  onboardingData.currentStep >= 6 ? 'text-green-700' : 'text-gray-500'
+                                }`}>
+                                  Pilih Inisiatif
+                                </p>
+                                <Lightbulb className={`w-4 h-4 mx-auto mt-1 ${
+                                  onboardingData.currentStep >= 6 ? 'text-green-600' : 'text-gray-400'
+                                }`} />
+                              </div>
+                            </div>
+
+                            {/* Arrow 3 */}
+                            <div className="flex-shrink-0 mx-1">
+                              <ArrowRight className={`w-4 h-4 ${
+                                onboardingData.currentStep >= 7 ? 'text-green-500' : 'text-gray-300'
+                              }`} />
+                            </div>
+
+                            {/* Step 4: Pilih Task */}
+                            <div className="flex flex-col items-center flex-1">
+                              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-300 ${
+                                onboardingData.currentStep >= 7 ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600'
+                              }`}>
+                                4
+                              </div>
+                              <div className="mt-2 text-center">
+                                <p className={`text-xs font-medium ${
+                                  onboardingData.currentStep >= 7 ? 'text-green-700' : 'text-gray-500'
+                                }`}>
+                                  Pilih Task
+                                </p>
+                                <ListTodo className={`w-4 h-4 mx-auto mt-1 ${
+                                  onboardingData.currentStep >= 7 ? 'text-green-600' : 'text-gray-400'
+                                }`} />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
                       <div className="flex items-center gap-3">
                         <div className="p-2 bg-orange-100 rounded-lg transition-all duration-300 hover:bg-orange-200 hover:scale-105">
                           <currentStepData.icon className="w-5 h-5 text-orange-600 transition-all duration-300" />
