@@ -74,46 +74,177 @@ const goalAreas = [
   }
 ];
 
+// Enhanced OKR Templates dengan variations berdasarkan company profile
 const okrTemplates = {
   revenue: {
-    objective: "Meningkatkan Pendapatan Perusahaan 30%",
-    keyResults: [
-      "Mencapai target penjualan Rp 500 juta per bulan",
-      "Meningkatkan jumlah customer aktif menjadi 1000 orang",
-      "Meningkatkan rata-rata nilai transaksi menjadi Rp 500rb"
-    ]
+    startup: {
+      objective: "Mencapai Product-Market Fit dan Pertumbuhan Revenue",
+      keyResults: [
+        "Mencapai MRR (Monthly Recurring Revenue) Rp 50 juta",
+        "Mendapatkan 500 paying customers dengan churn rate < 5%",
+        "Mencapai Net Revenue Retention rate 110%"
+      ]
+    },
+    small: {
+      objective: "Meningkatkan Pendapatan Bisnis 40%",
+      keyResults: [
+        "Mencapai target penjualan Rp 200 juta per bulan",
+        "Meningkatkan jumlah customer aktif menjadi 500 orang",
+        "Meningkatkan rata-rata nilai transaksi menjadi Rp 400rb"
+      ]
+    },
+    medium: {
+      objective: "Ekspansi Revenue dan Market Share",
+      keyResults: [
+        "Mencapai target penjualan Rp 1 miliar per bulan",
+        "Meningkatkan market share menjadi 15% di kategori",
+        "Meluncurkan 2 revenue stream baru"
+      ]
+    },
+    large: {
+      objective: "Optimasi Revenue dan Margin",
+      keyResults: [
+        "Mencapai target revenue Rp 10 miliar per kuartal",
+        "Meningkatkan gross margin menjadi 45%",
+        "Mengakuisisi 2 perusahaan strategic"
+      ]
+    }
   },
   operations: {
-    objective: "Mengoptimalkan Efisiensi Operasional",
-    keyResults: [
-      "Mengurangi waktu proses order menjadi maksimal 2 hari",
-      "Mencapai tingkat kepuasan customer 95%",
-      "Menurunkan biaya operasional sebesar 20%"
-    ]
+    startup: {
+      objective: "Membangun Fondasi Operasional yang Scalable",
+      keyResults: [
+        "Implementasi SOP untuk 5 proses core business",
+        "Mencapai customer satisfaction score 4.2/5",
+        "Mengurangi manual process sebesar 60%"
+      ]
+    },
+    small: {
+      objective: "Mengoptimalkan Efisiensi Operasional",
+      keyResults: [
+        "Mengurangi waktu proses order menjadi maksimal 2 hari",
+        "Mencapai tingkat kepuasan customer 95%",
+        "Menurunkan biaya operasional sebesar 20%"
+      ]
+    },
+    medium: {
+      objective: "Standardisasi dan Otomasi Operasi",
+      keyResults: [
+        "Mengotomasi 80% proses repetitive",
+        "Mencapai operational efficiency ratio 75%",
+        "Implementasi quality management system ISO"
+      ]
+    },
+    large: {
+      objective: "Excellence in Operational Performance",
+      keyResults: [
+        "Mencapai Six Sigma level dalam quality control",
+        "Mengurangi operational cost per unit sebesar 15%",
+        "Implementasi AI-driven predictive maintenance"
+      ]
+    }
   },
   team: {
-    objective: "Membangun Tim yang Solid dan Produktif",
-    keyResults: [
-      "Menyelesaikan program pelatihan untuk 100% tim",
-      "Mencapai employee satisfaction score 4.5/5",
-      "Menurunkan tingkat turnover menjadi di bawah 10%"
-    ]
+    startup: {
+      objective: "Membangun Tim Inti yang Solid",
+      keyResults: [
+        "Rekrut 5 key talents untuk posisi critical",
+        "Mencapai employee engagement score 4.0/5",
+        "Membuat program onboarding 2 minggu"
+      ]
+    },
+    small: {
+      objective: "Mengembangkan Kapasitas dan Budaya Tim",
+      keyResults: [
+        "Menyelesaikan program pelatihan untuk 100% tim",
+        "Mencapai employee satisfaction score 4.3/5",
+        "Menurunkan tingkat turnover menjadi di bawah 15%"
+      ]
+    },
+    medium: {
+      objective: "Skalakan Organisasi dan Leadership",
+      keyResults: [
+        "Mengembangkan 10 future leaders melalui program mentoring",
+        "Mencapai employee Net Promoter Score 70+",
+        "Implementasi performance management system"
+      ]
+    },
+    large: {
+      objective: "Transform to High-Performance Organization",
+      keyResults: [
+        "Mencapai Top Employer certification",
+        "Mengimplementasi succession planning untuk 100% key positions",
+        "Mencapai productivity growth 20% year-over-year"
+      ]
+    }
   },
   growth: {
-    objective: "Memperluas Jangkauan Pasar",
-    keyResults: [
-      "Meluncurkan 2 produk/layanan baru",
-      "Membuka 3 channel penjualan baru",
-      "Mencapai 50% customer dari luar kota asal"
-    ]
+    startup: {
+      objective: "Validasi dan Ekspansi Product-Market Fit",
+      keyResults: [
+        "Meluncurkan MVP di 2 market segment baru",
+        "Mencapai 1000 active users dengan retention rate 40%",
+        "Mendapatkan funding Series A min Rp 10 miliar"
+      ]
+    },
+    small: {
+      objective: "Memperluas Jangkauan Pasar dan Produk",
+      keyResults: [
+        "Meluncurkan 2 produk/layanan baru",
+        "Membuka 3 channel penjualan baru",
+        "Mencapai 40% customer dari luar kota asal"
+      ]
+    },
+    medium: {
+      objective: "Diversifikasi dan Market Leadership",
+      keyResults: [
+        "Ekspansi ke 3 kota besar baru",
+        "Meluncurkan business line baru dengan target revenue Rp 500jt",
+        "Mencapai market leadership di 1 kategori produk"
+      ]
+    },
+    large: {
+      objective: "Strategic Growth dan Market Dominance",
+      keyResults: [
+        "Ekspansi internasional ke 2 negara ASEAN",
+        "Mengakuisisi 3 perusahaan strategic senilai Rp 100 miliar",
+        "Mencapai kategori unicorn dengan valuasi $1 miliar"
+      ]
+    }
   },
   performance: {
-    objective: "Membangun Sistem Monitoring Kinerja",
-    keyResults: [
-      "Implementasi dashboard real-time untuk semua KPI",
-      "Mencapai 90% akurasi dalam forecasting",
-      "Mengurangi waktu reporting mingguan menjadi 2 jam"
-    ]
+    startup: {
+      objective: "Setup Measurement dan Analytics Foundation",
+      keyResults: [
+        "Implementasi analytics tracking untuk 10 key metrics",
+        "Membuat weekly dashboard untuk founders",
+        "Mencapai data-driven decision making 80%"
+      ]
+    },
+    small: {
+      objective: "Membangun Sistem Monitoring Kinerja",
+      keyResults: [
+        "Implementasi dashboard real-time untuk semua KPI",
+        "Mencapai 85% akurasi dalam forecasting",
+        "Mengurangi waktu reporting mingguan menjadi 3 jam"
+      ]
+    },
+    medium: {
+      objective: "Advanced Analytics dan Intelligence",
+      keyResults: [
+        "Implementasi predictive analytics untuk 5 business areas",
+        "Mencapai 95% akurasi dalam quarterly forecasting",
+        "Membuat automated reporting system"
+      ]
+    },
+    large: {
+      objective: "AI-Powered Business Intelligence",
+      keyResults: [
+        "Implementasi AI/ML untuk business optimization",
+        "Mencapai real-time decision making capability",
+        "Membuat competitive intelligence system"
+      ]
+    }
   }
 };
 
@@ -141,6 +272,119 @@ export default function GuidedOnboarding() {
     objective: "",
     keyResults: ["", "", ""]
   });
+
+  // Enhanced Recommendation Logic
+  const getCompanySizeCategory = (companySize: string): string => {
+    if (companySize === "1-5" || companySize === "6-10") return "startup";
+    if (companySize === "11-25" || companySize === "26-50") return "small";
+    if (companySize === "51-100" || companySize === "101-250") return "medium";
+    return "large";
+  };
+
+  const getIntelligentRecommendation = () => {
+    if (selectedAreas.length === 0 || !profileData.companySize) {
+      return null;
+    }
+
+    const companySizeCategory = getCompanySizeCategory(profileData.companySize);
+    const primaryArea = selectedAreas[0];
+    
+    // Get base template from primary area
+    const baseTemplate = (okrTemplates as any)[primaryArea]?.[companySizeCategory];
+    if (!baseTemplate) return null;
+
+    // Enhance recommendations based on additional selected areas
+    if (selectedAreas.length > 1) {
+      const enhancedKeyResults = [...baseTemplate.keyResults];
+      
+      // Add complementary key results from other selected areas
+      selectedAreas.slice(1).forEach((area) => {
+        const additionalTemplate = (okrTemplates as any)[area]?.[companySizeCategory];
+        if (additionalTemplate && additionalTemplate.keyResults[0]) {
+          // Take the first key result from additional areas as complementary
+          enhancedKeyResults.push(additionalTemplate.keyResults[0]);
+        }
+      });
+
+      // Combine areas in objective title for multi-focus goals
+      const areaNames = selectedAreas.map(areaId => {
+        const area = goalAreas.find(a => a.id === areaId);
+        return area?.title || areaId;
+      });
+      
+      const combinedObjective = selectedAreas.length === 2 
+        ? `${baseTemplate.objective} dengan Fokus ${areaNames[1]}`
+        : `Transformasi Holistik: ${areaNames.join(" + ")}`;
+
+      return {
+        objective: combinedObjective,
+        keyResults: enhancedKeyResults.slice(0, 4), // Limit to 4 key results max
+        areas: selectedAreas,
+        companySize: companySizeCategory
+      };
+    }
+
+    return {
+      ...baseTemplate,
+      areas: [primaryArea],
+      companySize: companySizeCategory
+    };
+  };
+
+  const getRecommendationInsights = () => {
+    const recommendation = getIntelligentRecommendation();
+    if (!recommendation) return "";
+
+    const companySizeCategory = getCompanySizeCategory(profileData.companySize);
+    const insights = [];
+
+    // Company size insights
+    if (companySizeCategory === "startup") {
+      insights.push("💡 Sebagai startup, fokus pada validasi dan foundation building");
+    } else if (companySizeCategory === "small") {
+      insights.push("💡 Fase growth: saatnya optimasi dan skalabilitas");
+    } else if (companySizeCategory === "medium") {
+      insights.push("💡 Prioritas: standardisasi dan leadership development");
+    } else {
+      insights.push("💡 Fokus enterprise: innovation dan market dominance");
+    }
+
+    // Multi-area insights
+    if (selectedAreas.length > 1) {
+      insights.push(`🎯 Kombinasi ${selectedAreas.length} area fokus akan menciptakan sinergi optimal`);
+    }
+
+    // Industry-specific insights
+    if (profileData.industry) {
+      insights.push(`🏭 Template disesuaikan dengan karakteristik industri ${profileData.industry}`);
+    }
+
+    return insights.join("\n");
+  };
+
+  const getAlternativeRecommendations = () => {
+    if (selectedAreas.length === 0 || !profileData.companySize) {
+      return [];
+    }
+
+    const companySizeCategory = getCompanySizeCategory(profileData.companySize);
+    const alternatives = [];
+
+    // Generate alternative recommendations for each selected area
+    selectedAreas.forEach((areaId) => {
+      const template = (okrTemplates as any)[areaId]?.[companySizeCategory];
+      if (template) {
+        const area = goalAreas.find(a => a.id === areaId);
+        alternatives.push({
+          areaId,
+          areaTitle: area?.title || areaId,
+          ...template
+        });
+      }
+    });
+
+    return alternatives;
+  };
   
   const totalSteps = 4;
   const progress = (currentStep / totalSteps) * 100;
@@ -367,13 +611,14 @@ export default function GuidedOnboarding() {
   );
 
   const renderStep3 = () => {
-    const primaryArea = selectedAreas[0];
-    const template = primaryArea ? okrTemplates[primaryArea as keyof typeof okrTemplates] : null;
+    const intelligentRecommendation = getIntelligentRecommendation();
+    const insights = getRecommendationInsights();
     
-    if (template && !customizedGoal.objective) {
+    // Auto-populate with intelligent recommendation if not already set
+    if (intelligentRecommendation && !customizedGoal.objective) {
       setCustomizedGoal({
-        objective: template.objective,
-        keyResults: [...template.keyResults]
+        objective: intelligentRecommendation.objective,
+        keyResults: [...intelligentRecommendation.keyResults]
       });
     }
 
@@ -391,17 +636,80 @@ export default function GuidedOnboarding() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          {template && (
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <h4 className="font-medium text-blue-800 mb-2">Template Rekomendasi:</h4>
-              <div className="space-y-2">
-                <p className="font-medium">{template.objective}</p>
-                <ul className="text-sm text-blue-700 space-y-1">
-                  {template.keyResults.map((kr, index) => (
-                    <li key={index}>• {kr}</li>
-                  ))}
-                </ul>
+          {/* Intelligent Recommendation Display */}
+          {intelligentRecommendation && (
+            <div className="space-y-4">
+              {/* Main Recommendation */}
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-200">
+                <div className="flex items-center space-x-2 mb-2">
+                  <Wand2 className="h-5 w-5 text-blue-600" />
+                  <h4 className="font-medium text-blue-800">Rekomendasi Cerdas untuk Anda:</h4>
+                </div>
+                <div className="space-y-2">
+                  <p className="font-medium text-blue-900">{intelligentRecommendation.objective}</p>
+                  <ul className="text-sm text-blue-700 space-y-1">
+                    {intelligentRecommendation.keyResults.map((kr, index) => (
+                      <li key={index} className="flex items-start space-x-2">
+                        <span className="text-blue-500 mt-1">•</span>
+                        <span>{kr}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
+
+              {/* Insights and Context */}
+              {insights && (
+                <div className="bg-orange-50 p-4 rounded-lg border border-orange-200">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <Target className="h-5 w-5 text-orange-600" />
+                    <h4 className="font-medium text-orange-800">Mengapa Rekomendasi Ini Cocok?</h4>
+                  </div>
+                  <div className="text-sm text-orange-700 whitespace-pre-line">
+                    {insights}
+                  </div>
+                </div>
+              )}
+
+              {/* Alternative Templates */}
+              {selectedAreas.length > 1 && (
+                <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                  <div className="flex items-center space-x-2 mb-3">
+                    <Eye className="h-5 w-5 text-gray-600" />
+                    <h4 className="font-medium text-gray-800">Template Alternatif per Area:</h4>
+                  </div>
+                  <div className="space-y-3">
+                    {getAlternativeRecommendations().map((alt, index) => (
+                      <div key={alt.areaId} className="bg-white p-3 rounded border border-gray-200">
+                        <div className="flex items-center justify-between mb-2">
+                          <h5 className="font-medium text-gray-800">{alt.areaTitle}</h5>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              setCustomizedGoal({
+                                objective: alt.objective,
+                                keyResults: [...alt.keyResults]
+                              });
+                            }}
+                          >
+                            Gunakan Template
+                          </Button>
+                        </div>
+                        <p className="text-sm font-medium text-gray-700 mb-1">{alt.objective}</p>
+                        <ul className="text-xs text-gray-600 space-y-1">
+                          {alt.keyResults.slice(0, 2).map((kr, krIndex) => (
+                            <li key={krIndex}>• {kr}</li>
+                          ))}
+                          {alt.keyResults.length > 2 && (
+                            <li className="text-gray-500">... +{alt.keyResults.length - 2} lainnya</li>
+                          )}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
