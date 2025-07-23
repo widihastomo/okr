@@ -88,38 +88,44 @@ const ONBOARDING_STEPS = [
   },
   {
     id: 3,
+    title: "Konsep Hirarki",
+    description: "Memahami struktur Goal → Target → Inisiatif → Task",
+    icon: Star,
+  },
+  {
+    id: 4,
     title: "Buat Goal",
     description:
       "Pilih satu tujuan yang paling penting dan bermakna. Anda dapat merubahnya setelah onboarding selesai",
     icon: Lightbulb,
   },
   {
-    id: 4,
+    id: 5,
     title: "Angka Target",
     description: "Bagaimana Anda tahu bahwa tujuan tadi benar-benar tercapai?",
     icon: TrendingUp,
   },
   {
-    id: 5,
+    id: 6,
     title: "Pilih Inisiatif Prioritas",
     description:
       "Tentukan langkah-langkah strategis untuk mencapai angka target",
     icon: CheckCircle,
   },
   {
-    id: 6,
+    id: 7,
     title: "Tugas untuk Inisiatif",
     description: "Tentukan tugas-tugas yang harus dikerjakan",
     icon: BarChart,
   },
   {
-    id: 7,
+    id: 8,
     title: "Pilih Ritme",
     description: "Seberapa sering Anda ingin update progress?",
     icon: Clock,
   },
   {
-    id: 8,
+    id: 9,
     title: "Ringkasan",
     description:
       "Lihat ringkasan dari goal dan strategi eksekusi yang sudah anda buat",
@@ -1020,6 +1026,9 @@ export default function CompanyOnboarding() {
         }
         break;
       case 3:
+        // Step 3 is now "Konsep Hirarki" - no validation needed as it's explanatory
+        break;
+      case 4:
         if (!data.objective?.trim()) {
           return {
             isValid: false,
@@ -1027,7 +1036,7 @@ export default function CompanyOnboarding() {
           };
         }
         break;
-      case 4:
+      case 5:
         if (data.keyResults.length === 0) {
           return {
             isValid: false,
@@ -1035,7 +1044,7 @@ export default function CompanyOnboarding() {
           };
         }
         break;
-      case 5:
+      case 6:
         if (data.initiatives.length === 0) {
           return {
             isValid: false,
@@ -1043,7 +1052,7 @@ export default function CompanyOnboarding() {
           };
         }
         break;
-      case 6:
+      case 7:
         if (data.tasks.length === 0) {
           return {
             isValid: false,
@@ -1051,7 +1060,7 @@ export default function CompanyOnboarding() {
           };
         }
         break;
-      case 7:
+      case 8:
         if (!data.cadence) {
           return { isValid: false, message: "Silakan pilih ritme check-in" };
         }
@@ -1641,7 +1650,155 @@ export default function CompanyOnboarding() {
           </div>
         );
 
-      case 3: // Buat Objective
+      case 3: // Pengenalan Konsep Hirarki
+        return (
+          <div className="space-y-6">
+            <div className="text-center space-y-3">
+              <div className="mx-auto w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                <Lightbulb className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-800">
+                Memahami Struktur Goal Management
+              </h3>
+              <p className="text-gray-600 max-w-2xl mx-auto">
+                Sebelum membuat goal, mari pahami bagaimana sistem ini bekerja secara hierarkis untuk membantu Anda mencapai tujuan bisnis.
+              </p>
+            </div>
+
+            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
+              <div className="space-y-6">
+                {/* Level 1: Goal */}
+                <div className="flex items-start space-x-4 p-4 bg-white rounded-lg border border-blue-300 shadow-sm">
+                  <div className="flex-shrink-0">
+                    <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center">
+                      <Target className="w-5 h-5 text-white" />
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-gray-800 mb-2">1. Goal (Tujuan Utama)</h4>
+                    <p className="text-sm text-gray-600 mb-2">
+                      Visi besar yang ingin dicapai dalam periode tertentu
+                    </p>
+                    <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+                      <p className="text-sm text-orange-800 font-medium">
+                        Contoh: "Tingkatkan Pendapatan" → "Mencapai pertumbuhan penjualan 50% dalam 6 bulan"
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Connector */}
+                <div className="flex justify-center">
+                  <ArrowDown className="w-6 h-6 text-blue-500" />
+                </div>
+
+                {/* Level 2: Key Results */}
+                <div className="flex items-start space-x-4 p-4 bg-white rounded-lg border border-blue-300 shadow-sm">
+                  <div className="flex-shrink-0">
+                    <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
+                      <TrendingUp className="w-5 h-5 text-white" />
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-gray-800 mb-2">2. Angka Target (Key Results)</h4>
+                    <p className="text-sm text-gray-600 mb-2">
+                      Metrik kuantitatif yang dapat diukur untuk mencapai goal
+                    </p>
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                      <p className="text-sm text-blue-800 font-medium">
+                        Contoh: "Mencapai penjualan Rp 500 juta/bulan" • "Dapatkan 100 pelanggan baru"
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Connector */}
+                <div className="flex justify-center">
+                  <ArrowDown className="w-6 h-6 text-blue-500" />
+                </div>
+
+                {/* Level 3: Initiatives */}
+                <div className="flex items-start space-x-4 p-4 bg-white rounded-lg border border-blue-300 shadow-sm">
+                  <div className="flex-shrink-0">
+                    <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-teal-500 rounded-full flex items-center justify-center">
+                      <Lightbulb className="w-5 h-5 text-white" />
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-gray-800 mb-2">3. Inisiatif (Strategi)</h4>
+                    <p className="text-sm text-gray-600 mb-2">
+                      Proyek atau program strategis untuk mencapai angka target
+                    </p>
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                      <p className="text-sm text-green-800 font-medium">
+                        Contoh: "Kampanye digital marketing" • "Program loyalitas pelanggan"
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Connector */}
+                <div className="flex justify-center">
+                  <ArrowDown className="w-6 h-6 text-blue-500" />
+                </div>
+
+                {/* Level 4: Tasks */}
+                <div className="flex items-start space-x-4 p-4 bg-white rounded-lg border border-blue-300 shadow-sm">
+                  <div className="flex-shrink-0">
+                    <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+                      <CheckSquare className="w-5 h-5 text-white" />
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-gray-800 mb-2">4. Task (Langkah Konkret)</h4>
+                    <p className="text-sm text-gray-600 mb-2">
+                      Tindakan spesifik yang dapat dikerjakan sehari-hari
+                    </p>
+                    <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
+                      <p className="text-sm text-purple-800 font-medium">
+                        Contoh: "Buat konten Instagram" • "Telepon 10 prospek" • "Analisis kompetitor"
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Summary Box */}
+            <div className="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-lg p-6 border border-indigo-200">
+              <div className="flex items-start space-x-3">
+                <Star className="w-6 h-6 text-indigo-600 flex-shrink-0 mt-1" />
+                <div>
+                  <h4 className="font-semibold text-indigo-800 mb-2">Mengapa Hierarki Ini Penting?</h4>
+                  <ul className="text-sm text-indigo-700 space-y-1">
+                    <li>• <strong>Fokus Terarah:</strong> Dari visi besar ke tindakan harian yang jelas</li>
+                    <li>• <strong>Terukur:</strong> Setiap level memiliki metrik yang dapat dipantau</li>
+                    <li>• <strong>Terstruktur:</strong> Memudahkan pelacakan progress dan evaluasi</li>
+                    <li>• <strong>Actionable:</strong> Setiap orang tahu apa yang harus dikerjakan</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div className="text-center">
+              <p className="text-sm text-gray-600">
+                Selanjutnya, kita akan membuat goal berdasarkan fokus bisnis yang sudah Anda pilih: 
+                <span className="font-medium text-orange-600"> {onboardingData.teamFocus === "penjualan"
+                  ? "Tingkatkan Pendapatan"
+                  : onboardingData.teamFocus === "operasional"
+                    ? "Rapikan Operasional"
+                    : onboardingData.teamFocus === "customer_service"
+                      ? "Kembangkan Tim"
+                      : onboardingData.teamFocus === "marketing"
+                        ? "Ekspansi Bisnis"
+                        : ""}
+                </span>
+              </p>
+            </div>
+          </div>
+        );
+
+      case 4: // Buat Objective
         const getObjectiveOptions = (teamFocus: string) => {
           const options: Record<string, string[]> = {
             penjualan: [
@@ -1721,7 +1878,7 @@ export default function CompanyOnboarding() {
           </div>
         );
 
-      case 4: // Ukuran Keberhasilan
+      case 5: // Ukuran Keberhasilan
         const getKeyResultOptions = (objective: string | undefined) => {
           if (!objective) return [];
           // Key Results untuk objective penjualan
@@ -1885,7 +2042,7 @@ export default function CompanyOnboarding() {
           </div>
         );
 
-      case 7: // Pilih Cadence
+      case 8: // Pilih Cadence
         return (
           <div className="space-y-6">
             <div className="space-y-2">
@@ -2282,7 +2439,7 @@ export default function CompanyOnboarding() {
           </div>
         );
 
-      case 5: // Pilih Inisiatif Prioritas
+      case 6: // Pilih Inisiatif Prioritas
         const initiativeMapping = {
           // Penjualan - Omzet
           "Mencapai target penjualan Rp 500 juta per bulan": [
@@ -3269,7 +3426,7 @@ export default function CompanyOnboarding() {
           </div>
         );
 
-      case 8: // Dashboard Ringkas
+      case 9: // Dashboard Ringkas
         return (
           <div className="space-y-4">
             <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
@@ -3675,31 +3832,34 @@ export default function CompanyOnboarding() {
       // Step 2: Business Focus Selection - Explain what this step is about  
       2: `Halaman ini untuk memilih fokus utama bisnis ${companyName}. Ada 5 area bisnis yang bisa dipilih: Marketing, Sales, Operasional, Customer Service, dan Pengembangan Produk. Setiap area memiliki template goal yang berbeda dan sesuai dengan kebutuhan bisnis. Pilih satu area yang paling berdampak dan mendesak untuk ditingkatkan.`,
       
-      // Step 3: Objective Creation - Explain what this step is about
-      3: selectedFocus 
+      // Step 3: Hierarchy Concept - Explain the goal hierarchy structure
+      3: `Halaman ini menjelaskan konsep hirarki dalam sistem OKR untuk ${companyName}. Struktur hirarki terdiri dari: Goal (tujuan utama) → Target (Key Results/angka yang terukur) → Inisiatif (langkah strategis) → Task (tugas konkret). Memahami hirarki ini penting agar eksekusi lebih terarah dan terstruktur.`,
+      
+      // Step 4: Objective Creation - Explain what this step is about
+      4: selectedFocus 
         ? `Halaman ini untuk membuat tujuan utama berdasarkan fokus ${selectedFocus} yang sudah dipilih. Anda akan merumuskan goal yang spesifik dan terukur untuk ${companyName}. Goal ini akan menjadi arah utama yang ingin dicapai dalam periode tertentu. Sistem akan memberikan rekomendasi goal yang sesuai dengan profil perusahaan.`
         : "Halaman ini untuk membuat tujuan utama berdasarkan fokus bisnis yang sudah dipilih. Anda akan merumuskan goal yang spesifik dan terukur untuk perusahaan. Goal ini akan menjadi arah utama yang ingin dicapai dalam periode tertentu.",
       
-      // Step 4: Key Results Definition - Explain what this step is about
-      4: selectedObjective
+      // Step 5: Key Results Definition - Explain what this step is about
+      5: selectedObjective
         ? `Halaman ini untuk menentukan Key Results dari tujuan "${selectedObjective}". Key Results adalah metrik konkret yang mengukur keberhasilan goal Anda. Setiap Key Result memiliki angka target yang spesifik dan terukur untuk ${companyName}. Sistem memberikan rekomendasi target berdasarkan fokus bisnis yang dipilih.`
         : "Halaman ini untuk menentukan Key Results dari tujuan yang sudah dibuat. Key Results adalah metrik konkret yang mengukur keberhasilan goal Anda. Setiap Key Result memiliki angka target yang spesifik dan terukur.",
       
-      // Step 5: Initiatives Selection - Explain what this step is about
-      5: selectedObjective
+      // Step 6: Initiatives Selection - Explain what this step is about
+      6: selectedObjective
         ? `Halaman ini untuk memilih inisiatif strategis yang akan membantu mencapai "${selectedObjective}". Inisiatif adalah langkah-langkah besar atau proyek yang akan dilakukan untuk mencapai target ${selectedFocus} di ${companyName}. Anda bisa memilih beberapa inisiatif yang paling efektif dari rekomendasi sistem.`
         : "Halaman ini untuk memilih inisiatif strategis yang akan membantu mencapai tujuan yang sudah ditetapkan. Inisiatif adalah langkah-langkah besar atau proyek yang akan dilakukan untuk mencapai target bisnis. Anda bisa memilih beberapa inisiatif yang paling efektif.",
       
-      // Step 6: Tasks Breakdown - Explain what this step is about
-      6: hasInitiatives
+      // Step 7: Tasks Breakdown - Explain what this step is about
+      7: hasInitiatives
         ? `Halaman ini untuk membuat tugas-tugas konkret dari inisiatif yang sudah dipilih. Setiap inisiatif akan dipecah menjadi action items yang dapat dikerjakan tim ${companyName}. Tugas-tugas ini akan memiliki deadline dan person in charge yang jelas.`
         : "Halaman ini untuk membuat tugas-tugas konkret dari inisiatif yang sudah dipilih. Setiap inisiatif akan dipecah menjadi action items yang dapat dikerjakan tim. Tugas-tugas ini akan memiliki deadline dan person in charge yang jelas.",
       
-      // Step 7: Progress Cadence - Explain what this step is about
-      7: `Halaman ini untuk mengatur ritme check-in progress untuk ${companyName}. Anda akan menentukan seberapa sering tim melaporkan kemajuan (harian, mingguan, bulanan) dan waktu reminder otomatis. Setting ini penting untuk menjaga momentum dan accountability tim.`,
+      // Step 8: Progress Cadence - Explain what this step is about
+      8: `Halaman ini untuk mengatur ritme check-in progress untuk ${companyName}. Anda akan menentukan seberapa sering tim melaporkan kemajuan (harian, mingguan, bulanan) dan waktu reminder otomatis. Setting ini penting untuk menjaga momentum dan accountability tim.`,
       
-      // Step 8: Summary Review - Explain what this step is about
-      8: `Halaman ini menampilkan ringkasan lengkap setup OKR yang sudah dibuat untuk ${companyName}. Anda bisa melihat semua goal, key results, inisiatif, tugas, dan setting reminder yang telah dikonfigurasi. Ini adalah review terakhir sebelum sistem mulai berjalan dan klik "Mulai Tur" untuk melihat dashboard.`,
+      // Step 9: Summary Review - Explain what this step is about
+      9: `Halaman ini menampilkan ringkasan lengkap setup OKR yang sudah dibuat untuk ${companyName}. Anda bisa melihat semua goal, key results, inisiatif, tugas, dan setting reminder yang telah dikonfigurasi. Ini adalah review terakhir sebelum sistem mulai berjalan dan klik "Mulai Tur" untuk melihat dashboard.`,
     };
 
     return (
