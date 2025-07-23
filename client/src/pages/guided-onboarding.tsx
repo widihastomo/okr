@@ -467,74 +467,105 @@ export default function GuidedOnboarding() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div>
-          <Label>Industri/Bidang Usaha *</Label>
+        {/* Industry Selection */}
+        <div className="space-y-2">
+          <Label htmlFor="industry" className="flex items-center gap-2">
+            <Building2 className="h-4 w-4" />
+            Industri/Bidang Usaha *
+          </Label>
           <RadioGroup 
             value={profileData.industry} 
             onValueChange={(value) => setProfileData({...profileData, industry: value})}
-            className="grid grid-cols-2 gap-2 mt-2"
+            className="grid grid-cols-2 gap-3 mt-3"
           >
             {industryOptions.map((industry) => (
-              <div key={industry} className="flex items-center space-x-2">
+              <div key={industry} className="flex items-center space-x-2 p-2 rounded border border-gray-200 hover:bg-gray-50">
                 <RadioGroupItem value={industry} id={industry} />
-                <Label htmlFor={industry} className="text-sm">{industry}</Label>
+                <Label htmlFor={industry} className="text-sm font-medium cursor-pointer">{industry}</Label>
               </div>
             ))}
           </RadioGroup>
         </div>
 
-        <div>
-          <Label>Peran/Posisi Anda *</Label>
+        {/* Role Selection */}
+        <div className="space-y-2">
+          <Label htmlFor="role" className="flex items-center gap-2">
+            <Users className="h-4 w-4" />
+            Peran/Posisi Anda *
+          </Label>
           <RadioGroup 
             value={profileData.role} 
             onValueChange={(value) => setProfileData({...profileData, role: value})}
-            className="grid grid-cols-2 gap-2 mt-2"
+            className="grid grid-cols-2 gap-3 mt-3"
           >
             {roleOptions.map((role) => (
-              <div key={role} className="flex items-center space-x-2">
+              <div key={role} className="flex items-center space-x-2 p-2 rounded border border-gray-200 hover:bg-gray-50">
                 <RadioGroupItem value={role} id={role} />
-                <Label htmlFor={role} className="text-sm">{role}</Label>
+                <Label htmlFor={role} className="text-sm font-medium cursor-pointer">{role}</Label>
               </div>
             ))}
           </RadioGroup>
         </div>
 
-        <div>
-          <Label>Ukuran Tim/Perusahaan *</Label>
+        {/* Company Size Selection */}
+        <div className="space-y-2">
+          <Label htmlFor="companySize" className="flex items-center gap-2">
+            <Settings className="h-4 w-4" />
+            Ukuran Tim/Perusahaan *
+          </Label>
           <RadioGroup 
             value={profileData.companySize} 
             onValueChange={(value) => setProfileData({...profileData, companySize: value})}
-            className="mt-2"
+            className="space-y-3 mt-3"
           >
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="solo" id="solo" />
-              <Label htmlFor="solo">Solo (hanya saya)</Label>
+            <div className="flex items-center space-x-2 p-2 rounded border border-gray-200 hover:bg-gray-50">
+              <RadioGroupItem value="1-5" id="1-5" />
+              <Label htmlFor="1-5" className="font-medium cursor-pointer">1-5 karyawan (Solo/Tim Kecil)</Label>
             </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="small" id="small" />
-              <Label htmlFor="small">Tim kecil (2-10 orang)</Label>
+            <div className="flex items-center space-x-2 p-2 rounded border border-gray-200 hover:bg-gray-50">
+              <RadioGroupItem value="6-10" id="6-10" />
+              <Label htmlFor="6-10" className="font-medium cursor-pointer">6-10 karyawan (Startup)</Label>
             </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="medium" id="medium" />
-              <Label htmlFor="medium">Tim menengah (11-50 orang)</Label>
+            <div className="flex items-center space-x-2 p-2 rounded border border-gray-200 hover:bg-gray-50">
+              <RadioGroupItem value="11-25" id="11-25" />
+              <Label htmlFor="11-25" className="font-medium cursor-pointer">11-25 karyawan (Tim Menengah)</Label>
             </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="large" id="large" />
-              <Label htmlFor="large">Perusahaan besar (50+ orang)</Label>
+            <div className="flex items-center space-x-2 p-2 rounded border border-gray-200 hover:bg-gray-50">
+              <RadioGroupItem value="26-50" id="26-50" />
+              <Label htmlFor="26-50" className="font-medium cursor-pointer">26-50 karyawan (Small Business)</Label>
+            </div>
+            <div className="flex items-center space-x-2 p-2 rounded border border-gray-200 hover:bg-gray-50">
+              <RadioGroupItem value="51-100" id="51-100" />
+              <Label htmlFor="51-100" className="font-medium cursor-pointer">51-100 karyawan (Medium Business)</Label>
+            </div>
+            <div className="flex items-center space-x-2 p-2 rounded border border-gray-200 hover:bg-gray-50">
+              <RadioGroupItem value="101-250" id="101-250" />
+              <Label htmlFor="101-250" className="font-medium cursor-pointer">101-250 karyawan (Large Business)</Label>
+            </div>
+            <div className="flex items-center space-x-2 p-2 rounded border border-gray-200 hover:bg-gray-50">
+              <RadioGroupItem value="250+" id="250+" />
+              <Label htmlFor="250+" className="font-medium cursor-pointer">250+ karyawan (Enterprise)</Label>
             </div>
           </RadioGroup>
         </div>
 
-        <div>
-          <Label htmlFor="mainGoal">Apa tujuan utama Anda dalam 6 bulan ke depan?</Label>
+        {/* Main Goal */}
+        <div className="space-y-2">
+          <Label htmlFor="mainGoal" className="flex items-center gap-2">
+            <Target className="h-4 w-4" />
+            Apa tujuan utama Anda dalam 6 bulan ke depan?
+          </Label>
           <Textarea
             id="mainGoal"
             value={profileData.mainGoal}
             onChange={(e) => setProfileData({...profileData, mainGoal: e.target.value})}
             placeholder="Misalnya: Meningkatkan penjualan 50%, mengoptimalkan operasional, membangun tim yang solid..."
-            className="mt-2"
+            className="mt-2 bg-gray-50 border-gray-300"
             rows={3}
           />
+          <p className="text-sm text-gray-500">
+            Tips: Deskripsikan tujuan spesifik yang ingin dicapai untuk membantu kami memberikan rekomendasi yang tepat
+          </p>
         </div>
       </CardContent>
     </Card>
@@ -714,36 +745,45 @@ export default function GuidedOnboarding() {
           )}
 
           <div className="space-y-4">
-            <div>
-              <Label htmlFor="objective">Objective (Tujuan Utama) *</Label>
+            <div className="space-y-2">
+              <Label htmlFor="objective" className="flex items-center gap-2">
+                <Target className="h-4 w-4" />
+                Objective (Tujuan Utama) *
+              </Label>
               <Input
                 id="objective"
                 value={customizedGoal.objective}
                 onChange={(e) => setCustomizedGoal({...customizedGoal, objective: e.target.value})}
                 placeholder="Masukkan tujuan utama Anda..."
-                className="mt-1"
+                className="bg-gray-50 border-gray-300"
               />
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-gray-500">
                 Tips: Gunakan kata kerja yang jelas dan angka target yang spesifik
               </p>
             </div>
 
-            <div>
-              <Label>Key Results (Hasil Kunci)</Label>
-              {customizedGoal.keyResults.map((kr, index) => (
-                <div key={index} className="mt-2">
-                  <Input
-                    value={kr}
-                    onChange={(e) => {
-                      const newKRs = [...customizedGoal.keyResults];
-                      newKRs[index] = e.target.value;
-                      setCustomizedGoal({...customizedGoal, keyResults: newKRs});
-                    }}
-                    placeholder={`Key Result ${index + 1}...`}
-                  />
-                </div>
-              ))}
-              <p className="text-sm text-gray-500 mt-1">
+            <div className="space-y-2">
+              <Label className="flex items-center gap-2">
+                <BarChart3 className="h-4 w-4" />
+                Key Results (Hasil Kunci)
+              </Label>
+              <div className="space-y-3">
+                {customizedGoal.keyResults.map((kr, index) => (
+                  <div key={index}>
+                    <Input
+                      value={kr}
+                      onChange={(e) => {
+                        const newKRs = [...customizedGoal.keyResults];
+                        newKRs[index] = e.target.value;
+                        setCustomizedGoal({...customizedGoal, keyResults: newKRs});
+                      }}
+                      placeholder={`Key Result ${index + 1}...`}
+                      className="bg-gray-50 border-gray-300"
+                    />
+                  </div>
+                ))}
+              </div>
+              <p className="text-sm text-gray-500">
                 Key Results harus terukur dan spesifik. Contoh: "Meningkatkan penjualan menjadi Rp 100 juta per bulan"
               </p>
             </div>
@@ -875,12 +915,12 @@ export default function GuidedOnboarding() {
         </div>
 
         {/* Navigation Buttons */}
-        <div className="flex justify-between">
+        <div className="flex justify-between pt-4">
           <Button
             variant="outline"
             onClick={handlePrev}
             disabled={currentStep === 1}
-            className="min-w-[120px]"
+            className="min-w-[120px] border-gray-300 hover:bg-gray-50"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Sebelumnya
@@ -894,7 +934,7 @@ export default function GuidedOnboarding() {
                 (currentStep === 2 && !isStep2Valid) ||
                 (currentStep === 3 && !isStep3Valid)
               }
-              className="bg-orange-500 hover:bg-orange-600 text-white min-w-[120px]"
+              className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white min-w-[120px]"
             >
               Selanjutnya
               <ArrowRight className="h-4 w-4 ml-2" />
@@ -903,7 +943,7 @@ export default function GuidedOnboarding() {
             <Button
               onClick={handleCompleteOnboarding}
               disabled={isLoading || !isStep3Valid}
-              className="bg-green-500 hover:bg-green-600 text-white min-w-[120px]"
+              className="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white min-w-[120px]"
             >
               {isLoading ? (
                 <>
