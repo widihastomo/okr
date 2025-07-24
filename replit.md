@@ -445,7 +445,8 @@ The system now includes a comprehensive dummy data generation feature that creat
   * INTEGRATED: Automatic date calculation from onboarding start date (today) plus selected duration
   * VALIDATED: Form validation ensures cycle duration is selected before proceeding to next step
   * STYLED: Purple-themed cycle selection interface with professional visual design
-  * RESULT: Users now see goal cycle periods with default 1-month selection from onboarding date
+  * ENHANCED: Added informational message when cycle is active explaining edit functionality for goals and key results
+  * RESULT: Users now see goal cycle periods with default 1-month selection from onboarding date and guidance on customization options
 - July 24, 2025. **TEMPLATE UNIT STANDARDIZATION COMPLETED** - Successfully updated all goal templates with form-compatible units:
   * FIXED: Updated populate script to modify existing templates instead of skipping them
   * STANDARDIZED: All template units now use predefined format ("%" instead of "persen", "orang" instead of "member", etc.)

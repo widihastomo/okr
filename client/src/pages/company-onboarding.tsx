@@ -2195,6 +2195,18 @@ export default function CompanyOnboarding() {
                   ))}
                 </div>
                 
+                {/* Informational message when cycle is active */}
+                {onboardingData.cycleDuration && (
+                  <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <Edit className="w-4 h-4 text-blue-600" />
+                      <span className="text-sm font-medium text-blue-800">Tips Kustomisasi:</span>
+                    </div>
+                    <p className="text-sm text-blue-700">
+                      Anda dapat menyesuaikan goal dan ukuran target dengan mengklik tombol <strong>"Edit Goal"</strong> dan <strong>ikon edit</strong> di samping setiap key result untuk personalisasi yang lebih detail.
+                    </p>
+                  </div>
+                )}
                 
               </div>
             )}
