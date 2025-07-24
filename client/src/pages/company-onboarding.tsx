@@ -2116,7 +2116,7 @@ export default function CompanyOnboarding() {
                                 e.stopPropagation();
                                 const selectedTemplate = goalTemplates?.find(t => t.title === onboardingData.objective);
                                 setTempObjectiveTitle(onboardingData.objective);
-                                setTempObjectiveDescription(selectedTemplate?.description || '');
+                                setTempObjectiveDescription(onboardingData.objectiveDescription || selectedTemplate?.description || '');
                                 setEditObjectiveModal(true);
                               }}
                               className="ml-2 text-xs px-2 py-1 h-7 border-orange-300 text-orange-700 hover:bg-orange-50"
@@ -2125,9 +2125,13 @@ export default function CompanyOnboarding() {
                             </Button>
                           )}
                         </div>
-                        {template.description && (
+                        {(selectedTemplateId === template.id && onboardingData.objectiveDescription 
+                          ? onboardingData.objectiveDescription 
+                          : template.description) && (
                           <p className="text-sm text-gray-600 leading-relaxed">
-                            {template.description}
+                            {selectedTemplateId === template.id && onboardingData.objectiveDescription 
+                              ? onboardingData.objectiveDescription 
+                              : template.description}
                           </p>
                         )}
                         
@@ -5144,13 +5148,14 @@ export default function CompanyOnboarding() {
               onClick={() => {
                 setOnboardingData({ 
                   ...onboardingData, 
-                  objective: tempObjectiveTitle 
+                  objective: tempObjectiveTitle,
+                  objectiveDescription: tempObjectiveDescription
                 });
                 setEditedObjective(tempObjectiveTitle);
                 setEditObjectiveModal(false);
                 toast({
                   title: "Goal Berhasil Diperbarui",
-                  description: "Nama goal telah diperbarui sesuai kebutuhan Anda.",
+                  description: "Nama dan deskripsi goal telah diperbarui sesuai kebutuhan Anda.",
                   variant: "default"
                 });
               }}

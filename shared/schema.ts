@@ -1635,6 +1635,7 @@ export const companyOnboardingDataSchema = z.object({
   cycleStartDate: z.string().optional(),
   cycleEndDate: z.string().optional(),
   objective: z.string().optional(),
+  objectiveDescription: z.string().optional(),
   keyResults: z.array(z.string()).default([]),
   cadence: z.string().optional(),
   reminderTime: z.string().optional(),
