@@ -1972,21 +1972,47 @@ export default function CompanyOnboarding() {
                         {/* Display Key Results */}
                         {template.keyResults && template.keyResults.length > 0 && (
                           <div className="space-y-2">
-                            <p className="text-xs font-medium text-orange-600 uppercase tracking-wide">
-                              Key Results:
-                            </p>
+                            <div className="flex items-center justify-between">
+                              <p className="text-xs font-medium text-orange-600 uppercase tracking-wide">
+                                Key Results:
+                              </p>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setShowEditModal(true);
+                                }}
+                                className="h-6 w-6 p-0 hover:bg-orange-50"
+                              >
+                                <Edit className="w-3 h-3 text-orange-600" />
+                              </Button>
+                            </div>
                             <div className="space-y-1">
                               {template.keyResults.slice(0, 3).map((keyResult: any, krIndex: number) => (
-                                <div key={krIndex} className="flex items-center space-x-2">
-                                  <div className="w-1.5 h-1.5 bg-orange-400 rounded-full flex-shrink-0"></div>
-                                  <span className="text-xs text-gray-600">
-                                    {keyResult.title}
-                                    {keyResult.targetValue && keyResult.unit && (
-                                      <span className="ml-1 px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded text-[10px] font-medium">
-                                        {keyResult.targetValue} {keyResult.unit}
-                                      </span>
-                                    )}
-                                  </span>
+                                <div key={krIndex} className="flex items-center justify-between group">
+                                  <div className="flex items-center space-x-2 flex-1">
+                                    <div className="w-1.5 h-1.5 bg-orange-400 rounded-full flex-shrink-0"></div>
+                                    <span className="text-xs text-gray-600 flex-1">
+                                      {keyResult.title}
+                                      {keyResult.targetValue && keyResult.unit && (
+                                        <span className="ml-1 px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded text-[10px] font-medium">
+                                          {keyResult.targetValue} {keyResult.unit}
+                                        </span>
+                                      )}
+                                    </span>
+                                  </div>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setShowEditModal(true);
+                                    }}
+                                    className="h-5 w-5 p-0 hover:bg-orange-50 opacity-0 group-hover:opacity-100 transition-opacity"
+                                  >
+                                    <Edit className="w-3 h-3 text-orange-600" />
+                                  </Button>
                                 </div>
                               ))}
                               {template.keyResults.length > 3 && (
