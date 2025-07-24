@@ -68,6 +68,24 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const focusAreaOptions = [
   { value: "penjualan", label: "Tingkatkan Pendapatan", icon: TrendingUp, color: "bg-green-100 text-green-800" },
@@ -182,17 +200,25 @@ function TemplateOverviewCard({ template }: { template: any }) {
 }
 
 // Key Results Card Component
-function KeyResultsCard({ keyResults }: { keyResults: any[] }) {
+function KeyResultsCard({ keyResults, onAddKeyResult }: { keyResults: any[], onAddKeyResult: () => void }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Target className="h-5 w-5 text-blue-600" />
-          Angka Target ({keyResults?.length || 0})
-        </CardTitle>
-        <CardDescription>
-          Target ukuran yang akan dicapai dalam template ini
-        </CardDescription>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <Target className="h-5 w-5 text-blue-600" />
+              Angka Target ({keyResults?.length || 0})
+            </CardTitle>
+            <CardDescription>
+              Target ukuran yang akan dicapai dalam template ini
+            </CardDescription>
+          </div>
+          <Button onClick={onAddKeyResult} size="sm" className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600">
+            <Plus className="h-4 w-4 mr-2" />
+            Tambah Angka Target
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
         {keyResults && keyResults.length > 0 ? (
@@ -246,17 +272,25 @@ function KeyResultsCard({ keyResults }: { keyResults: any[] }) {
 }
 
 // Initiatives Card Component
-function InitiativesCard({ initiatives }: { initiatives: any[] }) {
+function InitiativesCard({ initiatives, onAddInitiative }: { initiatives: any[], onAddInitiative: () => void }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Lightbulb className="h-5 w-5 text-orange-600" />
-          Inisiatif ({initiatives?.length || 0})
-        </CardTitle>
-        <CardDescription>
-          Strategi dan program yang akan dijalankan
-        </CardDescription>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <Lightbulb className="h-5 w-5 text-orange-600" />
+              Inisiatif ({initiatives?.length || 0})
+            </CardTitle>
+            <CardDescription>
+              Strategi dan program yang akan dijalankan
+            </CardDescription>
+          </div>
+          <Button onClick={onAddInitiative} size="sm" className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600">
+            <Plus className="h-4 w-4 mr-2" />
+            Tambah Inisiatif
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
         {initiatives && initiatives.length > 0 ? (
@@ -282,17 +316,25 @@ function InitiativesCard({ initiatives }: { initiatives: any[] }) {
 }
 
 // Tasks Card Component
-function TasksCard({ tasks }: { tasks: any[] }) {
+function TasksCard({ tasks, onAddTask }: { tasks: any[], onAddTask: () => void }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <ListTodo className="h-5 w-5 text-purple-600" />
-          Tugas ({tasks?.length || 0})
-        </CardTitle>
-        <CardDescription>
-          Task operasional yang perlu dikerjakan
-        </CardDescription>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <ListTodo className="h-5 w-5 text-purple-600" />
+              Tugas ({tasks?.length || 0})
+            </CardTitle>
+            <CardDescription>
+              Task operasional yang perlu dikerjakan
+            </CardDescription>
+          </div>
+          <Button onClick={onAddTask} size="sm" className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600">
+            <Plus className="h-4 w-4 mr-2" />
+            Tambah Tugas
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
         {tasks && tasks.length > 0 ? (
@@ -323,6 +365,31 @@ export default function TemplateDetailPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  
+  // Modal states for adding components
+  const [isAddKeyResultModalOpen, setIsAddKeyResultModalOpen] = useState(false);
+  const [isAddInitiativeModalOpen, setIsAddInitiativeModalOpen] = useState(false);
+  const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
+  
+  // Form data for new components
+  const [newKeyResult, setNewKeyResult] = useState({
+    title: "",
+    description: "",
+    keyResultType: "increase_to",
+    baseline: 0,
+    target: 0,
+    unit: ""
+  });
+  
+  const [newInitiative, setNewInitiative] = useState({
+    title: "",
+    description: ""
+  });
+  
+  const [newTask, setNewTask] = useState({
+    title: "",
+    description: ""
+  });
 
   // Fetch template details
   const { data: template, isLoading } = useQuery({
@@ -350,9 +417,67 @@ export default function TemplateDetailPage() {
     }
   });
 
+  // Update template mutation
+  const updateMutation = useMutation({
+    mutationFn: (data: any) => apiRequest(`/api/goal-templates/${id}`, "PATCH", data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/goal-templates/single/${id}`] });
+      toast({
+        title: "Template Diperbarui",
+        description: "Komponen berhasil ditambahkan ke template",
+        variant: "default"
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Gagal memperbarui template",
+        variant: "destructive"
+      });
+    }
+  });
+
   const handleDeleteTemplate = () => {
     deleteMutation.mutate();
     setDeleteDialogOpen(false);
+  };
+
+  // Handlers for adding components
+  const handleAddKeyResult = () => {
+    if (!template) return;
+    
+    const updatedKeyResults = [...(template.keyResults || []), newKeyResult];
+    updateMutation.mutate({ keyResults: updatedKeyResults });
+    
+    setNewKeyResult({
+      title: "",
+      description: "",
+      keyResultType: "increase_to",
+      baseline: 0,
+      target: 0,
+      unit: ""
+    });
+    setIsAddKeyResultModalOpen(false);
+  };
+
+  const handleAddInitiative = () => {
+    if (!template) return;
+    
+    const updatedInitiatives = [...(template.initiatives || []), newInitiative];
+    updateMutation.mutate({ initiatives: updatedInitiatives });
+    
+    setNewInitiative({ title: "", description: "" });
+    setIsAddInitiativeModalOpen(false);
+  };
+
+  const handleAddTask = () => {
+    if (!template) return;
+    
+    const updatedTasks = [...(template.tasks || []), newTask];
+    updateMutation.mutate({ tasks: updatedTasks });
+    
+    setNewTask({ title: "", description: "" });
+    setIsAddTaskModalOpen(false);
   };
 
   if (isLoading) {
@@ -460,17 +585,222 @@ export default function TemplateDetailPage() {
           </TabsList>
 
           <TabsContent value="key-results">
-            <KeyResultsCard keyResults={template.keyResults} />
+            <KeyResultsCard 
+              keyResults={template.keyResults} 
+              onAddKeyResult={() => setIsAddKeyResultModalOpen(true)}
+            />
           </TabsContent>
 
           <TabsContent value="initiatives">
-            <InitiativesCard initiatives={template.initiatives} />
+            <InitiativesCard 
+              initiatives={template.initiatives} 
+              onAddInitiative={() => setIsAddInitiativeModalOpen(true)}
+            />
           </TabsContent>
 
           <TabsContent value="tasks">
-            <TasksCard tasks={template.tasks} />
+            <TasksCard 
+              tasks={template.tasks} 
+              onAddTask={() => setIsAddTaskModalOpen(true)}
+            />
           </TabsContent>
         </Tabs>
+
+        {/* Add Key Result Modal */}
+        <Dialog open={isAddKeyResultModalOpen} onOpenChange={setIsAddKeyResultModalOpen}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Tambah Angka Target</DialogTitle>
+              <DialogDescription>
+                Tambahkan angka target baru ke template ini
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="kr-title">Judul Angka Target</Label>
+                <Input
+                  id="kr-title"
+                  value={newKeyResult.title}
+                  onChange={(e) => setNewKeyResult({ ...newKeyResult, title: e.target.value })}
+                  placeholder="Masukkan judul angka target..."
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="kr-description">Deskripsi</Label>
+                <Textarea
+                  id="kr-description"
+                  value={newKeyResult.description}
+                  onChange={(e) => setNewKeyResult({ ...newKeyResult, description: e.target.value })}
+                  placeholder="Masukkan deskripsi..."
+                  rows={3}
+                />
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="kr-type">Tipe Angka Target</Label>
+                  <Select value={newKeyResult.keyResultType} onValueChange={(value) => setNewKeyResult({ ...newKeyResult, keyResultType: value })}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {keyResultTypeOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div>
+                  <Label htmlFor="kr-unit">Unit</Label>
+                  <Input
+                    id="kr-unit"
+                    value={newKeyResult.unit}
+                    onChange={(e) => setNewKeyResult({ ...newKeyResult, unit: e.target.value })}
+                    placeholder="%, orang, rupiah, dll"
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="kr-baseline">Baseline</Label>
+                  <Input
+                    id="kr-baseline"
+                    type="number"
+                    value={newKeyResult.baseline}
+                    onChange={(e) => setNewKeyResult({ ...newKeyResult, baseline: Number(e.target.value) })}
+                    placeholder="0"
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="kr-target">Target</Label>
+                  <Input
+                    id="kr-target"
+                    type="number"
+                    value={newKeyResult.target}
+                    onChange={(e) => setNewKeyResult({ ...newKeyResult, target: Number(e.target.value) })}
+                    placeholder="100"
+                  />
+                </div>
+              </div>
+            </div>
+            
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsAddKeyResultModalOpen(false)}>
+                Batal
+              </Button>
+              <Button 
+                onClick={handleAddKeyResult}
+                disabled={!newKeyResult.title || updateMutation.isPending}
+                className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
+              >
+                {updateMutation.isPending ? "Menambahkan..." : "Tambah Angka Target"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Add Initiative Modal */}
+        <Dialog open={isAddInitiativeModalOpen} onOpenChange={setIsAddInitiativeModalOpen}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Tambah Inisiatif</DialogTitle>
+              <DialogDescription>
+                Tambahkan inisiatif baru ke template ini
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="init-title">Judul Inisiatif</Label>
+                <Input
+                  id="init-title"
+                  value={newInitiative.title}
+                  onChange={(e) => setNewInitiative({ ...newInitiative, title: e.target.value })}
+                  placeholder="Masukkan judul inisiatif..."
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="init-description">Deskripsi</Label>
+                <Textarea
+                  id="init-description"
+                  value={newInitiative.description}
+                  onChange={(e) => setNewInitiative({ ...newInitiative, description: e.target.value })}
+                  placeholder="Masukkan deskripsi inisiatif..."
+                  rows={4}
+                />
+              </div>
+            </div>
+            
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsAddInitiativeModalOpen(false)}>
+                Batal
+              </Button>
+              <Button 
+                onClick={handleAddInitiative}
+                disabled={!newInitiative.title || updateMutation.isPending}
+                className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
+              >
+                {updateMutation.isPending ? "Menambahkan..." : "Tambah Inisiatif"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Add Task Modal */}
+        <Dialog open={isAddTaskModalOpen} onOpenChange={setIsAddTaskModalOpen}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Tambah Tugas</DialogTitle>
+              <DialogDescription>
+                Tambahkan tugas baru ke template ini
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="task-title">Judul Tugas</Label>
+                <Input
+                  id="task-title"
+                  value={newTask.title}
+                  onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
+                  placeholder="Masukkan judul tugas..."
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="task-description">Deskripsi</Label>
+                <Textarea
+                  id="task-description"
+                  value={newTask.description}
+                  onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
+                  placeholder="Masukkan deskripsi tugas..."
+                  rows={4}
+                />
+              </div>
+            </div>
+            
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsAddTaskModalOpen(false)}>
+                Batal
+              </Button>
+              <Button 
+                onClick={handleAddTask}
+                disabled={!newTask.title || updateMutation.isPending}
+                className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
+              >
+                {updateMutation.isPending ? "Menambahkan..." : "Tambah Tugas"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         {/* Delete Confirmation Dialog */}
         <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>

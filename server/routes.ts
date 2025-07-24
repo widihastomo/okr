@@ -1642,6 +1642,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update goal template
+  app.patch("/api/goal-templates/:id", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      const templateId = req.params.id;
+      
+      // Only system owner can update templates
+      if (!currentUser.isSystemOwner) {
+        return res.status(403).json({ message: "Access denied - System owner required" });
+      }
+      
+      const template = await storage.getGoalTemplate(templateId);
+      
+      if (!template) {
+        return res.status(404).json({ message: "Template not found" });
+      }
+      
+      // Update template with new data
+      const updatedTemplate = await storage.updateGoalTemplate(templateId, req.body);
+      
+      res.json(updatedTemplate);
+    } catch (error) {
+      console.error("Error updating goal template:", error);
+      res.status(500).json({ message: "Failed to update goal template" });
+    }
+  });
+
   // Goal template CRUD for system owners
   app.post("/api/goal-templates", requireAuth, async (req, res) => {
     try {
