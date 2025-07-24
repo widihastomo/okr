@@ -1551,129 +1551,99 @@ export default function CompanyOnboarding() {
                 Pilih area yang paling ingin Anda tingkatkan dalam 3 bulan kedepan.
               </p>
             </div>
-            <RadioGroup
-              value={onboardingData.teamFocus}
-              onValueChange={(value) =>
-                setOnboardingData({ ...onboardingData, teamFocus: value })
-              }
-              className="grid grid-cols-1 sm:grid-cols-2 gap-4"
-            >
-              <label htmlFor="penjualan" className="cursor-pointer">
-                <div
-                  className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
-                    onboardingData.teamFocus === "penjualan"
-                      ? "border-orange-500 bg-orange-50 shadow-md"
-                      : "border-gray-200 bg-white hover:border-orange-300"
-                  }`}
-                >
-                  <div className="flex items-start space-x-3">
-                    <RadioGroupItem
-                      value="penjualan"
-                      id="penjualan"
-                      className="mt-1"
-                    />
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <DollarSign className="w-5 h-5 text-green-600" />
-                        <span className="font-medium">
-                          Tingkatkan Pendapatan
-                        </span>
-                      </div>
-                      <p className="text-sm text-gray-600">
-                        Fokus pada peningkatan omzet dan penjualan
-                      </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div
+                onClick={() => setOnboardingData({ ...onboardingData, teamFocus: "penjualan" })}
+                className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
+                  onboardingData.teamFocus === "penjualan"
+                    ? "border-orange-500 bg-orange-50 shadow-md"
+                    : "border-gray-200 bg-white hover:border-orange-300"
+                }`}
+              >
+                <div className="flex items-start space-x-3">
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <DollarSign className="w-5 h-5 text-green-600" />
+                      <span className="font-medium">
+                        Tingkatkan Pendapatan
+                      </span>
                     </div>
+                    <p className="text-sm text-gray-600">
+                      Fokus pada peningkatan omzet dan penjualan
+                    </p>
                   </div>
                 </div>
-              </label>
+              </div>
 
-              <label htmlFor="operasional" className="cursor-pointer">
-                <div
-                  className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
-                    onboardingData.teamFocus === "operasional"
-                      ? "border-orange-500 bg-orange-50 shadow-md"
-                      : "border-gray-200 bg-white hover:border-orange-300"
-                  }`}
-                >
-                  <div className="flex items-start space-x-3">
-                    <RadioGroupItem
-                      value="operasional"
-                      id="operasional"
-                      className="mt-1"
-                    />
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <Settings className="w-5 h-5 text-blue-600" />
-                        <span className="font-medium">
-                          Rapikan Operasional
-                        </span>
-                      </div>
-                      <p className="text-sm text-gray-600">
-                        Optimalisasi proses, dan produktivitas operasional
-                      </p>
+              <div
+                onClick={() => setOnboardingData({ ...onboardingData, teamFocus: "operasional" })}
+                className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
+                  onboardingData.teamFocus === "operasional"
+                    ? "border-orange-500 bg-orange-50 shadow-md"
+                    : "border-gray-200 bg-white hover:border-orange-300"
+                }`}
+              >
+                <div className="flex items-start space-x-3">
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <Settings className="w-5 h-5 text-blue-600" />
+                      <span className="font-medium">
+                        Rapikan Operasional
+                      </span>
                     </div>
+                    <p className="text-sm text-gray-600">
+                      Optimalisasi proses, dan produktivitas operasional
+                    </p>
                   </div>
                 </div>
-              </label>
+              </div>
 
-              <label htmlFor="customer_service" className="cursor-pointer">
-                <div
-                  className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
-                    onboardingData.teamFocus === "customer_service"
-                      ? "border-orange-500 bg-orange-50 shadow-md"
-                      : "border-gray-200 bg-white hover:border-orange-300"
-                  }`}
-                >
-                  <div className="flex items-start space-x-3">
-                    <RadioGroupItem
-                      value="customer_service"
-                      id="customer_service"
-                      className="mt-1"
-                    />
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <HeartHandshake className="w-5 h-5 text-purple-600" />
-                        <span className="font-medium">
-                          Kembangkan Tim
-                        </span>
-                      </div>
-                      <p className="text-sm text-gray-600">
-                        Peningkatan Kapasitas dan kinerja tim
-                      </p>
+              <div
+                onClick={() => setOnboardingData({ ...onboardingData, teamFocus: "customer_service" })}
+                className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
+                  onboardingData.teamFocus === "customer_service"
+                    ? "border-orange-500 bg-orange-50 shadow-md"
+                    : "border-gray-200 bg-white hover:border-orange-300"
+                }`}
+              >
+                <div className="flex items-start space-x-3">
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <HeartHandshake className="w-5 h-5 text-purple-600" />
+                      <span className="font-medium">
+                        Kembangkan Tim
+                      </span>
                     </div>
+                    <p className="text-sm text-gray-600">
+                      Peningkatan Kapasitas dan kinerja tim
+                    </p>
                   </div>
                 </div>
-              </label>
+              </div>
 
-              <label htmlFor="marketing" className="cursor-pointer">
-                <div
-                  className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
-                    onboardingData.teamFocus === "marketing"
-                      ? "border-orange-500 bg-orange-50 shadow-md"
-                      : "border-gray-200 bg-white hover:border-orange-300"
-                  }`}
-                >
-                  <div className="flex items-start space-x-3">
-                    <RadioGroupItem
-                      value="marketing"
-                      id="marketing"
-                      className="mt-1"
-                    />
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <Rocket className="w-5 h-5 text-red-600" />
-                        <span className="font-medium">
-                          Ekspansi Bisnis
-                        </span>
-                      </div>
-                      <p className="text-sm text-gray-600">
-                        Perluas pasar dan pengembangan produk
-                      </p>
+              <div
+                onClick={() => setOnboardingData({ ...onboardingData, teamFocus: "marketing" })}
+                className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
+                  onboardingData.teamFocus === "marketing"
+                    ? "border-orange-500 bg-orange-50 shadow-md"
+                    : "border-gray-200 bg-white hover:border-orange-300"
+                }`}
+              >
+                <div className="flex items-start space-x-3">
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <Rocket className="w-5 h-5 text-red-600" />
+                      <span className="font-medium">
+                        Ekspansi Bisnis
+                      </span>
                     </div>
+                    <p className="text-sm text-gray-600">
+                      Perluas pasar dan pengembangan produk
+                    </p>
                   </div>
                 </div>
-              </label>
-            </RadioGroup>
+              </div>
+            </div>
 
             {onboardingData.teamFocus && (
               <div className="p-4 bg-orange-50 rounded-lg border border-orange-200">
