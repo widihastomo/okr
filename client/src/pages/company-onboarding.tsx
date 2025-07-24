@@ -2125,15 +2125,28 @@ export default function CompanyOnboarding() {
                             </Button>
                           )}
                         </div>
-                        {(selectedTemplateId === template.id && onboardingData.objectiveDescription 
-                          ? onboardingData.objectiveDescription 
-                          : template.description) && (
-                          <p className="text-sm text-gray-600 leading-relaxed">
-                            {selectedTemplateId === template.id && onboardingData.objectiveDescription 
-                              ? onboardingData.objectiveDescription 
-                              : template.description}
-                          </p>
-                        )}
+                        {(() => {
+                          const displayDescription = selectedTemplateId === template.id && onboardingData.objectiveDescription 
+                            ? onboardingData.objectiveDescription 
+                            : template.description;
+                          
+                          // Debug logging
+                          if (selectedTemplateId === template.id) {
+                            console.log('🔍 Debug template description:', {
+                              templateId: template.id,
+                              selectedTemplateId,
+                              objectiveDescription: onboardingData.objectiveDescription,
+                              templateDescription: template.description,
+                              displayDescription
+                            });
+                          }
+                          
+                          return displayDescription ? (
+                            <p className="text-sm text-gray-600 leading-relaxed">
+                              {displayDescription}
+                            </p>
+                          ) : null;
+                        })()}
                         
                         {/* Display Key Results */}
                         {template.keyResults && template.keyResults.length > 0 && (
@@ -5146,6 +5159,12 @@ export default function CompanyOnboarding() {
             </Button>
             <Button
               onClick={() => {
+                console.log('🔍 Saving objective data:', {
+                  tempObjectiveTitle,
+                  tempObjectiveDescription,
+                  currentOnboardingData: onboardingData
+                });
+                
                 setOnboardingData({ 
                   ...onboardingData, 
                   objective: tempObjectiveTitle,
