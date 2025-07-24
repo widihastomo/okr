@@ -391,7 +391,7 @@ function InitiativesCard({ initiatives, onAddInitiative }: { initiatives: any[],
 }
 
 // Tasks Card Component
-function TasksCard({ tasks, onAddTask }: { tasks: any[], onAddTask: () => void }) {
+function TasksCard({ tasks, onAddTask, keyResults }: { tasks: any[], onAddTask: () => void, keyResults: any[] }) {
   return (
     <Card>
       <CardHeader>
@@ -414,14 +414,25 @@ function TasksCard({ tasks, onAddTask }: { tasks: any[], onAddTask: () => void }
       <CardContent>
         {tasks && tasks.length > 0 ? (
           <div className="space-y-4">
-            {tasks.map((task: any, index: number) => (
-              <div key={index} className="border rounded-lg p-4">
-                <h4 className="font-medium mb-2">{task.title}</h4>
-                {task.description && (
-                  <p className="text-sm text-gray-600">{task.description}</p>
-                )}
-              </div>
-            ))}
+            {tasks.map((task: any, index: number) => {
+              const relatedKeyResult = keyResults && task.keyResultId ? keyResults[parseInt(task.keyResultId)] : null;
+              return (
+                <div key={index} className="border rounded-lg p-4">
+                  <div className="flex items-start justify-between mb-2">
+                    <h4 className="font-medium">{task.title}</h4>
+                    {relatedKeyResult && (
+                      <Badge variant="outline" className="text-xs">
+                        <Target className="h-3 w-3 mr-1" />
+                        {relatedKeyResult.title}
+                      </Badge>
+                    )}
+                  </div>
+                  {task.description && (
+                    <p className="text-sm text-gray-600">{task.description}</p>
+                  )}
+                </div>
+              );
+            })}
           </div>
         ) : (
           <div className="text-center py-8 text-gray-500">
@@ -455,7 +466,8 @@ export default function TemplateDetailPage() {
   
   const [newTask, setNewTask] = useState({
     title: "",
-    description: ""
+    description: "",
+    keyResultId: "" // Add key result relation
   });
 
   const [newInitiative, setNewInitiative] = useState({
@@ -570,7 +582,7 @@ export default function TemplateDetailPage() {
     const updatedTasks = [...(template?.tasks || []), newTask];
     updateMutation.mutate({ tasks: updatedTasks });
     
-    setNewTask({ title: "", description: "" });
+    setNewTask({ title: "", description: "", keyResultId: "" });
     setIsAddTaskModalOpen(false);
   };
 
@@ -761,6 +773,7 @@ export default function TemplateDetailPage() {
             <TasksCard 
               tasks={template?.tasks} 
               onAddTask={() => setIsAddTaskModalOpen(true)}
+              keyResults={template?.keyResults || []}
             />
           </TabsContent>
         </Tabs>
@@ -852,6 +865,31 @@ export default function TemplateDetailPage() {
                   rows={4}
                 />
               </div>
+
+              <div>
+                <Label htmlFor="task-key-result">Angka Target Terkait</Label>
+                <Select value={newTask.keyResultId} onValueChange={(value) => setNewTask({ ...newTask, keyResultId: value })}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Pilih angka target..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {template?.keyResults && template.keyResults.length > 0 ? (
+                      template.keyResults.map((kr: any, index: number) => (
+                        <SelectItem key={index} value={index.toString()}>
+                          {kr.title}
+                        </SelectItem>
+                      ))
+                    ) : (
+                      <SelectItem value="no-key-results" disabled>
+                        Belum ada angka target tersedia
+                      </SelectItem>
+                    )}
+                  </SelectContent>
+                </Select>
+                <p className="text-sm text-gray-500 mt-1">
+                  Pilih angka target yang akan didukung oleh tugas ini
+                </p>
+              </div>
             </div>
             
             <DialogFooter>
@@ -860,7 +898,7 @@ export default function TemplateDetailPage() {
               </Button>
               <Button 
                 onClick={handleAddTask}
-                disabled={!newTask.title || updateMutation.isPending}
+                disabled={!newTask.title || !newTask.keyResultId || updateMutation.isPending}
                 className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
               >
                 {updateMutation.isPending ? "Menambahkan..." : "Tambah Tugas"}
