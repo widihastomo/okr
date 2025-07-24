@@ -2529,102 +2529,59 @@ export class DatabaseStorage implements IStorage {
         throw new Error("User must be associated with an organization");
       }
       
-      // Use current date as onboarding start date with GMT+7 timezone
-      const onboardingDate = new Date();
-      const year = onboardingDate.getFullYear();
+      console.log(`🔄 Creating cycle from onboarding data:`, {
+        cycleDuration: onboardingData.cycleDuration,
+        cycleStartDate: onboardingData.cycleStartDate,
+        cycleEndDate: onboardingData.cycleEndDate,
+        objective: onboardingData.objective
+      });
       
-      console.log(`🔄 Creating cycle structure for onboarding date: ${onboardingDate.toISOString()}`);
+      // Use user-selected cycle data from onboarding
+      const startDate = onboardingData.cycleStartDate ? new Date(onboardingData.cycleStartDate) : new Date();
+      const endDate = onboardingData.cycleEndDate ? new Date(onboardingData.cycleEndDate) : new Date();
+      const cycleDuration = onboardingData.cycleDuration || '1bulan';
       
-      // Helper function to create date with GMT+7 timezone
-      const createGMT7Date = (year: number, month: number, day: number, isEndOfDay: boolean = false) => {
-        const date = new Date(year, month - 1, day);
-        if (isEndOfDay) {
-          date.setHours(23, 59, 59, 999);
-        } else {
-          date.setHours(0, 0, 0, 0);
-        }
-        // Adjust for GMT+7 timezone (subtract 7 hours to get UTC)
-        const gmt7Date = new Date(date.getTime() - (7 * 60 * 60 * 1000));
-        return gmt7Date.toISOString();
-      };
+      // Determine cycle name and type based on user selection
+      let cycleName = '';
+      let cycleType = '';
+      let cycleDescription = '';
       
-      // 1. Create Annual Cycle (1 Jan - 31 Dec)
-      const annualCycle = {
-        name: `Tahunan ${year}`,
-        type: 'annual',
-        startDate: createGMT7Date(year, 1, 1, false), // 1 January
-        endDate: createGMT7Date(year, 12, 31, true),  // 31 December
-        organizationId: user.organizationId,
-        createdBy: userId,
-        lastUpdateBy: userId,
-        description: `Siklus tahunan ${year} - ${onboardingData.teamFocus || 'General'}`
-      };
-      
-      console.log("🔄 Creating annual cycle:", annualCycle);
-      const [newAnnualCycle] = await db.insert(cycles).values(annualCycle).returning();
-      console.log("✅ Annual cycle created:", newAnnualCycle);
-      
-      // 2. Create 4 Quarterly Cycles
-      const quarterlyPromises = [];
-      const quarterDates = [
-        { start: { month: 1, day: 1 }, end: { month: 3, day: 31 } },   // Q1: Jan 1 - Mar 31
-        { start: { month: 4, day: 1 }, end: { month: 6, day: 30 } },   // Q2: Apr 1 - Jun 30
-        { start: { month: 7, day: 1 }, end: { month: 9, day: 30 } },   // Q3: Jul 1 - Sep 30
-        { start: { month: 10, day: 1 }, end: { month: 12, day: 31 } }  // Q4: Oct 1 - Dec 31
-      ];
-      
-      for (let quarter = 1; quarter <= 4; quarter++) {
-        const quarterData = quarterDates[quarter - 1];
-        
-        const quarterlyCycle = {
-          name: `Q${quarter} ${year}`,
-          type: 'quarterly',
-          startDate: createGMT7Date(year, quarterData.start.month, quarterData.start.day, false),
-          endDate: createGMT7Date(year, quarterData.end.month, quarterData.end.day, true),
-          organizationId: user.organizationId,
-          createdBy: userId,
-          lastUpdateBy: userId,
-          description: `Kuartal ${quarter} ${year} - ${onboardingData.teamFocus || 'General'}`
-        };
-        
-        quarterlyPromises.push(db.insert(cycles).values(quarterlyCycle).returning());
+      if (cycleDuration === '1bulan') {
+        cycleType = 'monthly';
+        const monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+                          'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+        const monthIndex = startDate.getMonth();
+        cycleName = `${monthNames[monthIndex]} ${startDate.getFullYear()}`;
+        cycleDescription = `Siklus bulanan - ${onboardingData.teamFocus || 'General'}`;
+      } else if (cycleDuration === '3bulan') {
+        cycleType = 'quarterly';
+        const quarter = Math.ceil((startDate.getMonth() + 1) / 3);
+        cycleName = `Q${quarter} ${startDate.getFullYear()}`;
+        cycleDescription = `Siklus triwulanan - ${onboardingData.teamFocus || 'General'}`;
+      } else if (cycleDuration === '1tahun') {
+        cycleType = 'annual';
+        cycleName = `Tahunan ${startDate.getFullYear()}`;
+        cycleDescription = `Siklus tahunan - ${onboardingData.teamFocus || 'General'}`;
       }
       
-      const quarterlyResults = await Promise.all(quarterlyPromises);
-      console.log("✅ Quarterly cycles created:", quarterlyResults.length);
-      
-      // 3. Create Only Current Month's Cycle
-      const monthNames = [
-        'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-        'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
-      ];
-      
-      const currentMonth = onboardingDate.getMonth() + 1;
-      
-      // Get the last day of the current month
-      const lastDayOfMonth = new Date(year, currentMonth, 0).getDate();
-      
-      const currentMonthlyCycle = {
-        name: `${monthNames[currentMonth - 1]} ${year}`,
-        type: 'monthly',
-        startDate: createGMT7Date(year, currentMonth, 1, false), // First day of month
-        endDate: createGMT7Date(year, currentMonth, lastDayOfMonth, true), // Last day of month
+      // Create user-selected cycle
+      const userSelectedCycle = {
+        name: cycleName,
+        type: cycleType,
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
         organizationId: user.organizationId,
         createdBy: userId,
         lastUpdateBy: userId,
-        description: `Siklus bulanan ${monthNames[currentMonth - 1]} ${year} - ${onboardingData.teamFocus || 'General'}`
+        description: cycleDescription
       };
       
-      console.log("🔄 Creating current month cycle:", currentMonthlyCycle);
-      const [newMonthlyCycle] = await db.insert(cycles).values(currentMonthlyCycle).returning();
-      console.log("✅ Current month cycle created:", newMonthlyCycle);
+      console.log("🔄 Creating user-selected cycle:", userSelectedCycle);
+      const [newUserCycle] = await db.insert(cycles).values(userSelectedCycle).returning();
+      console.log("✅ User-selected cycle created:", newUserCycle);
       
-      // 4. Use the current month's cycle for the objective
-      const currentMonthCycle = newMonthlyCycle;
-      
-      console.log(`✅ Using monthly cycle for objective: ${currentMonthCycle.name}`);
-      
-      const activeCycle = [currentMonthCycle];
+      // Use the user-selected cycle for the objective
+      const activeCycle = [newUserCycle];
       
       // Create objective from onboarding data
       const objectiveData = {

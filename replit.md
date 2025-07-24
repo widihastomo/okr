@@ -452,6 +452,13 @@ The system now includes a comprehensive dummy data generation feature that creat
 
 ## Changelog
 ```
+- July 24, 2025. **ONBOARDING-TO-GOALS CONVERSION SYSTEM FIXED** - Successfully updated createFirstObjectiveFromOnboarding to use user's selected cycle preferences instead of defaulting to current month:
+  * FIXED: Updated createFirstObjectiveFromOnboarding function to respect user's cycleDuration, cycleStartDate, and cycleEndDate selections from onboarding
+  * ENHANCED: Cycle creation now dynamically determines type and name based on user selection (1bulan→monthly, 3bulan→quarterly, 1tahun→annual)
+  * IMPROVED: Objectives created from onboarding now use the exact cycle period selected by user during setup
+  * VERIFIED: Invoice protection system confirmed working - both 'goals-only' and 'complete' reset operations preserve all invoice and billing data
+  * CONFIRMED: Dual reset system maintains invoice safety with explicit protection messaging in API responses
+  * RESULT: Complete onboarding-to-goals conversion system now properly honors user's preferred cycle duration and protects financial records
 - July 24, 2025. **CYCLE DURATION UPDATE COMPLETED** - Successfully changed cycle duration option from "6 bulan" to "1 tahun" with proper date calculations and consistency updates:
   * UPDATED: Cycle duration option from "6 Bulan" to "1 Tahun" with description "Rencana strategis tahunan"
   * FIXED: Date calculation logic changed from setMonth(+6) to setFullYear(+1) for proper yearly calculation
