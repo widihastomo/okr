@@ -1661,13 +1661,13 @@ export default function CompanyOnboarding() {
           <div className="space-y-6">
 
             {/* Mobile-Optimized OKR Explanation */}
-            <div className="bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl md:rounded-2xl shadow-xl border-2 border-blue-100 p-4 md:p-10 relative overflow-hidden">
+            <div className="bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl md:rounded-2xl shadow-xl border-2 border-blue-100 p-3 md:p-6 relative overflow-hidden">
               {/* Subtle background decoration - smaller on mobile */}
               <div className="absolute top-0 right-0 w-16 h-16 md:w-32 md:h-32 bg-blue-200 rounded-full -translate-y-8 translate-x-8 md:-translate-y-16 md:translate-x-16 opacity-20"></div>
               <div className="absolute bottom-0 left-0 w-12 h-12 md:w-24 md:h-24 bg-purple-200 rounded-full translate-y-6 -translate-x-6 md:translate-y-12 md:-translate-x-12 opacity-20"></div>
               
               {/* Header */}
-              <div className="text-center mb-6 md:mb-10 relative">
+              <div className="text-center mb-4 md:mb-6 relative">
                 <div className="inline-flex items-center justify-center w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg md:rounded-xl mb-3 md:mb-4 shadow-lg">
                   <Target className="w-4 h-4 md:w-5 md:h-5 text-white" />
                 </div>
@@ -1678,7 +1678,7 @@ export default function CompanyOnboarding() {
               </div>
               
               {/* Enhanced Steps - Mobile Optimized */}
-              <div className="space-y-6 md:space-y-8 relative">
+              <div className="space-y-4 md:space-y-6 relative">
                 {/* Step 1: Goal */}
                 <div className="group">
                   <div className="flex items-start space-x-3 md:space-x-6">
@@ -1693,8 +1693,8 @@ export default function CompanyOnboarding() {
                         <h4 className="text-lg md:text-xl font-bold text-gray-800">GOAL / Tujuan</h4>
                         <div className="px-2 py-1 md:px-3 md:py-1 bg-orange-500 text-white rounded-full text-xs font-bold self-start">VISI BESAR</div>
                       </div>
-                      <p className="text-gray-600 mb-3 md:mb-4 text-base md:text-lg">Apa yang ingin dicapai dalam 3-6 bulan ke depan</p>
-                      <div className="bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg md:rounded-xl p-3 md:p-4 border-l-4 border-orange-400 shadow-md">
+                      <p className="text-gray-600 mb-2 md:mb-3 text-base md:text-lg">Apa yang ingin dicapai dalam 3-6 bulan ke depan</p>
+                      <div className="bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg md:rounded-xl p-2 md:p-3 border-l-4 border-orange-400 shadow-md">
                         <div className="flex items-center space-x-2 mb-2">
                           <Sparkles className="w-4 h-4 text-orange-500 flex-shrink-0" />
                           <span className="text-sm font-bold text-orange-700">Contoh Real:</span>
@@ -1726,8 +1726,8 @@ export default function CompanyOnboarding() {
                         <h4 className="text-lg md:text-xl font-bold text-gray-800">KEY RESULTS / Target Angka</h4>
                         <div className="px-2 py-1 md:px-3 md:py-1 bg-blue-500 text-white rounded-full text-xs font-bold self-start">TERUKUR</div>
                       </div>
-                      <p className="text-gray-600 mb-3 md:mb-4 text-base md:text-lg">Angka spesifik yang mengukur pencapaian tujuan</p>
-                      <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg md:rounded-xl p-3 md:p-4 border-l-4 border-blue-400 shadow-md">
+                      <p className="text-gray-600 mb-2 md:mb-3 text-base md:text-lg">Angka spesifik yang mengukur pencapaian tujuan</p>
+                      <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg md:rounded-xl p-2 md:p-3 border-l-4 border-blue-400 shadow-md">
                         <div className="flex items-center space-x-2 mb-3">
                           <BarChart3 className="w-4 h-4 text-blue-500 flex-shrink-0" />
                           <span className="text-sm font-bold text-blue-700">Target Konkret:</span>
@@ -1770,8 +1770,8 @@ export default function CompanyOnboarding() {
                         <h4 className="text-lg md:text-xl font-bold text-gray-800">INITIATIVES / Strategi</h4>
                         <div className="px-2 py-1 md:px-3 md:py-1 bg-green-500 text-white rounded-full text-xs font-bold self-start">PROGRAM</div>
                       </div>
-                      <p className="text-gray-600 mb-3 md:mb-4 text-base md:text-lg">Program besar yang dilakukan untuk mencapai target</p>
-                      <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-lg md:rounded-xl p-3 md:p-4 border-l-4 border-green-400 shadow-md">
+                      <p className="text-gray-600 mb-2 md:mb-3 text-base md:text-lg">Program besar yang dilakukan untuk mencapai target</p>
+                      <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-lg md:rounded-xl p-2 md:p-3 border-l-4 border-green-400 shadow-md">
                         <div className="flex items-center space-x-2 mb-3">
                           <Lightbulb className="w-4 h-4 text-green-500 flex-shrink-0" />
                           <span className="text-sm font-bold text-green-700">Rencana Strategis:</span>
@@ -1814,8 +1814,8 @@ export default function CompanyOnboarding() {
                         <h4 className="text-lg md:text-xl font-bold text-gray-800">TASKS / Tugas Harian</h4>
                         <div className="px-2 py-1 md:px-3 md:py-1 bg-purple-500 text-white rounded-full text-xs font-bold self-start">EKSEKUSI</div>
                       </div>
-                      <p className="text-gray-600 mb-3 md:mb-4 text-base md:text-lg">Aktivitas konkret yang dikerjakan setiap hari</p>
-                      <div className="bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg md:rounded-xl p-3 md:p-4 border-l-4 border-purple-400 shadow-md">
+                      <p className="text-gray-600 mb-2 md:mb-3 text-base md:text-lg">Aktivitas konkret yang dikerjakan setiap hari</p>
+                      <div className="bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg md:rounded-xl p-2 md:p-3 border-l-4 border-purple-400 shadow-md">
                         <div className="flex items-center space-x-2 mb-3">
                           <CheckCircle className="w-4 h-4 text-purple-500 flex-shrink-0" />
                           <span className="text-sm font-bold text-purple-700">Action Items:</span>
@@ -1841,7 +1841,7 @@ export default function CompanyOnboarding() {
               </div>
               
               {/* Mobile-Optimized Summary */}
-              <div className="mt-8 md:mt-10 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg md:rounded-xl p-4 md:p-6 shadow-xl relative overflow-hidden">
+              <div className="mt-6 md:mt-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg md:rounded-xl p-3 md:p-4 shadow-xl relative overflow-hidden">
                 <div className="absolute inset-0 bg-black/10"></div>
                 <div className="relative">
                   <div className="flex items-center justify-center space-x-2 mb-3 md:mb-4">
