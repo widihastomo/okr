@@ -4480,45 +4480,202 @@ export default function CompanyOnboarding() {
                 return null;
               }
 
-              // Initialize key results from template if not already set
+              // Initialize structured key results from template if not already set
               const currentKeyResults = onboardingData.keyResults.length > 0 
-                ? onboardingData.keyResults 
-                : selectedTemplate.keyResults.map((kr: any) => 
-                    kr.targetValue && kr.unit 
-                      ? `${kr.title} (Target: ${kr.targetValue} ${kr.unit})`
-                      : kr.title
-                  );
+                ? onboardingData.keyResults.map((kr: any) => {
+                    if (typeof kr === 'string') {
+                      // Convert old string format to new object format
+                      return {
+                        title: kr,
+                        keyResultType: 'increase_to',
+                        targetValue: '',
+                        currentValue: '0',
+                        baseValue: '0',
+                        unit: 'number'
+                      };
+                    }
+                    return kr;
+                  })
+                : selectedTemplate.keyResults.map((kr: any) => ({
+                    title: kr.title || '',
+                    keyResultType: kr.keyResultType || 'increase_to',
+                    targetValue: kr.targetValue || '',
+                    currentValue: kr.currentValue || '0',
+                    baseValue: kr.baseValue || '0',
+                    unit: kr.unit || 'number'
+                  }));
 
               return (
                 <div className="space-y-4">
                   <Label className="text-sm font-medium text-gray-800">
                     Edit Key Results:
                   </Label>
-                  <div className="space-y-3">
-                    {currentKeyResults.map((keyResult: string, index: number) => (
-                      <div key={index} className="space-y-2">
-                        <Label htmlFor={`kr-${index}`} className="text-xs font-medium text-blue-700">
-                          Key Result {index + 1}:
-                        </Label>
-                        <Textarea
-                          id={`kr-${index}`}
-                          value={keyResult}
-                          onChange={(e) => {
-                            const updatedKeyResults = [...currentKeyResults];
-                            updatedKeyResults[index] = e.target.value;
-                            setOnboardingData({ 
-                              ...onboardingData, 
-                              keyResults: updatedKeyResults 
-                            });
-                          }}
-                          placeholder={`Sesuaikan key result ${index + 1}...`}
-                          className="min-h-[60px] text-sm border-blue-200 focus:border-blue-400 focus:ring-blue-400"
-                        />
-                      </div>
+                  <div className="space-y-6">
+                    {currentKeyResults.map((keyResult: any, index: number) => (
+                      <Card key={index} className="p-4 border-blue-200">
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between">
+                            <Label className="text-sm font-medium text-blue-700">
+                              Key Result {index + 1}
+                            </Label>
+                            <Target className="w-4 h-4 text-blue-500" />
+                          </div>
+                          
+                          {/* Title */}
+                          <div className="space-y-2">
+                            <Label htmlFor={`kr-title-${index}`} className="text-xs font-medium text-gray-700">
+                              Judul Key Result:
+                            </Label>
+                            <Input
+                              id={`kr-title-${index}`}
+                              value={keyResult.title}
+                              onChange={(e) => {
+                                const updatedKeyResults = [...currentKeyResults];
+                                updatedKeyResults[index] = { ...updatedKeyResults[index], title: e.target.value };
+                                setOnboardingData({ 
+                                  ...onboardingData, 
+                                  keyResults: updatedKeyResults 
+                                });
+                              }}
+                              placeholder="Masukkan judul key result..."
+                              className="text-sm"
+                            />
+                          </div>
+
+                          {/* Type Selection */}
+                          <div className="space-y-2">
+                            <Label htmlFor={`kr-type-${index}`} className="text-xs font-medium text-gray-700">
+                              Tipe Key Result:
+                            </Label>
+                            <Select
+                              value={keyResult.keyResultType}
+                              onValueChange={(value) => {
+                                const updatedKeyResults = [...currentKeyResults];
+                                updatedKeyResults[index] = { ...updatedKeyResults[index], keyResultType: value };
+                                setOnboardingData({ 
+                                  ...onboardingData, 
+                                  keyResults: updatedKeyResults 
+                                });
+                              }}
+                            >
+                              <SelectTrigger className="text-sm">
+                                <SelectValue placeholder="Pilih tipe key result" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="increase_to">Tingkatkan ke (Increase to)</SelectItem>
+                                <SelectItem value="decrease_to">Turunkan ke (Decrease to)</SelectItem>
+                                <SelectItem value="achieve_or_not">Capai atau Tidak (Achieve or Not)</SelectItem>
+                                <SelectItem value="should_stay_above">Tetap di Atas (Stay Above)</SelectItem>
+                                <SelectItem value="should_stay_below">Tetap di Bawah (Stay Below)</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          {/* Values Row */}
+                          {keyResult.keyResultType !== 'achieve_or_not' && (
+                            <div className="grid grid-cols-3 gap-3">
+                              {/* Base Value */}
+                              <div className="space-y-2">
+                                <Label htmlFor={`kr-base-${index}`} className="text-xs font-medium text-gray-700">
+                                  Nilai Awal:
+                                </Label>
+                                <Input
+                                  id={`kr-base-${index}`}
+                                  type="number"
+                                  value={keyResult.baseValue}
+                                  onChange={(e) => {
+                                    const updatedKeyResults = [...currentKeyResults];
+                                    updatedKeyResults[index] = { ...updatedKeyResults[index], baseValue: e.target.value };
+                                    setOnboardingData({ 
+                                      ...onboardingData, 
+                                      keyResults: updatedKeyResults 
+                                    });
+                                  }}
+                                  placeholder="0"
+                                  className="text-sm"
+                                />
+                              </div>
+
+                              {/* Current Value */}
+                              <div className="space-y-2">
+                                <Label htmlFor={`kr-current-${index}`} className="text-xs font-medium text-gray-700">
+                                  Nilai Saat Ini:
+                                </Label>
+                                <Input
+                                  id={`kr-current-${index}`}
+                                  type="number"
+                                  value={keyResult.currentValue}
+                                  onChange={(e) => {
+                                    const updatedKeyResults = [...currentKeyResults];
+                                    updatedKeyResults[index] = { ...updatedKeyResults[index], currentValue: e.target.value };
+                                    setOnboardingData({ 
+                                      ...onboardingData, 
+                                      keyResults: updatedKeyResults 
+                                    });
+                                  }}
+                                  placeholder="0"
+                                  className="text-sm"
+                                />
+                              </div>
+
+                              {/* Target Value */}
+                              <div className="space-y-2">
+                                <Label htmlFor={`kr-target-${index}`} className="text-xs font-medium text-gray-700">
+                                  Target:
+                                </Label>
+                                <Input
+                                  id={`kr-target-${index}`}
+                                  type="number"
+                                  value={keyResult.targetValue}
+                                  onChange={(e) => {
+                                    const updatedKeyResults = [...currentKeyResults];
+                                    updatedKeyResults[index] = { ...updatedKeyResults[index], targetValue: e.target.value };
+                                    setOnboardingData({ 
+                                      ...onboardingData, 
+                                      keyResults: updatedKeyResults 
+                                    });
+                                  }}
+                                  placeholder="100"
+                                  className="text-sm"
+                                />
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Unit */}
+                          {keyResult.keyResultType !== 'achieve_or_not' && (
+                            <div className="space-y-2">
+                              <Label htmlFor={`kr-unit-${index}`} className="text-xs font-medium text-gray-700">
+                                Satuan:
+                              </Label>
+                              <Select
+                                value={keyResult.unit}
+                                onValueChange={(value) => {
+                                  const updatedKeyResults = [...currentKeyResults];
+                                  updatedKeyResults[index] = { ...updatedKeyResults[index], unit: value };
+                                  setOnboardingData({ 
+                                    ...onboardingData, 
+                                    keyResults: updatedKeyResults 
+                                  });
+                                }}
+                              >
+                                <SelectTrigger className="text-sm">
+                                  <SelectValue placeholder="Pilih satuan" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="number">Angka</SelectItem>
+                                  <SelectItem value="percentage">Persentase (%)</SelectItem>
+                                  <SelectItem value="currency">Mata Uang (Rp)</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          )}
+                        </div>
+                      </Card>
                     ))}
                   </div>
-                  <p className="text-xs text-blue-600 bg-blue-50 p-2 rounded">
-                    💡 Tip: Pastikan key results dapat diukur dengan angka yang spesifik
+                  <p className="text-xs text-blue-600 bg-blue-50 p-3 rounded-lg">
+                    💡 <strong>Tips:</strong> Gunakan format database yang lengkap dengan tipe, nilai target, dan satuan yang sesuai untuk tracking progress yang akurat
                   </p>
                 </div>
               );
