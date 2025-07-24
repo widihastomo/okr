@@ -5,6 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { 
   Card, CardContent, CardDescription, CardHeader, CardTitle 
 } from "@/components/ui/card";
+import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -574,6 +575,16 @@ export default function TemplateManagement() {
                     </div>
                     
                     <div className="flex items-center space-x-2 pt-3">
+                      <Link href={`/template/${template.id}`}>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="flex-1"
+                        >
+                          <Eye className="w-4 h-4 mr-1" />
+                          Lihat Detail
+                        </Button>
+                      </Link>
                       <Button
                         variant="outline"
                         size="sm"

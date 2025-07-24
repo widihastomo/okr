@@ -1613,6 +1613,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get single goal template by ID
+  app.get("/api/goal-templates/single/:id", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      const templateId = req.params.id;
+      
+      // System owner can see all templates, regular users only their organization's templates
+      if (!currentUser.isSystemOwner && !currentUser.organizationId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const template = await storage.getGoalTemplate(templateId);
+      
+      if (!template) {
+        return res.status(404).json({ message: "Template not found" });
+      }
+      
+      // Check access permissions
+      if (!currentUser.isSystemOwner && template.organizationId !== currentUser.organizationId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      res.json(template);
+    } catch (error) {
+      console.error("Error fetching goal template:", error);
+      res.status(500).json({ message: "Failed to fetch goal template" });
+    }
+  });
+
   // Goal template CRUD for system owners
   app.post("/api/goal-templates", requireAuth, async (req, res) => {
     try {
