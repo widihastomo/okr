@@ -1615,31 +1615,7 @@ export default function CompanyOnboarding() {
                     <p className="text-sm text-gray-600">
                       Fokus pada peningkatan omzet dan penjualan
                     </p>
-                    {onboardingData.teamFocus === "penjualan" && (
-                      <div className="mt-3">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setHasLocalChanges(true);
-                            setOnboardingData({ 
-                              ...onboardingData, 
-                              teamFocus: "",
-                              objective: "",
-                              keyResults: [],
-                              initiatives: [],
-                              tasks: []
-                            });
-                            setSelectedTemplateId("");
-                          }}
-                          className="h-6 w-full text-xs text-orange-600 hover:text-orange-700 hover:bg-orange-100 border border-orange-200"
-                        >
-                          <Edit className="w-3 h-3 mr-1" />
-                          Ubah Fokus
-                        </Button>
-                      </div>
-                    )}
+                    
                   </div>
                 </div>
               </div>
@@ -1671,31 +1647,7 @@ export default function CompanyOnboarding() {
                     <p className="text-sm text-gray-600">
                       Optimalisasi proses, dan produktivitas operasional
                     </p>
-                    {onboardingData.teamFocus === "operasional" && (
-                      <div className="mt-3">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setHasLocalChanges(true);
-                            setOnboardingData({ 
-                              ...onboardingData, 
-                              teamFocus: "",
-                              objective: "",
-                              keyResults: [],
-                              initiatives: [],
-                              tasks: []
-                            });
-                            setSelectedTemplateId("");
-                          }}
-                          className="h-6 w-full text-xs text-orange-600 hover:text-orange-700 hover:bg-orange-100 border border-orange-200"
-                        >
-                          <Edit className="w-3 h-3 mr-1" />
-                          Ubah Fokus
-                        </Button>
-                      </div>
-                    )}
+                    
                   </div>
                 </div>
               </div>
@@ -1727,31 +1679,7 @@ export default function CompanyOnboarding() {
                     <p className="text-sm text-gray-600">
                       Peningkatan Kapasitas dan kinerja tim
                     </p>
-                    {onboardingData.teamFocus === "customer_service" && (
-                      <div className="mt-3">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setHasLocalChanges(true);
-                            setOnboardingData({ 
-                              ...onboardingData, 
-                              teamFocus: "",
-                              objective: "",
-                              keyResults: [],
-                              initiatives: [],
-                              tasks: []
-                            });
-                            setSelectedTemplateId("");
-                          }}
-                          className="h-6 w-full text-xs text-orange-600 hover:text-orange-700 hover:bg-orange-100 border border-orange-200"
-                        >
-                          <Edit className="w-3 h-3 mr-1" />
-                          Ubah Fokus
-                        </Button>
-                      </div>
-                    )}
+                    
                   </div>
                 </div>
               </div>
@@ -1783,31 +1711,7 @@ export default function CompanyOnboarding() {
                     <p className="text-sm text-gray-600">
                       Perluas pasar dan pengembangan produk
                     </p>
-                    {onboardingData.teamFocus === "marketing" && (
-                      <div className="mt-3">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setHasLocalChanges(true);
-                            setOnboardingData({ 
-                              ...onboardingData, 
-                              teamFocus: "",
-                              objective: "",
-                              keyResults: [],
-                              initiatives: [],
-                              tasks: []
-                            });
-                            setSelectedTemplateId("");
-                          }}
-                          className="h-6 w-full text-xs text-orange-600 hover:text-orange-700 hover:bg-orange-100 border border-orange-200"
-                        >
-                          <Edit className="w-3 h-3 mr-1" />
-                          Ubah Fokus
-                        </Button>
-                      </div>
-                    )}
+                    
                   </div>
                 </div>
               </div>
