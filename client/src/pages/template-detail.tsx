@@ -453,13 +453,12 @@ export default function TemplateDetailPage() {
   const [deleteKeyResultDialogOpen, setDeleteKeyResultDialogOpen] = useState(false);
   const [keyResultToDelete, setKeyResultToDelete] = useState<number>(-1);
   
-  // Form data for new components
-  const [newInitiative, setNewInitiative] = useState({
+  const [newTask, setNewTask] = useState({
     title: "",
     description: ""
   });
-  
-  const [newTask, setNewTask] = useState({
+
+  const [newInitiative, setNewInitiative] = useState({
     title: "",
     description: ""
   });
