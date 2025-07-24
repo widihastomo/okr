@@ -1660,107 +1660,215 @@ export default function CompanyOnboarding() {
         return (
           <div className="space-y-6">
 
-            {/* Simple OKR Explanation */}
-            <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-8">
+            {/* Engaging OKR Explanation */}
+            <div className="bg-gradient-to-br from-slate-50 to-blue-50 rounded-2xl shadow-xl border-2 border-blue-100 p-10 relative overflow-hidden">
+              {/* Subtle background decoration */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-blue-200 rounded-full -translate-y-16 translate-x-16 opacity-20"></div>
+              <div className="absolute bottom-0 left-0 w-24 h-24 bg-purple-200 rounded-full translate-y-12 -translate-x-12 opacity-20"></div>
+              
               {/* Header */}
-              <div className="text-center mb-8">
-                <h3 className="text-2xl font-bold text-gray-800 mb-2">Cara Kerja OKR</h3>
-                <p className="text-gray-600">
-                  4 langkah sederhana untuk mencapai tujuan
+              <div className="text-center mb-10 relative">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl mb-4 shadow-lg">
+                  <Target className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-3xl font-bold text-gray-800 mb-3">Cara Kerja OKR</h3>
+                <p className="text-gray-600 text-lg">
+                  4 langkah sederhana yang terbukti efektif untuk mencapai tujuan besar
                 </p>
               </div>
               
-              {/* Simple Steps */}
-              <div className="space-y-6">
+              {/* Enhanced Steps */}
+              <div className="space-y-8 relative">
                 {/* Step 1: Goal */}
-                <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-orange-500 rounded-lg flex items-center justify-center text-white font-bold text-lg">
-                    1
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="text-lg font-semibold text-gray-800 mb-2">GOAL / Tujuan</h4>
-                    <p className="text-gray-600 mb-3">Apa yang ingin dicapai dalam 3-6 bulan</p>
-                    <div className="bg-orange-50 rounded-lg p-3 border border-orange-200">
-                      <p className="text-sm text-gray-700">
-                        <strong>Contoh:</strong> "Meningkatkan penjualan produk secara signifikan"
-                      </p>
+                <div className="group">
+                  <div className="flex items-start space-x-6">
+                    <div className="relative">
+                      <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-orange-600 rounded-2xl flex items-center justify-center text-white font-bold text-xl shadow-xl group-hover:shadow-2xl transition-all duration-300">
+                        1
+                      </div>
+                      <div className="absolute -inset-2 bg-orange-200 rounded-2xl -z-10 opacity-0 group-hover:opacity-30 transition-all duration-300"></div>
                     </div>
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-3 mb-3">
+                        <h4 className="text-xl font-bold text-gray-800">GOAL / Tujuan</h4>
+                        <div className="px-3 py-1 bg-orange-500 text-white rounded-full text-xs font-bold">VISI BESAR</div>
+                      </div>
+                      <p className="text-gray-600 mb-4 text-lg">Apa yang ingin dicapai dalam 3-6 bulan ke depan</p>
+                      <div className="bg-gradient-to-r from-orange-50 to-orange-100 rounded-xl p-4 border-l-4 border-orange-400 shadow-md">
+                        <div className="flex items-center space-x-2 mb-2">
+                          <Sparkles className="w-4 h-4 text-orange-500" />
+                          <span className="text-sm font-bold text-orange-700">Contoh Real:</span>
+                        </div>
+                        <p className="text-gray-800 font-medium">
+                          "Meningkatkan penjualan produk secara signifikan"
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Connecting line */}
+                  <div className="flex justify-center my-6">
+                    <div className="w-1 h-8 bg-gradient-to-b from-orange-300 to-blue-300"></div>
                   </div>
                 </div>
 
                 {/* Step 2: Key Results */}
-                <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center text-white font-bold text-lg">
-                    2
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="text-lg font-semibold text-gray-800 mb-2">KEY RESULTS / Target Angka</h4>
-                    <p className="text-gray-600 mb-3">Angka spesifik yang mengukur pencapaian tujuan</p>
-                    <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
-                      <p className="text-sm text-gray-700 mb-2"><strong>Contoh:</strong></p>
-                      <ul className="text-sm text-gray-700 space-y-1">
-                        <li>• Penjualan naik 50% dari bulan lalu</li>
-                        <li>• Dapat 1000 pelanggan baru</li>
-                        <li>• Rating produk mencapai 4.5/5</li>
-                      </ul>
+                <div className="group">
+                  <div className="flex items-start space-x-6">
+                    <div className="relative">
+                      <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl flex items-center justify-center text-white font-bold text-xl shadow-xl group-hover:shadow-2xl transition-all duration-300">
+                        2
+                      </div>
+                      <div className="absolute -inset-2 bg-blue-200 rounded-2xl -z-10 opacity-0 group-hover:opacity-30 transition-all duration-300"></div>
                     </div>
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-3 mb-3">
+                        <h4 className="text-xl font-bold text-gray-800">KEY RESULTS / Target Angka</h4>
+                        <div className="px-3 py-1 bg-blue-500 text-white rounded-full text-xs font-bold">TERUKUR</div>
+                      </div>
+                      <p className="text-gray-600 mb-4 text-lg">Angka spesifik yang mengukur pencapaian tujuan</p>
+                      <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl p-4 border-l-4 border-blue-400 shadow-md">
+                        <div className="flex items-center space-x-2 mb-3">
+                          <BarChart3 className="w-4 h-4 text-blue-500" />
+                          <span className="text-sm font-bold text-blue-700">Target Konkret:</span>
+                        </div>
+                        <div className="space-y-2">
+                          <div className="flex items-center space-x-2">
+                            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                            <span className="text-gray-800">Penjualan naik 50% dari bulan lalu</span>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                            <span className="text-gray-800">Dapat 1000 pelanggan baru</span>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                            <span className="text-gray-800">Rating produk mencapai 4.5/5</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Connecting line */}
+                  <div className="flex justify-center my-6">
+                    <div className="w-1 h-8 bg-gradient-to-b from-blue-300 to-green-300"></div>
                   </div>
                 </div>
 
                 {/* Step 3: Initiatives */}
-                <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center text-white font-bold text-lg">
-                    3
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="text-lg font-semibold text-gray-800 mb-2">INITIATIVES / Strategi</h4>
-                    <p className="text-gray-600 mb-3">Program besar yang dilakukan untuk mencapai target</p>
-                    <div className="bg-green-50 rounded-lg p-3 border border-green-200">
-                      <p className="text-sm text-gray-700 mb-2"><strong>Contoh:</strong></p>
-                      <ul className="text-sm text-gray-700 space-y-1">
-                        <li>• Kampanye marketing di media sosial</li>
-                        <li>• Program diskon untuk pelanggan baru</li>
-                        <li>• Pelatihan tim customer service</li>
-                      </ul>
+                <div className="group">
+                  <div className="flex items-start space-x-6">
+                    <div className="relative">
+                      <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-2xl flex items-center justify-center text-white font-bold text-xl shadow-xl group-hover:shadow-2xl transition-all duration-300">
+                        3
+                      </div>
+                      <div className="absolute -inset-2 bg-green-200 rounded-2xl -z-10 opacity-0 group-hover:opacity-30 transition-all duration-300"></div>
                     </div>
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-3 mb-3">
+                        <h4 className="text-xl font-bold text-gray-800">INITIATIVES / Strategi</h4>
+                        <div className="px-3 py-1 bg-green-500 text-white rounded-full text-xs font-bold">PROGRAM</div>
+                      </div>
+                      <p className="text-gray-600 mb-4 text-lg">Program besar yang dilakukan untuk mencapai target</p>
+                      <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-xl p-4 border-l-4 border-green-400 shadow-md">
+                        <div className="flex items-center space-x-2 mb-3">
+                          <Lightbulb className="w-4 h-4 text-green-500" />
+                          <span className="text-sm font-bold text-green-700">Rencana Strategis:</span>
+                        </div>
+                        <div className="space-y-2">
+                          <div className="flex items-center space-x-2">
+                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                            <span className="text-gray-800">Kampanye marketing di media sosial</span>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                            <span className="text-gray-800">Program diskon untuk pelanggan baru</span>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                            <span className="text-gray-800">Pelatihan tim customer service</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Connecting line */}
+                  <div className="flex justify-center my-6">
+                    <div className="w-1 h-8 bg-gradient-to-b from-green-300 to-purple-300"></div>
                   </div>
                 </div>
 
                 {/* Step 4: Tasks */}
-                <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center text-white font-bold text-lg">
-                    4
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="text-lg font-semibold text-gray-800 mb-2">TASKS / Tugas Harian</h4>
-                    <p className="text-gray-600 mb-3">Aktivitas konkret yang dikerjakan setiap hari</p>
-                    <div className="bg-purple-50 rounded-lg p-3 border border-purple-200">
-                      <p className="text-sm text-gray-700 mb-2"><strong>Contoh:</strong></p>
-                      <ul className="text-sm text-gray-700 space-y-1">
-                        <li>• Posting konten di Instagram setiap hari</li>
-                        <li>• Menelpon 10 calon pelanggan</li>
-                        <li>• Update website dengan produk baru</li>
-                      </ul>
+                <div className="group">
+                  <div className="flex items-start space-x-6">
+                    <div className="relative">
+                      <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-purple-600 rounded-2xl flex items-center justify-center text-white font-bold text-xl shadow-xl group-hover:shadow-2xl transition-all duration-300">
+                        4
+                      </div>
+                      <div className="absolute -inset-2 bg-purple-200 rounded-2xl -z-10 opacity-0 group-hover:opacity-30 transition-all duration-300"></div>
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-3 mb-3">
+                        <h4 className="text-xl font-bold text-gray-800">TASKS / Tugas Harian</h4>
+                        <div className="px-3 py-1 bg-purple-500 text-white rounded-full text-xs font-bold">EKSEKUSI</div>
+                      </div>
+                      <p className="text-gray-600 mb-4 text-lg">Aktivitas konkret yang dikerjakan setiap hari</p>
+                      <div className="bg-gradient-to-r from-purple-50 to-purple-100 rounded-xl p-4 border-l-4 border-purple-400 shadow-md">
+                        <div className="flex items-center space-x-2 mb-3">
+                          <CheckCircle className="w-4 h-4 text-purple-500" />
+                          <span className="text-sm font-bold text-purple-700">Action Items:</span>
+                        </div>
+                        <div className="space-y-2">
+                          <div className="flex items-center space-x-2">
+                            <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                            <span className="text-gray-800">Posting konten di Instagram setiap hari</span>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                            <span className="text-gray-800">Menelpon 10 calon pelanggan</span>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                            <span className="text-gray-800">Update website dengan produk baru</span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
               
-              {/* Simple Summary */}
-              <div className="mt-8 bg-gray-50 rounded-lg p-6 border border-gray-200">
-                <h4 className="text-lg font-semibold text-gray-800 mb-3 text-center">Urutan Kerja OKR</h4>
-                <div className="flex items-center justify-center space-x-3 text-sm">
-                  <span className="px-3 py-1 bg-orange-100 text-orange-800 rounded-full font-medium">Tujuan</span>
-                  <ArrowRight className="w-4 h-4 text-gray-400" />
-                  <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full font-medium">Target</span>
-                  <ArrowRight className="w-4 h-4 text-gray-400" />
-                  <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full font-medium">Strategi</span>
-                  <ArrowRight className="w-4 h-4 text-gray-400" />
-                  <span className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full font-medium">Tugas</span>
+              {/* Attractive Summary */}
+              <div className="mt-10 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-6 shadow-xl relative overflow-hidden">
+                <div className="absolute inset-0 bg-black/10"></div>
+                <div className="relative">
+                  <div className="flex items-center justify-center space-x-2 mb-4">
+                    <Zap className="w-5 h-5 text-white" />
+                    <h4 className="text-xl font-bold text-white">Formula Sukses OKR</h4>
+                  </div>
+                  <div className="flex items-center justify-center space-x-3 mb-4 flex-wrap">
+                    <span className="px-4 py-2 bg-white/20 backdrop-blur-sm text-white rounded-full font-bold text-sm shadow-lg">
+                      🎯 Tujuan
+                    </span>
+                    <ArrowRight className="w-4 h-4 text-white/80" />
+                    <span className="px-4 py-2 bg-white/20 backdrop-blur-sm text-white rounded-full font-bold text-sm shadow-lg">
+                      📊 Target
+                    </span>
+                    <ArrowRight className="w-4 h-4 text-white/80" />
+                    <span className="px-4 py-2 bg-white/20 backdrop-blur-sm text-white rounded-full font-bold text-sm shadow-lg">
+                      🚀 Strategi
+                    </span>
+                    <ArrowRight className="w-4 h-4 text-white/80" />
+                    <span className="px-4 py-2 bg-white/20 backdrop-blur-sm text-white rounded-full font-bold text-sm shadow-lg">
+                      ✅ Eksekusi
+                    </span>
+                  </div>
+                  <p className="text-white/90 text-center leading-relaxed">
+                    <strong>Kunci keberhasilan:</strong> Setiap tugas harian mendukung strategi → strategi mencapai target → target mewujudkan tujuan besar
+                  </p>
                 </div>
-                <p className="text-gray-600 text-sm mt-3 text-center">
-                  Setiap tugas harian mendukung strategi → strategi mencapai target → target mewujudkan tujuan
-                </p>
               </div>
             </div>
 
