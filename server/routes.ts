@@ -1561,6 +1561,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Goal Templates endpoints
+  app.get("/api/goal-templates/all", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      
+      // Get all goal templates for the user's organization
+      if (!currentUser.organizationId) {
+        return res.status(400).json({ message: "User not associated with an organization" });
+      }
+      
+      const templates = await storage.getAllGoalTemplates(currentUser.organizationId);
+      res.json(templates);
+    } catch (error) {
+      console.error("Error fetching all goal templates:", error);
+      res.status(500).json({ message: "Failed to fetch all goal templates" });
+    }
+  });
+
   app.get("/api/goal-templates/:focusArea", requireAuth, async (req, res) => {
     try {
       const focusArea = req.params.focusArea;

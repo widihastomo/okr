@@ -41,6 +41,7 @@ export interface IStorage {
   createOKRFromTemplate(data: CreateOKRFromTemplate): Promise<OKRWithKeyResults[]>;
 
   // Goal Templates
+  getAllGoalTemplates(organizationId: string): Promise<GoalTemplate[]>;
   getGoalTemplatesByFocusArea(focusAreaTag: string): Promise<GoalTemplate[]>;
   getGoalTemplate(id: string): Promise<GoalTemplate | undefined>;
   createGoalTemplate(template: InsertGoalTemplate): Promise<GoalTemplate>;
@@ -3501,6 +3502,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Goal Templates
+  async getAllGoalTemplates(organizationId: string): Promise<GoalTemplate[]> {
+    return await db
+      .select()
+      .from(goalTemplates)
+      .where(eq(goalTemplates.organizationId, organizationId))
+      .orderBy(asc(goalTemplates.title));
+  }
+
   async getGoalTemplatesByFocusArea(focusAreaTag: string): Promise<GoalTemplate[]> {
     return await db
       .select()

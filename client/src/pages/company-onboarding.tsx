@@ -280,6 +280,12 @@ export default function CompanyOnboarding() {
     enabled: !!onboardingData.teamFocus
   });
 
+  // Fetch all goal templates for step 5 (initiative selection needs access to all templates)
+  const { data: allGoalTemplates } = useQuery({
+    queryKey: ["/api/goal-templates/all"],
+    enabled: onboardingData.currentStep === 5
+  });
+
   // Fetch users for key result assignment
   const { data: users } = useQuery({
     queryKey: ["/api/my-team-users"],
@@ -2371,14 +2377,14 @@ export default function CompanyOnboarding() {
         );
 
       case 5: // Pilihan Inisiatif Strategis
-        // Get selected template based on objective
-        const selectedTemplate = goalTemplates?.find(template => template.title === onboardingData.objective);
+        // Get selected template based on objective from all templates (not just current focus area)
+        const selectedTemplate = allGoalTemplates?.find(template => template.title === onboardingData.objective);
         
         // Debug logging
         console.log("🔍 Step 5 Debug:", {
           objective: onboardingData.objective,
-          templateCount: goalTemplates?.length || 0,
-          templateTitles: goalTemplates?.map(t => t.title) || [],
+          allTemplateCount: allGoalTemplates?.length || 0,
+          allTemplateTitles: allGoalTemplates?.map(t => t.title) || [],
           selectedTemplate: selectedTemplate ? selectedTemplate.title : "NOT FOUND",
           selectedTemplateInitiatives: selectedTemplate?.initiatives || "NO INITIATIVES"
         });
