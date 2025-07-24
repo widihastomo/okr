@@ -2094,6 +2094,7 @@ export default function CompanyOnboarding() {
                         setOnboardingData({ 
                           ...onboardingData, 
                           objective: template.title,
+                          objectiveDescription: template.description, // Add description from template
                           // Set default 1-month cycle
                           cycleDuration: "1bulan",
                           cycleStartDate: startDate.toISOString().split('T')[0],

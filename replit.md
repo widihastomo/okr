@@ -452,6 +452,12 @@ The system now includes a comprehensive dummy data generation feature that creat
 
 ## Changelog
 ```
+- July 24, 2025. **GOAL EDIT DESCRIPTION BUG FIXED** - Successfully resolved issue where goal description was not populated in edit modal:
+  * IDENTIFIED: objectiveDescription was not being saved to onboardingData when template was selected
+  * FIXED: Added objectiveDescription: template.description to setOnboardingData when template is selected
+  * ENHANCED: Edit Goal modal now properly populates with existing description from template or custom edits
+  * TESTED: Goal template selection now saves description, edit modal shows correct data
+  * RESULT: Edit Goal modal description field properly populated with template description when editing goals
 - July 24, 2025. **MANUAL SEEDER WITH GOAL TEMPLATES COMPLETED** - Successfully enhanced manual seeder to include goal templates for complete database setup:
   * ENHANCED: server/manual-seeder.ts now includes goal templates seeder with 8 comprehensive templates
   * INCLUDED: Goal templates across 4 focus areas (penjualan, marketing, operasional, customer_service) with proper key results, initiatives, and tasks
