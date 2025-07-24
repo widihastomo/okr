@@ -1671,7 +1671,7 @@ export default function CompanyOnboarding() {
                 <div className="inline-flex items-center justify-center w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl md:rounded-2xl mb-3 md:mb-4 shadow-lg">
                   <Target className="w-6 h-6 md:w-8 md:h-8 text-white" />
                 </div>
-                <h3 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2 md:mb-3">Cara Kerja OKR</h3>
+                
                 <p className="text-gray-600 text-base md:text-lg px-2">
                   4 langkah sederhana yang terbukti efektif untuk mencapai tujuan besar
                 </p>
