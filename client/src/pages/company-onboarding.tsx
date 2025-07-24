@@ -192,11 +192,7 @@ export default function CompanyOnboarding() {
   const [isRedirecting, setIsRedirecting] = useState(false);
   const { startTour } = useTour();
 
-  // Fetch organization data for company details
-  const { data: organizationData } = useQuery({
-    queryKey: ["/api/my-organization-with-role"],
-    enabled: !!user,
-  });
+  // Initialize state first
   const [onboardingData, setOnboardingData] = useState<OnboardingData>({
     currentStep: 0, // Start at welcome screen
     completedSteps: [],
@@ -223,6 +219,18 @@ export default function CompanyOnboarding() {
     tasks: [],
     firstCheckIn: "",
     isCompleted: false,
+  });
+
+  // Fetch organization data for company details
+  const { data: organizationData } = useQuery({
+    queryKey: ["/api/my-organization-with-role"],
+    enabled: !!user,
+  });
+
+  // Fetch goal templates based on selected focus area
+  const { data: goalTemplates, isLoading: isLoadingTemplates } = useQuery({
+    queryKey: [`/api/goal-templates/${onboardingData.teamFocus}`],
+    enabled: !!onboardingData.teamFocus
   });
 
   // Options for searchable select boxes
@@ -1893,42 +1901,25 @@ export default function CompanyOnboarding() {
         );
 
       case 4: // Buat Objective
-        const getObjectiveOptions = (teamFocus: string) => {
-          const options: Record<string, string[]> = {
-            penjualan: [
-              "Menciptakan pertumbuhan penjualan yang berkelanjutan dan signifikan",
-              "Membangun basis pelanggan yang kuat dan loyal",
-              "Mengoptimalkan konversi prospek menjadi pelanggan",
-            ],
-            operasional: [
-              "Mencapai efisiensi operasional yang optimal dan berkelanjutan",
-              "Mempercepat proses produksi dengan kualitas terjaga",
-              "Mengoptimalkan biaya operasional tanpa mengurangi kualitas",
-            ],
-            customer_service: [
-              "Mencapai kepuasan pelanggan yang luar biasa dan berkelanjutan",
-              "Memberikan respon pelanggan yang cepat dan efektif",
-              "Membangun loyalitas pelanggan dan advokasi yang tinggi",
-            ],
-            marketing: [
-              "Meningkatkan kesadaran merek di pasar target",
-              "Membangun komunitas yang aktif dan engaged di media sosial",
-              "Menghasilkan lead berkualitas tinggi secara konsisten",
-            ],
-          };
-          return options[teamFocus] || [];
-        };
-
-        const objectiveOptions = getObjectiveOptions(onboardingData.teamFocus || "");
-
         return (
           <div className="space-y-4">
-            {objectiveOptions.length > 0 && (
+            {isLoadingTemplates ? (
+              <div className="flex items-center justify-center p-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600"></div>
+                <span className="ml-3 text-gray-600">Memuat template goal...</span>
+              </div>
+            ) : goalTemplates && goalTemplates.length > 0 ? (
               <div className="space-y-3">
                 <Label>
-                  Dari beberapa goal yang bisa dipilih, mana yang bisa anda
-                  fokuskan supaya terjadi peningkatan {onboardingData.teamFocus}
-                  :
+                  Pilih goal template yang sesuai dengan fokus bisnis Anda ({onboardingData.teamFocus === "penjualan"
+                    ? "Tingkatkan Pendapatan"
+                    : onboardingData.teamFocus === "operasional"
+                      ? "Rapikan Operasional"
+                      : onboardingData.teamFocus === "customer_service"
+                        ? "Kembangkan Tim"
+                        : onboardingData.teamFocus === "marketing"
+                          ? "Ekspansi Bisnis"
+                          : ""}):
                 </Label>
                 <RadioGroup
                   value={onboardingData.objective}
@@ -1936,39 +1927,61 @@ export default function CompanyOnboarding() {
                     setOnboardingData({ ...onboardingData, objective: value })
                   }
                 >
-                  {objectiveOptions.map((option: string, index: number) => (
+                  {goalTemplates.map((template: any, index: number) => (
                     <div
-                      key={index}
-                      className="flex items-start space-x-2 p-3 rounded-lg border border-gray-200 hover:bg-gray-50"
+                      key={template.id}
+                      className="flex items-start space-x-2 p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
                     >
                       <RadioGroupItem
-                        value={option}
-                        id={`objective-${index}`}
+                        value={template.title}
+                        id={`template-${template.id}`}
                         className="mt-1"
                       />
-                      <div className="flex items-start space-x-2 flex-1">
-                        <Target className="w-4 h-4 text-orange-600 mt-0.5 flex-shrink-0" />
-                        <Label
-                          htmlFor={`objective-${index}`}
-                          className="cursor-pointer leading-relaxed"
-                        >
-                          {option}
-                        </Label>
+                      <div className="flex-1 space-y-2">
+                        <div className="flex items-start space-x-2">
+                          <Target className="w-4 h-4 text-orange-600 mt-0.5 flex-shrink-0" />
+                          <Label
+                            htmlFor={`template-${template.id}`}
+                            className="cursor-pointer leading-relaxed font-medium"
+                          >
+                            {template.title}
+                          </Label>
+                        </div>
+                        {template.description && (
+                          <p className="text-sm text-gray-600 ml-6 leading-relaxed">
+                            {template.description}
+                          </p>
+                        )}
+                        {template.targetValue && template.unit && (
+                          <div className="ml-6 flex items-center space-x-2">
+                            <div className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-medium">
+                              Target: {template.targetValue} {template.unit}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}
                 </RadioGroup>
               </div>
+            ) : (
+              <div className="text-center p-8 text-gray-500">
+                <Target className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                <p>Tidak ada template goal untuk fokus area yang dipilih.</p>
+              </div>
             )}
 
-            {onboardingData.objective &&
-              objectiveOptions.includes(onboardingData.objective) && (
-                <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
-                  <p className="text-sm text-blue-800">
-                    <strong>Goal terpilih:</strong> {onboardingData.objective}
-                  </p>
+            {onboardingData.objective && (
+              <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <div className="flex items-center space-x-2 mb-2">
+                  <CheckCircle className="w-5 h-5 text-blue-600" />
+                  <p className="font-medium text-blue-800">Goal Template Terpilih</p>
                 </div>
-              )}
+                <p className="text-sm text-blue-700 leading-relaxed">
+                  {onboardingData.objective}
+                </p>
+              </div>
+            )}
           </div>
         );
 
@@ -4152,13 +4165,10 @@ export default function CompanyOnboarding() {
                               </div>
                               <div className="mt-2 text-center">
                                 <div className="flex items-center justify-center gap-1 mb-1">
-                                  <Target className={`w-4 h-4 ${
-                                    onboardingData.currentStep >= 4 ? 'text-orange-600' : 'text-gray-400'
-                                  }`} />
                                   <p className={`text-xs font-medium ${
                                     onboardingData.currentStep >= 4 ? 'text-orange-700' : 'text-gray-500'
                                   }`}>
-                                    Buat Goal
+                                    1. Buat Goal
                                   </p>
                                 </div>
                               </div>
@@ -4180,13 +4190,10 @@ export default function CompanyOnboarding() {
                               </div>
                               <div className="mt-2 text-center">
                                 <div className="flex items-center justify-center gap-1 mb-1">
-                                  <TrendingUp className={`w-4 h-4 ${
-                                    onboardingData.currentStep >= 5 ? 'text-orange-600' : 'text-gray-400'
-                                  }`} />
                                   <p className={`text-xs font-medium ${
                                     onboardingData.currentStep >= 5 ? 'text-orange-700' : 'text-gray-500'
                                   }`}>
-                                    Ukuran Keberhasilan
+                                    2. Ukuran Keberhasilan
                                   </p>
                                 </div>
                               </div>
@@ -4208,13 +4215,10 @@ export default function CompanyOnboarding() {
                               </div>
                               <div className="mt-2 text-center">
                                 <div className="flex items-center justify-center gap-1 mb-1">
-                                  <Lightbulb className={`w-4 h-4 ${
-                                    onboardingData.currentStep >= 6 ? 'text-orange-600' : 'text-gray-400'
-                                  }`} />
                                   <p className={`text-xs font-medium ${
                                     onboardingData.currentStep >= 6 ? 'text-orange-700' : 'text-gray-500'
                                   }`}>
-                                    Pilih Inisiatif
+                                    3. Pilih Inisiatif
                                   </p>
                                 </div>
                               </div>
@@ -4236,13 +4240,10 @@ export default function CompanyOnboarding() {
                               </div>
                               <div className="mt-2 text-center">
                                 <div className="flex items-center justify-center gap-1 mb-1">
-                                  <ListTodo className={`w-4 h-4 ${
-                                    onboardingData.currentStep >= 7 ? 'text-orange-600' : 'text-gray-400'
-                                  }`} />
                                   <p className={`text-xs font-medium ${
                                     onboardingData.currentStep >= 7 ? 'text-orange-700' : 'text-gray-500'
                                   }`}>
-                                    Pilih Task
+                                    4. Pilih Task
                                   </p>
                                 </div>
                               </div>

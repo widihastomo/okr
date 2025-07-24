@@ -13,10 +13,10 @@ import {
   teams, teamMembers, cycles, objectives, keyResults, checkIns, initiatives, tasks, taskComments,
   initiativeSuccessMetrics, successMetricUpdates, definitionOfDoneItems, initiativeComments, initiativeNotes,
   initiativeDocuments, initiativeMembers, templates, userAchievements, userStats, activityLogs,
-  userActivityLog, notifications, userOnboardingProgress, taskAuditTrail,
+  userActivityLog, notifications, userOnboardingProgress, taskAuditTrail, goalTemplates, insertGoalTemplateSchema,
   type User, type SubscriptionPlan, type Organization, type OrganizationSubscription, type UserOnboardingProgress, type UpdateOnboardingProgress, type CompanyOnboardingData,
   type InsertUser, type ApplicationSetting, type InsertApplicationSetting, type UpdateApplicationSetting,
-  type TaskAuditTrail, type InsertTaskAuditTrail
+  type TaskAuditTrail, type InsertTaskAuditTrail, type GoalTemplate
 } from "@shared/schema";
 import { z } from "zod";
 import { createInsertSchema } from "drizzle-zod";
@@ -1557,6 +1557,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid data", errors: error.errors });
       }
       res.status(500).json({ message: "Failed to create OKR from template" });
+    }
+  });
+
+  // Goal Templates endpoints
+  app.get("/api/goal-templates/:focusArea", requireAuth, async (req, res) => {
+    try {
+      const focusArea = req.params.focusArea;
+      
+      // Validate focus area
+      const validFocusAreas = ['penjualan', 'operasional', 'customer_service', 'marketing'];
+      if (!validFocusAreas.includes(focusArea)) {
+        return res.status(400).json({ message: "Invalid focus area" });
+      }
+      
+      const templates = await storage.getGoalTemplatesByFocusArea(focusArea);
+      res.json(templates);
+    } catch (error) {
+      console.error("Error fetching goal templates:", error);
+      res.status(500).json({ message: "Failed to fetch goal templates" });
     }
   });
 

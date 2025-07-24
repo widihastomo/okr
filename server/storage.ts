@@ -3,7 +3,7 @@ import {
   initiativeMembers, initiativeDocuments, initiativeNotes, initiativeComments, initiativeSuccessMetrics, successMetricUpdates,
   notifications, notificationPreferences, userOnboardingProgress, organizations, applicationSettings, auditTrail,
   subscriptionPlans, billingPeriods, organizationSubscriptions, timelineComments, timelineReactions, definitionOfDoneItems,
-  timelineUpdates,
+  timelineUpdates, goalTemplates,
   type Cycle, type Template, type Objective, type KeyResult, type User, type Team, type TeamMember,
   type CheckIn, type Initiative, type Task, type TaskComment, type TaskAuditTrail, type KeyResultWithDetails, type InitiativeMember, type InitiativeDocument,
   type InitiativeNote, type InitiativeComment, type InsertCycle, type InsertTemplate, type InsertObjective, type InsertKeyResult, 
@@ -15,7 +15,7 @@ import {
   type UserOnboardingProgress, type InsertUserOnboardingProgress, type UpdateOnboardingProgress,
   type ApplicationSetting, type InsertApplicationSetting, type UpdateApplicationSetting,
   type Organization, type TimelineComment, type TimelineReaction, type InsertTimelineComment, type InsertTimelineReaction,
-  type InsertDefinitionOfDoneItem, insertTimelineUpdateSchema
+  type InsertDefinitionOfDoneItem, insertTimelineUpdateSchema, type GoalTemplate, type InsertGoalTemplate
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, asc, inArray, count, sql } from "drizzle-orm";
@@ -39,6 +39,11 @@ export interface IStorage {
   updateTemplate(id: string, template: Partial<InsertTemplate>): Promise<Template | undefined>;
   deleteTemplate(id: string): Promise<boolean>;
   createOKRFromTemplate(data: CreateOKRFromTemplate): Promise<OKRWithKeyResults[]>;
+
+  // Goal Templates
+  getGoalTemplatesByFocusArea(focusAreaTag: string): Promise<GoalTemplate[]>;
+  getGoalTemplate(id: string): Promise<GoalTemplate | undefined>;
+  createGoalTemplate(template: InsertGoalTemplate): Promise<GoalTemplate>;
   
   // Objectives
   getObjectives(): Promise<Objective[]>;
@@ -3536,6 +3541,32 @@ export class DatabaseStorage implements IStorage {
         eq(timelineReactions.emoji, emoji)
       ));
     return reaction || undefined;
+  }
+
+  // Goal Templates
+  async getGoalTemplatesByFocusArea(focusAreaTag: string): Promise<GoalTemplate[]> {
+    return await db
+      .select()
+      .from(goalTemplates)
+      .where(eq(goalTemplates.focusAreaTag, focusAreaTag))
+      .orderBy(desc(goalTemplates.createdAt));
+  }
+
+  async getGoalTemplate(id: string): Promise<GoalTemplate | undefined> {
+    const [template] = await db
+      .select()
+      .from(goalTemplates)
+      .where(eq(goalTemplates.id, id))
+      .limit(1);
+    return template || undefined;
+  }
+
+  async createGoalTemplate(template: InsertGoalTemplate): Promise<GoalTemplate> {
+    const [newTemplate] = await db
+      .insert(goalTemplates)
+      .values(template)
+      .returning();
+    return newTemplate;
   }
 }
 

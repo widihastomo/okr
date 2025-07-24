@@ -25,8 +25,23 @@ export const templates = pgTable("templates", {
   objectives: text("objectives").notNull(), // JSON string of objective templates
   organizationId: uuid("organization_id").references(() => organizations.id), // organization ID for multi-tenant security
   createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),  
   lastUpdateBy: uuid("last_update_by").references(() => users.id), // user ID who last updated the template
+});
+
+// Goal Templates with Focus Area Tagging
+export const goalTemplates = pgTable("goal_templates", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  title: text("title").notNull(),
+  description: text("description"),
+  focusAreaTag: text("focus_area_tag").notNull(), // "penjualan", "operasional", "customer_service", "marketing"
+  keyResults: jsonb("key_results").notNull(), // Array of key result templates
+  initiatives: jsonb("initiatives").notNull(), // Array of initiative templates  
+  tasks: jsonb("tasks").notNull(), // Array of task templates
+  isDefault: boolean("is_default").default(true), // System-provided templates
+  organizationId: uuid("organization_id").references(() => organizations.id), // null for system templates
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const objectives = pgTable("objectives", {
@@ -855,6 +870,16 @@ export const insertTimelineUpdateSchema = createInsertSchema(timelineUpdates).om
   createdAt: true,
   updatedAt: true,
 });
+
+// Goal Template Schema
+export const insertGoalTemplateSchema = createInsertSchema(goalTemplates).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type GoalTemplate = typeof goalTemplates.$inferSelect;
+export type InsertGoalTemplate = z.infer<typeof insertGoalTemplateSchema>;
 
 // SaaS Insert Schemas
 export const insertSubscriptionPlanSchema = createInsertSchema(subscriptionPlans).omit({
