@@ -1993,6 +1993,9 @@ export default function CompanyOnboarding() {
                         // Track the selected template ID
                         setSelectedTemplateId(template.id);
                         
+                        // Clear edited data when switching templates
+                        setEditedKeyResults({});
+                        
                         setOnboardingData({ 
                           ...onboardingData, 
                           objective: template.title,
@@ -2011,7 +2014,7 @@ export default function CompanyOnboarding() {
                       <div className="space-y-2">
                         <div className="flex items-start justify-between">
                           <h3 className="leading-relaxed font-semibold text-base flex-1">
-                            {selectedTemplateId === template.id ? onboardingData.objective : template.title}
+                            {selectedTemplateId === template.id && onboardingData.objective !== template.title ? onboardingData.objective : template.title}
                           </h3>
                           {selectedTemplateId === template.id && (
                             <Button
@@ -2046,8 +2049,8 @@ export default function CompanyOnboarding() {
                             </div>
                             <div className="space-y-1">
                               {template.keyResults.slice(0, 3).map((keyResult: any, krIndex: number) => {
-                                // Use edited data if available, otherwise use original template data
-                                const displayKeyResult = editedKeyResults[krIndex] || keyResult;
+                                // Use edited data only if this template is selected and has edits, otherwise use original template data
+                                const displayKeyResult = (selectedTemplateId === template.id && editedKeyResults[krIndex]) ? editedKeyResults[krIndex] : keyResult;
                                 
                                 return (
                                 <div key={krIndex} className="flex items-center justify-between group">
