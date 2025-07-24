@@ -32,6 +32,40 @@ import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
 
+// Template Key Result Type Options
+const templateKeyResultTypes = [
+  {
+    value: "increase_to",
+    label: "Naik ke Target",
+    icon: TrendingUp,
+    color: "text-green-600 border-green-200 bg-green-50"
+  },
+  {
+    value: "decrease_to", 
+    label: "Turun ke Target",
+    icon: TrendingDown,
+    color: "text-red-600 border-red-200 bg-red-50"
+  },
+  {
+    value: "achieve_or_not",
+    label: "Dicapai/Tidak",
+    icon: Target,
+    color: "text-blue-600 border-blue-200 bg-blue-50"
+  },
+  {
+    value: "should_stay_above",
+    label: "Tetap di Atas",
+    icon: Plus,
+    color: "text-emerald-600 border-emerald-200 bg-emerald-50"
+  },
+  {
+    value: "should_stay_below",
+    label: "Tetap di Bawah", 
+    icon: TrendingDown,
+    color: "text-amber-600 border-amber-200 bg-amber-50"
+  }
+];
+
 // UI Components
 import { 
   Card, 
@@ -69,6 +103,14 @@ import {
 } from "@/components/ui/tooltip";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -93,14 +135,6 @@ const focusAreaOptions = [
   { value: "operasional", label: "Rapikan Operasional", icon: Settings, color: "bg-blue-100 text-blue-800" },
   { value: "customer_service", label: "Kembangkan Tim", icon: Users, color: "bg-purple-100 text-purple-800" },
   { value: "marketing", label: "Ekspansi Bisnis", icon: Target, color: "bg-orange-100 text-orange-800" }
-];
-
-const keyResultTypeOptions = [
-  { value: "increase_to", label: "Meningkat ke", icon: TrendingUp, color: "text-green-600" },
-  { value: "decrease_to", label: "Menurun ke", icon: TrendingDown, color: "text-red-600" },
-  { value: "achieve_or_not", label: "Tercapai/Tidak", icon: Target, color: "text-blue-600" },
-  { value: "should_stay_above", label: "Tetap di atas", icon: Plus, color: "text-emerald-600" },
-  { value: "should_stay_below", label: "Tetap di bawah", icon: TrendingDown, color: "text-amber-600" }
 ];
 
 // Template Overview Card Component
@@ -201,7 +235,17 @@ function TemplateOverviewCard({ template }: { template: any }) {
 }
 
 // Key Results Card Component
-function KeyResultsCard({ keyResults, onAddKeyResult }: { keyResults: any[], onAddKeyResult: () => void }) {
+function KeyResultsCard({ 
+  keyResults, 
+  onAddKeyResult, 
+  onEditKeyResult, 
+  onDeleteKeyResult 
+}: { 
+  keyResults: any[], 
+  onAddKeyResult: () => void,
+  onEditKeyResult: (keyResult: any, index: number) => void,
+  onDeleteKeyResult: (index: number) => void
+}) {
   return (
     <Card>
       <CardHeader>
@@ -223,43 +267,73 @@ function KeyResultsCard({ keyResults, onAddKeyResult }: { keyResults: any[], onA
       </CardHeader>
       <CardContent>
         {keyResults && keyResults.length > 0 ? (
-          <div className="space-y-4">
-            {keyResults.map((kr: any, index: number) => {
-              const krType = keyResultTypeOptions.find(t => t.value === kr.keyResultType);
-              const TypeIcon = krType?.icon || Target;
-              
-              return (
-                <div key={index} className="border rounded-lg p-4">
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="flex-1">
-                      <h4 className="font-medium">{kr.title}</h4>
-                      {kr.description && (
-                        <p className="text-sm text-gray-600 mt-1">{kr.description}</p>
-                      )}
-                    </div>
-                    <Badge variant="outline" className={krType?.color}>
-                      <TypeIcon className="w-3 h-3 mr-1" />
-                      {krType?.label}
-                    </Badge>
-                  </div>
+          <div className="border rounded-lg">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Judul & Deskripsi</TableHead>
+                  <TableHead>Tipe</TableHead>
+                  <TableHead>Baseline</TableHead>
+                  <TableHead>Target</TableHead>
+                  <TableHead>Unit</TableHead>
+                  <TableHead className="w-20">Aksi</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {keyResults.map((kr: any, index: number) => {
+                  const krType = templateKeyResultTypes.find(t => t.value === kr.keyResultType);
+                  const TypeIcon = krType?.icon || Target;
                   
-                  <div className="grid grid-cols-3 gap-4 mt-3 text-sm">
-                    <div>
-                      <span className="font-medium text-gray-500">Baseline:</span>
-                      <div className="font-medium">{kr.baseline || 0} {kr.unit}</div>
-                    </div>
-                    <div>
-                      <span className="font-medium text-gray-500">Target:</span>
-                      <div className="font-medium">{kr.target || 0} {kr.unit}</div>
-                    </div>
-                    <div>
-                      <span className="font-medium text-gray-500">Unit:</span>
-                      <div className="font-medium">{kr.unit || "-"}</div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+                  return (
+                    <TableRow key={index}>
+                      <TableCell>
+                        <div>
+                          <div className="font-medium">{kr.title}</div>
+                          {kr.description && (
+                            <div className="text-sm text-gray-600 mt-1">{kr.description}</div>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className={krType?.color}>
+                          <TypeIcon className="w-3 h-3 mr-1" />
+                          {krType?.label}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <span className="font-medium">{kr.baseValue || "0"}</span>
+                      </TableCell>
+                      <TableCell>
+                        <span className="font-medium">{kr.targetValue || "0"}</span>
+                      </TableCell>
+                      <TableCell>
+                        <span className="font-medium">{kr.unit || "-"}</span>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => onEditKeyResult(kr, index)}
+                            className="h-8 w-8 p-0"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => onDeleteKeyResult(index)}
+                            className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
           </div>
         ) : (
           <div className="text-center py-8 text-gray-500">
@@ -371,6 +445,13 @@ export default function TemplateDetailPage() {
   const [isAddKeyResultModalOpen, setIsAddKeyResultModalOpen] = useState(false);
   const [isAddInitiativeModalOpen, setIsAddInitiativeModalOpen] = useState(false);
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
+  
+  // Modal states for editing/deleting key results
+  const [isEditKeyResultModalOpen, setIsEditKeyResultModalOpen] = useState(false);
+  const [keyResultToEdit, setKeyResultToEdit] = useState<any>(null);
+  const [keyResultEditIndex, setKeyResultEditIndex] = useState<number>(-1);
+  const [deleteKeyResultDialogOpen, setDeleteKeyResultDialogOpen] = useState(false);
+  const [keyResultToDelete, setKeyResultToDelete] = useState<number>(-1);
   
   // Form data for new components
   const [newInitiative, setNewInitiative] = useState({
@@ -494,6 +575,69 @@ export default function TemplateDetailPage() {
     setIsAddTaskModalOpen(false);
   };
 
+  // Handlers for editing/deleting key results
+  const handleEditKeyResult = (keyResult: any, index: number) => {
+    // Convert template format to KeyResultModal format
+    const modalKeyResult = {
+      title: keyResult.title,
+      description: keyResult.description || "",
+      keyResultType: keyResult.keyResultType,
+      baseValue: keyResult.baseValue || "0",
+      targetValue: keyResult.targetValue || "0",
+      currentValue: "0", // Default for template
+      unit: keyResult.unit || "",
+      status: "in_progress" // Default for template
+    };
+    
+    setKeyResultToEdit(modalKeyResult);
+    setKeyResultEditIndex(index);
+    setIsEditKeyResultModalOpen(true);
+  };
+
+  const handleSaveEditKeyResult = (keyResultData: any) => {
+    if (!template || keyResultEditIndex === -1) return;
+    
+    // Convert KeyResultModal data back to template format
+    const templateKeyResult = {
+      title: keyResultData.title,
+      description: keyResultData.description || "",
+      keyResultType: keyResultData.keyResultType,
+      baseValue: keyResultData.baseValue || "0",
+      targetValue: keyResultData.targetValue || "0",
+      unit: keyResultData.unit || ""
+    };
+    
+    const updatedKeyResults = [...(template?.keyResults || [])];
+    updatedKeyResults[keyResultEditIndex] = templateKeyResult;
+    
+    updateMutation.mutate({ keyResults: updatedKeyResults });
+    
+    setIsEditKeyResultModalOpen(false);
+    setKeyResultToEdit(null);
+    setKeyResultEditIndex(-1);
+  };
+
+  const handleDeleteKeyResult = (index: number) => {
+    setKeyResultToDelete(index);
+    setDeleteKeyResultDialogOpen(true);
+  };
+
+  const confirmDeleteKeyResult = () => {
+    if (!template || keyResultToDelete === -1) return;
+    
+    const updatedKeyResults = template.keyResults.filter((_, index) => index !== keyResultToDelete);
+    updateMutation.mutate({ keyResults: updatedKeyResults });
+    
+    setDeleteKeyResultDialogOpen(false);
+    setKeyResultToDelete(-1);
+    
+    toast({
+      title: "Angka Target Dihapus",
+      description: "Angka target berhasil dihapus dari template",
+      variant: "default"
+    });
+  };
+
   if (isLoading) {
     return (
       <div className="container max-w-7xl mx-auto space-y-6 p-6">
@@ -602,6 +746,8 @@ export default function TemplateDetailPage() {
             <KeyResultsCard 
               keyResults={template?.keyResults} 
               onAddKeyResult={() => setIsAddKeyResultModalOpen(true)}
+              onEditKeyResult={handleEditKeyResult}
+              onDeleteKeyResult={handleDeleteKeyResult}
             />
           </TabsContent>
 
@@ -724,7 +870,39 @@ export default function TemplateDetailPage() {
           </DialogContent>
         </Dialog>
 
-        {/* Delete Confirmation Dialog */}
+        {/* Edit Key Result Modal */}
+        <KeyResultModal
+          open={isEditKeyResultModalOpen}
+          onOpenChange={setIsEditKeyResultModalOpen}
+          onSubmit={handleSaveEditKeyResult}
+          isEditing={true}
+          editingKeyResult={keyResultToEdit}
+        />
+
+        {/* Delete Key Result Confirmation Dialog */}
+        <AlertDialog open={deleteKeyResultDialogOpen} onOpenChange={setDeleteKeyResultDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Hapus Angka Target</AlertDialogTitle>
+              <AlertDialogDescription>
+                Apakah Anda yakin ingin menghapus angka target ini dari template? 
+                Tindakan ini tidak dapat dibatalkan.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Batal</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={confirmDeleteKeyResult}
+                className="bg-red-600 hover:bg-red-700"
+                disabled={updateMutation.isPending}
+              >
+                {updateMutation.isPending ? "Menghapus..." : "Hapus"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        {/* Delete Template Confirmation Dialog */}
         <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
           <AlertDialogContent>
             <AlertDialogHeader>
