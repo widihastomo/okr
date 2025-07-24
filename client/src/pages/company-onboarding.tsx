@@ -1683,7 +1683,7 @@ export default function CompanyOnboarding() {
                 <div className="group">
                   <div className="flex items-start space-x-3 md:space-x-6">
                     <div className="relative flex-shrink-0">
-                      <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl md:rounded-2xl flex items-center justify-center text-white font-bold text-lg md:text-xl shadow-xl group-hover:shadow-2xl transition-all duration-300">
+                      <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-orange-400 to-orange-600 rounded-lg md:rounded-xl flex items-center justify-center text-white font-bold text-sm md:text-base shadow-xl group-hover:shadow-2xl transition-all duration-300">
                         1
                       </div>
                       <div className="hidden md:block absolute -inset-2 bg-orange-200 rounded-2xl -z-10 opacity-0 group-hover:opacity-30 transition-all duration-300"></div>
@@ -1716,7 +1716,7 @@ export default function CompanyOnboarding() {
                 <div className="group">
                   <div className="flex items-start space-x-3 md:space-x-6">
                     <div className="relative flex-shrink-0">
-                      <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl md:rounded-2xl flex items-center justify-center text-white font-bold text-lg md:text-xl shadow-xl group-hover:shadow-2xl transition-all duration-300">
+                      <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg md:rounded-xl flex items-center justify-center text-white font-bold text-sm md:text-base shadow-xl group-hover:shadow-2xl transition-all duration-300">
                         2
                       </div>
                       <div className="hidden md:block absolute -inset-2 bg-blue-200 rounded-2xl -z-10 opacity-0 group-hover:opacity-30 transition-all duration-300"></div>
@@ -1760,7 +1760,7 @@ export default function CompanyOnboarding() {
                 <div className="group">
                   <div className="flex items-start space-x-3 md:space-x-6">
                     <div className="relative flex-shrink-0">
-                      <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-xl md:rounded-2xl flex items-center justify-center text-white font-bold text-lg md:text-xl shadow-xl group-hover:shadow-2xl transition-all duration-300">
+                      <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-green-400 to-green-600 rounded-lg md:rounded-xl flex items-center justify-center text-white font-bold text-sm md:text-base shadow-xl group-hover:shadow-2xl transition-all duration-300">
                         3
                       </div>
                       <div className="hidden md:block absolute -inset-2 bg-green-200 rounded-2xl -z-10 opacity-0 group-hover:opacity-30 transition-all duration-300"></div>
@@ -1804,7 +1804,7 @@ export default function CompanyOnboarding() {
                 <div className="group">
                   <div className="flex items-start space-x-3 md:space-x-6">
                     <div className="relative flex-shrink-0">
-                      <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-purple-400 to-purple-600 rounded-xl md:rounded-2xl flex items-center justify-center text-white font-bold text-lg md:text-xl shadow-xl group-hover:shadow-2xl transition-all duration-300">
+                      <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-purple-400 to-purple-600 rounded-lg md:rounded-xl flex items-center justify-center text-white font-bold text-sm md:text-base shadow-xl group-hover:shadow-2xl transition-all duration-300">
                         4
                       </div>
                       <div className="hidden md:block absolute -inset-2 bg-purple-200 rounded-2xl -z-10 opacity-0 group-hover:opacity-30 transition-all duration-300"></div>
