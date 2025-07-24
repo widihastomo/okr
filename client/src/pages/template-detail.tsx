@@ -411,8 +411,13 @@ export default function TemplateDetailPage() {
 
   // Update template mutation
   const updateMutation = useMutation({
-    mutationFn: (data: any) => apiRequest(`/api/goal-templates/${id}`, "PATCH", data),
-    onSuccess: () => {
+    mutationFn: (data: any) => {
+      console.log("🚀 Mutation starting with data:", data);
+      console.log("📡 API URL:", `/api/goal-templates/${id}`);
+      return apiRequest(`/api/goal-templates/${id}`, "PATCH", data);
+    },
+    onSuccess: (result) => {
+      console.log("✅ Mutation success:", result);
       queryClient.invalidateQueries({ queryKey: [`/api/goal-templates/single/${id}`] });
       toast({
         title: "Template Diperbarui",
@@ -421,6 +426,12 @@ export default function TemplateDetailPage() {
       });
     },
     onError: (error: any) => {
+      console.error("❌ Mutation error:", error);
+      console.error("❌ Error details:", {
+        message: error.message,
+        stack: error.stack,
+        response: error.response
+      });
       toast({
         title: "Error",
         description: error.message || "Gagal memperbarui template",

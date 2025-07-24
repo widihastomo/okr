@@ -3546,12 +3546,24 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateGoalTemplate(id: string, template: Partial<InsertGoalTemplate>): Promise<GoalTemplate | undefined> {
-    const [updatedTemplate] = await db
-      .update(goalTemplates)
-      .set({ ...template, updatedAt: new Date() })
-      .where(eq(goalTemplates.id, id))
-      .returning();
-    return updatedTemplate || undefined;
+    console.log("🔧 Storage updateGoalTemplate called:", {
+      id,
+      template: JSON.stringify(template, null, 2)
+    });
+    
+    try {
+      const [updatedTemplate] = await db
+        .update(goalTemplates)
+        .set({ ...template, updatedAt: new Date() })
+        .where(eq(goalTemplates.id, id))
+        .returning();
+      
+      console.log("✅ Template updated in database:", updatedTemplate ? "Success" : "Not found");
+      return updatedTemplate || undefined;
+    } catch (error) {
+      console.error("❌ Database error in updateGoalTemplate:", error);
+      throw error;
+    }
   }
 
   async deleteGoalTemplate(id: string): Promise<boolean> {
