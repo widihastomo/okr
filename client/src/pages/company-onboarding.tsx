@@ -1939,24 +1939,21 @@ export default function CompanyOnboarding() {
                         className="mt-1"
                       />
                       <div className="flex-1 space-y-2">
-                        <div className="flex items-start space-x-2">
-                          <Target className="w-4 h-4 text-orange-600 mt-0.5 flex-shrink-0" />
-                          <Label
-                            htmlFor={`template-${template.id}`}
-                            className="cursor-pointer leading-relaxed font-medium"
-                          >
-                            {template.title}
-                          </Label>
-                        </div>
+                        <Label
+                          htmlFor={`template-${template.id}`}
+                          className="cursor-pointer leading-relaxed font-semibold text-base block"
+                        >
+                          {template.title}
+                        </Label>
                         {template.description && (
-                          <p className="text-sm text-gray-600 ml-6 leading-relaxed">
+                          <p className="text-sm text-gray-600 leading-relaxed">
                             {template.description}
                           </p>
                         )}
                         
                         {/* Display Key Results */}
                         {template.keyResults && template.keyResults.length > 0 && (
-                          <div className="ml-6 space-y-2">
+                          <div className="space-y-2">
                             <p className="text-xs font-medium text-orange-600 uppercase tracking-wide">
                               Key Results:
                             </p>
