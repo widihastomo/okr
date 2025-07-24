@@ -103,6 +103,12 @@ export default function SystemAdminSidebar({
       path: "/referral-codes",
       active: location === "/referral-codes",
     },
+    {
+      label: "Template Management",
+      icon: FileText,
+      path: "/system-admin/template-management",
+      active: location === "/system-admin/template-management",
+    },
 
     {
       label: "Pemetaan Status Client",

@@ -72,6 +72,7 @@ import ApplicationSettings from "@/pages/system-admin/application-settings";
 import AcceptInvitation from "@/pages/accept-invitation";
 import TestToast from "@/pages/test-toast";
 import UpgradePackage from "@/pages/upgrade-package";
+import TemplateManagement from "@/pages/template-management";
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -300,6 +301,10 @@ function Router() {
               <Route
                 path="/system-admin/application-settings"
                 component={ApplicationSettings}
+              />
+              <Route
+                path="/system-admin/template-management"
+                component={TemplateManagement}
               />
               <Route
                 path="/system-admin/subscriptions"

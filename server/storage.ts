@@ -41,10 +41,13 @@ export interface IStorage {
   createOKRFromTemplate(data: CreateOKRFromTemplate): Promise<OKRWithKeyResults[]>;
 
   // Goal Templates
+  getSystemGoalTemplates(): Promise<GoalTemplate[]>;
   getAllGoalTemplates(organizationId: string): Promise<GoalTemplate[]>;
   getGoalTemplatesByFocusArea(focusAreaTag: string): Promise<GoalTemplate[]>;
   getGoalTemplate(id: string): Promise<GoalTemplate | undefined>;
   createGoalTemplate(template: InsertGoalTemplate): Promise<GoalTemplate>;
+  updateGoalTemplate(id: string, template: Partial<InsertGoalTemplate>): Promise<GoalTemplate | undefined>;
+  deleteGoalTemplate(id: string): Promise<boolean>;
   
   // Objectives
   getObjectives(): Promise<Objective[]>;
@@ -3502,6 +3505,13 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Goal Templates
+  async getSystemGoalTemplates(): Promise<GoalTemplate[]> {
+    return await db
+      .select()
+      .from(goalTemplates)
+      .orderBy(asc(goalTemplates.title));
+  }
+
   async getAllGoalTemplates(organizationId: string): Promise<GoalTemplate[]> {
     return await db
       .select()
@@ -3533,6 +3543,22 @@ export class DatabaseStorage implements IStorage {
       .values(template)
       .returning();
     return newTemplate;
+  }
+
+  async updateGoalTemplate(id: string, template: Partial<InsertGoalTemplate>): Promise<GoalTemplate | undefined> {
+    const [updatedTemplate] = await db
+      .update(goalTemplates)
+      .set({ ...template, updatedAt: new Date() })
+      .where(eq(goalTemplates.id, id))
+      .returning();
+    return updatedTemplate || undefined;
+  }
+
+  async deleteGoalTemplate(id: string): Promise<boolean> {
+    const result = await db
+      .delete(goalTemplates)
+      .where(eq(goalTemplates.id, id));
+    return (result.rowCount || 0) > 0;
   }
 }
 

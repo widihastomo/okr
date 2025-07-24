@@ -1561,6 +1561,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Goal Templates endpoints
+  app.get("/api/goal-templates/all-system", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      
+      // System owner can see all templates across organizations
+      if (!currentUser.isSystemOwner) {
+        return res.status(403).json({ message: "System owner access required" });
+      }
+      
+      const templates = await storage.getSystemGoalTemplates();
+      res.json(templates);
+    } catch (error) {
+      console.error("Error fetching system goal templates:", error);
+      res.status(500).json({ message: "Failed to fetch system goal templates" });
+    }
+  });
+
   app.get("/api/goal-templates/all", requireAuth, async (req, res) => {
     try {
       const currentUser = req.user as User;
@@ -1593,6 +1610,81 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching goal templates:", error);
       res.status(500).json({ message: "Failed to fetch goal templates" });
+    }
+  });
+
+  // Goal template CRUD for system owners
+  app.post("/api/goal-templates", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      
+      if (!currentUser.isSystemOwner) {
+        return res.status(403).json({ message: "System owner access required" });
+      }
+      
+      const data = {
+        ...req.body,
+        organizationId: null, // System templates have null organizationId
+        createdBy: currentUser.id,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      
+      const template = await storage.createGoalTemplate(data);
+      res.status(201).json(template);
+    } catch (error) {
+      console.error("Error creating goal template:", error);
+      res.status(500).json({ message: "Failed to create goal template" });
+    }
+  });
+
+  app.patch("/api/goal-templates/:id", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      const templateId = req.params.id;
+      
+      if (!currentUser.isSystemOwner) {
+        return res.status(403).json({ message: "System owner access required" });
+      }
+      
+      const updatedData = {
+        ...req.body,
+        updatedAt: new Date(),
+        lastUpdateBy: currentUser.id
+      };
+      
+      const template = await storage.updateGoalTemplate(templateId, updatedData);
+      
+      if (!template) {
+        return res.status(404).json({ message: "Template not found" });
+      }
+      
+      res.json(template);
+    } catch (error) {
+      console.error("Error updating goal template:", error);
+      res.status(500).json({ message: "Failed to update goal template" });
+    }
+  });
+
+  app.delete("/api/goal-templates/:id", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      const templateId = req.params.id;
+      
+      if (!currentUser.isSystemOwner) {
+        return res.status(403).json({ message: "System owner access required" });
+      }
+      
+      const deleted = await storage.deleteGoalTemplate(templateId);
+      
+      if (!deleted) {
+        return res.status(404).json({ message: "Template not found" });
+      }
+      
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting goal template:", error);
+      res.status(500).json({ message: "Failed to delete goal template" });
     }
   });
 
