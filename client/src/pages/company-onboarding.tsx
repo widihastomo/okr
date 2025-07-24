@@ -4148,7 +4148,7 @@ export default function CompanyOnboarding() {
                               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-300 ${
                                 onboardingData.currentStep >= 4 ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-600'
                               }`}>
-                                1
+                                <Target className="w-4 h-4" />
                               </div>
                               <div className="mt-2 text-center">
                                 <div className="flex items-center justify-center gap-1 mb-1">
@@ -4158,7 +4158,7 @@ export default function CompanyOnboarding() {
                                   <p className={`text-xs font-medium ${
                                     onboardingData.currentStep >= 4 ? 'text-orange-700' : 'text-gray-500'
                                   }`}>
-                                    Buat Goal
+                                    1
                                   </p>
                                 </div>
                               </div>
@@ -4176,7 +4176,7 @@ export default function CompanyOnboarding() {
                               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-300 ${
                                 onboardingData.currentStep >= 5 ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-600'
                               }`}>
-                                2
+                                <TrendingUp className="w-4 h-4" />
                               </div>
                               <div className="mt-2 text-center">
                                 <div className="flex items-center justify-center gap-1 mb-1">
@@ -4186,7 +4186,7 @@ export default function CompanyOnboarding() {
                                   <p className={`text-xs font-medium ${
                                     onboardingData.currentStep >= 5 ? 'text-orange-700' : 'text-gray-500'
                                   }`}>
-                                    Ukuran Keberhasilan
+                                    2
                                   </p>
                                 </div>
                               </div>
@@ -4204,7 +4204,7 @@ export default function CompanyOnboarding() {
                               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-300 ${
                                 onboardingData.currentStep >= 6 ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-600'
                               }`}>
-                                3
+                                <Lightbulb className="w-4 h-4" />
                               </div>
                               <div className="mt-2 text-center">
                                 <div className="flex items-center justify-center gap-1 mb-1">
@@ -4214,7 +4214,7 @@ export default function CompanyOnboarding() {
                                   <p className={`text-xs font-medium ${
                                     onboardingData.currentStep >= 6 ? 'text-orange-700' : 'text-gray-500'
                                   }`}>
-                                    Pilih Inisiatif
+                                    3
                                   </p>
                                 </div>
                               </div>
@@ -4232,7 +4232,7 @@ export default function CompanyOnboarding() {
                               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-300 ${
                                 onboardingData.currentStep >= 7 ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-600'
                               }`}>
-                                4
+                                <ListTodo className="w-4 h-4" />
                               </div>
                               <div className="mt-2 text-center">
                                 <div className="flex items-center justify-center gap-1 mb-1">
@@ -4242,7 +4242,7 @@ export default function CompanyOnboarding() {
                                   <p className={`text-xs font-medium ${
                                     onboardingData.currentStep >= 7 ? 'text-orange-700' : 'text-gray-500'
                                   }`}>
-                                    Pilih Task
+                                    4
                                   </p>
                                 </div>
                               </div>
