@@ -260,6 +260,9 @@ export default function CompanyOnboarding() {
     isCompleted: false,
   });
 
+  // Track local changes to prevent server override
+  const [hasLocalChanges, setHasLocalChanges] = useState(false);
+
   // Fetch organization data for company details
   const { data: organizationData } = useQuery({
     queryKey: ["/api/my-organization-with-role"],
@@ -1009,9 +1012,9 @@ export default function CompanyOnboarding() {
     refetchInterval: false, // Don't auto-refetch
   });
 
-  // Update local state when progress data is loaded
+  // Update local state when progress data is loaded, but respect local changes
   useEffect(() => {
-    if (progress) {
+    if (progress && !hasLocalChanges) {
       setOnboardingData((prevData) => ({
         ...prevData,
         ...progress,
@@ -1029,7 +1032,7 @@ export default function CompanyOnboarding() {
         }
       }
     }
-  }, [progress, goalTemplates, selectedTemplateId]);
+  }, [progress, goalTemplates, selectedTemplateId, hasLocalChanges]);
 
   // Validation function for each step
   const validateStep = (
@@ -1555,6 +1558,7 @@ export default function CompanyOnboarding() {
               <div
                 onClick={() => {
                   console.log("Clicking penjualan");
+                  setHasLocalChanges(true);
                   setOnboardingData({ ...onboardingData, teamFocus: "penjualan" });
                 }}
                 className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
@@ -1581,6 +1585,7 @@ export default function CompanyOnboarding() {
               <div
                 onClick={() => {
                   console.log("Clicking operasional");
+                  setHasLocalChanges(true);
                   setOnboardingData({ ...onboardingData, teamFocus: "operasional" });
                 }}
                 className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
@@ -1607,6 +1612,7 @@ export default function CompanyOnboarding() {
               <div
                 onClick={() => {
                   console.log("Clicking customer_service");
+                  setHasLocalChanges(true);
                   setOnboardingData({ ...onboardingData, teamFocus: "customer_service" });
                 }}
                 className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
@@ -1633,6 +1639,7 @@ export default function CompanyOnboarding() {
               <div
                 onClick={() => {
                   console.log("Clicking marketing");
+                  setHasLocalChanges(true);
                   setOnboardingData({ ...onboardingData, teamFocus: "marketing" });
                 }}
                 className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
