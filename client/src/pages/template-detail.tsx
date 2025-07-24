@@ -86,6 +86,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { KeyResultModal } from "@/components/goal-form-modal";
 
 const focusAreaOptions = [
   { value: "penjualan", label: "Tingkatkan Pendapatan", icon: TrendingUp, color: "bg-green-100 text-green-800" },
@@ -372,15 +373,6 @@ export default function TemplateDetailPage() {
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
   
   // Form data for new components
-  const [newKeyResult, setNewKeyResult] = useState({
-    title: "",
-    description: "",
-    keyResultType: "increase_to",
-    baseline: 0,
-    target: 0,
-    unit: ""
-  });
-  
   const [newInitiative, setNewInitiative] = useState({
     title: "",
     description: ""
@@ -443,27 +435,29 @@ export default function TemplateDetailPage() {
   };
 
   // Handlers for adding components
-  const handleAddKeyResult = () => {
+  const handleAddKeyResult = (keyResultData: any) => {
     if (!template) return;
     
-    const updatedKeyResults = [...(template.keyResults || []), newKeyResult];
+    // Convert KeyResultModal data to template format
+    const templateKeyResult = {
+      title: keyResultData.title,
+      description: keyResultData.description || "",
+      keyResultType: keyResultData.keyResultType,
+      baseValue: keyResultData.baseValue || "0",
+      targetValue: keyResultData.targetValue || "0",
+      unit: keyResultData.unit || ""
+    };
+    
+    const updatedKeyResults = [...(template?.keyResults || []), templateKeyResult];
     updateMutation.mutate({ keyResults: updatedKeyResults });
     
-    setNewKeyResult({
-      title: "",
-      description: "",
-      keyResultType: "increase_to",
-      baseline: 0,
-      target: 0,
-      unit: ""
-    });
     setIsAddKeyResultModalOpen(false);
   };
 
   const handleAddInitiative = () => {
     if (!template) return;
     
-    const updatedInitiatives = [...(template.initiatives || []), newInitiative];
+    const updatedInitiatives = [...(template?.initiatives || []), newInitiative];
     updateMutation.mutate({ initiatives: updatedInitiatives });
     
     setNewInitiative({ title: "", description: "" });
@@ -473,7 +467,7 @@ export default function TemplateDetailPage() {
   const handleAddTask = () => {
     if (!template) return;
     
-    const updatedTasks = [...(template.tasks || []), newTask];
+    const updatedTasks = [...(template?.tasks || []), newTask];
     updateMutation.mutate({ tasks: updatedTasks });
     
     setNewTask({ title: "", description: "" });
@@ -545,21 +539,21 @@ export default function TemplateDetailPage() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">Angka Target</span>
-                  <Badge variant="secondary">{template.keyResults?.length || 0}</Badge>
+                  <Badge variant="secondary">{template?.keyResults?.length || 0}</Badge>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">Inisiatif</span>
-                  <Badge variant="secondary">{template.initiatives?.length || 0}</Badge>
+                  <Badge variant="secondary">{template?.initiatives?.length || 0}</Badge>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">Tugas</span>
-                  <Badge variant="secondary">{template.tasks?.length || 0}</Badge>
+                  <Badge variant="secondary">{template?.tasks?.length || 0}</Badge>
                 </div>
                 <Separator />
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">Total Komponen</span>
                   <Badge className="bg-blue-600 text-white">
-                    {(template.keyResults?.length || 0) + (template.initiatives?.length || 0) + (template.tasks?.length || 0)}
+                    {(template?.keyResults?.length || 0) + (template?.initiatives?.length || 0) + (template?.tasks?.length || 0)}
                   </Badge>
                 </div>
               </div>
@@ -586,125 +580,33 @@ export default function TemplateDetailPage() {
 
           <TabsContent value="key-results">
             <KeyResultsCard 
-              keyResults={template.keyResults} 
+              keyResults={template?.keyResults} 
               onAddKeyResult={() => setIsAddKeyResultModalOpen(true)}
             />
           </TabsContent>
 
           <TabsContent value="initiatives">
             <InitiativesCard 
-              initiatives={template.initiatives} 
+              initiatives={template?.initiatives} 
               onAddInitiative={() => setIsAddInitiativeModalOpen(true)}
             />
           </TabsContent>
 
           <TabsContent value="tasks">
             <TasksCard 
-              tasks={template.tasks} 
+              tasks={template?.tasks} 
               onAddTask={() => setIsAddTaskModalOpen(true)}
             />
           </TabsContent>
         </Tabs>
 
         {/* Add Key Result Modal */}
-        <Dialog open={isAddKeyResultModalOpen} onOpenChange={setIsAddKeyResultModalOpen}>
-          <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>Tambah Angka Target</DialogTitle>
-              <DialogDescription>
-                Tambahkan angka target baru ke template ini
-              </DialogDescription>
-            </DialogHeader>
-            
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="kr-title">Judul Angka Target</Label>
-                <Input
-                  id="kr-title"
-                  value={newKeyResult.title}
-                  onChange={(e) => setNewKeyResult({ ...newKeyResult, title: e.target.value })}
-                  placeholder="Masukkan judul angka target..."
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="kr-description">Deskripsi</Label>
-                <Textarea
-                  id="kr-description"
-                  value={newKeyResult.description}
-                  onChange={(e) => setNewKeyResult({ ...newKeyResult, description: e.target.value })}
-                  placeholder="Masukkan deskripsi..."
-                  rows={3}
-                />
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="kr-type">Tipe Angka Target</Label>
-                  <Select value={newKeyResult.keyResultType} onValueChange={(value) => setNewKeyResult({ ...newKeyResult, keyResultType: value })}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {keyResultTypeOptions.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div>
-                  <Label htmlFor="kr-unit">Unit</Label>
-                  <Input
-                    id="kr-unit"
-                    value={newKeyResult.unit}
-                    onChange={(e) => setNewKeyResult({ ...newKeyResult, unit: e.target.value })}
-                    placeholder="%, orang, rupiah, dll"
-                  />
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="kr-baseline">Baseline</Label>
-                  <Input
-                    id="kr-baseline"
-                    type="number"
-                    value={newKeyResult.baseline}
-                    onChange={(e) => setNewKeyResult({ ...newKeyResult, baseline: Number(e.target.value) })}
-                    placeholder="0"
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="kr-target">Target</Label>
-                  <Input
-                    id="kr-target"
-                    type="number"
-                    value={newKeyResult.target}
-                    onChange={(e) => setNewKeyResult({ ...newKeyResult, target: Number(e.target.value) })}
-                    placeholder="100"
-                  />
-                </div>
-              </div>
-            </div>
-            
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsAddKeyResultModalOpen(false)}>
-                Batal
-              </Button>
-              <Button 
-                onClick={handleAddKeyResult}
-                disabled={!newKeyResult.title || updateMutation.isPending}
-                className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
-              >
-                {updateMutation.isPending ? "Menambahkan..." : "Tambah Angka Target"}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <KeyResultModal
+          open={isAddKeyResultModalOpen}
+          onOpenChange={setIsAddKeyResultModalOpen}
+          onSubmit={handleAddKeyResult}
+          isEditing={false}
+        />
 
         {/* Add Initiative Modal */}
         <Dialog open={isAddInitiativeModalOpen} onOpenChange={setIsAddInitiativeModalOpen}>
@@ -808,7 +710,7 @@ export default function TemplateDetailPage() {
             <AlertDialogHeader>
               <AlertDialogTitle>Hapus Template</AlertDialogTitle>
               <AlertDialogDescription>
-                Apakah Anda yakin ingin menghapus template "{template.title}"? 
+                Apakah Anda yakin ingin menghapus template "{template?.title}"? 
                 Tindakan ini tidak dapat dibatalkan.
               </AlertDialogDescription>
             </AlertDialogHeader>
