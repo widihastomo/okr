@@ -1976,17 +1976,19 @@ export default function CompanyOnboarding() {
                               <p className="text-xs font-medium text-orange-600 uppercase tracking-wide">
                                 Key Results:
                               </p>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setShowEditModal(true);
-                                }}
-                                className="h-6 w-6 p-0 hover:bg-orange-50"
-                              >
-                                <Edit className="w-3 h-3 text-orange-600" />
-                              </Button>
+                              {onboardingData.objective === template.title && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setShowEditModal(true);
+                                  }}
+                                  className="h-6 w-6 p-0 hover:bg-orange-50"
+                                >
+                                  <Edit className="w-3 h-3 text-orange-600" />
+                                </Button>
+                              )}
                             </div>
                             <div className="space-y-1">
                               {template.keyResults.slice(0, 3).map((keyResult: any, krIndex: number) => (
@@ -2002,17 +2004,19 @@ export default function CompanyOnboarding() {
                                       )}
                                     </span>
                                   </div>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      setShowEditModal(true);
-                                    }}
-                                    className="h-5 w-5 p-0 hover:bg-orange-50 opacity-0 group-hover:opacity-100 transition-opacity"
-                                  >
-                                    <Edit className="w-3 h-3 text-orange-600" />
-                                  </Button>
+                                  {onboardingData.objective === template.title && (
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setShowEditModal(true);
+                                      }}
+                                      className="h-5 w-5 p-0 hover:bg-orange-50 opacity-0 group-hover:opacity-100 transition-opacity"
+                                    >
+                                      <Edit className="w-3 h-3 text-orange-600" />
+                                    </Button>
+                                  )}
                                 </div>
                               ))}
                               {template.keyResults.length > 3 && (
