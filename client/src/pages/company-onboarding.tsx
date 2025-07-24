@@ -2235,18 +2235,7 @@ export default function CompanyOnboarding() {
                               <div className="font-medium">Periode:</div>
                               <div>{new Date(onboardingData.cycleStartDate).toLocaleDateString('id-ID')} - {new Date(onboardingData.cycleEndDate).toLocaleDateString('id-ID')}</div>
                             </div>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setEditCycleModal(true);
-                              }}
-                              className="h-6 w-full text-xs text-purple-600 hover:text-purple-700 hover:bg-purple-100 border border-purple-200"
-                            >
-                              <Edit className="w-3 h-3 mr-1" />
-                              Ubah Periode
-                            </Button>
+
                           </div>
                         )}
                       </div>
