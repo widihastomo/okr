@@ -439,25 +439,26 @@ The system now includes a comprehensive dummy data generation feature that creat
 ## Manual Seeder Script
 
 ### **MANUAL SEEDER SYSTEM IMPLEMENTED** - Mengganti auto-seeder dengan script manual untuk mempercepat development startup:
-* **CREATED**: `server/manual-seeder.ts` - Comprehensive manual seeder script dengan system owner, application settings, dan subscription plans
+* **CREATED**: `server/manual-seeder.ts` - Comprehensive manual seeder script dengan system owner, application settings, subscription plans, dan goal templates
 * **ENHANCED**: Script terpisah yang tidak running otomatis saat `npm run dev` untuk development startup yang lebih cepat
 * **ADDED**: `run-manual-seeder.sh` - Shell script wrapper untuk kemudahan eksekusi manual seeder
 * **REMOVED**: Auto-seeder dari `server/index.ts` yang memperlambat development server startup
+* **INCLUDED**: Goal templates seeder dengan 8 templates across 4 focus areas (penjualan, marketing, operasional, customer_service)
 * **USAGE**: 
   - `bash run-manual-seeder.sh` - Menjalankan setup database lengkap 
   - `npx tsx server/manual-seeder.ts` - Direct TypeScript execution
-* **CREDENTIALS**: System owner account (admin@refokus.com / RefokusAdmin2025!) dengan 19 application settings dan 4 subscription plans
-* **BENEFIT**: Development server startup lebih cepat tanpa delay auto-seeder, database setup hanya ketika diperlukan
+* **CREDENTIALS**: System owner account (admin@refokus.com / RefokusAdmin2025!) dengan 19 application settings, 4 subscription plans, dan 8 goal templates
+* **BENEFIT**: Development server startup lebih cepat tanpa delay auto-seeder, database setup lengkap hanya ketika diperlukan
 
 ## Changelog
 ```
-- July 24, 2025. **MANUAL SEEDER SYSTEM COMPLETED** - Successfully implemented manual seeder to replace auto-running seeder for faster development:
-  * CREATED: server/manual-seeder.ts with comprehensive database setup (system owner + application settings + subscription plans)
-  * ENHANCED: Separate script execution prevents auto-running during npm run dev for faster startup
-  * ADDED: run-manual-seeder.sh shell script wrapper for easy manual execution
-  * REMOVED: Auto-seeder from server/index.ts that was slowing down development server startup
-  * IMPROVED: Development workflow - server starts faster, database setup only when needed manually
-  * USAGE: bash run-manual-seeder.sh or npx tsx server/manual-seeder.ts for manual database setup
+- July 24, 2025. **MANUAL SEEDER WITH GOAL TEMPLATES COMPLETED** - Successfully enhanced manual seeder to include goal templates for complete database setup:
+  * ENHANCED: server/manual-seeder.ts now includes goal templates seeder with 8 comprehensive templates
+  * INCLUDED: Goal templates across 4 focus areas (penjualan, marketing, operasional, customer_service) with proper key results, initiatives, and tasks
+  * OPTIMIZED: All-in-one seeder script that creates system owner + application settings + subscription plans + goal templates
+  * TESTED: Manual seeder successfully creates/updates 8 goal templates (6 new + 2 existing updated)
+  * IMPROVED: Complete database setup for development without impacting server startup performance
+  * USAGE: bash run-manual-seeder.sh or npx tsx server/manual-seeder.ts for comprehensive database setup
 - July 24, 2025. **CYCLE MANAGEMENT IMPLEMENTATION COMPLETED** - Successfully implemented cycle selection functionality in goals section with default 1-month cycle:
   * ADDED: Cycle selection interface in Step 4 (goals) with visual period options (1 month, 3 months, 6 months)
   * IMPLEMENTED: Default 1-month cycle automatically set when selecting a goal template
