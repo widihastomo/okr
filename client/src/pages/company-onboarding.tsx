@@ -205,6 +205,20 @@ export default function CompanyOnboarding() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editGoalModal, setEditGoalModal] = useState(false);
   const [editKeyResultModal, setEditKeyResultModal] = useState<{ open: boolean; index: number; keyResult: any }>({ open: false, index: -1, keyResult: null });
+  
+  // Separate states for individual editing
+  const [editObjectiveModal, setEditObjectiveModal] = useState(false);
+  const [editIndividualKeyResultModal, setEditIndividualKeyResultModal] = useState<{ 
+    open: boolean; 
+    index: number; 
+    keyResult: any;
+    originalText: string;
+  }>({ open: false, index: -1, keyResult: null, originalText: '' });
+  
+  // Temporary editing values
+  const [tempObjectiveTitle, setTempObjectiveTitle] = useState('');
+  const [tempObjectiveDescription, setTempObjectiveDescription] = useState('');
+  const [tempKeyResultText, setTempKeyResultText] = useState('');
   const { startTour } = useTour();
 
   // Initialize state first
@@ -1958,11 +1972,14 @@ export default function CompanyOnboarding() {
                               size="sm"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                setShowEditModal(true);
+                                const selectedTemplate = goalTemplates?.find(t => t.title === onboardingData.objective);
+                                setTempObjectiveTitle(onboardingData.objective);
+                                setTempObjectiveDescription(selectedTemplate?.description || '');
+                                setEditObjectiveModal(true);
                               }}
                               className="ml-2 text-xs px-2 py-1 h-7 border-orange-300 text-orange-700 hover:bg-orange-50"
                             >
-                              Edit
+                              Edit Goal
                             </Button>
                           )}
                         </div>
@@ -2019,7 +2036,16 @@ export default function CompanyOnboarding() {
                                       size="sm"
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        setShowEditModal(true);
+                                        const originalText = keyResult.targetValue && keyResult.unit 
+                                          ? `${keyResult.title} (Target: ${keyResult.targetValue} ${keyResult.unit})`
+                                          : keyResult.title;
+                                        setTempKeyResultText(originalText);
+                                        setEditIndividualKeyResultModal({
+                                          open: true,
+                                          index: krIndex,
+                                          keyResult: keyResult,
+                                          originalText: originalText
+                                        });
                                       }}
                                       className="h-5 w-5 p-0 hover:bg-orange-50"
                                     >
@@ -4790,6 +4816,140 @@ export default function CompanyOnboarding() {
             <Button
               onClick={() => setEditKeyResultModal({ open: false, index: -1, keyResult: null })}
               className="bg-green-600 hover:bg-green-700 text-white"
+            >
+              Simpan Perubahan
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Individual Objective Edit Modal */}
+      <Dialog open={editObjectiveModal} onOpenChange={setEditObjectiveModal}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center space-x-2">
+              <Target className="w-5 h-5 text-orange-600" />
+              <span>Edit Nama Goal dan Deskripsi</span>
+            </DialogTitle>
+            <DialogDescription>
+              Edit nama goal dan deskripsi sesuai kebutuhan perusahaan Anda
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="objective-title" className="text-sm font-medium text-orange-800">
+                Nama Goal:
+              </Label>
+              <Input
+                id="objective-title"
+                value={tempObjectiveTitle}
+                onChange={(e) => setTempObjectiveTitle(e.target.value)}
+                placeholder="Masukkan nama goal..."
+                className="text-sm bg-white border-orange-200 focus:border-orange-400 focus:ring-orange-400"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="objective-description" className="text-sm font-medium text-orange-800">
+                Deskripsi Goal:
+              </Label>
+              <Textarea
+                id="objective-description"
+                value={tempObjectiveDescription}
+                onChange={(e) => setTempObjectiveDescription(e.target.value)}
+                placeholder="Masukkan deskripsi goal..."
+                className="min-h-[100px] text-sm leading-relaxed bg-white border-orange-200 focus:border-orange-400 focus:ring-orange-400"
+              />
+            </div>
+          </div>
+
+          <div className="flex justify-end space-x-3 pt-4">
+            <Button
+              variant="outline"
+              onClick={() => setEditObjectiveModal(false)}
+              className="border-gray-300 text-gray-700 hover:bg-gray-50"
+            >
+              Batal
+            </Button>
+            <Button
+              onClick={() => {
+                setOnboardingData({ 
+                  ...onboardingData, 
+                  objective: tempObjectiveTitle 
+                });
+                setEditObjectiveModal(false);
+                toast({
+                  title: "Goal Berhasil Diperbarui",
+                  description: "Nama goal telah diperbarui sesuai kebutuhan Anda.",
+                  variant: "default"
+                });
+              }}
+              className="bg-orange-600 hover:bg-orange-700 text-white"
+            >
+              Simpan Perubahan
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Individual Key Result Edit Modal */}
+      <Dialog open={editIndividualKeyResultModal.open} onOpenChange={(open) => 
+        setEditIndividualKeyResultModal({ open, index: -1, keyResult: null, originalText: '' })
+      }>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center space-x-2">
+              <TrendingUp className="w-5 h-5 text-blue-600" />
+              <span>Edit Key Result #{editIndividualKeyResultModal.index + 1}</span>
+            </DialogTitle>
+            <DialogDescription>
+              Edit teks key result sesuai kebutuhan spesifik perusahaan Anda
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="kr-individual-edit" className="text-sm font-medium text-blue-800">
+                Teks Key Result:
+              </Label>
+              <Textarea
+                id="kr-individual-edit"
+                value={tempKeyResultText}
+                onChange={(e) => setTempKeyResultText(e.target.value)}
+                placeholder="Masukkan teks key result yang spesifik dan terukur..."
+                className="min-h-[120px] text-sm leading-relaxed bg-white border-blue-200 focus:border-blue-400 focus:ring-blue-400"
+              />
+              <p className="text-xs text-blue-600">
+                💡 Tip: Pastikan target bersifat SMART (Specific, Measurable, Achievable, Relevant, Time-bound)
+              </p>
+            </div>
+          </div>
+
+          <div className="flex justify-end space-x-3 pt-4">
+            <Button
+              variant="outline"
+              onClick={() => setEditIndividualKeyResultModal({ open: false, index: -1, keyResult: null, originalText: '' })}
+              className="border-gray-300 text-gray-700 hover:bg-gray-50"
+            >
+              Batal
+            </Button>
+            <Button
+              onClick={() => {
+                // Update the specific key result in onboardingData
+                const newKeyResults = [...onboardingData.keyResults];
+                if (editIndividualKeyResultModal.index >= 0 && editIndividualKeyResultModal.index < newKeyResults.length) {
+                  newKeyResults[editIndividualKeyResultModal.index] = tempKeyResultText;
+                  setOnboardingData({ ...onboardingData, keyResults: newKeyResults });
+                }
+                setEditIndividualKeyResultModal({ open: false, index: -1, keyResult: null, originalText: '' });
+                toast({
+                  title: "Key Result Berhasil Diperbarui",
+                  description: "Key result telah diperbarui sesuai kebutuhan Anda.",
+                  variant: "default"
+                });
+              }}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
             >
               Simpan Perubahan
             </Button>
