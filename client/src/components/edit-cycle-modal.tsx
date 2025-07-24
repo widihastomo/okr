@@ -3,7 +3,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { CalendarIcon, Save, X } from "lucide-react";
+import { format } from "date-fns";
+import { id } from "date-fns/locale";
+import { cn } from "@/lib/utils";
 
 interface EditCycleModalProps {
   isOpen: boolean;
@@ -22,16 +27,34 @@ const EditCycleModal: React.FC<EditCycleModalProps> = ({
   onSave,
   initialData,
 }) => {
-  const [periodName, setPeriodName] = useState(initialData.periodName);
-  const [startDate, setStartDate] = useState(initialData.startDate);
-  const [endDate, setEndDate] = useState(initialData.endDate);
+  // Convert cycleDuration to proper period name for display
+  const getCyclePeriodName = (duration: string) => {
+    switch (duration) {
+      case "1bulan":
+        return "1 Bulan";
+      case "3bulan":
+        return "3 Bulan";
+      case "6bulan":
+        return "6 Bulan";
+      default:
+        return duration;
+    }
+  };
+
+  const [periodName, setPeriodName] = useState(getCyclePeriodName(initialData.periodName));
+  const [startDate, setStartDate] = useState<Date | undefined>(
+    initialData.startDate ? new Date(initialData.startDate) : undefined
+  );
+  const [endDate, setEndDate] = useState<Date | undefined>(
+    initialData.endDate ? new Date(initialData.endDate) : undefined
+  );
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (isOpen) {
-      setPeriodName(initialData.periodName);
-      setStartDate(initialData.startDate);
-      setEndDate(initialData.endDate);
+      setPeriodName(getCyclePeriodName(initialData.periodName));
+      setStartDate(initialData.startDate ? new Date(initialData.startDate) : undefined);
+      setEndDate(initialData.endDate ? new Date(initialData.endDate) : undefined);
       setErrors({});
     }
   }, [isOpen, initialData]);
@@ -51,7 +74,7 @@ const EditCycleModal: React.FC<EditCycleModalProps> = ({
       newErrors.endDate = "Tanggal selesai harus diisi";
     }
 
-    if (startDate && endDate && new Date(startDate) >= new Date(endDate)) {
+    if (startDate && endDate && startDate >= endDate) {
       newErrors.endDate = "Tanggal selesai harus lebih besar dari tanggal mulai";
     }
 
@@ -63,8 +86,8 @@ const EditCycleModal: React.FC<EditCycleModalProps> = ({
     if (validateForm()) {
       onSave({
         periodName: periodName.trim(),
-        startDate,
-        endDate,
+        startDate: startDate ? startDate.toISOString().split('T')[0] : "",
+        endDate: endDate ? endDate.toISOString().split('T')[0] : "",
       });
       onClose();
     }
@@ -107,16 +130,35 @@ const EditCycleModal: React.FC<EditCycleModalProps> = ({
 
           {/* Start Date */}
           <div className="space-y-2">
-            <Label htmlFor="start-date">Tanggal Mulai</Label>
-            <Input
-              id="start-date"
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className={`focus:ring-2 focus:ring-purple-500 ${
-                errors.startDate ? "border-red-500" : ""
-              }`}
-            />
+            <Label>Tanggal Mulai</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full pl-3 text-left font-normal focus:ring-2 focus:ring-purple-500",
+                    !startDate && "text-muted-foreground",
+                    errors.startDate ? "border-red-500" : ""
+                  )}
+                >
+                  {startDate ? (
+                    format(startDate, "PPP", { locale: id })
+                  ) : (
+                    <span>Pilih tanggal mulai</span>
+                  )}
+                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={startDate}
+                  onSelect={setStartDate}
+                  disabled={(date) => date < new Date("1900-01-01")}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
             {errors.startDate && (
               <p className="text-xs text-red-600">{errors.startDate}</p>
             )}
@@ -124,16 +166,35 @@ const EditCycleModal: React.FC<EditCycleModalProps> = ({
 
           {/* End Date */}
           <div className="space-y-2">
-            <Label htmlFor="end-date">Tanggal Selesai</Label>
-            <Input
-              id="end-date"
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              className={`focus:ring-2 focus:ring-purple-500 ${
-                errors.endDate ? "border-red-500" : ""
-              }`}
-            />
+            <Label>Tanggal Selesai</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full pl-3 text-left font-normal focus:ring-2 focus:ring-purple-500",
+                    !endDate && "text-muted-foreground",
+                    errors.endDate ? "border-red-500" : ""
+                  )}
+                >
+                  {endDate ? (
+                    format(endDate, "PPP", { locale: id })
+                  ) : (
+                    <span>Pilih tanggal selesai</span>
+                  )}
+                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={endDate}
+                  onSelect={setEndDate}
+                  disabled={(date) => date < new Date("1900-01-01")}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
             {errors.endDate && (
               <p className="text-xs text-red-600">{errors.endDate}</p>
             )}
@@ -146,12 +207,10 @@ const EditCycleModal: React.FC<EditCycleModalProps> = ({
                 <strong>Pratinjau Periode:</strong>
               </div>
               <div className="text-sm text-purple-700">
-                {new Date(startDate).toLocaleDateString('id-ID')} - {new Date(endDate).toLocaleDateString('id-ID')}
+                {startDate.toLocaleDateString('id-ID')} - {endDate.toLocaleDateString('id-ID')}
               </div>
               {(() => {
-                const start = new Date(startDate);
-                const end = new Date(endDate);
-                const diffTime = Math.abs(end.getTime() - start.getTime());
+                const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
                 return (
                   <div className="text-xs text-purple-600 mt-1">
