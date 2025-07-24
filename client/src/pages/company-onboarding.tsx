@@ -1691,20 +1691,42 @@ export default function CompanyOnboarding() {
 
             {onboardingData.teamFocus && (
               <div className="p-4 bg-orange-50 rounded-lg border border-orange-200">
-                <div className="flex items-center space-x-2">
-                  <CheckCircle className="w-5 h-5 text-orange-600" />
-                  <p className="text-sm text-orange-800">
-                    <strong>Fokus terpilih:</strong>{" "}
-                    {onboardingData.teamFocus === "penjualan"
-                      ? "Tingkatkan Pendapatan"
-                      : onboardingData.teamFocus === "operasional"
-                        ? "Rapikan Operasional"
-                        : onboardingData.teamFocus === "customer_service"
-                          ? "Kembangkan Tim"
-                          : onboardingData.teamFocus === "marketing"
-                            ? "Ekspansi Bisnis"
-                            : ""}
-                  </p>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <CheckCircle className="w-5 h-5 text-orange-600" />
+                    <p className="text-sm text-orange-800">
+                      <strong>Fokus terpilih:</strong>{" "}
+                      {onboardingData.teamFocus === "penjualan"
+                        ? "Tingkatkan Pendapatan"
+                        : onboardingData.teamFocus === "operasional"
+                          ? "Rapikan Operasional"
+                          : onboardingData.teamFocus === "customer_service"
+                            ? "Kembangkan Tim"
+                            : onboardingData.teamFocus === "marketing"
+                              ? "Ekspansi Bisnis"
+                              : ""}
+                    </p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setHasLocalChanges(true);
+                      setOnboardingData({ 
+                        ...onboardingData, 
+                        teamFocus: "",
+                        objective: "",
+                        keyResults: [],
+                        initiatives: [],
+                        tasks: []
+                      });
+                      setSelectedTemplateId("");
+                    }}
+                    className="h-6 text-xs text-orange-600 hover:text-orange-700 hover:bg-orange-100"
+                  >
+                    <Edit className="w-3 h-3 mr-1" />
+                    Ubah Fokus
+                  </Button>
                 </div>
               </div>
             )}
@@ -2212,9 +2234,48 @@ export default function CompanyOnboarding() {
                   ))}
                 </div>
                 
-                {/* Informational message when cycle is active */}
+                {/* Edit cycle duration section */}
                 {onboardingData.cycleDuration && (
-                  <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                  <div className="mt-4 p-3 bg-amber-50 rounded-lg border border-amber-200">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center space-x-2">
+                        <CalendarIcon className="w-4 h-4 text-amber-600" />
+                        <span className="text-sm font-medium text-amber-800">Periode Terpilih: {
+                          onboardingData.cycleDuration === "1bulan" ? "1 Bulan" :
+                          onboardingData.cycleDuration === "3bulan" ? "3 Bulan" :
+                          onboardingData.cycleDuration === "6bulan" ? "6 Bulan" : onboardingData.cycleDuration
+                        }</span>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setOnboardingData({ 
+                            ...onboardingData, 
+                            cycleDuration: "",
+                            cycleStartDate: "",
+                            cycleEndDate: ""
+                          });
+                        }}
+                        className="h-6 text-xs text-amber-600 hover:text-amber-700 hover:bg-amber-100"
+                      >
+                        <Edit className="w-3 h-3 mr-1" />
+                        Ubah Periode
+                      </Button>
+                    </div>
+                    <p className="text-sm text-amber-700">
+                      {onboardingData.cycleStartDate && onboardingData.cycleEndDate && (
+                        <>
+                          <strong>Periode:</strong> {new Date(onboardingData.cycleStartDate).toLocaleDateString('id-ID')} - {new Date(onboardingData.cycleEndDate).toLocaleDateString('id-ID')}
+                        </>
+                      )}
+                    </p>
+                  </div>
+                )}
+                
+                {/* Tips section when cycle is active */}
+                {onboardingData.cycleDuration && (
+                  <div className="mt-2 p-3 bg-blue-50 rounded-lg border border-blue-200">
                     <div className="flex items-center space-x-2 mb-2">
                       <Edit className="w-4 h-4 text-blue-600" />
                       <span className="text-sm font-medium text-blue-800">Tips Kustomisasi:</span>
