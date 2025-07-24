@@ -1718,9 +1718,9 @@ export default function CompanyOnboarding() {
                       <div className="hidden md:block absolute -inset-2 bg-blue-200 rounded-2xl -z-10 opacity-0 group-hover:opacity-30 transition-all duration-300"></div>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3 mb-3">
-                        <h4 className="text-lg md:text-xl font-bold text-white">KEY RESULTS / Target Angka</h4>
-                        <div className="px-2 py-1 md:px-3 md:py-1 bg-blue-500 text-white rounded-full text-xs font-bold self-start">TERUKUR</div>
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="text-lg md:text-xl font-bold text-white">ANGKA TARGET</h4>
+                        <div className="px-2 py-1 md:px-3 md:py-1 bg-blue-500 text-white rounded-full text-xs font-bold">UKURAN</div>
                       </div>
                       <p className="text-gray-300 mb-2 md:mb-3 text-base md:text-lg">Angka spesifik yang mengukur pencapaian tujuan</p>
                       <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg md:rounded-xl p-2 md:p-3 border-l-4 border-blue-400 shadow-md">
@@ -1763,10 +1763,10 @@ export default function CompanyOnboarding() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3 mb-3">
-                        <h4 className="text-lg md:text-xl font-bold text-white">INITIATIVES / Strategi</h4>
+                        <h4 className="text-lg md:text-xl font-bold text-white">INIISIATIF / Strategi</h4>
                         <div className="px-2 py-1 md:px-3 md:py-1 bg-green-500 text-white rounded-full text-xs font-bold self-start">PROGRAM</div>
                       </div>
-                      <p className="text-gray-300 mb-2 md:mb-3 text-base md:text-lg">Program besar yang dilakukan untuk mencapai target</p>
+                      <p className="text-gray-300 mb-2 md:mb-3 text-base md:text-lg">Program spesifik yang dilakukan untuk mencapai target</p>
                       <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-lg md:rounded-xl p-2 md:p-3 border-l-4 border-green-400 shadow-md">
                         <div className="flex items-center space-x-2 mb-3">
                           <Lightbulb className="w-4 h-4 text-green-500 flex-shrink-0" />
@@ -1807,7 +1807,7 @@ export default function CompanyOnboarding() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3 mb-3">
-                        <h4 className="text-lg md:text-xl font-bold text-white">TASKS / Tugas Harian</h4>
+                        <h4 className="text-lg md:text-xl font-bold text-white">TASK / Tugas Harian</h4>
                         <div className="px-2 py-1 md:px-3 md:py-1 bg-purple-500 text-white rounded-full text-xs font-bold self-start">EKSEKUSI</div>
                       </div>
                       <p className="text-gray-300 mb-2 md:mb-3 text-base md:text-lg">Aktivitas konkret yang dikerjakan setiap hari</p>
@@ -1819,7 +1819,7 @@ export default function CompanyOnboarding() {
                         <div className="space-y-2">
                           <div className="flex items-start space-x-2">
                             <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
-                            <span className="text-gray-800 text-sm md:text-base">Posting konten di Instagram setiap hari</span>
+                            <span className="text-gray-800 text-sm md:text-base">Membuat perencanaan kampanye marketing</span>
                           </div>
                           <div className="flex items-start space-x-2">
                             <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
