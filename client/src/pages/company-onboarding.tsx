@@ -220,6 +220,9 @@ export default function CompanyOnboarding() {
   const [tempObjectiveTitle, setTempObjectiveTitle] = useState('');
   const [tempObjectiveDescription, setTempObjectiveDescription] = useState('');
   const [tempKeyResultText, setTempKeyResultText] = useState('');
+  
+  // Track originally selected template
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
   const { startTour } = useTour();
 
   // Initialize state first
@@ -1008,8 +1011,19 @@ export default function CompanyOnboarding() {
         ...progress,
         currentStep: progress.currentStep || 0, // Ensure it starts at 0 if no progress
       }));
+      
+      // Initialize selectedTemplateId if objective exists but no template is selected
+      if (progress.objective && !selectedTemplateId) {
+        // Find template that matches the objective
+        const matchingTemplate = goalTemplates?.find((template: any) => 
+          template.title === progress.objective
+        );
+        if (matchingTemplate) {
+          setSelectedTemplateId(matchingTemplate.id);
+        }
+      }
     }
-  }, [progress]);
+  }, [progress, goalTemplates, selectedTemplateId]);
 
   // Validation function for each step
   const validateStep = (
@@ -1973,6 +1987,9 @@ export default function CompanyOnboarding() {
                         const endDate = new Date();
                         endDate.setMonth(startDate.getMonth() + 1);
                         
+                        // Track the selected template ID
+                        setSelectedTemplateId(template.id);
+                        
                         setOnboardingData({ 
                           ...onboardingData, 
                           objective: template.title,
@@ -1983,7 +2000,7 @@ export default function CompanyOnboarding() {
                         });
                       }}
                       className={`p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] h-fit ${
-                        onboardingData.objective === template.title
+                        selectedTemplateId === template.id
                           ? "border-orange-500 bg-orange-50 shadow-md"
                           : "border-gray-200 bg-white hover:border-orange-300"
                       }`}
@@ -1991,9 +2008,9 @@ export default function CompanyOnboarding() {
                       <div className="space-y-2">
                         <div className="flex items-start justify-between">
                           <h3 className="leading-relaxed font-semibold text-base flex-1">
-                            {template.title}
+                            {selectedTemplateId === template.id ? onboardingData.objective : template.title}
                           </h3>
-                          {onboardingData.objective === template.title && (
+                          {selectedTemplateId === template.id && (
                             <Button
                               variant="outline"
                               size="sm"
@@ -2057,7 +2074,7 @@ export default function CompanyOnboarding() {
                                       )}
                                     </span>
                                   </div>
-                                  {onboardingData.objective === template.title && (
+                                  {selectedTemplateId === template.id && (
                                     <Button
                                       variant="ghost"
                                       size="sm"
@@ -2115,7 +2132,7 @@ export default function CompanyOnboarding() {
             )}
 
             {/* Cycle Selection */}
-            {onboardingData.objective && (
+            {selectedTemplateId && onboardingData.objective && (
               <div className="mt-6 space-y-4 p-4 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg border border-purple-200">
                 <div className="flex items-center space-x-2">
                   <CalendarIcon className="w-5 h-5 text-purple-600" />
