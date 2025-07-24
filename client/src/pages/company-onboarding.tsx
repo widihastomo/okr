@@ -90,6 +90,7 @@ import { ReminderSettings } from "@/components/ReminderSettings";
 import { SimpleSelect } from "@/components/SimpleSelect";
 import { type CompanyOnboardingData } from "@shared/schema";
 import { useTour } from "@/hooks/useTour";
+import { KeyResultModal } from "@/components/goal-form-modal";
 
 // Onboarding steps following the reference structure
 const ONBOARDING_STEPS = [
@@ -260,6 +261,12 @@ export default function CompanyOnboarding() {
   const { data: goalTemplates, isLoading: isLoadingTemplates } = useQuery({
     queryKey: [`/api/goal-templates/${onboardingData.teamFocus}`],
     enabled: !!onboardingData.teamFocus
+  });
+
+  // Fetch users for key result assignment
+  const { data: users } = useQuery({
+    queryKey: ["/api/my-team-users"],
+    enabled: !!user,
   });
 
   // Options for searchable select boxes
@@ -4893,69 +4900,46 @@ export default function CompanyOnboarding() {
         </DialogContent>
       </Dialog>
 
-      {/* Individual Key Result Edit Modal */}
-      <Dialog open={editIndividualKeyResultModal.open} onOpenChange={(open) => 
-        setEditIndividualKeyResultModal({ open, index: -1, keyResult: null, originalText: '' })
-      }>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle className="flex items-center space-x-2">
-              <TrendingUp className="w-5 h-5 text-blue-600" />
-              <span>Edit Key Result #{editIndividualKeyResultModal.index + 1}</span>
-            </DialogTitle>
-            <DialogDescription>
-              Edit teks key result sesuai kebutuhan spesifik perusahaan Anda
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="kr-individual-edit" className="text-sm font-medium text-blue-800">
-                Teks Key Result:
-              </Label>
-              <Textarea
-                id="kr-individual-edit"
-                value={tempKeyResultText}
-                onChange={(e) => setTempKeyResultText(e.target.value)}
-                placeholder="Masukkan teks key result yang spesifik dan terukur..."
-                className="min-h-[120px] text-sm leading-relaxed bg-white border-blue-200 focus:border-blue-400 focus:ring-blue-400"
-              />
-              <p className="text-xs text-blue-600">
-                💡 Tip: Pastikan target bersifat SMART (Specific, Measurable, Achievable, Relevant, Time-bound)
-              </p>
-            </div>
-          </div>
-
-          <div className="flex justify-end space-x-3 pt-4">
-            <Button
-              variant="outline"
-              onClick={() => setEditIndividualKeyResultModal({ open: false, index: -1, keyResult: null, originalText: '' })}
-              className="border-gray-300 text-gray-700 hover:bg-gray-50"
-            >
-              Batal
-            </Button>
-            <Button
-              onClick={() => {
-                // Update the specific key result in onboardingData
-                const newKeyResults = [...onboardingData.keyResults];
-                if (editIndividualKeyResultModal.index >= 0 && editIndividualKeyResultModal.index < newKeyResults.length) {
-                  newKeyResults[editIndividualKeyResultModal.index] = tempKeyResultText;
-                  setOnboardingData({ ...onboardingData, keyResults: newKeyResults });
-                }
-                setEditIndividualKeyResultModal({ open: false, index: -1, keyResult: null, originalText: '' });
-                toast({
-                  title: "Key Result Berhasil Diperbarui",
-                  description: "Key result telah diperbarui sesuai kebutuhan Anda.",
-                  variant: "default"
-                });
-              }}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
-            >
-              Simpan Perubahan
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {/* Individual Key Result Edit Modal - Using Comprehensive Form */}
+      <KeyResultModal
+        open={editIndividualKeyResultModal.open}
+        onOpenChange={(open) => 
+          setEditIndividualKeyResultModal({ open, index: -1, keyResult: null, originalText: '' })
+        }
+        onSubmit={(keyResultData) => {
+          // Convert the comprehensive key result data back to simple text for onboarding
+          const formattedText = keyResultData.targetValue && keyResultData.unit && keyResultData.keyResultType !== 'achieve_or_not'
+            ? `${keyResultData.title} (Target: ${keyResultData.targetValue} ${keyResultData.unit})`
+            : keyResultData.title;
+          
+          // Update the specific key result in onboardingData
+          const newKeyResults = [...onboardingData.keyResults];
+          if (editIndividualKeyResultModal.index >= 0 && editIndividualKeyResultModal.index < newKeyResults.length) {
+            newKeyResults[editIndividualKeyResultModal.index] = formattedText;
+            setOnboardingData({ ...onboardingData, keyResults: newKeyResults });
+          }
+          
+          setEditIndividualKeyResultModal({ open: false, index: -1, keyResult: null, originalText: '' });
+          toast({
+            title: "Key Result Berhasil Diperbarui",
+            description: "Key result telah diperbarui dengan form lengkap.",
+            variant: "default"
+          });
+        }}
+        editingKeyResult={editIndividualKeyResultModal.keyResult ? {
+          title: editIndividualKeyResultModal.originalText || editIndividualKeyResultModal.keyResult.title || '',
+          description: editIndividualKeyResultModal.keyResult.description || '',
+          keyResultType: editIndividualKeyResultModal.keyResult.keyResultType || 'increase_to',
+          baseValue: editIndividualKeyResultModal.keyResult.baseValue || '0',
+          targetValue: editIndividualKeyResultModal.keyResult.targetValue || '0',
+          currentValue: editIndividualKeyResultModal.keyResult.currentValue || '0',
+          unit: editIndividualKeyResultModal.keyResult.unit || '',
+          status: 'in_progress',
+          assignedTo: user?.id || '',
+        } : undefined}
+        isEditing={editIndividualKeyResultModal.open}
+        users={users || []}
+      />
     </div>
   );
 }
