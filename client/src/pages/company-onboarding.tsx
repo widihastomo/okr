@@ -2431,7 +2431,7 @@ export default function CompanyOnboarding() {
             ],
           };
 
-          // Key Results untuk objective marketing
+          // Angka Target untuk objective marketing
           const marketingKeyResults: Record<string, string[]> = {
             "Meningkatkan kesadaran merek di pasar target": [
               "Mencapai brand recall 60% dalam market research",
@@ -2450,7 +2450,7 @@ export default function CompanyOnboarding() {
             ],
           };
 
-          // Gabungkan semua key results
+          // Gabungkan semua angka target
           const allKeyResults: Record<string, string[]> = {
             ...salesKeyResults,
             ...operationalKeyResults,
@@ -2461,28 +2461,28 @@ export default function CompanyOnboarding() {
           return allKeyResults[objective] || [];
         };
 
-        const keyResultOptions = getKeyResultOptions(onboardingData.objective);
-        const selectedKeyResults = onboardingData.keyResults.filter(
+        const angkaTargetOptions = getKeyResultOptions(onboardingData.objective);
+        const selectedAngkaTarget = onboardingData.keyResults.filter(
           (kr) => kr && kr.trim() !== "",
         );
 
         return (
           <div className="space-y-4">
-            {keyResultOptions.length > 0 && (
+            {angkaTargetOptions.length > 0 && (
               <div className="space-y-3">
                 <Label>
                   Pilih Angka Target (Alat ukur kuantitatif) untuk mengetahui
                   kemajual Goal : "{onboardingData.objective}"
                 </Label>
                 <div className="space-y-2">
-                  {keyResultOptions.map((option: string, index: number) => (
+                  {angkaTargetOptions.map((option: string, index: number) => (
                     <div
                       key={index}
                       className="flex items-start space-x-2 p-3 rounded-lg border border-gray-200 hover:bg-gray-50"
                     >
                       <Checkbox
-                        id={`keyresult-${index}`}
-                        checked={selectedKeyResults.includes(option)}
+                        id={`angkatarget-${index}`}
+                        checked={selectedAngkaTarget.includes(option)}
                         onCheckedChange={(checked) => {
                           let newKeyResults = [...onboardingData.keyResults];
                           if (checked) {
@@ -2501,7 +2501,7 @@ export default function CompanyOnboarding() {
                       <div className="flex items-start space-x-2 flex-1">
                         <TrendingUp className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
                         <Label
-                          htmlFor={`keyresult-${index}`}
+                          htmlFor={`angkatarget-${index}`}
                           className="cursor-pointer leading-relaxed"
                         >
                           {option}
@@ -4018,7 +4018,7 @@ export default function CompanyOnboarding() {
                               key={krIndex}
                               className="border-l-2 border-green-200 pl-4 space-y-3"
                             >
-                              {/* Key Result */}
+                              {/* Angka Target */}
                               <div className="flex items-start justify-between">
                                 <div className="flex items-start space-x-2 flex-1">
                                   <div className="w-2 h-2 bg-green-500 rounded-full mt-1.5"></div>
@@ -4043,7 +4043,7 @@ export default function CompanyOnboarding() {
                                 </Button>
                               </div>
 
-                              {/* Initiatives for this Key Result */}
+                              {/* Initiatives for this Angka Target */}
                               {relatedInitiatives.map((init, initIndex) => {
                                 // Get tasks related to this specific initiative using the mapping
                                 const taskGroups = {
@@ -4752,10 +4752,10 @@ export default function CompanyOnboarding() {
           <DialogHeader>
             <DialogTitle className="flex items-center space-x-2">
               <Edit className="w-5 h-5 text-orange-600" />
-              <span>Edit Goal & Key Results</span>
+              <span>Edit Goal & Angka Target</span>
             </DialogTitle>
             <DialogDescription>
-              Sesuaikan goal dan key results sesuai kebutuhan spesifik perusahaan Anda
+              Sesuaikan goal dan angka target sesuai kebutuhan spesifik perusahaan Anda
             </DialogDescription>
           </DialogHeader>
 
@@ -4776,7 +4776,7 @@ export default function CompanyOnboarding() {
               />
             </div>
 
-            {/* Edit Key Results Section */}
+            {/* Edit Angka Target Section */}
             {(() => {
               const selectedTemplate = goalTemplates?.find((t: any) => t.title === onboardingData.objective);
               if (!selectedTemplate || !selectedTemplate.keyResults || selectedTemplate.keyResults.length === 0) {
@@ -4812,7 +4812,7 @@ export default function CompanyOnboarding() {
                 <div className="space-y-4">
                   <Label className="text-sm font-medium text-gray-800 flex items-center gap-2">
                     <Target className="w-4 h-4 text-blue-500" />
-                    Edit Key Results:
+                    Edit Angka Target:
                   </Label>
                   
                   <div className="border border-blue-200 rounded-lg overflow-hidden">
@@ -4820,7 +4820,7 @@ export default function CompanyOnboarding() {
                       <table className="w-full text-sm">
                         <thead className="bg-blue-50 border-b border-blue-200">
                           <tr>
-                            <th className="text-left p-3 font-medium text-gray-700 min-w-[200px]">Judul Key Result</th>
+                            <th className="text-left p-3 font-medium text-gray-700 min-w-[200px]">Judul Angka Target</th>
                             <th className="text-left p-3 font-medium text-gray-700 min-w-[140px]">Tipe</th>
                             <th className="text-left p-3 font-medium text-gray-700 w-20">Awal</th>
                             <th className="text-left p-3 font-medium text-gray-700 w-20">Saat Ini</th>
@@ -4975,7 +4975,7 @@ export default function CompanyOnboarding() {
                   </div>
                   
                   <p className="text-xs text-blue-600 bg-blue-50 p-3 rounded-lg">
-                    💡 <strong>Tips:</strong> Format tabel memudahkan editing multiple key results dengan struktur database lengkap
+                    💡 <strong>Tips:</strong> Format tabel memudahkan editing multiple angka target dengan struktur database lengkap
                   </p>
                 </div>
               );
@@ -4994,7 +4994,7 @@ export default function CompanyOnboarding() {
                 setShowEditModal(false);
                 toast({
                   title: "Perubahan Disimpan",
-                  description: "Goal dan key results telah berhasil diperbarui",
+                  description: "Goal dan angka target telah berhasil diperbarui",
                   variant: "default",
                 });
               }}
@@ -5052,7 +5052,7 @@ export default function CompanyOnboarding() {
         </DialogContent>
       </Dialog>
 
-      {/* Edit Key Result Modal */}
+      {/* Edit Angka Target Modal */}
       <Dialog open={editKeyResultModal.open} onOpenChange={(open) => 
         setEditKeyResultModal({ open, index: -1, keyResult: null })
       }>
