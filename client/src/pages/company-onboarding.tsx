@@ -1921,30 +1921,21 @@ export default function CompanyOnboarding() {
                           ? "Ekspansi Bisnis"
                           : ""}):
                 </Label>
-                <RadioGroup
-                  value={onboardingData.objective}
-                  onValueChange={(value) =>
-                    setOnboardingData({ ...onboardingData, objective: value })
-                  }
-                  className="grid grid-cols-1 lg:grid-cols-2 gap-4"
-                >
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   {goalTemplates.map((template: any, index: number) => (
                     <div
                       key={template.id}
-                      className="flex items-start space-x-2 p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors h-fit"
+                      onClick={() => setOnboardingData({ ...onboardingData, objective: template.title })}
+                      className={`p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] h-fit ${
+                        onboardingData.objective === template.title
+                          ? "border-orange-500 bg-orange-50 shadow-md"
+                          : "border-gray-200 bg-white hover:border-orange-300"
+                      }`}
                     >
-                      <RadioGroupItem
-                        value={template.title}
-                        id={`template-${template.id}`}
-                        className="mt-1"
-                      />
-                      <div className="flex-1 space-y-2">
-                        <Label
-                          htmlFor={`template-${template.id}`}
-                          className="cursor-pointer leading-relaxed font-semibold text-base block"
-                        >
+                      <div className="space-y-2">
+                        <h3 className="leading-relaxed font-semibold text-base">
                           {template.title}
-                        </Label>
+                        </h3>
                         {template.description && (
                           <p className="text-sm text-gray-600 leading-relaxed">
                             {template.description}
@@ -1985,7 +1976,7 @@ export default function CompanyOnboarding() {
                       </div>
                     </div>
                   ))}
-                </RadioGroup>
+                </div>
               </div>
             ) : (
               <div className="text-center p-8 text-gray-500">
