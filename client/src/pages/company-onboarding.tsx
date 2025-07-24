@@ -223,6 +223,9 @@ export default function CompanyOnboarding() {
   
   // Track originally selected template
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
+  
+  // Track edited key results to override template display
+  const [editedKeyResults, setEditedKeyResults] = useState<Record<number, any>>({});
   const { startTour } = useTour();
 
   // Initialize state first
@@ -2042,7 +2045,11 @@ export default function CompanyOnboarding() {
                               </p>
                             </div>
                             <div className="space-y-1">
-                              {template.keyResults.slice(0, 3).map((keyResult: any, krIndex: number) => (
+                              {template.keyResults.slice(0, 3).map((keyResult: any, krIndex: number) => {
+                                // Use edited data if available, otherwise use original template data
+                                const displayKeyResult = editedKeyResults[krIndex] || keyResult;
+                                
+                                return (
                                 <div key={krIndex} className="flex items-center justify-between group">
                                   <div className="flex items-center space-x-2 flex-1">
                                     {(() => {
@@ -2063,13 +2070,13 @@ export default function CompanyOnboarding() {
                                             return <div className="w-1.5 h-1.5 bg-orange-400 rounded-full flex-shrink-0"></div>;
                                         }
                                       };
-                                      return getKeyResultIcon(keyResult.keyResultType || 'default');
+                                      return getKeyResultIcon(displayKeyResult.keyResultType || 'default');
                                     })()}
                                     <span className="text-xs text-gray-600 flex-1">
-                                      {keyResult.title}
-                                      {keyResult.targetValue && keyResult.unit && (
+                                      {displayKeyResult.title}
+                                      {displayKeyResult.targetValue && displayKeyResult.unit && (
                                         <span className="ml-1 px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded text-[10px] font-medium">
-                                          {keyResult.targetValue} {keyResult.unit}
+                                          {displayKeyResult.targetValue} {displayKeyResult.unit}
                                         </span>
                                       )}
                                     </span>
@@ -2107,7 +2114,8 @@ export default function CompanyOnboarding() {
                                     </Button>
                                   )}
                                 </div>
-                              ))}
+                                );
+                              })}
                               {template.keyResults.length > 3 && (
                                 <div className="flex items-center space-x-2">
                                   <div className="w-1.5 h-1.5 bg-gray-300 rounded-full flex-shrink-0"></div>
@@ -5060,6 +5068,22 @@ export default function CompanyOnboarding() {
           if (editIndividualKeyResultModal.index >= 0 && editIndividualKeyResultModal.index < newKeyResults.length) {
             newKeyResults[editIndividualKeyResultModal.index] = formattedText;
             setOnboardingData({ ...onboardingData, keyResults: newKeyResults });
+          }
+          
+          // Store the edited key result data for display override
+          if (editIndividualKeyResultModal.index >= 0) {
+            setEditedKeyResults(prev => ({
+              ...prev,
+              [editIndividualKeyResultModal.index]: {
+                title: keyResultData.title,
+                description: keyResultData.description,
+                keyResultType: keyResultData.keyResultType,
+                baseValue: keyResultData.baseValue,
+                targetValue: keyResultData.targetValue,
+                currentValue: keyResultData.currentValue,
+                unit: keyResultData.unit,
+              }
+            }));
           }
           
           setEditIndividualKeyResultModal({ open: false, index: -1, keyResult: null, originalText: '' });
