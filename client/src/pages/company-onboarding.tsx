@@ -1553,7 +1553,10 @@ export default function CompanyOnboarding() {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div
-                onClick={() => setOnboardingData({ ...onboardingData, teamFocus: "penjualan" })}
+                onClick={() => {
+                  console.log("Clicking penjualan");
+                  setOnboardingData({ ...onboardingData, teamFocus: "penjualan" });
+                }}
                 className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
                   onboardingData.teamFocus === "penjualan"
                     ? "border-orange-500 bg-orange-50 shadow-md"
@@ -1576,7 +1579,10 @@ export default function CompanyOnboarding() {
               </div>
 
               <div
-                onClick={() => setOnboardingData({ ...onboardingData, teamFocus: "operasional" })}
+                onClick={() => {
+                  console.log("Clicking operasional");
+                  setOnboardingData({ ...onboardingData, teamFocus: "operasional" });
+                }}
                 className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
                   onboardingData.teamFocus === "operasional"
                     ? "border-orange-500 bg-orange-50 shadow-md"
@@ -1599,7 +1605,10 @@ export default function CompanyOnboarding() {
               </div>
 
               <div
-                onClick={() => setOnboardingData({ ...onboardingData, teamFocus: "customer_service" })}
+                onClick={() => {
+                  console.log("Clicking customer_service");
+                  setOnboardingData({ ...onboardingData, teamFocus: "customer_service" });
+                }}
                 className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
                   onboardingData.teamFocus === "customer_service"
                     ? "border-orange-500 bg-orange-50 shadow-md"
@@ -1622,7 +1631,10 @@ export default function CompanyOnboarding() {
               </div>
 
               <div
-                onClick={() => setOnboardingData({ ...onboardingData, teamFocus: "marketing" })}
+                onClick={() => {
+                  console.log("Clicking marketing");
+                  setOnboardingData({ ...onboardingData, teamFocus: "marketing" });
+                }}
                 className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
                   onboardingData.teamFocus === "marketing"
                     ? "border-orange-500 bg-orange-50 shadow-md"
