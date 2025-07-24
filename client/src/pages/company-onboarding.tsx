@@ -1998,13 +1998,28 @@ export default function CompanyOnboarding() {
 
             {onboardingData.objective && (
               <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <div className="flex items-center space-x-2 mb-2">
+                <div className="flex items-center space-x-2 mb-3">
                   <CheckCircle className="w-5 h-5 text-blue-600" />
                   <p className="font-medium text-blue-800">Goal Template Terpilih</p>
                 </div>
-                <p className="text-sm text-blue-700 leading-relaxed">
-                  {onboardingData.objective}
-                </p>
+                
+                <div className="space-y-3">
+                  <Label htmlFor="edit-objective" className="text-sm font-medium text-blue-800">
+                    Edit goal Anda (opsional):
+                  </Label>
+                  <Textarea
+                    id="edit-objective"
+                    value={onboardingData.objective}
+                    onChange={(e) =>
+                      setOnboardingData({ ...onboardingData, objective: e.target.value })
+                    }
+                    placeholder="Sesuaikan goal sesuai kebutuhan perusahaan Anda..."
+                    className="min-h-[80px] text-sm leading-relaxed bg-white border-blue-200 focus:border-blue-400 focus:ring-blue-400"
+                  />
+                  <p className="text-xs text-blue-600">
+                    💡 Tip: Sesuaikan goal ini dengan kondisi spesifik perusahaan Anda
+                  </p>
+                </div>
               </div>
             )}
           </div>
