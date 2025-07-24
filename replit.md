@@ -438,6 +438,19 @@ The system now includes a comprehensive dummy data generation feature that creat
 
 ## Changelog
 ```
+- July 24, 2025. **CYCLE MANAGEMENT IMPLEMENTATION COMPLETED** - Successfully implemented cycle selection functionality in goals section with default 1-month cycle:
+  * ADDED: Cycle selection interface in Step 4 (goals) with visual period options (1 month, 3 months, 6 months)
+  * IMPLEMENTED: Default 1-month cycle automatically set when selecting a goal template
+  * ENHANCED: Visual cycle cards with gradient backgrounds, emoji icons, and period date display
+  * INTEGRATED: Automatic date calculation from onboarding start date (today) plus selected duration
+  * VALIDATED: Form validation ensures cycle duration is selected before proceeding to next step
+  * STYLED: Purple-themed cycle selection interface with professional visual design
+  * RESULT: Users now see goal cycle periods with default 1-month selection from onboarding date
+- July 24, 2025. **TEMPLATE UNIT STANDARDIZATION COMPLETED** - Successfully updated all goal templates with form-compatible units:
+  * FIXED: Updated populate script to modify existing templates instead of skipping them
+  * STANDARDIZED: All template units now use predefined format ("%" instead of "persen", "orang" instead of "member", etc.)
+  * UPDATED: Database templates successfully refreshed with corrected unit formats
+  * RESULT: KeyResultModal now properly initializes with template data using compatible unit formats
 - July 24, 2025. **COMPREHENSIVE KEY RESULT FORM INTEGRATION COMPLETED** - Successfully replaced simple textarea with full KeyResultModal form for advanced editing:
   * REPLACED: Simple textarea form with comprehensive KeyResultModal from goal-form-modal component
   * INTEGRATED: Full key result form with title, description, key result type, base/target/current values, unit, status, and user assignment

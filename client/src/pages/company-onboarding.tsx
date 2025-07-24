@@ -1086,6 +1086,12 @@ export default function CompanyOnboarding() {
             message: "Silakan pilih atau tulis goal yang ingin dicapai",
           };
         }
+        if (!data.cycleDuration?.trim()) {
+          return {
+            isValid: false,
+            message: "Silakan pilih durasi periode waktu untuk goal",
+          };
+        }
         break;
       case 5:
         if (data.keyResults.length === 0) {
@@ -1961,7 +1967,21 @@ export default function CompanyOnboarding() {
                   {goalTemplates.map((template: any, index: number) => (
                     <div
                       key={template.id}
-                      onClick={() => setOnboardingData({ ...onboardingData, objective: template.title })}
+                      onClick={() => {
+                        // Set default 1-month cycle when selecting a goal
+                        const startDate = new Date();
+                        const endDate = new Date();
+                        endDate.setMonth(startDate.getMonth() + 1);
+                        
+                        setOnboardingData({ 
+                          ...onboardingData, 
+                          objective: template.title,
+                          // Set default 1-month cycle
+                          cycleDuration: "1bulan",
+                          cycleStartDate: startDate.toISOString().split('T')[0],
+                          cycleEndDate: endDate.toISOString().split('T')[0]
+                        });
+                      }}
                       className={`p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] h-fit ${
                         onboardingData.objective === template.title
                           ? "border-orange-500 bg-orange-50 shadow-md"
@@ -2094,6 +2114,105 @@ export default function CompanyOnboarding() {
               </div>
             )}
 
+            {/* Cycle Selection */}
+            {onboardingData.objective && (
+              <div className="mt-6 space-y-4 p-4 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg border border-purple-200">
+                <div className="flex items-center space-x-2">
+                  <CalendarIcon className="w-5 h-5 text-purple-600" />
+                  <Label className="text-lg font-semibold text-purple-800">
+                    Periode Waktu Goal
+                  </Label>
+                </div>
+                <p className="text-sm text-purple-700 mb-4">
+                  Pilih durasi waktu untuk mencapai goal "{onboardingData.objective}"
+                </p>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  {[
+                    { 
+                      value: "1bulan", 
+                      label: "1 Bulan", 
+                      description: "Sprint intensif jangka pendek",
+                      icon: "🚀",
+                      color: "from-green-500 to-emerald-500"
+                    },
+                    { 
+                      value: "3bulan", 
+                      label: "3 Bulan", 
+                      description: "Kuartal strategis",
+                      icon: "📈",
+                      color: "from-blue-500 to-cyan-500"
+                    },
+                    { 
+                      value: "6bulan", 
+                      label: "6 Bulan", 
+                      description: "Semester pengembangan",
+                      icon: "🎯",
+                      color: "from-purple-500 to-violet-500"
+                    }
+                  ].map((option) => (
+                    <div
+                      key={option.value}
+                      onClick={() => {
+                        const startDate = new Date();
+                        const endDate = new Date();
+                        
+                        if (option.value === "1bulan") {
+                          endDate.setMonth(startDate.getMonth() + 1);
+                        } else if (option.value === "3bulan") {
+                          endDate.setMonth(startDate.getMonth() + 3);
+                        } else if (option.value === "6bulan") {
+                          endDate.setMonth(startDate.getMonth() + 6);
+                        }
+                        
+                        setOnboardingData({ 
+                          ...onboardingData, 
+                          cycleDuration: option.value,
+                          cycleStartDate: startDate.toISOString().split('T')[0],
+                          cycleEndDate: endDate.toISOString().split('T')[0]
+                        });
+                      }}
+                      className={`p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
+                        onboardingData.cycleDuration === option.value
+                          ? "border-purple-500 bg-white shadow-md ring-2 ring-purple-200"
+                          : "border-gray-200 bg-white hover:border-purple-300"
+                      }`}
+                    >
+                      <div className="text-center space-y-2">
+                        <div className={`w-12 h-12 mx-auto rounded-full bg-gradient-to-r ${option.color} flex items-center justify-center text-white text-xl shadow-lg`}>
+                          {option.icon}
+                        </div>
+                        <h4 className="font-semibold text-gray-800">{option.label}</h4>
+                        <p className="text-xs text-gray-600">{option.description}</p>
+                        {onboardingData.cycleDuration === option.value && onboardingData.cycleStartDate && onboardingData.cycleEndDate && (
+                          <div className="mt-2 p-2 bg-purple-50 rounded text-xs text-purple-700">
+                            <div className="font-medium">Periode:</div>
+                            <div>{new Date(onboardingData.cycleStartDate).toLocaleDateString('id-ID')} - {new Date(onboardingData.cycleEndDate).toLocaleDateString('id-ID')}</div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                {onboardingData.cycleDuration && (
+                  <div className="mt-4 p-3 bg-white rounded-lg border border-purple-200">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <CheckCircle className="w-4 h-4 text-green-600" />
+                      <span className="text-sm font-medium text-gray-800">Periode goal terpilih:</span>
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      <strong>{onboardingData.cycleDuration === "1bulan" ? "1 Bulan" : onboardingData.cycleDuration === "3bulan" ? "3 Bulan" : "6 Bulan"}</strong>
+                      {onboardingData.cycleStartDate && onboardingData.cycleEndDate && (
+                        <span className="ml-2">
+                          ({new Date(onboardingData.cycleStartDate).toLocaleDateString('id-ID')} - {new Date(onboardingData.cycleEndDate).toLocaleDateString('id-ID')})
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
             
           </div>
         );
