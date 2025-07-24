@@ -1663,8 +1663,8 @@ export default function CompanyOnboarding() {
             {/* Mobile-Optimized OKR Explanation */}
             <div className="bg-gradient-to-br from-gray-900 to-slate-800 rounded-xl md:rounded-2xl shadow-xl border-2 border-gray-700 p-3 md:p-6 relative overflow-hidden">
               {/* Subtle background decoration - smaller on mobile */}
-              <div className="absolute top-0 right-0 w-16 h-16 md:w-32 md:h-32 bg-blue-200 rounded-full -translate-y-8 translate-x-8 md:-translate-y-16 md:translate-x-16 opacity-20"></div>
-              <div className="absolute bottom-0 left-0 w-12 h-12 md:w-24 md:h-24 bg-purple-200 rounded-full translate-y-6 -translate-x-6 md:translate-y-12 md:-translate-x-12 opacity-20"></div>
+              <div className="absolute top-0 right-0 w-16 h-16 md:w-32 md:h-32 bg-blue-400 rounded-full -translate-y-8 translate-x-8 md:-translate-y-16 md:translate-x-16 opacity-10"></div>
+              <div className="absolute bottom-0 left-0 w-12 h-12 md:w-24 md:h-24 bg-purple-400 rounded-full translate-y-6 -translate-x-6 md:translate-y-12 md:-translate-x-12 opacity-10"></div>
               
               {/* Header */}
               <div className="text-center mb-4 md:mb-6 relative">
@@ -1708,7 +1708,7 @@ export default function CompanyOnboarding() {
                   
                   {/* Connecting line */}
                   <div className="flex justify-center my-4 md:my-6">
-                    <div className="w-1 h-6 md:h-8 bg-gradient-to-b from-orange-300 to-blue-300"></div>
+                    <div className="w-1 h-6 md:h-8 bg-gradient-to-b from-orange-400 to-blue-400 opacity-60"></div>
                   </div>
                 </div>
 
@@ -1752,7 +1752,7 @@ export default function CompanyOnboarding() {
                   
                   {/* Connecting line */}
                   <div className="flex justify-center my-4 md:my-6">
-                    <div className="w-1 h-6 md:h-8 bg-gradient-to-b from-blue-300 to-green-300"></div>
+                    <div className="w-1 h-6 md:h-8 bg-gradient-to-b from-blue-400 to-green-400 opacity-60"></div>
                   </div>
                 </div>
 
@@ -1796,7 +1796,7 @@ export default function CompanyOnboarding() {
                   
                   {/* Connecting line */}
                   <div className="flex justify-center my-4 md:my-6">
-                    <div className="w-1 h-6 md:h-8 bg-gradient-to-b from-green-300 to-purple-300"></div>
+                    <div className="w-1 h-6 md:h-8 bg-gradient-to-b from-green-400 to-purple-400 opacity-60"></div>
                   </div>
                 </div>
 
@@ -1841,8 +1841,8 @@ export default function CompanyOnboarding() {
               </div>
               
               {/* Mobile-Optimized Summary */}
-              <div className="mt-6 md:mt-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg md:rounded-xl p-3 md:p-4 shadow-xl relative overflow-hidden">
-                <div className="absolute inset-0 bg-black/10"></div>
+              <div className="mt-6 md:mt-8 bg-gradient-to-r from-slate-700 to-gray-800 rounded-lg md:rounded-xl p-3 md:p-4 shadow-xl relative overflow-hidden border border-gray-600">
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10"></div>
                 <div className="relative">
                   <div className="flex items-center justify-center space-x-2 mb-3 md:mb-4">
                     <Zap className="w-4 h-4 md:w-5 md:h-5 text-white" />
@@ -1851,22 +1851,22 @@ export default function CompanyOnboarding() {
                   
                   {/* Mobile: Stack vertically, Desktop: Horizontal */}
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-center space-y-2 sm:space-y-0 sm:space-x-2 md:space-x-3 mb-3 md:mb-4">
-                    <span className="px-3 py-2 md:px-4 md:py-2 bg-white/20 backdrop-blur-sm text-white rounded-full font-bold text-xs md:text-sm shadow-lg text-center">
+                    <span className="px-3 py-2 md:px-4 md:py-2 bg-orange-500/80 backdrop-blur-sm text-white rounded-full font-bold text-xs md:text-sm shadow-lg text-center border border-orange-400/50">
                       🎯 Tujuan
                     </span>
-                    <ArrowRight className="w-4 h-4 text-white/80 self-center hidden sm:block" />
-                    <ArrowDown className="w-4 h-4 text-white/80 self-center sm:hidden" />
-                    <span className="px-3 py-2 md:px-4 md:py-2 bg-white/20 backdrop-blur-sm text-white rounded-full font-bold text-xs md:text-sm shadow-lg text-center">
+                    <ArrowRight className="w-4 h-4 text-gray-300 self-center hidden sm:block" />
+                    <ArrowDown className="w-4 h-4 text-gray-300 self-center sm:hidden" />
+                    <span className="px-3 py-2 md:px-4 md:py-2 bg-blue-500/80 backdrop-blur-sm text-white rounded-full font-bold text-xs md:text-sm shadow-lg text-center border border-blue-400/50">
                       📊 Target
                     </span>
-                    <ArrowRight className="w-4 h-4 text-white/80 self-center hidden sm:block" />
-                    <ArrowDown className="w-4 h-4 text-white/80 self-center sm:hidden" />
-                    <span className="px-3 py-2 md:px-4 md:py-2 bg-white/20 backdrop-blur-sm text-white rounded-full font-bold text-xs md:text-sm shadow-lg text-center">
+                    <ArrowRight className="w-4 h-4 text-gray-300 self-center hidden sm:block" />
+                    <ArrowDown className="w-4 h-4 text-gray-300 self-center sm:hidden" />
+                    <span className="px-3 py-2 md:px-4 md:py-2 bg-green-500/80 backdrop-blur-sm text-white rounded-full font-bold text-xs md:text-sm shadow-lg text-center border border-green-400/50">
                       🚀 Strategi
                     </span>
-                    <ArrowRight className="w-4 h-4 text-white/80 self-center hidden sm:block" />
-                    <ArrowDown className="w-4 h-4 text-white/80 self-center sm:hidden" />
-                    <span className="px-3 py-2 md:px-4 md:py-2 bg-white/20 backdrop-blur-sm text-white rounded-full font-bold text-xs md:text-sm shadow-lg text-center">
+                    <ArrowRight className="w-4 h-4 text-gray-300 self-center hidden sm:block" />
+                    <ArrowDown className="w-4 h-4 text-gray-300 self-center sm:hidden" />
+                    <span className="px-3 py-2 md:px-4 md:py-2 bg-purple-500/80 backdrop-blur-sm text-white rounded-full font-bold text-xs md:text-sm shadow-lg text-center border border-purple-400/50">
                       ✅ Eksekusi
                     </span>
                   </div>
