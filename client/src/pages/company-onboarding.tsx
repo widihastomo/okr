@@ -1661,7 +1661,7 @@ export default function CompanyOnboarding() {
           <div className="space-y-6">
 
             {/* Mobile-Optimized OKR Explanation */}
-            <div className="bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl md:rounded-2xl shadow-xl border-2 border-blue-100 p-3 md:p-6 relative overflow-hidden">
+            <div className="bg-gradient-to-br from-gray-900 to-slate-800 rounded-xl md:rounded-2xl shadow-xl border-2 border-gray-700 p-3 md:p-6 relative overflow-hidden">
               {/* Subtle background decoration - smaller on mobile */}
               <div className="absolute top-0 right-0 w-16 h-16 md:w-32 md:h-32 bg-blue-200 rounded-full -translate-y-8 translate-x-8 md:-translate-y-16 md:translate-x-16 opacity-20"></div>
               <div className="absolute bottom-0 left-0 w-12 h-12 md:w-24 md:h-24 bg-purple-200 rounded-full translate-y-6 -translate-x-6 md:translate-y-12 md:-translate-x-12 opacity-20"></div>
@@ -1672,7 +1672,7 @@ export default function CompanyOnboarding() {
                   <Target className="w-4 h-4 md:w-5 md:h-5 text-white" />
                 </div>
                 
-                <p className="text-gray-600 text-base md:text-lg px-2">
+                <p className="text-gray-200 text-base md:text-lg px-2">
                   4 langkah sederhana yang terbukti efektif untuk mencapai tujuan besar
                 </p>
               </div>
@@ -1690,10 +1690,10 @@ export default function CompanyOnboarding() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3 mb-3">
-                        <h4 className="text-lg md:text-xl font-bold text-gray-800">GOAL / Tujuan</h4>
+                        <h4 className="text-lg md:text-xl font-bold text-white">GOAL / Tujuan</h4>
                         <div className="px-2 py-1 md:px-3 md:py-1 bg-orange-500 text-white rounded-full text-xs font-bold self-start">VISI BESAR</div>
                       </div>
-                      <p className="text-gray-600 mb-2 md:mb-3 text-base md:text-lg">Apa yang ingin dicapai dalam 3-6 bulan ke depan</p>
+                      <p className="text-gray-300 mb-2 md:mb-3 text-base md:text-lg">Apa yang ingin dicapai dalam 3-6 bulan ke depan</p>
                       <div className="bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg md:rounded-xl p-2 md:p-3 border-l-4 border-orange-400 shadow-md">
                         <div className="flex items-center space-x-2 mb-2">
                           <Sparkles className="w-4 h-4 text-orange-500 flex-shrink-0" />
@@ -1723,10 +1723,10 @@ export default function CompanyOnboarding() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3 mb-3">
-                        <h4 className="text-lg md:text-xl font-bold text-gray-800">KEY RESULTS / Target Angka</h4>
+                        <h4 className="text-lg md:text-xl font-bold text-white">KEY RESULTS / Target Angka</h4>
                         <div className="px-2 py-1 md:px-3 md:py-1 bg-blue-500 text-white rounded-full text-xs font-bold self-start">TERUKUR</div>
                       </div>
-                      <p className="text-gray-600 mb-2 md:mb-3 text-base md:text-lg">Angka spesifik yang mengukur pencapaian tujuan</p>
+                      <p className="text-gray-300 mb-2 md:mb-3 text-base md:text-lg">Angka spesifik yang mengukur pencapaian tujuan</p>
                       <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg md:rounded-xl p-2 md:p-3 border-l-4 border-blue-400 shadow-md">
                         <div className="flex items-center space-x-2 mb-3">
                           <BarChart3 className="w-4 h-4 text-blue-500 flex-shrink-0" />
@@ -1767,10 +1767,10 @@ export default function CompanyOnboarding() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3 mb-3">
-                        <h4 className="text-lg md:text-xl font-bold text-gray-800">INITIATIVES / Strategi</h4>
+                        <h4 className="text-lg md:text-xl font-bold text-white">INITIATIVES / Strategi</h4>
                         <div className="px-2 py-1 md:px-3 md:py-1 bg-green-500 text-white rounded-full text-xs font-bold self-start">PROGRAM</div>
                       </div>
-                      <p className="text-gray-600 mb-2 md:mb-3 text-base md:text-lg">Program besar yang dilakukan untuk mencapai target</p>
+                      <p className="text-gray-300 mb-2 md:mb-3 text-base md:text-lg">Program besar yang dilakukan untuk mencapai target</p>
                       <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-lg md:rounded-xl p-2 md:p-3 border-l-4 border-green-400 shadow-md">
                         <div className="flex items-center space-x-2 mb-3">
                           <Lightbulb className="w-4 h-4 text-green-500 flex-shrink-0" />
@@ -1811,10 +1811,10 @@ export default function CompanyOnboarding() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3 mb-3">
-                        <h4 className="text-lg md:text-xl font-bold text-gray-800">TASKS / Tugas Harian</h4>
+                        <h4 className="text-lg md:text-xl font-bold text-white">TASKS / Tugas Harian</h4>
                         <div className="px-2 py-1 md:px-3 md:py-1 bg-purple-500 text-white rounded-full text-xs font-bold self-start">EKSEKUSI</div>
                       </div>
-                      <p className="text-gray-600 mb-2 md:mb-3 text-base md:text-lg">Aktivitas konkret yang dikerjakan setiap hari</p>
+                      <p className="text-gray-300 mb-2 md:mb-3 text-base md:text-lg">Aktivitas konkret yang dikerjakan setiap hari</p>
                       <div className="bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg md:rounded-xl p-2 md:p-3 border-l-4 border-purple-400 shadow-md">
                         <div className="flex items-center space-x-2 mb-3">
                           <CheckCircle className="w-4 h-4 text-purple-500 flex-shrink-0" />
