@@ -125,9 +125,9 @@ const ONBOARDING_STEPS = [
   },
   {
     id: 5,
-    title: "Angka Target",
-    description: "Bagaimana Anda tahu bahwa tujuan tadi benar-benar tercapai?",
-    icon: TrendingUp,
+    title: "Pilihan Inisiatif",
+    description: "Pilih inisiatif strategis yang akan membantu mencapai tujuan Anda",
+    icon: Lightbulb,
   },
   {
     id: 6,
@@ -1131,10 +1131,10 @@ export default function CompanyOnboarding() {
         }
         break;
       case 5:
-        if (data.keyResults.length === 0) {
+        if (!data.initiatives || data.initiatives.length === 0) {
           return {
             isValid: false,
-            message: "Silakan pilih minimal 1 angka target",
+            message: "Silakan pilih minimal 1 inisiatif strategis",
           };
         }
         break;
@@ -2370,165 +2370,90 @@ export default function CompanyOnboarding() {
           </div>
         );
 
-      case 5: // Ukuran Keberhasilan
-        const getKeyResultOptions = (objective: string | undefined) => {
-          if (!objective) return [];
-          // Angka Target untuk objective penjualan
-          const salesAngkaTarget: Record<string, string[]> = {
-            "Menciptakan pertumbuhan penjualan yang berkelanjutan dan signifikan":
-              [
-                "Mencapai target penjualan Rp 500 juta per bulan",
-                "Meningkatkan rata-rata nilai transaksi menjadi Rp 2 juta",
-                "Menambah 100 transaksi baru setiap bulan",
-              ],
-            "Membangun basis pelanggan yang kuat dan loyal": [
-              "Mendapatkan 100 pelanggan baru setiap bulan",
-              "Mencapai conversion rate 15% dari lead ke customer",
-              "Meningkatkan customer retention rate menjadi 85%",
-            ],
-            "Mengoptimalkan konversi prospek menjadi pelanggan": [
-              "Mencapai conversion rate 25% dari total lead",
-              "Mengurangi waktu follow-up lead menjadi maksimal 24 jam",
-              "Meningkatkan kualitas lead scoring menjadi 80% akurat",
-            ],
-          };
-
-          // Angka Target untuk objective operasional
-          const operationalAngkaTarget: Record<string, string[]> = {
-            "Mencapai efisiensi operasional yang optimal dan berkelanjutan": [
-              "Mengurangi waktu proses produksi menjadi 4 jam per unit",
-              "Meningkatkan utilitas mesin menjadi 85%",
-              "Mengurangi waste produksi menjadi maksimal 5%",
-            ],
-            "Mempercepat proses produksi dengan kualitas terjaga": [
-              "Mencapai waktu siklus 3 jam per produk",
-              "Meningkatkan throughput menjadi 50 unit per hari",
-              "Mengurangi downtime mesin menjadi maksimal 2%",
-            ],
-            "Mengoptimalkan biaya operasional tanpa mengurangi kualitas": [
-              "Menurunkan biaya per unit menjadi Rp 50,000",
-              "Meningkatkan rasio efisiensi menjadi 90%",
-              "Mengurangi biaya overhead sebesar 20%",
-            ],
-          };
-
-          // Angka Target untuk objective customer service
-          const customerServiceAngkaTarget: Record<string, string[]> = {
-            "Mencapai kepuasan pelanggan yang luar biasa dan berkelanjutan": [
-              "Mencapai CSAT score 4.8/5 dalam survey bulanan",
-              "Meningkatkan customer retention rate menjadi 95%",
-              "Mengurangi complaint rate menjadi di bawah 1%",
-            ],
-            "Memberikan respon pelanggan yang cepat dan efektif": [
-              "Mencapai rata-rata waktu respons 1 jam",
-              "Meningkatkan tingkat respons pertama menjadi 95%",
-              "Mencapai waktu penyelesaian maksimal 24 jam",
-            ],
-            "Membangun loyalitas pelanggan dan advokasi yang tinggi": [
-              "Mencapai skor NPS 70+ dalam survei triwulanan",
-              "Meningkatkan tingkat advokasi pelanggan menjadi 40%",
-              "Mencapai tingkat rekomendasi pelanggan 80%",
-            ],
-          };
-
-          // Angka Target untuk objective marketing
-          const marketingAngkaTarget: Record<string, string[]> = {
-            "Meningkatkan kesadaran merek di pasar target": [
-              "Mencapai brand recall 60% dalam market research",
-              "Meningkatkan social media reach menjadi 100,000 per post",
-              "Mencapai top-of-mind awareness 25% di kategori produk",
-            ],
-            "Membangun komunitas yang aktif dan engaged di media sosial": [
-              "Mencapai 10,000 pengikut baru di Instagram",
-              "Meningkatkan tingkat pertumbuhan pengikut 15% per bulan",
-              "Mencapai tingkat engagement 8% di semua platform",
-            ],
-            "Menghasilkan lead berkualitas tinggi secara konsisten": [
-              "Mencapai 500 qualified leads per bulan",
-              "Meningkatkan lead quality score menjadi 85%",
-              "Mencapai cost per lead di bawah Rp 100,000",
-            ],
-          };
-
-          // Gabungkan semua angka target
-          const allAngkaTarget: Record<string, string[]> = {
-            ...salesAngkaTarget,
-            ...operationalAngkaTarget,
-            ...customerServiceAngkaTarget,
-            ...marketingAngkaTarget,
-          };
-
-          return allAngkaTarget[objective] || [];
+      case 5: // Pilihan Inisiatif Strategis
+        // Get selected template based on objective
+        const selectedTemplate = goalTemplates?.find(template => template.title === onboardingData.objective);
+        
+        // Get initiatives from selected template
+        const getTemplateInitiatives = () => {
+          if (!selectedTemplate || !selectedTemplate.initiatives) {
+            return [];
+          }
+          return selectedTemplate.initiatives.map((initiative: any) => ({
+            title: initiative.title,
+            description: initiative.description
+          }));
         };
 
-        const angkaTargetOptions = getKeyResultOptions(onboardingData.objective);
-        const selectedAngkaTarget = onboardingData.keyResults.filter(
-          (kr) => kr && kr.trim() !== "",
-        );
+        const availableInitiatives = getTemplateInitiatives();
+        const selectedInitiatives = onboardingData.initiatives || [];
 
         return (
-          <div className="space-y-4">
-            {angkaTargetOptions.length > 0 && (
-              <div className="space-y-3">
-                <Label>
-                  Pilih Angka Target (Alat ukur kuantitatif) untuk mengetahui
-                  kemajual Goal : "{onboardingData.objective}"
-                </Label>
-                <div className="space-y-2">
-                  {angkaTargetOptions.map((option: string, index: number) => (
-                    <div
-                      key={index}
-                      className="flex items-start space-x-2 p-3 rounded-lg border border-gray-200 hover:bg-gray-50"
-                    >
+          <div className="space-y-6">
+            <div className="text-center space-y-2">
+              <h3 className="text-lg font-semibold text-gray-900">
+                Pilih Inisiatif Strategis
+              </h3>
+              <p className="text-sm text-gray-600">
+                Pilih inisiatif yang paling sesuai untuk mencapai goal: <span className="font-medium text-indigo-600">"{onboardingData.objective}"</span>
+              </p>
+            </div>
+
+            {availableInitiatives.length > 0 ? (
+              <div className="space-y-4">
+                {availableInitiatives.map((initiative: any, index: number) => (
+                  <div
+                    key={index}
+                    className={`p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ${
+                      selectedInitiatives.includes(initiative.title)
+                        ? "border-indigo-500 bg-indigo-50"
+                        : "border-gray-200 hover:border-indigo-300 hover:bg-gray-50"
+                    }`}
+                    onClick={() => {
+                      const newInitiatives = selectedInitiatives.includes(initiative.title)
+                        ? selectedInitiatives.filter(init => init !== initiative.title)
+                        : [...selectedInitiatives, initiative.title];
+                      
+                      setOnboardingData({
+                        ...onboardingData,
+                        initiatives: newInitiatives
+                      });
+                    }}
+                  >
+                    <div className="flex items-start space-x-3">
                       <Checkbox
-                        id={`angkatarget-${index}`}
-                        checked={selectedAngkaTarget.includes(option)}
-                        onCheckedChange={(checked) => {
-                          let newKeyResults = [...onboardingData.keyResults];
-                          if (checked) {
-                            newKeyResults.push(option);
-                          } else {
-                            newKeyResults = newKeyResults.filter(
-                              (kr) => kr !== option,
-                            );
-                          }
-                          setOnboardingData({
-                            ...onboardingData,
-                            keyResults: newKeyResults,
-                          });
-                        }}
+                        checked={selectedInitiatives.includes(initiative.title)}
+                        onChange={() => {}} // Handled by parent div onClick
+                        className="mt-1"
                       />
-                      <div className="flex items-start space-x-2 flex-1">
-                        <TrendingUp className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
-                        <Label
-                          htmlFor={`angkatarget-${index}`}
-                          className="cursor-pointer leading-relaxed"
-                        >
-                          {option}
-                        </Label>
+                      <div className="flex-1">
+                        <h4 className="font-medium text-gray-900 mb-1">
+                          {initiative.title}
+                        </h4>
+                        <p className="text-sm text-gray-600">
+                          {initiative.description}
+                        </p>
                       </div>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-gray-500">
+                  Tidak ada inisiatif tersedia untuk goal ini.
+                </p>
+                <p className="text-sm text-gray-400 mt-2">
+                  Silakan pilih goal yang berbeda di step sebelumnya.
+                </p>
               </div>
             )}
 
-            {selectedAngkaTarget.length > 0 && (
-              <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
-                <div className="flex items-center space-x-2 mb-2">
-                  <Award className="w-4 h-4 text-blue-600" />
-                  <p className="text-sm text-blue-800 font-medium">
-                    Angka target terpilih:
-                  </p>
-                </div>
-                <ul className="text-sm text-blue-700 space-y-1">
-                  {selectedAngkaTarget.map((kr: string, index: number) => (
-                    <li key={index} className="flex items-start space-x-2">
-                      <Star className="w-3 h-3 text-blue-500 mt-1 flex-shrink-0" />
-                      <span>{kr}</span>
-                    </li>
-                  ))}
-                </ul>
+            {selectedInitiatives.length > 0 && (
+              <div className="mt-4 p-3 bg-green-50 rounded-lg">
+                <p className="text-sm text-green-700">
+                  ✅ {selectedInitiatives.length} inisiatif dipilih
+                </p>
               </div>
             )}
           </div>
@@ -3138,7 +3063,7 @@ export default function CompanyOnboarding() {
         const initiativeOptions = getInitiativeOptions(
           selectedKeyResultsForInitiatives,
         );
-        const selectedInitiatives = onboardingData.initiatives.filter(
+        const selectedInitiativesFiltered = onboardingData.initiatives.filter(
           (init) => init && init.trim() !== "",
         );
 
@@ -3194,7 +3119,7 @@ export default function CompanyOnboarding() {
                           >
                             <Checkbox
                               id={`initiative-${groupIndex}-${initIndex}`}
-                              checked={selectedInitiatives.includes(initiative)}
+                              checked={selectedInitiativesFiltered.includes(initiative)}
                               onCheckedChange={(checked) => {
                                 let newInitiatives = [
                                   ...onboardingData.initiatives,
@@ -3227,16 +3152,16 @@ export default function CompanyOnboarding() {
               </div>
             )}
 
-            {selectedInitiatives.length > 0 && (
+            {selectedInitiativesFiltered.length > 0 && (
               <div className="p-4 bg-green-50 rounded-lg border border-green-200">
                 <h4 className="font-semibold text-green-800 mb-3">
-                  🎯 Inisiatif yang Dipilih ({selectedInitiatives.length})
+                  🎯 Inisiatif yang Dipilih ({selectedInitiativesFiltered.length})
                 </h4>
                 <div className="space-y-2">
                   {Object.entries(initiativesByKeyResult).map(
                     ([keyResult, initiatives]) => {
                       const selectedInThisKR = initiatives.filter((init) =>
-                        selectedInitiatives.includes(init),
+                        selectedInitiativesFiltered.includes(init),
                       );
                       if (selectedInThisKR.length === 0) return null;
 
@@ -3268,7 +3193,7 @@ export default function CompanyOnboarding() {
                 </div>
                 <p className="text-sm text-green-700 mt-3">
                   <strong>
-                    Total: {selectedInitiatives.length} inisiatif terpilih
+                    Total: {selectedInitiativesFiltered.length} inisiatif terpilih
                   </strong>
                 </p>
               </div>
