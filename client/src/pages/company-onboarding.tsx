@@ -226,6 +226,9 @@ export default function CompanyOnboarding() {
   
   // Track edited key results to override template display
   const [editedKeyResults, setEditedKeyResults] = useState<Record<number, any>>({});
+  
+  // Track edited objective for the selected template
+  const [editedObjective, setEditedObjective] = useState<string | null>(null);
   const { startTour } = useTour();
 
   // Initialize state first
@@ -1995,6 +1998,7 @@ export default function CompanyOnboarding() {
                         
                         // Clear edited data when switching templates
                         setEditedKeyResults({});
+                        setEditedObjective(null);
                         
                         setOnboardingData({ 
                           ...onboardingData, 
@@ -2014,7 +2018,7 @@ export default function CompanyOnboarding() {
                       <div className="space-y-2">
                         <div className="flex items-start justify-between">
                           <h3 className="leading-relaxed font-semibold text-base flex-1">
-                            {selectedTemplateId === template.id && onboardingData.objective !== template.title ? onboardingData.objective : template.title}
+                            {selectedTemplateId === template.id && editedObjective ? editedObjective : template.title}
                           </h3>
                           {selectedTemplateId === template.id && (
                             <Button
@@ -5039,6 +5043,7 @@ export default function CompanyOnboarding() {
                   ...onboardingData, 
                   objective: tempObjectiveTitle 
                 });
+                setEditedObjective(tempObjectiveTitle);
                 setEditObjectiveModal(false);
                 toast({
                   title: "Goal Berhasil Diperbarui",
