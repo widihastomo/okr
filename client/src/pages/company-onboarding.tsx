@@ -31,6 +31,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
@@ -73,6 +81,7 @@ import {
   TrendingDown,
   Info,
   User,
+  Edit,
 } from "lucide-react";
 import { ReminderSettings } from "@/components/ReminderSettings";
 import { SimpleSelect } from "@/components/SimpleSelect";
@@ -190,6 +199,7 @@ export default function CompanyOnboarding() {
   const [startDateOpen, setStartDateOpen] = useState(false);
   const [endDateOpen, setEndDateOpen] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const { startTour } = useTour();
 
   // Initialize state first
@@ -1933,9 +1943,24 @@ export default function CompanyOnboarding() {
                       }`}
                     >
                       <div className="space-y-2">
-                        <h3 className="leading-relaxed font-semibold text-base">
-                          {template.title}
-                        </h3>
+                        <div className="flex items-start justify-between">
+                          <h3 className="leading-relaxed font-semibold text-base flex-1">
+                            {template.title}
+                          </h3>
+                          {onboardingData.objective === template.title && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setShowEditModal(true);
+                              }}
+                              className="ml-2 text-xs px-2 py-1 h-7 border-orange-300 text-orange-700 hover:bg-orange-50"
+                            >
+                              Edit
+                            </Button>
+                          )}
+                        </div>
                         {template.description && (
                           <p className="text-sm text-gray-600 leading-relaxed">
                             {template.description}
@@ -4417,6 +4442,112 @@ export default function CompanyOnboarding() {
           </div>
         </div>
       </div>
+
+      {/* Edit Goal Modal */}
+      <Dialog open={showEditModal} onOpenChange={setShowEditModal}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center space-x-2">
+              <Edit className="w-5 h-5 text-orange-600" />
+              <span>Edit Goal & Key Results</span>
+            </DialogTitle>
+            <DialogDescription>
+              Sesuaikan goal dan key results sesuai kebutuhan spesifik perusahaan Anda
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-6">
+            {/* Edit Goal Section */}
+            <div className="space-y-3">
+              <Label htmlFor="modal-objective" className="text-sm font-medium text-gray-800">
+                Edit Goal:
+              </Label>
+              <Textarea
+                id="modal-objective"
+                value={onboardingData.objective}
+                onChange={(e) =>
+                  setOnboardingData({ ...onboardingData, objective: e.target.value })
+                }
+                placeholder="Sesuaikan goal sesuai kebutuhan perusahaan Anda..."
+                className="min-h-[80px] text-sm leading-relaxed"
+              />
+            </div>
+
+            {/* Edit Key Results Section */}
+            {(() => {
+              const selectedTemplate = goalTemplates?.find((t: any) => t.title === onboardingData.objective);
+              if (!selectedTemplate || !selectedTemplate.keyResults || selectedTemplate.keyResults.length === 0) {
+                return null;
+              }
+
+              // Initialize key results from template if not already set
+              const currentKeyResults = onboardingData.keyResults.length > 0 
+                ? onboardingData.keyResults 
+                : selectedTemplate.keyResults.map((kr: any) => 
+                    kr.targetValue && kr.unit 
+                      ? `${kr.title} (Target: ${kr.targetValue} ${kr.unit})`
+                      : kr.title
+                  );
+
+              return (
+                <div className="space-y-4">
+                  <Label className="text-sm font-medium text-gray-800">
+                    Edit Key Results:
+                  </Label>
+                  <div className="space-y-3">
+                    {currentKeyResults.map((keyResult: string, index: number) => (
+                      <div key={index} className="space-y-2">
+                        <Label htmlFor={`kr-${index}`} className="text-xs font-medium text-blue-700">
+                          Key Result {index + 1}:
+                        </Label>
+                        <Textarea
+                          id={`kr-${index}`}
+                          value={keyResult}
+                          onChange={(e) => {
+                            const updatedKeyResults = [...currentKeyResults];
+                            updatedKeyResults[index] = e.target.value;
+                            setOnboardingData({ 
+                              ...onboardingData, 
+                              keyResults: updatedKeyResults 
+                            });
+                          }}
+                          placeholder={`Sesuaikan key result ${index + 1}...`}
+                          className="min-h-[60px] text-sm border-blue-200 focus:border-blue-400 focus:ring-blue-400"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-xs text-blue-600 bg-blue-50 p-2 rounded">
+                    💡 Tip: Pastikan key results dapat diukur dengan angka yang spesifik
+                  </p>
+                </div>
+              );
+            })()}
+          </div>
+
+          <DialogFooter className="space-x-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowEditModal(false)}
+            >
+              Batal
+            </Button>
+            <Button
+              onClick={() => {
+                setShowEditModal(false);
+                toast({
+                  title: "Perubahan Disimpan",
+                  description: "Goal dan key results telah berhasil diperbarui",
+                  variant: "default",
+                });
+              }}
+              className="bg-orange-600 hover:bg-orange-700"
+            >
+              Simpan Perubahan
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
