@@ -1014,7 +1014,9 @@ export default function CompanyOnboarding() {
 
   // Update local state when progress data is loaded, but respect local changes
   useEffect(() => {
+    console.log("🔄 Server data useEffect - hasLocalChanges:", hasLocalChanges, "progress.teamFocus:", progress?.teamFocus);
     if (progress && !hasLocalChanges) {
+      console.log("📥 Updating from server data, teamFocus will be:", progress.teamFocus);
       setOnboardingData((prevData) => ({
         ...prevData,
         ...progress,
@@ -1031,8 +1033,15 @@ export default function CompanyOnboarding() {
           setSelectedTemplateId(matchingTemplate.id);
         }
       }
+    } else if (hasLocalChanges) {
+      console.log("🚫 Skipping server data update due to local changes");
     }
   }, [progress, goalTemplates, selectedTemplateId, hasLocalChanges]);
+
+  // Debug teamFocus changes
+  useEffect(() => {
+    console.log("🎯 TeamFocus changed to:", onboardingData.teamFocus);
+  }, [onboardingData.teamFocus]);
 
   // Validation function for each step
   const validateStep = (
@@ -1557,9 +1566,13 @@ export default function CompanyOnboarding() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div
                 onClick={() => {
-                  console.log("Clicking penjualan");
+                  console.log("Clicking penjualan - current teamFocus:", onboardingData.teamFocus);
                   setHasLocalChanges(true);
-                  setOnboardingData({ ...onboardingData, teamFocus: "penjualan" });
+                  setOnboardingData(prev => {
+                    const newData = { ...prev, teamFocus: "penjualan" };
+                    console.log("Setting new teamFocus to:", newData.teamFocus);
+                    return newData;
+                  });
                 }}
                 className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
                   onboardingData.teamFocus === "penjualan"
@@ -1584,9 +1597,13 @@ export default function CompanyOnboarding() {
 
               <div
                 onClick={() => {
-                  console.log("Clicking operasional");
+                  console.log("Clicking operasional - current teamFocus:", onboardingData.teamFocus);
                   setHasLocalChanges(true);
-                  setOnboardingData({ ...onboardingData, teamFocus: "operasional" });
+                  setOnboardingData(prev => {
+                    const newData = { ...prev, teamFocus: "operasional" };
+                    console.log("Setting new teamFocus to:", newData.teamFocus);
+                    return newData;
+                  });
                 }}
                 className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
                   onboardingData.teamFocus === "operasional"
@@ -1611,9 +1628,13 @@ export default function CompanyOnboarding() {
 
               <div
                 onClick={() => {
-                  console.log("Clicking customer_service");
+                  console.log("Clicking customer_service - current teamFocus:", onboardingData.teamFocus);
                   setHasLocalChanges(true);
-                  setOnboardingData({ ...onboardingData, teamFocus: "customer_service" });
+                  setOnboardingData(prev => {
+                    const newData = { ...prev, teamFocus: "customer_service" };
+                    console.log("Setting new teamFocus to:", newData.teamFocus);
+                    return newData;
+                  });
                 }}
                 className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
                   onboardingData.teamFocus === "customer_service"
@@ -1638,9 +1659,13 @@ export default function CompanyOnboarding() {
 
               <div
                 onClick={() => {
-                  console.log("Clicking marketing");
+                  console.log("Clicking marketing - current teamFocus:", onboardingData.teamFocus);
                   setHasLocalChanges(true);
-                  setOnboardingData({ ...onboardingData, teamFocus: "marketing" });
+                  setOnboardingData(prev => {
+                    const newData = { ...prev, teamFocus: "marketing" };
+                    console.log("Setting new teamFocus to:", newData.teamFocus);
+                    return newData;
+                  });
                 }}
                 className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
                   onboardingData.teamFocus === "marketing"
