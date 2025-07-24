@@ -1591,6 +1591,31 @@ export default function CompanyOnboarding() {
                     <p className="text-sm text-gray-600">
                       Fokus pada peningkatan omzet dan penjualan
                     </p>
+                    {onboardingData.teamFocus === "penjualan" && (
+                      <div className="mt-3">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setHasLocalChanges(true);
+                            setOnboardingData({ 
+                              ...onboardingData, 
+                              teamFocus: "",
+                              objective: "",
+                              keyResults: [],
+                              initiatives: [],
+                              tasks: []
+                            });
+                            setSelectedTemplateId("");
+                          }}
+                          className="h-6 w-full text-xs text-orange-600 hover:text-orange-700 hover:bg-orange-100 border border-orange-200"
+                        >
+                          <Edit className="w-3 h-3 mr-1" />
+                          Ubah Fokus
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -1622,6 +1647,31 @@ export default function CompanyOnboarding() {
                     <p className="text-sm text-gray-600">
                       Optimalisasi proses, dan produktivitas operasional
                     </p>
+                    {onboardingData.teamFocus === "operasional" && (
+                      <div className="mt-3">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setHasLocalChanges(true);
+                            setOnboardingData({ 
+                              ...onboardingData, 
+                              teamFocus: "",
+                              objective: "",
+                              keyResults: [],
+                              initiatives: [],
+                              tasks: []
+                            });
+                            setSelectedTemplateId("");
+                          }}
+                          className="h-6 w-full text-xs text-orange-600 hover:text-orange-700 hover:bg-orange-100 border border-orange-200"
+                        >
+                          <Edit className="w-3 h-3 mr-1" />
+                          Ubah Fokus
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -1653,6 +1703,31 @@ export default function CompanyOnboarding() {
                     <p className="text-sm text-gray-600">
                       Peningkatan Kapasitas dan kinerja tim
                     </p>
+                    {onboardingData.teamFocus === "customer_service" && (
+                      <div className="mt-3">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setHasLocalChanges(true);
+                            setOnboardingData({ 
+                              ...onboardingData, 
+                              teamFocus: "",
+                              objective: "",
+                              keyResults: [],
+                              initiatives: [],
+                              tasks: []
+                            });
+                            setSelectedTemplateId("");
+                          }}
+                          className="h-6 w-full text-xs text-orange-600 hover:text-orange-700 hover:bg-orange-100 border border-orange-200"
+                        >
+                          <Edit className="w-3 h-3 mr-1" />
+                          Ubah Fokus
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -1684,52 +1759,37 @@ export default function CompanyOnboarding() {
                     <p className="text-sm text-gray-600">
                       Perluas pasar dan pengembangan produk
                     </p>
+                    {onboardingData.teamFocus === "marketing" && (
+                      <div className="mt-3">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setHasLocalChanges(true);
+                            setOnboardingData({ 
+                              ...onboardingData, 
+                              teamFocus: "",
+                              objective: "",
+                              keyResults: [],
+                              initiatives: [],
+                              tasks: []
+                            });
+                            setSelectedTemplateId("");
+                          }}
+                          className="h-6 w-full text-xs text-orange-600 hover:text-orange-700 hover:bg-orange-100 border border-orange-200"
+                        >
+                          <Edit className="w-3 h-3 mr-1" />
+                          Ubah Fokus
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
             </div>
 
-            {onboardingData.teamFocus && (
-              <div className="p-4 bg-orange-50 rounded-lg border border-orange-200">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <CheckCircle className="w-5 h-5 text-orange-600" />
-                    <p className="text-sm text-orange-800">
-                      <strong>Fokus terpilih:</strong>{" "}
-                      {onboardingData.teamFocus === "penjualan"
-                        ? "Tingkatkan Pendapatan"
-                        : onboardingData.teamFocus === "operasional"
-                          ? "Rapikan Operasional"
-                          : onboardingData.teamFocus === "customer_service"
-                            ? "Kembangkan Tim"
-                            : onboardingData.teamFocus === "marketing"
-                              ? "Ekspansi Bisnis"
-                              : ""}
-                    </p>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      setHasLocalChanges(true);
-                      setOnboardingData({ 
-                        ...onboardingData, 
-                        teamFocus: "",
-                        objective: "",
-                        keyResults: [],
-                        initiatives: [],
-                        tasks: []
-                      });
-                      setSelectedTemplateId("");
-                    }}
-                    className="h-6 text-xs text-orange-600 hover:text-orange-700 hover:bg-orange-100"
-                  >
-                    <Edit className="w-3 h-3 mr-1" />
-                    Ubah Fokus
-                  </Button>
-                </div>
-              </div>
-            )}
+
           </div>
         );
 
@@ -2224,54 +2284,35 @@ export default function CompanyOnboarding() {
                         <h4 className="font-semibold text-gray-800">{option.label}</h4>
                         <p className="text-xs text-gray-600">{option.description}</p>
                         {onboardingData.cycleDuration === option.value && onboardingData.cycleStartDate && onboardingData.cycleEndDate && (
-                          <div className="mt-2 p-2 bg-purple-50 rounded text-xs text-purple-700">
-                            <div className="font-medium">Periode:</div>
-                            <div>{new Date(onboardingData.cycleStartDate).toLocaleDateString('id-ID')} - {new Date(onboardingData.cycleEndDate).toLocaleDateString('id-ID')}</div>
+                          <div className="mt-2 space-y-2">
+                            <div className="p-2 bg-purple-50 rounded text-xs text-purple-700">
+                              <div className="font-medium">Periode:</div>
+                              <div>{new Date(onboardingData.cycleStartDate).toLocaleDateString('id-ID')} - {new Date(onboardingData.cycleEndDate).toLocaleDateString('id-ID')}</div>
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setOnboardingData({ 
+                                  ...onboardingData, 
+                                  cycleDuration: "",
+                                  cycleStartDate: "",
+                                  cycleEndDate: ""
+                                });
+                              }}
+                              className="h-6 w-full text-xs text-purple-600 hover:text-purple-700 hover:bg-purple-100 border border-purple-200"
+                            >
+                              <Edit className="w-3 h-3 mr-1" />
+                              Ubah Periode
+                            </Button>
                           </div>
                         )}
                       </div>
                     </div>
                   ))}
                 </div>
-                
-                {/* Edit cycle duration section */}
-                {onboardingData.cycleDuration && (
-                  <div className="mt-4 p-3 bg-amber-50 rounded-lg border border-amber-200">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center space-x-2">
-                        <CalendarIcon className="w-4 h-4 text-amber-600" />
-                        <span className="text-sm font-medium text-amber-800">Periode Terpilih: {
-                          onboardingData.cycleDuration === "1bulan" ? "1 Bulan" :
-                          onboardingData.cycleDuration === "3bulan" ? "3 Bulan" :
-                          onboardingData.cycleDuration === "6bulan" ? "6 Bulan" : onboardingData.cycleDuration
-                        }</span>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          setOnboardingData({ 
-                            ...onboardingData, 
-                            cycleDuration: "",
-                            cycleStartDate: "",
-                            cycleEndDate: ""
-                          });
-                        }}
-                        className="h-6 text-xs text-amber-600 hover:text-amber-700 hover:bg-amber-100"
-                      >
-                        <Edit className="w-3 h-3 mr-1" />
-                        Ubah Periode
-                      </Button>
-                    </div>
-                    <p className="text-sm text-amber-700">
-                      {onboardingData.cycleStartDate && onboardingData.cycleEndDate && (
-                        <>
-                          <strong>Periode:</strong> {new Date(onboardingData.cycleStartDate).toLocaleDateString('id-ID')} - {new Date(onboardingData.cycleEndDate).toLocaleDateString('id-ID')}
-                        </>
-                      )}
-                    </p>
-                  </div>
-                )}
+
                 
                 {/* Tips section when cycle is active */}
                 {onboardingData.cycleDuration && (
