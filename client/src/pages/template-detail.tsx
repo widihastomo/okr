@@ -391,7 +391,7 @@ export default function TemplateDetailPage() {
 
   // Delete template mutation
   const deleteMutation = useMutation({
-    mutationFn: () => apiRequest(`/api/goal-templates/${id}`, "DELETE"),
+    mutationFn: () => apiRequest("DELETE", `/api/goal-templates/${id}`),
     onSuccess: () => {
       toast({
         title: "Template Dihapus",
@@ -414,7 +414,7 @@ export default function TemplateDetailPage() {
     mutationFn: (data: any) => {
       console.log("🚀 Mutation starting with data:", data);
       console.log("📡 API URL:", `/api/goal-templates/${id}`);
-      return apiRequest(`/api/goal-templates/${id}`, "PATCH", data);
+      return apiRequest("PATCH", `/api/goal-templates/${id}`, data);
     },
     onSuccess: (result) => {
       console.log("✅ Mutation success:", result);
