@@ -5158,19 +5158,40 @@ export default function CompanyOnboarding() {
               Batal
             </Button>
             <Button
-              onClick={() => {
+              onClick={async () => {
                 console.log('🔍 Saving objective data:', {
                   tempObjectiveTitle,
                   tempObjectiveDescription,
                   currentOnboardingData: onboardingData
                 });
                 
-                setOnboardingData({ 
+                const updatedData = { 
                   ...onboardingData, 
                   objective: tempObjectiveTitle,
                   objectiveDescription: tempObjectiveDescription
-                });
+                };
+                
+                // Update local state
+                setOnboardingData(updatedData);
                 setEditedObjective(tempObjectiveTitle);
+                
+                // Save to backend
+                try {
+                  const response = await fetch('/api/onboarding/progress', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updatedData)
+                  });
+                  
+                  if (!response.ok) {
+                    throw new Error('Failed to save');
+                  }
+                  
+                  console.log('✅ Objective description saved to backend');
+                } catch (error) {
+                  console.error('❌ Error saving objective description:', error);
+                }
+                
                 setEditObjectiveModal(false);
                 toast({
                   title: "Goal Berhasil Diperbarui",
