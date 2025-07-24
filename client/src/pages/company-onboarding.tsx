@@ -1842,7 +1842,7 @@ export default function CompanyOnboarding() {
                 <div className="relative">
                   <div className="flex items-center justify-center space-x-2 mb-3 md:mb-4">
                     <Zap className="w-4 h-4 md:w-5 md:h-5 text-white" />
-                    <h4 className="text-lg md:text-xl font-bold text-white">Formula Sukses OKR</h4>
+                    <h4 className="text-lg md:text-xl font-bold text-white">Formula Sukses :</h4>
                   </div>
                   
                   {/* Mobile: Stack vertically, Desktop: Horizontal */}
@@ -4148,7 +4148,7 @@ export default function CompanyOnboarding() {
                               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-300 ${
                                 onboardingData.currentStep >= 4 ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-600'
                               }`}>
-                                1
+                                <Target className="w-4 h-4" />
                               </div>
                               <div className="mt-2 text-center">
                                 <div className="flex items-center justify-center gap-1 mb-1">
@@ -4176,7 +4176,7 @@ export default function CompanyOnboarding() {
                               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-300 ${
                                 onboardingData.currentStep >= 5 ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-600'
                               }`}>
-                                2
+                                <TrendingUp className="w-4 h-4" />
                               </div>
                               <div className="mt-2 text-center">
                                 <div className="flex items-center justify-center gap-1 mb-1">
@@ -4204,7 +4204,7 @@ export default function CompanyOnboarding() {
                               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-300 ${
                                 onboardingData.currentStep >= 6 ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-600'
                               }`}>
-                                3
+                                <Lightbulb className="w-4 h-4" />
                               </div>
                               <div className="mt-2 text-center">
                                 <div className="flex items-center justify-center gap-1 mb-1">
@@ -4232,7 +4232,7 @@ export default function CompanyOnboarding() {
                               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-300 ${
                                 onboardingData.currentStep >= 7 ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-600'
                               }`}>
-                                4
+                                <ListTodo className="w-4 h-4" />
                               </div>
                               <div className="mt-2 text-center">
                                 <div className="flex items-center justify-center gap-1 mb-1">
