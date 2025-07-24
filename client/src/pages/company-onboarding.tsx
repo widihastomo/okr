@@ -1685,9 +1685,9 @@ export default function CompanyOnboarding() {
                       <div className="hidden md:block absolute -inset-2 bg-orange-200 rounded-2xl -z-10 opacity-0 group-hover:opacity-30 transition-all duration-300"></div>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3 mb-3">
+                      <div className="flex items-center justify-between mb-3">
                         <h4 className="text-lg md:text-xl font-bold text-white">GOAL / Tujuan</h4>
-                        <div className="px-2 py-1 md:px-3 md:py-1 bg-orange-500 text-white rounded-full text-xs font-bold self-start">VISI BESAR</div>
+                        <div className="px-2 py-1 md:px-3 md:py-1 bg-orange-500 text-white rounded-full text-xs font-bold">VISI BESAR</div>
                       </div>
                       <p className="text-gray-300 mb-2 md:mb-3 text-base md:text-lg">Apa yang ingin dicapai dalam 3-6 bulan ke depan</p>
                       <div className="bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg md:rounded-xl p-2 md:p-3 border-l-4 border-orange-400 shadow-md">
@@ -1762,9 +1762,9 @@ export default function CompanyOnboarding() {
                       <div className="hidden md:block absolute -inset-2 bg-green-200 rounded-2xl -z-10 opacity-0 group-hover:opacity-30 transition-all duration-300"></div>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3 mb-3">
+                      <div className="flex items-center justify-between mb-3">
                         <h4 className="text-lg md:text-xl font-bold text-white">INIISIATIF / Strategi</h4>
-                        <div className="px-2 py-1 md:px-3 md:py-1 bg-green-500 text-white rounded-full text-xs font-bold self-start">PROGRAM</div>
+                        <div className="px-2 py-1 md:px-3 md:py-1 bg-green-500 text-white rounded-full text-xs font-bold">PROGRAM</div>
                       </div>
                       <p className="text-gray-300 mb-2 md:mb-3 text-base md:text-lg">Program spesifik yang dilakukan untuk mencapai target</p>
                       <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-lg md:rounded-xl p-2 md:p-3 border-l-4 border-green-400 shadow-md">
@@ -1806,9 +1806,9 @@ export default function CompanyOnboarding() {
                       <div className="hidden md:block absolute -inset-2 bg-purple-200 rounded-2xl -z-10 opacity-0 group-hover:opacity-30 transition-all duration-300"></div>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3 mb-3">
+                      <div className="flex items-center justify-between mb-3">
                         <h4 className="text-lg md:text-xl font-bold text-white">TASK / Tugas Harian</h4>
-                        <div className="px-2 py-1 md:px-3 md:py-1 bg-purple-500 text-white rounded-full text-xs font-bold self-start">EKSEKUSI</div>
+                        <div className="px-2 py-1 md:px-3 md:py-1 bg-purple-500 text-white rounded-full text-xs font-bold">EKSEKUSI</div>
                       </div>
                       <p className="text-gray-300 mb-2 md:mb-3 text-base md:text-lg">Aktivitas konkret yang dikerjakan setiap hari</p>
                       <div className="bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg md:rounded-xl p-2 md:p-3 border-l-4 border-purple-400 shadow-md">
