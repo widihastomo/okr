@@ -85,10 +85,7 @@ export default function TemplateManagement() {
 
   // Create template mutation
   const createMutation = useMutation({
-    mutationFn: (data: TemplateFormData) => apiRequest("/api/goal-templates", {
-      method: "POST",
-      body: JSON.stringify(data)
-    }),
+    mutationFn: (data: TemplateFormData) => apiRequest("/api/goal-templates", "POST", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/goal-templates/all-system"] });
       setIsCreateModalOpen(false);
@@ -110,10 +107,7 @@ export default function TemplateManagement() {
 
   // Update template mutation
   const updateMutation = useMutation({
-    mutationFn: (data: TemplateFormData & { id: string }) => apiRequest(`/api/goal-templates/${data.id}`, {
-      method: "PATCH",
-      body: JSON.stringify(data)
-    }),
+    mutationFn: (data: TemplateFormData & { id: string }) => apiRequest(`/api/goal-templates/${data.id}`, "PATCH", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/goal-templates/all-system"] });
       setIsEditModalOpen(false);
@@ -135,9 +129,7 @@ export default function TemplateManagement() {
 
   // Delete template mutation
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => apiRequest(`/api/goal-templates/${id}`, {
-      method: "DELETE"
-    }),
+    mutationFn: (id: string) => apiRequest(`/api/goal-templates/${id}`, "DELETE"),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/goal-templates/all-system"] });
       toast({
@@ -545,7 +537,7 @@ export default function TemplateManagement() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {templates?.map((template: any) => {
+          {Array.isArray(templates) && templates.map((template: any) => {
             const focusArea = focusAreaOptions.find(f => f.value === template.focusAreaTag);
             const FocusIcon = focusArea?.icon || Target;
             
@@ -606,6 +598,20 @@ export default function TemplateManagement() {
               </Card>
             );
           })}
+          
+          {!Array.isArray(templates) || templates.length === 0 && (
+            <div className="col-span-full text-center py-12">
+              <div className="text-gray-400 mb-4">
+                <Target className="w-16 h-16 mx-auto" />
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                No templates found
+              </h3>
+              <p className="text-gray-600">
+                Create your first template to get started.
+              </p>
+            </div>
+          )}
         </div>
       )}
 
