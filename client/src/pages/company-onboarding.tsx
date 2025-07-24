@@ -1926,11 +1926,12 @@ export default function CompanyOnboarding() {
                   onValueChange={(value) =>
                     setOnboardingData({ ...onboardingData, objective: value })
                   }
+                  className="grid grid-cols-1 lg:grid-cols-2 gap-4"
                 >
                   {goalTemplates.map((template: any, index: number) => (
                     <div
                       key={template.id}
-                      className="flex items-start space-x-2 p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+                      className="flex items-start space-x-2 p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors h-fit"
                     >
                       <RadioGroupItem
                         value={template.title}
