@@ -4158,7 +4158,7 @@ export default function CompanyOnboarding() {
                                   <p className={`text-xs font-medium ${
                                     onboardingData.currentStep >= 4 ? 'text-orange-700' : 'text-gray-500'
                                   }`}>
-                                    1
+                                    Buat Goal
                                   </p>
                                 </div>
                               </div>
@@ -4186,7 +4186,7 @@ export default function CompanyOnboarding() {
                                   <p className={`text-xs font-medium ${
                                     onboardingData.currentStep >= 5 ? 'text-orange-700' : 'text-gray-500'
                                   }`}>
-                                    2
+                                    Ukuran Keberhasilan
                                   </p>
                                 </div>
                               </div>
@@ -4214,7 +4214,7 @@ export default function CompanyOnboarding() {
                                   <p className={`text-xs font-medium ${
                                     onboardingData.currentStep >= 6 ? 'text-orange-700' : 'text-gray-500'
                                   }`}>
-                                    3
+                                    Pilih Inisiatif
                                   </p>
                                 </div>
                               </div>
@@ -4242,7 +4242,7 @@ export default function CompanyOnboarding() {
                                   <p className={`text-xs font-medium ${
                                     onboardingData.currentStep >= 7 ? 'text-orange-700' : 'text-gray-500'
                                   }`}>
-                                    4
+                                    Pilih Task
                                   </p>
                                 </div>
                               </div>
