@@ -91,6 +91,7 @@ import { SimpleSelect } from "@/components/SimpleSelect";
 import { type CompanyOnboardingData } from "@shared/schema";
 import { useTour } from "@/hooks/useTour";
 import { KeyResultModal } from "@/components/goal-form-modal";
+import EditCycleModal from "@/components/edit-cycle-modal";
 
 // Onboarding steps following the reference structure
 const ONBOARDING_STEPS = [
@@ -206,6 +207,7 @@ export default function CompanyOnboarding() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editGoalModal, setEditGoalModal] = useState(false);
   const [editKeyResultModal, setEditKeyResultModal] = useState<{ open: boolean; index: number; keyResult: any }>({ open: false, index: -1, keyResult: null });
+  const [editCycleModal, setEditCycleModal] = useState(false);
   
   // Separate states for individual editing
   const [editObjectiveModal, setEditObjectiveModal] = useState(false);
@@ -1235,6 +1237,25 @@ export default function CompanyOnboarding() {
       });
     },
   });
+
+  // Handler for edit cycle modal
+  const handleEditCycle = (data: { periodName: string; startDate: string; endDate: string }) => {
+    const newData = {
+      ...onboardingData,
+      cycleDuration: data.periodName,
+      cycleStartDate: data.startDate,
+      cycleEndDate: data.endDate,
+    };
+    setOnboardingData(newData);
+    setHasLocalChanges(true);
+    setEditCycleModal(false);
+    
+    toast({
+      title: "Berhasil!",
+      description: "Informasi periode telah diperbarui",
+      variant: "success",
+    });
+  };
 
   const currentStepData = ONBOARDING_STEPS.find(
     (step) => step.id === onboardingData.currentStep,
@@ -2294,12 +2315,7 @@ export default function CompanyOnboarding() {
                               size="sm"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                setOnboardingData({ 
-                                  ...onboardingData, 
-                                  cycleDuration: "",
-                                  cycleStartDate: "",
-                                  cycleEndDate: ""
-                                });
+                                setEditCycleModal(true);
                               }}
                               className="h-6 w-full text-xs text-purple-600 hover:text-purple-700 hover:bg-purple-100 border border-purple-200"
                             >
@@ -5201,6 +5217,18 @@ export default function CompanyOnboarding() {
         } : undefined}
         isEditing={editIndividualKeyResultModal.open}
         users={users || []}
+      />
+
+      {/* Edit Cycle Modal */}
+      <EditCycleModal
+        isOpen={editCycleModal}
+        onClose={() => setEditCycleModal(false)}
+        onSave={handleEditCycle}
+        initialData={{
+          periodName: onboardingData.cycleDuration,
+          startDate: onboardingData.cycleStartDate,
+          endDate: onboardingData.cycleEndDate,
+        }}
       />
     </div>
   );

@@ -1,295 +1,189 @@
-import { useEffect } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import React, { useState, useEffect } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
-import { insertCycleSchema } from "@shared/schema";
-import { HelpCircle, CalendarIcon } from "lucide-react";
-import { format } from "date-fns";
-import { id } from "date-fns/locale";
-import type { Cycle } from "@shared/schema";
-
-const editCycleFormSchema = insertCycleSchema.omit({ type: true, description: true }).extend({
-  startDate: z.date({ required_error: "Tanggal mulai diperlukan" }),
-  endDate: z.date({ required_error: "Tanggal berakhir diperlukan" }),
-});
-
-type EditCycleFormData = z.infer<typeof editCycleFormSchema>;
+import { Label } from "@/components/ui/label";
+import { CalendarIcon, Save, X } from "lucide-react";
 
 interface EditCycleModalProps {
-  cycle: Cycle | null;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  isOpen: boolean;
+  onClose: () => void;
+  onSave: (data: { periodName: string; startDate: string; endDate: string }) => void;
+  initialData: {
+    periodName: string;
+    startDate: string;
+    endDate: string;
+  };
 }
 
-export default function EditCycleModal({ cycle, open, onOpenChange }: EditCycleModalProps) {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-  
-  const form = useForm<EditCycleFormData>({
-    resolver: zodResolver(editCycleFormSchema),
-    defaultValues: {
-      name: "",
-      startDate: undefined,
-      endDate: undefined,
-    },
-  });
+const EditCycleModal: React.FC<EditCycleModalProps> = ({
+  isOpen,
+  onClose,
+  onSave,
+  initialData,
+}) => {
+  const [periodName, setPeriodName] = useState(initialData.periodName);
+  const [startDate, setStartDate] = useState(initialData.startDate);
+  const [endDate, setEndDate] = useState(initialData.endDate);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const mutation = useMutation({
-    mutationFn: async (data: EditCycleFormData) => {
-      // Convert dates to local date format to prevent timezone issues
-      const formatDateToLocal = (date: Date) => {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-      };
-      
-      const formattedData = {
-        ...data,
-        startDate: formatDateToLocal(data.startDate),
-        endDate: formatDateToLocal(data.endDate),
-        type: "monthly"
-      };
-      return apiRequest('PATCH', `/api/cycles/${cycle?.id}`, formattedData);
-    },
-    onSuccess: () => {
-      // Invalidate cache to refresh the cycles list
-      queryClient.invalidateQueries({ queryKey: ["/api/cycles"] });
-      toast({
-        title: "Siklus berhasil diperbarui",
-        description: "Siklus telah berhasil diperbarui",
-        className: "border-green-200 bg-green-50 text-green-800",
-      });
-      onOpenChange(false);
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Error",
-        description: error.message || "Gagal memperbarui siklus",
-        variant: "destructive",
-      });
-    },
-  });
+  useEffect(() => {
+    if (isOpen) {
+      setPeriodName(initialData.periodName);
+      setStartDate(initialData.startDate);
+      setEndDate(initialData.endDate);
+      setErrors({});
+    }
+  }, [isOpen, initialData]);
 
-  const onSubmit = (data: EditCycleFormData) => {
-    mutation.mutate(data);
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!periodName.trim()) {
+      newErrors.periodName = "Nama periode harus diisi";
+    }
+
+    if (!startDate) {
+      newErrors.startDate = "Tanggal mulai harus diisi";
+    }
+
+    if (!endDate) {
+      newErrors.endDate = "Tanggal selesai harus diisi";
+    }
+
+    if (startDate && endDate && new Date(startDate) >= new Date(endDate)) {
+      newErrors.endDate = "Tanggal selesai harus lebih besar dari tanggal mulai";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
-  // Update form data when cycle changes
-  useEffect(() => {
-    if (cycle) {
-      const parseDate = (dateString: string | null | undefined) => {
-        if (!dateString) return undefined;
-        try {
-          // Handle different date formats
-          const date = new Date(dateString);
-          if (isNaN(date.getTime())) {
-            // Try parsing as YYYY-MM-DD format
-            const dateParts = dateString.split('-');
-            if (dateParts.length === 3) {
-              const parsedDate = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]));
-              return isNaN(parsedDate.getTime()) ? undefined : parsedDate;
-            }
-            return undefined;
-          }
-          return date;
-        } catch (error) {
-          console.error('Error parsing date:', error);
-          return undefined;
-        }
-      };
-
-      form.reset({
-        name: cycle.name,
-        startDate: parseDate(cycle.startDate),
-        endDate: parseDate(cycle.endDate),
+  const handleSave = () => {
+    if (validateForm()) {
+      onSave({
+        periodName: periodName.trim(),
+        startDate,
+        endDate,
       });
+      onClose();
     }
-  }, [cycle, form]);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && e.ctrlKey) {
+      handleSave();
+    }
+  };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px] w-[95vw] max-h-[90vh] overflow-y-auto">
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-md" onKeyDown={handleKeyDown}>
         <DialogHeader>
-          <DialogTitle className="text-lg">Edit Siklus</DialogTitle>
-          <DialogDescription className="text-sm">
-            Perbarui informasi siklus tujuan Anda
-          </DialogDescription>
+          <DialogTitle className="flex items-center space-x-2">
+            <CalendarIcon className="w-5 h-5 text-purple-600" />
+            <span>Edit Periode Siklus</span>
+          </DialogTitle>
         </DialogHeader>
-        
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center gap-2">
-                    Nama Siklus
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <button 
-                          type="button" 
-                          className="inline-flex items-center justify-center"
-                        >
-                          <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                        </button>
-                      </PopoverTrigger>
-                      <PopoverContent side="right" className="max-w-xs">
-                        <p className="text-sm">
-                          Berikan nama yang jelas dan deskriptif untuk siklus ini.
-                          <br /><br />
-                          <strong>Contoh:</strong> "Juli 2025" (bulanan), "Q3 2025" (kuartalan), "Tahun 2025" (tahunan)
-                        </p>
-                      </PopoverContent>
-                    </Popover>
-                  </FormLabel>
-                  <FormControl>
-                    <Input placeholder="contoh: Juli 2025" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+
+        <div className="space-y-4 py-4">
+          {/* Period Name */}
+          <div className="space-y-2">
+            <Label htmlFor="period-name">Nama Periode</Label>
+            <Input
+              id="period-name"
+              type="text"
+              value={periodName}
+              onChange={(e) => setPeriodName(e.target.value)}
+              placeholder="Contoh: Kuartal 1 2025"
+              className={`focus:ring-2 focus:ring-purple-500 ${
+                errors.periodName ? "border-red-500" : ""
+              }`}
             />
+            {errors.periodName && (
+              <p className="text-xs text-red-600">{errors.periodName}</p>
+            )}
+          </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="startDate"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex items-center gap-2">
-                      Tanggal Mulai
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <button 
-                            type="button" 
-                            className="inline-flex items-center justify-center"
-                          >
-                            <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                          </button>
-                        </PopoverTrigger>
-                        <PopoverContent side="right" className="max-w-xs">
-                          <p className="text-sm">
-                            Pilih tanggal dimulainya siklus ini.
-                            <br /><br />
-                            <strong>Biasanya:</strong> Siklus bulanan (tanggal 1), kuartalan (awal kuartal), tahunan (1 Januari)
-                          </p>
-                        </PopoverContent>
-                      </Popover>
-                    </FormLabel>
-                    <FormControl>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant="outline"
-                            className="w-full justify-start text-left font-normal focus:ring-orange-500 focus:border-orange-500"
-                          >
-                            <CalendarIcon className="mr-2 h-4 w-4 flex-shrink-0" />
-                            <span className="truncate">
-                              {field.value ? format(field.value, "PPP", { locale: id }) : "Tanggal mulai"}
-                            </span>
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={field.value}
-                            onSelect={field.onChange}
-                            disabled={(date) => date < new Date("1900-01-01")}
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+          {/* Start Date */}
+          <div className="space-y-2">
+            <Label htmlFor="start-date">Tanggal Mulai</Label>
+            <Input
+              id="start-date"
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className={`focus:ring-2 focus:ring-purple-500 ${
+                errors.startDate ? "border-red-500" : ""
+              }`}
+            />
+            {errors.startDate && (
+              <p className="text-xs text-red-600">{errors.startDate}</p>
+            )}
+          </div>
 
-              <FormField
-                control={form.control}
-                name="endDate"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex items-center gap-2">
-                      Tanggal Berakhir
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <button 
-                            type="button" 
-                            className="inline-flex items-center justify-center"
-                          >
-                            <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                          </button>
-                        </PopoverTrigger>
-                        <PopoverContent side="right" className="max-w-xs">
-                          <p className="text-sm">
-                            Pilih tanggal berakhirnya siklus ini.
-                            <br /><br />
-                            <strong>Biasanya:</strong> Siklus bulanan (akhir bulan), kuartalan (akhir kuartal), tahunan (31 Desember)
-                          </p>
-                        </PopoverContent>
-                      </Popover>
-                    </FormLabel>
-                    <FormControl>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant="outline"
-                            className="w-full justify-start text-left font-normal focus:ring-orange-500 focus:border-orange-500"
-                          >
-                            <CalendarIcon className="mr-2 h-4 w-4 flex-shrink-0" />
-                            <span className="truncate">
-                              {field.value ? format(field.value, "PPP", { locale: id }) : "Tanggal berakhir"}
-                            </span>
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={field.value}
-                            onSelect={field.onChange}
-                            disabled={(date) => date < new Date("1900-01-01")}
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+          {/* End Date */}
+          <div className="space-y-2">
+            <Label htmlFor="end-date">Tanggal Selesai</Label>
+            <Input
+              id="end-date"
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className={`focus:ring-2 focus:ring-purple-500 ${
+                errors.endDate ? "border-red-500" : ""
+              }`}
+            />
+            {errors.endDate && (
+              <p className="text-xs text-red-600">{errors.endDate}</p>
+            )}
+          </div>
+
+          {/* Period Preview */}
+          {startDate && endDate && !errors.endDate && (
+            <div className="p-3 bg-purple-50 rounded-lg border border-purple-200">
+              <div className="text-sm text-purple-800">
+                <strong>Pratinjau Periode:</strong>
+              </div>
+              <div className="text-sm text-purple-700">
+                {new Date(startDate).toLocaleDateString('id-ID')} - {new Date(endDate).toLocaleDateString('id-ID')}
+              </div>
+              {(() => {
+                const start = new Date(startDate);
+                const end = new Date(endDate);
+                const diffTime = Math.abs(end.getTime() - start.getTime());
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                return (
+                  <div className="text-xs text-purple-600 mt-1">
+                    Durasi: {diffDays} hari
+                  </div>
+                );
+              })()}
             </div>
+          )}
+        </div>
 
-            <div className="flex justify-end space-x-2 pt-4">
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={() => onOpenChange(false)}
-              >
-                Batal
-              </Button>
-              <Button 
-                type="submit" 
-                disabled={mutation.isPending}
-                className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
-              >
-                {mutation.isPending ? "Menyimpan..." : "Simpan Perubahan"}
-              </Button>
-            </div>
-          </form>
-        </Form>
+        <div className="flex justify-end space-x-2 pt-4 border-t">
+          <Button variant="outline" onClick={onClose} className="flex items-center space-x-1">
+            <X className="w-4 h-4" />
+            <span>Batal</span>
+          </Button>
+          <Button 
+            onClick={handleSave}
+            className="bg-purple-600 hover:bg-purple-700 text-white flex items-center space-x-1"
+          >
+            <Save className="w-4 h-4" />
+            <span>Simpan Perubahan</span>
+          </Button>
+        </div>
+
+        <div className="text-xs text-gray-500 text-center">
+          Tip: Tekan Ctrl+Enter untuk menyimpan
+        </div>
       </DialogContent>
     </Dialog>
   );
-}
+};
+
+export default EditCycleModal;
+export { EditCycleModal };
