@@ -85,10 +85,13 @@ import {
   Info,
   User,
   Edit,
+  Trophy,
 } from "lucide-react";
 import { ReminderSettings } from "@/components/ReminderSettings";
 import { SimpleSelect } from "@/components/SimpleSelect";
 import { type CompanyOnboardingData } from "@shared/schema";
+
+// Type definitions for complex objects
 import { useTour } from "@/hooks/useTour";
 import { KeyResultModal } from "@/components/goal-form-modal";
 import EditCycleModal from "@/components/edit-cycle-modal";
@@ -234,7 +237,7 @@ export default function CompanyOnboarding() {
   const { startTour } = useTour();
 
   // Initialize state first
-  const [onboardingData, setOnboardingData] = useState<OnboardingData>({
+  const [onboardingData, setOnboardingData] = useState<any>({
     currentStep: 0, // Start at welcome screen
     completedSteps: [],
     companyName: "",
@@ -1016,20 +1019,20 @@ export default function CompanyOnboarding() {
 
   // Update local state when progress data is loaded, but respect local changes
   useEffect(() => {
-    console.log("🔄 Server data useEffect - hasLocalChanges:", hasLocalChanges, "progress.teamFocus:", progress?.teamFocus);
+    console.log("🔄 Server data useEffect - hasLocalChanges:", hasLocalChanges, "progress.teamFocus:", (progress as any)?.teamFocus);
     if (progress && !hasLocalChanges) {
-      console.log("📥 Updating from server data, teamFocus will be:", progress.teamFocus);
+      console.log("📥 Updating from server data, teamFocus will be:", (progress as any).teamFocus);
       setOnboardingData((prevData) => ({
         ...prevData,
-        ...progress,
-        currentStep: progress.currentStep || 0, // Ensure it starts at 0 if no progress
+        ...(progress as any),
+        currentStep: (progress as any).currentStep || 0, // Ensure it starts at 0 if no progress
       }));
       
       // Initialize selectedTemplateId if objective exists but no template is selected
-      if (progress.objective && !selectedTemplateId) {
+      if ((progress as any).objective && !selectedTemplateId) {
         // Find template that matches the objective
-        const matchingTemplate = goalTemplates?.find((template: any) => 
-          template.title === progress.objective
+        const matchingTemplate = (goalTemplates as any)?.find((template: any) => 
+          template.title === (progress as any).objective
         );
         if (matchingTemplate) {
           setSelectedTemplateId(matchingTemplate.id);
@@ -1048,7 +1051,7 @@ export default function CompanyOnboarding() {
   // Validation function for each step
   const validateStep = (
     step: number,
-    data: OnboardingData,
+    data: any,
   ): { isValid: boolean; message?: string } => {
     switch (step) {
       case 1:
@@ -1417,7 +1420,7 @@ export default function CompanyOnboarding() {
               <Label htmlFor="companyName">Nama Perusahaan</Label>
               <Input
                 id="companyName"
-                value={onboardingData.companyName || organizationData?.organization?.name || ""}
+                value={onboardingData.companyName || (organizationData as any)?.organization?.name || ""}
                 onChange={(e) =>
                   setOnboardingData({
                     ...onboardingData,
@@ -5258,10 +5261,10 @@ export default function CompanyOnboarding() {
           currentValue: editIndividualKeyResultModal.keyResult.currentValue || '0',
           unit: editIndividualKeyResultModal.keyResult.unit || '',
           status: 'in_progress',
-          assignedTo: user?.id || '',
+          assignedTo: (user as any)?.id || '',
         } : undefined}
         isEditing={editIndividualKeyResultModal.open}
-        users={users || []}
+        users={(users as any) || []}
       />
 
       {/* Edit Cycle Modal */}
