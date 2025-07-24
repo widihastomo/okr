@@ -367,10 +367,9 @@ const config = getConfig();
     const dbConnected = await testDatabaseConnection();
     
     if (dbConnected) {
-      // Run build seeder first (essential data)
-      console.log("🌱 Running build seeder for development...");
-      const { runBuildSeeder } = await import("./build-seeder");
-      await runBuildSeeder();
+      // Build seeder is now manual for faster development startup
+      console.log("ℹ️  Auto-seeder disabled for faster development startup");
+      console.log("📝 To setup database: bash run-manual-seeder.sh or npx tsx server/manual-seeder.ts");
       
       // Skip RLS setup in development to avoid pool conflicts
       if (process.env.NODE_ENV === 'production') {
