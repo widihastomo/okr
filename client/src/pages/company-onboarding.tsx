@@ -73,12 +73,15 @@ import {
   ListTodo,
   PlayCircle,
   BellRing,
+  TrendingDown,
+  Target as TargetIcon,
+  Minus,
+  Plus,
   Award,
   Rocket,
   Star,
   Globe,
   Lightbulb,
-  TrendingDown,
   Info,
   User,
   Edit,
@@ -1981,7 +1984,26 @@ export default function CompanyOnboarding() {
                               {template.keyResults.slice(0, 3).map((keyResult: any, krIndex: number) => (
                                 <div key={krIndex} className="flex items-center justify-between group">
                                   <div className="flex items-center space-x-2 flex-1">
-                                    <div className="w-1.5 h-1.5 bg-orange-400 rounded-full flex-shrink-0"></div>
+                                    {(() => {
+                                      // Type-specific icons based on keyResultType
+                                      const getKeyResultIcon = (type: string) => {
+                                        switch (type) {
+                                          case 'increase_to':
+                                            return <TrendingUp className="w-3 h-3 text-green-600 flex-shrink-0" />;
+                                          case 'decrease_to':
+                                            return <TrendingDown className="w-3 h-3 text-red-600 flex-shrink-0" />;
+                                          case 'achieve_or_not':
+                                            return <TargetIcon className="w-3 h-3 text-blue-600 flex-shrink-0" />;
+                                          case 'should_stay_above':
+                                            return <Plus className="w-3 h-3 text-emerald-600 flex-shrink-0" />;
+                                          case 'should_stay_below':
+                                            return <Minus className="w-3 h-3 text-amber-600 flex-shrink-0" />;
+                                          default:
+                                            return <div className="w-1.5 h-1.5 bg-orange-400 rounded-full flex-shrink-0"></div>;
+                                        }
+                                      };
+                                      return getKeyResultIcon(keyResult.keyResultType || 'default');
+                                    })()}
                                     <span className="text-xs text-gray-600 flex-1">
                                       {keyResult.title}
                                       {keyResult.targetValue && keyResult.unit && (
