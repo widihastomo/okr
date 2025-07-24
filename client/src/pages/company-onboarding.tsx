@@ -2050,7 +2050,17 @@ export default function CompanyOnboarding() {
                                         setEditIndividualKeyResultModal({
                                           open: true,
                                           index: krIndex,
-                                          keyResult: keyResult,
+                                          keyResult: {
+                                            ...keyResult,
+                                            // Ensure we use the actual template data
+                                            title: keyResult.title,
+                                            description: keyResult.description || '',
+                                            keyResultType: keyResult.keyResultType || 'increase_to',
+                                            baseValue: keyResult.baseValue || '0',
+                                            targetValue: keyResult.targetValue || '0',
+                                            currentValue: keyResult.currentValue || '0',
+                                            unit: keyResult.unit || '',
+                                          },
                                           originalText: originalText
                                         });
                                       }}
@@ -4927,7 +4937,7 @@ export default function CompanyOnboarding() {
           });
         }}
         editingKeyResult={editIndividualKeyResultModal.keyResult ? {
-          title: editIndividualKeyResultModal.originalText || editIndividualKeyResultModal.keyResult.title || '',
+          title: editIndividualKeyResultModal.keyResult.title || '',
           description: editIndividualKeyResultModal.keyResult.description || '',
           keyResultType: editIndividualKeyResultModal.keyResult.keyResultType || 'increase_to',
           baseValue: editIndividualKeyResultModal.keyResult.baseValue || '0',
