@@ -9,9 +9,9 @@ const sampleGoalTemplates = [
     description: "Fokus pada peningkatan revenue melalui strategi penjualan yang lebih efektif dan ekspansi market reach untuk produk skincare premium",
     focusAreaTag: "penjualan",
     keyResults: [
-      { title: "Penjualan naik 40% dari bulan sebelumnya", targetValue: "40", unit: "persen", keyResultType: "increase_to" },
-      { title: "Mendapat 300 pelanggan baru per bulan", targetValue: "300", unit: "pelanggan", keyResultType: "increase_to" },
-      { title: "Tingkat konversi mencapai 8%", targetValue: "8", unit: "persen", keyResultType: "increase_to" }
+      { title: "Penjualan naik 40% dari bulan sebelumnya", targetValue: "40", unit: "%", keyResultType: "increase_to" },
+      { title: "Mendapat 300 pelanggan baru per bulan", targetValue: "300", unit: "orang", keyResultType: "increase_to" },
+      { title: "Tingkat konversi mencapai 8%", targetValue: "8", unit: "%", keyResultType: "increase_to" }
     ],
     initiatives: [
       { title: "Program digital marketing intensif", description: "Kampanye terintegrasi di media sosial dan Google Ads" },
@@ -28,9 +28,9 @@ const sampleGoalTemplates = [
     description: "Menciptakan program membership yang menarik untuk meningkatkan customer retention dan lifetime value pelanggan skincare",
     focusAreaTag: "penjualan",
     keyResults: [
-      { title: "500 member baru bergabung", targetValue: "500", unit: "member", keyResultType: "increase_to" },
-      { title: "Tingkat retention member 85%", targetValue: "85", unit: "persen", keyResultType: "should_stay_above" },
-      { title: "Average order value member naik 25%", targetValue: "25", unit: "persen", keyResultType: "increase_to" }
+      { title: "500 member baru bergabung", targetValue: "500", unit: "orang", keyResultType: "increase_to" },
+      { title: "Tingkat retention member 85%", targetValue: "85", unit: "%", keyResultType: "should_stay_above" },
+      { title: "Average order value member naik 25%", targetValue: "25", unit: "%", keyResultType: "increase_to" }
     ],
     initiatives: [
       { title: "Program loyalty rewards", description: "Sistem poin dan hadiah untuk member setia" },
@@ -49,9 +49,9 @@ const sampleGoalTemplates = [
     description: "Streamline proses produksi dan supply chain untuk mengurangi waste dan meningkatkan output produk berkualitas",
     focusAreaTag: "operasional",
     keyResults: [
-      { title: "Efisiensi produksi naik 30%", targetValue: "30", unit: "persen", keyResultType: "increase_to" },
-      { title: "Reduce waste produksi hingga 15%", targetValue: "15", unit: "persen", keyResultType: "decrease_to" },
-      { title: "Lead time produksi turun 20%", targetValue: "20", unit: "persen", keyResultType: "decrease_to" }
+      { title: "Efisiensi produksi naik 30%", targetValue: "30", unit: "%", keyResultType: "increase_to" },
+      { title: "Reduce waste produksi hingga 15%", targetValue: "15", unit: "%", keyResultType: "decrease_to" },
+      { title: "Lead time produksi turun 20%", targetValue: "20", unit: "%", keyResultType: "decrease_to" }
     ],
     initiatives: [
       { title: "Automatisasi proses produksi", description: "Implementasi teknologi untuk mengotomatisasi tahapan produksi" },
@@ -68,9 +68,9 @@ const sampleGoalTemplates = [
     description: "Audit dan optimasi semua aspek operasional untuk mencapai efisiensi biaya tanpa mengorbankan kualitas produk dan service",
     focusAreaTag: "operasional",
     keyResults: [
-      { title: "Biaya operasional turun 25%", targetValue: "25", unit: "persen", keyResultType: "decrease_to" },
-      { title: "Cost per unit produksi turun 20%", targetValue: "20", unit: "persen", keyResultType: "decrease_to" },
-      { title: "ROI operasional naik 15%", targetValue: "15", unit: "persen", keyResultType: "increase_to" }
+      { title: "Biaya operasional turun 25%", targetValue: "25", unit: "%", keyResultType: "decrease_to" },
+      { title: "Cost per unit produksi turun 20%", targetValue: "20", unit: "%", keyResultType: "decrease_to" },
+      { title: "ROI operasional naik 15%", targetValue: "15", unit: "%", keyResultType: "increase_to" }
     ],
     initiatives: [
       { title: "Cost reduction program", description: "Program sistematis untuk mengurangi biaya tanpa mengurangi kualitas" },
@@ -89,9 +89,9 @@ const sampleGoalTemplates = [
     description: "Meningkatkan kualitas layanan pelanggan melalui training tim dan implementasi sistem customer support yang responsif",
     focusAreaTag: "customer_service",
     keyResults: [
-      { title: "Customer satisfaction score 95%", targetValue: "95", unit: "persen", keyResultType: "should_stay_above" },
-      { title: "Response time rata-rata 2 jam", targetValue: "2", unit: "jam", keyResultType: "should_stay_below" },
-      { title: "First call resolution 80%", targetValue: "80", unit: "persen", keyResultType: "should_stay_above" }
+      { title: "Customer satisfaction score 95%", targetValue: "95", unit: "%", keyResultType: "should_stay_above" },
+      { title: "Response time rata-rata 2 jam", targetValue: "2", unit: "hari", keyResultType: "should_stay_below" },
+      { title: "First call resolution 80%", targetValue: "80", unit: "%", keyResultType: "should_stay_above" }
     ],
     initiatives: [
       { title: "Customer service excellence program", description: "Program pelatihan komprehensif untuk tim customer service" },
@@ -108,9 +108,9 @@ const sampleGoalTemplates = [
     description: "Implementasi sistem ticketing dan SOP baru untuk memberikan respon yang lebih cepat dan memuaskan kepada pelanggan",
     focusAreaTag: "customer_service",
     keyResults: [
-      { title: "Average response time 2 jam", targetValue: "2", unit: "jam", keyResultType: "should_stay_below" },
-      { title: "95% tiket resolved dalam 24 jam", targetValue: "95", unit: "persen", keyResultType: "should_stay_above" },
-      { title: "Customer complaint rate turun 40%", targetValue: "40", unit: "persen", keyResultType: "decrease_to" }
+      { title: "Average response time 2 jam", targetValue: "2", unit: "hari", keyResultType: "should_stay_below" },
+      { title: "95% tiket resolved dalam 24 jam", targetValue: "95", unit: "%", keyResultType: "should_stay_above" },
+      { title: "Customer complaint rate turun 40%", targetValue: "40", unit: "%", keyResultType: "decrease_to" }
     ],
     initiatives: [
       { title: "Fast response system", description: "Sistem otomatis untuk prioritas dan routing customer queries" },
@@ -129,9 +129,9 @@ const sampleGoalTemplates = [
     description: "Kampanye marketing digital yang komprehensif untuk meningkatkan visibility dan recognition brand di target market",
     focusAreaTag: "marketing",
     keyResults: [
-      { title: "Brand awareness naik 60%", targetValue: "60", unit: "persen", keyResultType: "increase_to" },
-      { title: "Social media reach 100K per bulan", targetValue: "100000", unit: "reach", keyResultType: "increase_to" },
-      { title: "Website traffic naik 80%", targetValue: "80", unit: "persen", keyResultType: "increase_to" }
+      { title: "Brand awareness naik 60%", targetValue: "60", unit: "%", keyResultType: "increase_to" },
+      { title: "Social media reach 100K per bulan", targetValue: "100000", unit: "orang", keyResultType: "increase_to" },
+      { title: "Website traffic naik 80%", targetValue: "80", unit: "%", keyResultType: "increase_to" }
     ],
     initiatives: [
       { title: "Integrated digital marketing campaign", description: "Kampanye terintegrasi di semua channel digital" },
@@ -148,9 +148,9 @@ const sampleGoalTemplates = [
     description: "Strategi lead generation melalui content marketing, social media, dan digital advertising untuk memperbesar sales funnel",
     focusAreaTag: "marketing",
     keyResults: [
-      { title: "1000 qualified leads per bulan", targetValue: "1000", unit: "leads", keyResultType: "increase_to" },
-      { title: "Lead conversion rate 12%", targetValue: "12", unit: "persen", keyResultType: "should_stay_above" },
-      { title: "Cost per lead turun 30%", targetValue: "30", unit: "persen", keyResultType: "decrease_to" }
+      { title: "1000 qualified leads per bulan", targetValue: "1000", unit: "orang", keyResultType: "increase_to" },
+      { title: "Lead conversion rate 12%", targetValue: "12", unit: "%", keyResultType: "should_stay_above" },
+      { title: "Cost per lead turun 30%", targetValue: "30", unit: "%", keyResultType: "decrease_to" }
     ],
     initiatives: [
       { title: "Content marketing strategy", description: "Strategi konten untuk menarik dan nurture leads" },
@@ -184,7 +184,15 @@ async function populateGoalTemplates() {
         });
         console.log(`✅ Created template: ${template.title}`);
       } else {
-        console.log(`ℹ️  Template already exists: ${template.title}`);
+        // Update existing template with new data (including corrected units)
+        await db
+          .update(goalTemplates)
+          .set({
+            ...template,
+            updatedAt: new Date()
+          })
+          .where(eq(goalTemplates.title, template.title));
+        console.log(`🔄 Updated template: ${template.title}`);
       }
     }
 
