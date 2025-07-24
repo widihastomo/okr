@@ -4445,7 +4445,7 @@ export default function CompanyOnboarding() {
 
       {/* Edit Goal Modal */}
       <Dialog open={showEditModal} onOpenChange={setShowEditModal}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center space-x-2">
               <Edit className="w-5 h-5 text-orange-600" />
