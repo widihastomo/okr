@@ -436,7 +436,11 @@ export default function TemplateDetailPage() {
 
   // Handlers for adding components
   const handleAddKeyResult = (keyResultData: any) => {
-    if (!template) return;
+    console.log("handleAddKeyResult called with data:", keyResultData);
+    if (!template) {
+      console.error("No template available");
+      return;
+    }
     
     // Convert KeyResultModal data to template format
     const templateKeyResult = {
@@ -448,7 +452,12 @@ export default function TemplateDetailPage() {
       unit: keyResultData.unit || ""
     };
     
+    console.log("Converted template key result:", templateKeyResult);
+    console.log("Current template keyResults:", template?.keyResults);
+    
     const updatedKeyResults = [...(template?.keyResults || []), templateKeyResult];
+    console.log("Updated keyResults array:", updatedKeyResults);
+    
     updateMutation.mutate({ keyResults: updatedKeyResults });
     
     setIsAddKeyResultModalOpen(false);

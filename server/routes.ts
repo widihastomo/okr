@@ -1642,32 +1642,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Update goal template
-  app.patch("/api/goal-templates/:id", requireAuth, async (req, res) => {
-    try {
-      const currentUser = req.user as User;
-      const templateId = req.params.id;
-      
-      // Only system owner can update templates
-      if (!currentUser.isSystemOwner) {
-        return res.status(403).json({ message: "Access denied - System owner required" });
-      }
-      
-      const template = await storage.getGoalTemplate(templateId);
-      
-      if (!template) {
-        return res.status(404).json({ message: "Template not found" });
-      }
-      
-      // Update template with new data
-      const updatedTemplate = await storage.updateGoalTemplate(templateId, req.body);
-      
-      res.json(updatedTemplate);
-    } catch (error) {
-      console.error("Error updating goal template:", error);
-      res.status(500).json({ message: "Failed to update goal template" });
-    }
-  });
+
 
   // Goal template CRUD for system owners
   app.post("/api/goal-templates", requireAuth, async (req, res) => {
@@ -1699,7 +1674,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const currentUser = req.user as User;
       const templateId = req.params.id;
       
+      console.log("🔧 PATCH goal template request:", {
+        templateId,
+        userId: currentUser.id,
+        isSystemOwner: currentUser.isSystemOwner,
+        requestBody: JSON.stringify(req.body, null, 2)
+      });
+      
       if (!currentUser.isSystemOwner) {
+        console.log("❌ Access denied - user is not system owner");
         return res.status(403).json({ message: "System owner access required" });
       }
       
@@ -1709,15 +1692,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         lastUpdateBy: currentUser.id
       };
       
+      console.log("📝 Updating template with data:", updatedData);
+      
       const template = await storage.updateGoalTemplate(templateId, updatedData);
       
       if (!template) {
+        console.log("❌ Template not found after update");
         return res.status(404).json({ message: "Template not found" });
       }
       
+      console.log("✅ Template updated successfully:", template.id);
       res.json(template);
     } catch (error) {
-      console.error("Error updating goal template:", error);
+      console.error("❌ Error updating goal template:", error);
       res.status(500).json({ message: "Failed to update goal template" });
     }
   });
