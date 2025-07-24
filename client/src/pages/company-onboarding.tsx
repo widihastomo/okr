@@ -2195,22 +2195,7 @@ export default function CompanyOnboarding() {
                   ))}
                 </div>
                 
-                {onboardingData.cycleDuration && (
-                  <div className="mt-4 p-3 bg-white rounded-lg border border-purple-200">
-                    <div className="flex items-center space-x-2 mb-2">
-                      <CheckCircle className="w-4 h-4 text-green-600" />
-                      <span className="text-sm font-medium text-gray-800">Periode goal terpilih:</span>
-                    </div>
-                    <div className="text-sm text-gray-600">
-                      <strong>{onboardingData.cycleDuration === "1bulan" ? "1 Bulan" : onboardingData.cycleDuration === "3bulan" ? "3 Bulan" : "6 Bulan"}</strong>
-                      {onboardingData.cycleStartDate && onboardingData.cycleEndDate && (
-                        <span className="ml-2">
-                          ({new Date(onboardingData.cycleStartDate).toLocaleDateString('id-ID')} - {new Date(onboardingData.cycleEndDate).toLocaleDateString('id-ID')})
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                )}
+                
               </div>
             )}
             
