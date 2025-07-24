@@ -1640,7 +1640,6 @@ export function KeyResultModal({
       currentValue: "0",
       unit: "",
       status: "in_progress",
-      assignedTo: user?.id || "",
     },
   });
 
@@ -1661,7 +1660,6 @@ export function KeyResultModal({
           currentValue: "0",
           unit: "",
           status: "in_progress",
-          assignedTo: user?.id || "",
         });
       }
     }
@@ -1873,53 +1871,7 @@ export function KeyResultModal({
               )}
             />
 
-            {/* Penanggung Jawab */}
-            <FormField
-              control={keyResultForm.control}
-              name="assignedTo"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center gap-2">
-                    Penanggung Jawab
-                    <Popover>
-                      <PopoverTrigger>
-                        <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                      </PopoverTrigger>
-                      <PopoverContent side="right" className="max-w-xs">
-                        <p>
-                          <strong>Pilih orang yang bertanggung jawab</strong>
-                          <br />
-                          <br />
-                          Tentukan siapa yang akan bertanggung jawab untuk
-                          memantau dan mencapai Angka Target ini.
-                          <br />
-                          <br />
-                          <strong>Tips:</strong> Pilih orang yang memiliki akses
-                          dan kontrol langsung terhadap metrik yang diukur.
-                          <br />
-                          <br />
-                          <strong>Opsional:</strong> Bisa dikosongkan jika belum
-                          ada penanggung jawab yang ditentukan.
-                        </p>
-                      </PopoverContent>
-                    </Popover>
-                  </FormLabel>
-                  <FormControl>
-                    <SearchableUserSelect
-                      users={
-                        users?.filter((user) => user.isActive === true) || []
-                      }
-                      value={field.value}
-                      onValueChange={field.onChange}
-                      placeholder="Pilih penanggung jawab..."
-                      allowUnassigned={true}
-                      currentUser={user}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Key Result Type */}
