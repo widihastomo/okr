@@ -1668,10 +1668,6 @@ export default function CompanyOnboarding() {
               
               {/* Header */}
               <div className="text-center mb-4 md:mb-6 relative">
-                <div className="inline-flex items-center justify-center w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg md:rounded-xl mb-3 md:mb-4 shadow-lg">
-                  <Target className="w-4 h-4 md:w-5 md:h-5 text-white" />
-                </div>
-                
                 <p className="text-gray-200 text-base md:text-lg px-2">
                   4 langkah sederhana yang terbukti efektif untuk mencapai tujuan besar
                 </p>
