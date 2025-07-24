@@ -34,8 +34,8 @@ const EditCycleModal: React.FC<EditCycleModalProps> = ({
         return "1 Bulan";
       case "3bulan":
         return "3 Bulan";
-      case "6bulan":
-        return "6 Bulan";
+      case "1tahun":
+        return "1 Tahun";
       default:
         return duration;
     }

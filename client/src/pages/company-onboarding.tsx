@@ -1850,7 +1850,7 @@ export default function CompanyOnboarding() {
                         <h4 className="text-lg md:text-xl font-bold text-white">GOAL / Tujuan</h4>
                         <div className="px-2 py-1 md:px-3 md:py-1 bg-orange-500 text-white rounded-full text-xs font-bold">VISI BESAR</div>
                       </div>
-                      <p className="text-gray-300 mb-2 md:mb-3 text-base md:text-lg">Apa yang ingin dicapai dalam 3-6 bulan ke depan</p>
+                      <p className="text-gray-300 mb-2 md:mb-3 text-base md:text-lg">Apa yang ingin dicapai dalam 3-12 bulan ke depan</p>
                       <div className="bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg md:rounded-xl p-2 md:p-3 border-l-4 border-orange-400 shadow-md">
                         <div className="flex items-center space-x-2 mb-2">
                           <Sparkles className="w-4 h-4 text-orange-500 flex-shrink-0" />
@@ -2285,9 +2285,9 @@ export default function CompanyOnboarding() {
                       color: "from-blue-500 to-cyan-500"
                     },
                     { 
-                      value: "6bulan", 
-                      label: "6 Bulan", 
-                      description: "Semester pengembangan",
+                      value: "1tahun", 
+                      label: "1 Tahun", 
+                      description: "Rencana strategis tahunan",
                       icon: "🎯",
                       color: "from-purple-500 to-violet-500"
                     }
@@ -2302,8 +2302,8 @@ export default function CompanyOnboarding() {
                           endDate.setMonth(startDate.getMonth() + 1);
                         } else if (option.value === "3bulan") {
                           endDate.setMonth(startDate.getMonth() + 3);
-                        } else if (option.value === "6bulan") {
-                          endDate.setMonth(startDate.getMonth() + 6);
+                        } else if (option.value === "1tahun") {
+                          endDate.setFullYear(startDate.getFullYear() + 1);
                         }
                         
                         setOnboardingData({ 

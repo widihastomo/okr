@@ -452,6 +452,12 @@ The system now includes a comprehensive dummy data generation feature that creat
 
 ## Changelog
 ```
+- July 24, 2025. **CYCLE DURATION UPDATE COMPLETED** - Successfully changed cycle duration option from "6 bulan" to "1 tahun" with proper date calculations and consistency updates:
+  * UPDATED: Cycle duration option from "6 Bulan" to "1 Tahun" with description "Rencana strategis tahunan"
+  * FIXED: Date calculation logic changed from setMonth(+6) to setFullYear(+1) for proper yearly calculation
+  * UPDATED: EditCycleModal component to handle "1tahun" value instead of "6bulan"
+  * UPDATED: Description text changed from "3-6 bulan ke depan" to "3-12 bulan ke depan" for consistency
+  * RESULT: Complete cycle duration system now supports 1 month, 3 months, and 1 year options with accurate date handling
 - July 24, 2025. **COMPREHENSIVE TERMINOLOGY UPDATE COMPLETED** - Successfully changed all instances of "Key Result" to "Angka Target" throughout entire onboarding page:
   * UPDATED: All modal titles, labels, headers, and descriptive text to use "Angka Target" terminology
   * REPLACED: "Edit Goal & Key Results" → "Edit Goal & Angka Target", "Key Results:" → "Angka Target:"
