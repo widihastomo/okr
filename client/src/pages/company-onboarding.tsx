@@ -200,6 +200,8 @@ export default function CompanyOnboarding() {
   const [endDateOpen, setEndDateOpen] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [editGoalModal, setEditGoalModal] = useState(false);
+  const [editKeyResultModal, setEditKeyResultModal] = useState<{ open: boolean; index: number; keyResult: any }>({ open: false, index: -1, keyResult: null });
   const { startTour } = useTour();
 
   // Initialize state first
@@ -3691,9 +3693,19 @@ export default function CompanyOnboarding() {
               {/* Detailed Information */}
               <div className="space-y-4">
                 <div className="bg-white p-4 rounded-lg border border-gray-200">
-                  <h4 className="font-semibold text-blue-800 mb-2">
-                    🎯 Goal Utama
-                  </h4>
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="font-semibold text-blue-800">
+                      🎯 Goal Utama
+                    </h4>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setEditGoalModal(true)}
+                      className="h-8 w-8 p-0 hover:bg-blue-50"
+                    >
+                      <Edit className="w-4 h-4 text-blue-600" />
+                    </Button>
+                  </div>
                   <p className="text-gray-700">
                     {onboardingData.objective || "Belum diisi"}
                   </p>
@@ -3730,14 +3742,28 @@ export default function CompanyOnboarding() {
                               className="border-l-2 border-green-200 pl-4 space-y-3"
                             >
                               {/* Key Result */}
-                              <div className="flex items-start space-x-2">
-                                <div className="w-2 h-2 bg-green-500 rounded-full mt-1.5"></div>
-                                <div>
-                                  <span className="text-sm font-semibold text-green-800">
-                                    Angka Target {krIndex + 1}
-                                  </span>
-                                  <p className="text-sm text-gray-700">{kr}</p>
+                              <div className="flex items-start justify-between">
+                                <div className="flex items-start space-x-2 flex-1">
+                                  <div className="w-2 h-2 bg-green-500 rounded-full mt-1.5"></div>
+                                  <div className="flex-1">
+                                    <span className="text-sm font-semibold text-green-800">
+                                      Angka Target {krIndex + 1}
+                                    </span>
+                                    <p className="text-sm text-gray-700">{kr}</p>
+                                  </div>
                                 </div>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => setEditKeyResultModal({ 
+                                    open: true, 
+                                    index: krIndex, 
+                                    keyResult: kr 
+                                  })}
+                                  className="h-8 w-8 p-0 hover:bg-green-50 ml-2"
+                                >
+                                  <Edit className="w-4 h-4 text-green-600" />
+                                </Button>
                               </div>
 
                               {/* Initiatives for this Key Result */}
@@ -4700,6 +4726,112 @@ export default function CompanyOnboarding() {
               Simpan Perubahan
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Goal Modal */}
+      <Dialog open={editGoalModal} onOpenChange={setEditGoalModal}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center space-x-2">
+              <Edit className="w-5 h-5 text-blue-600" />
+              <span>Edit Goal Utama</span>
+            </DialogTitle>
+            <DialogDescription>
+              Sesuaikan goal utama sesuai kebutuhan spesifik perusahaan Anda
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <Label htmlFor="goal-edit" className="text-sm font-medium text-blue-800">
+              Goal Utama:
+            </Label>
+            <Textarea
+              id="goal-edit"
+              value={onboardingData.objective}
+              onChange={(e) =>
+                setOnboardingData({ ...onboardingData, objective: e.target.value })
+              }
+              placeholder="Masukkan goal utama perusahaan Anda..."
+              className="min-h-[100px] text-sm leading-relaxed bg-white border-blue-200 focus:border-blue-400 focus:ring-blue-400"
+            />
+          </div>
+
+          <div className="flex justify-end space-x-3 pt-4">
+            <Button
+              variant="outline"
+              onClick={() => setEditGoalModal(false)}
+              className="border-gray-300 text-gray-700 hover:bg-gray-50"
+            >
+              Batal
+            </Button>
+            <Button
+              onClick={() => setEditGoalModal(false)}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              Simpan Perubahan
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Key Result Modal */}
+      <Dialog open={editKeyResultModal.open} onOpenChange={(open) => 
+        setEditKeyResultModal({ open, index: -1, keyResult: null })
+      }>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center space-x-2">
+              <Edit className="w-5 h-5 text-green-600" />
+              <span>Edit Angka Target {editKeyResultModal.index + 1}</span>
+            </DialogTitle>
+            <DialogDescription>
+              Sesuaikan angka target sesuai kondisi spesifik perusahaan Anda
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <Label htmlFor="kr-edit" className="text-sm font-medium text-green-800">
+              Angka Target:
+            </Label>
+            <Textarea
+              id="kr-edit"
+              value={editKeyResultModal.keyResult || ''}
+              onChange={(e) => {
+                // Update the key result in onboardingData
+                const newKeyResults = [...onboardingData.keyResults];
+                newKeyResults[editKeyResultModal.index] = e.target.value;
+                setOnboardingData({ ...onboardingData, keyResults: newKeyResults });
+                
+                // Update modal state
+                setEditKeyResultModal({
+                  ...editKeyResultModal,
+                  keyResult: e.target.value
+                });
+              }}
+              placeholder="Masukkan angka target yang spesifik dan terukur..."
+              className="min-h-[100px] text-sm leading-relaxed bg-white border-green-200 focus:border-green-400 focus:ring-green-400"
+            />
+            <p className="text-xs text-green-600">
+              💡 Tip: Pastikan target bersifat SMART (Specific, Measurable, Achievable, Relevant, Time-bound)
+            </p>
+          </div>
+
+          <div className="flex justify-end space-x-3 pt-4">
+            <Button
+              variant="outline"
+              onClick={() => setEditKeyResultModal({ open: false, index: -1, keyResult: null })}
+              className="border-gray-300 text-gray-700 hover:bg-gray-50"
+            >
+              Batal
+            </Button>
+            <Button
+              onClick={() => setEditKeyResultModal({ open: false, index: -1, keyResult: null })}
+              className="bg-green-600 hover:bg-green-700 text-white"
+            >
+              Simpan Perubahan
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
