@@ -1660,46 +1660,46 @@ export default function CompanyOnboarding() {
         return (
           <div className="space-y-6">
 
-            {/* Engaging OKR Explanation */}
-            <div className="bg-gradient-to-br from-slate-50 to-blue-50 rounded-2xl shadow-xl border-2 border-blue-100 p-10 relative overflow-hidden">
-              {/* Subtle background decoration */}
-              <div className="absolute top-0 right-0 w-32 h-32 bg-blue-200 rounded-full -translate-y-16 translate-x-16 opacity-20"></div>
-              <div className="absolute bottom-0 left-0 w-24 h-24 bg-purple-200 rounded-full translate-y-12 -translate-x-12 opacity-20"></div>
+            {/* Mobile-Optimized OKR Explanation */}
+            <div className="bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl md:rounded-2xl shadow-xl border-2 border-blue-100 p-4 md:p-10 relative overflow-hidden">
+              {/* Subtle background decoration - smaller on mobile */}
+              <div className="absolute top-0 right-0 w-16 h-16 md:w-32 md:h-32 bg-blue-200 rounded-full -translate-y-8 translate-x-8 md:-translate-y-16 md:translate-x-16 opacity-20"></div>
+              <div className="absolute bottom-0 left-0 w-12 h-12 md:w-24 md:h-24 bg-purple-200 rounded-full translate-y-6 -translate-x-6 md:translate-y-12 md:-translate-x-12 opacity-20"></div>
               
               {/* Header */}
-              <div className="text-center mb-10 relative">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl mb-4 shadow-lg">
-                  <Target className="w-8 h-8 text-white" />
+              <div className="text-center mb-6 md:mb-10 relative">
+                <div className="inline-flex items-center justify-center w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl md:rounded-2xl mb-3 md:mb-4 shadow-lg">
+                  <Target className="w-6 h-6 md:w-8 md:h-8 text-white" />
                 </div>
-                <h3 className="text-3xl font-bold text-gray-800 mb-3">Cara Kerja OKR</h3>
-                <p className="text-gray-600 text-lg">
+                <h3 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2 md:mb-3">Cara Kerja OKR</h3>
+                <p className="text-gray-600 text-base md:text-lg px-2">
                   4 langkah sederhana yang terbukti efektif untuk mencapai tujuan besar
                 </p>
               </div>
               
-              {/* Enhanced Steps */}
-              <div className="space-y-8 relative">
+              {/* Enhanced Steps - Mobile Optimized */}
+              <div className="space-y-6 md:space-y-8 relative">
                 {/* Step 1: Goal */}
                 <div className="group">
-                  <div className="flex items-start space-x-6">
-                    <div className="relative">
-                      <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-orange-600 rounded-2xl flex items-center justify-center text-white font-bold text-xl shadow-xl group-hover:shadow-2xl transition-all duration-300">
+                  <div className="flex items-start space-x-3 md:space-x-6">
+                    <div className="relative flex-shrink-0">
+                      <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl md:rounded-2xl flex items-center justify-center text-white font-bold text-lg md:text-xl shadow-xl group-hover:shadow-2xl transition-all duration-300">
                         1
                       </div>
-                      <div className="absolute -inset-2 bg-orange-200 rounded-2xl -z-10 opacity-0 group-hover:opacity-30 transition-all duration-300"></div>
+                      <div className="hidden md:block absolute -inset-2 bg-orange-200 rounded-2xl -z-10 opacity-0 group-hover:opacity-30 transition-all duration-300"></div>
                     </div>
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-3 mb-3">
-                        <h4 className="text-xl font-bold text-gray-800">GOAL / Tujuan</h4>
-                        <div className="px-3 py-1 bg-orange-500 text-white rounded-full text-xs font-bold">VISI BESAR</div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3 mb-3">
+                        <h4 className="text-lg md:text-xl font-bold text-gray-800">GOAL / Tujuan</h4>
+                        <div className="px-2 py-1 md:px-3 md:py-1 bg-orange-500 text-white rounded-full text-xs font-bold self-start">VISI BESAR</div>
                       </div>
-                      <p className="text-gray-600 mb-4 text-lg">Apa yang ingin dicapai dalam 3-6 bulan ke depan</p>
-                      <div className="bg-gradient-to-r from-orange-50 to-orange-100 rounded-xl p-4 border-l-4 border-orange-400 shadow-md">
+                      <p className="text-gray-600 mb-3 md:mb-4 text-base md:text-lg">Apa yang ingin dicapai dalam 3-6 bulan ke depan</p>
+                      <div className="bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg md:rounded-xl p-3 md:p-4 border-l-4 border-orange-400 shadow-md">
                         <div className="flex items-center space-x-2 mb-2">
-                          <Sparkles className="w-4 h-4 text-orange-500" />
+                          <Sparkles className="w-4 h-4 text-orange-500 flex-shrink-0" />
                           <span className="text-sm font-bold text-orange-700">Contoh Real:</span>
                         </div>
-                        <p className="text-gray-800 font-medium">
+                        <p className="text-gray-800 font-medium text-sm md:text-base">
                           "Meningkatkan penjualan produk secara signifikan"
                         </p>
                       </div>
@@ -1707,43 +1707,43 @@ export default function CompanyOnboarding() {
                   </div>
                   
                   {/* Connecting line */}
-                  <div className="flex justify-center my-6">
-                    <div className="w-1 h-8 bg-gradient-to-b from-orange-300 to-blue-300"></div>
+                  <div className="flex justify-center my-4 md:my-6">
+                    <div className="w-1 h-6 md:h-8 bg-gradient-to-b from-orange-300 to-blue-300"></div>
                   </div>
                 </div>
 
                 {/* Step 2: Key Results */}
                 <div className="group">
-                  <div className="flex items-start space-x-6">
-                    <div className="relative">
-                      <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl flex items-center justify-center text-white font-bold text-xl shadow-xl group-hover:shadow-2xl transition-all duration-300">
+                  <div className="flex items-start space-x-3 md:space-x-6">
+                    <div className="relative flex-shrink-0">
+                      <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl md:rounded-2xl flex items-center justify-center text-white font-bold text-lg md:text-xl shadow-xl group-hover:shadow-2xl transition-all duration-300">
                         2
                       </div>
-                      <div className="absolute -inset-2 bg-blue-200 rounded-2xl -z-10 opacity-0 group-hover:opacity-30 transition-all duration-300"></div>
+                      <div className="hidden md:block absolute -inset-2 bg-blue-200 rounded-2xl -z-10 opacity-0 group-hover:opacity-30 transition-all duration-300"></div>
                     </div>
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-3 mb-3">
-                        <h4 className="text-xl font-bold text-gray-800">KEY RESULTS / Target Angka</h4>
-                        <div className="px-3 py-1 bg-blue-500 text-white rounded-full text-xs font-bold">TERUKUR</div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3 mb-3">
+                        <h4 className="text-lg md:text-xl font-bold text-gray-800">KEY RESULTS / Target Angka</h4>
+                        <div className="px-2 py-1 md:px-3 md:py-1 bg-blue-500 text-white rounded-full text-xs font-bold self-start">TERUKUR</div>
                       </div>
-                      <p className="text-gray-600 mb-4 text-lg">Angka spesifik yang mengukur pencapaian tujuan</p>
-                      <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl p-4 border-l-4 border-blue-400 shadow-md">
+                      <p className="text-gray-600 mb-3 md:mb-4 text-base md:text-lg">Angka spesifik yang mengukur pencapaian tujuan</p>
+                      <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg md:rounded-xl p-3 md:p-4 border-l-4 border-blue-400 shadow-md">
                         <div className="flex items-center space-x-2 mb-3">
-                          <BarChart3 className="w-4 h-4 text-blue-500" />
+                          <BarChart3 className="w-4 h-4 text-blue-500 flex-shrink-0" />
                           <span className="text-sm font-bold text-blue-700">Target Konkret:</span>
                         </div>
                         <div className="space-y-2">
-                          <div className="flex items-center space-x-2">
-                            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                            <span className="text-gray-800">Penjualan naik 50% dari bulan lalu</span>
+                          <div className="flex items-start space-x-2">
+                            <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                            <span className="text-gray-800 text-sm md:text-base">Penjualan naik 50% dari bulan lalu</span>
                           </div>
-                          <div className="flex items-center space-x-2">
-                            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                            <span className="text-gray-800">Dapat 1000 pelanggan baru</span>
+                          <div className="flex items-start space-x-2">
+                            <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                            <span className="text-gray-800 text-sm md:text-base">Dapat 1000 pelanggan baru</span>
                           </div>
-                          <div className="flex items-center space-x-2">
-                            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                            <span className="text-gray-800">Rating produk mencapai 4.5/5</span>
+                          <div className="flex items-start space-x-2">
+                            <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                            <span className="text-gray-800 text-sm md:text-base">Rating produk mencapai 4.5/5</span>
                           </div>
                         </div>
                       </div>
@@ -1751,43 +1751,43 @@ export default function CompanyOnboarding() {
                   </div>
                   
                   {/* Connecting line */}
-                  <div className="flex justify-center my-6">
-                    <div className="w-1 h-8 bg-gradient-to-b from-blue-300 to-green-300"></div>
+                  <div className="flex justify-center my-4 md:my-6">
+                    <div className="w-1 h-6 md:h-8 bg-gradient-to-b from-blue-300 to-green-300"></div>
                   </div>
                 </div>
 
                 {/* Step 3: Initiatives */}
                 <div className="group">
-                  <div className="flex items-start space-x-6">
-                    <div className="relative">
-                      <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-2xl flex items-center justify-center text-white font-bold text-xl shadow-xl group-hover:shadow-2xl transition-all duration-300">
+                  <div className="flex items-start space-x-3 md:space-x-6">
+                    <div className="relative flex-shrink-0">
+                      <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-xl md:rounded-2xl flex items-center justify-center text-white font-bold text-lg md:text-xl shadow-xl group-hover:shadow-2xl transition-all duration-300">
                         3
                       </div>
-                      <div className="absolute -inset-2 bg-green-200 rounded-2xl -z-10 opacity-0 group-hover:opacity-30 transition-all duration-300"></div>
+                      <div className="hidden md:block absolute -inset-2 bg-green-200 rounded-2xl -z-10 opacity-0 group-hover:opacity-30 transition-all duration-300"></div>
                     </div>
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-3 mb-3">
-                        <h4 className="text-xl font-bold text-gray-800">INITIATIVES / Strategi</h4>
-                        <div className="px-3 py-1 bg-green-500 text-white rounded-full text-xs font-bold">PROGRAM</div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3 mb-3">
+                        <h4 className="text-lg md:text-xl font-bold text-gray-800">INITIATIVES / Strategi</h4>
+                        <div className="px-2 py-1 md:px-3 md:py-1 bg-green-500 text-white rounded-full text-xs font-bold self-start">PROGRAM</div>
                       </div>
-                      <p className="text-gray-600 mb-4 text-lg">Program besar yang dilakukan untuk mencapai target</p>
-                      <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-xl p-4 border-l-4 border-green-400 shadow-md">
+                      <p className="text-gray-600 mb-3 md:mb-4 text-base md:text-lg">Program besar yang dilakukan untuk mencapai target</p>
+                      <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-lg md:rounded-xl p-3 md:p-4 border-l-4 border-green-400 shadow-md">
                         <div className="flex items-center space-x-2 mb-3">
-                          <Lightbulb className="w-4 h-4 text-green-500" />
+                          <Lightbulb className="w-4 h-4 text-green-500 flex-shrink-0" />
                           <span className="text-sm font-bold text-green-700">Rencana Strategis:</span>
                         </div>
                         <div className="space-y-2">
-                          <div className="flex items-center space-x-2">
-                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                            <span className="text-gray-800">Kampanye marketing di media sosial</span>
+                          <div className="flex items-start space-x-2">
+                            <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
+                            <span className="text-gray-800 text-sm md:text-base">Kampanye marketing di media sosial</span>
                           </div>
-                          <div className="flex items-center space-x-2">
-                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                            <span className="text-gray-800">Program diskon untuk pelanggan baru</span>
+                          <div className="flex items-start space-x-2">
+                            <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
+                            <span className="text-gray-800 text-sm md:text-base">Program diskon untuk pelanggan baru</span>
                           </div>
-                          <div className="flex items-center space-x-2">
-                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                            <span className="text-gray-800">Pelatihan tim customer service</span>
+                          <div className="flex items-start space-x-2">
+                            <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
+                            <span className="text-gray-800 text-sm md:text-base">Pelatihan tim customer service</span>
                           </div>
                         </div>
                       </div>
@@ -1795,43 +1795,43 @@ export default function CompanyOnboarding() {
                   </div>
                   
                   {/* Connecting line */}
-                  <div className="flex justify-center my-6">
-                    <div className="w-1 h-8 bg-gradient-to-b from-green-300 to-purple-300"></div>
+                  <div className="flex justify-center my-4 md:my-6">
+                    <div className="w-1 h-6 md:h-8 bg-gradient-to-b from-green-300 to-purple-300"></div>
                   </div>
                 </div>
 
                 {/* Step 4: Tasks */}
                 <div className="group">
-                  <div className="flex items-start space-x-6">
-                    <div className="relative">
-                      <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-purple-600 rounded-2xl flex items-center justify-center text-white font-bold text-xl shadow-xl group-hover:shadow-2xl transition-all duration-300">
+                  <div className="flex items-start space-x-3 md:space-x-6">
+                    <div className="relative flex-shrink-0">
+                      <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-purple-400 to-purple-600 rounded-xl md:rounded-2xl flex items-center justify-center text-white font-bold text-lg md:text-xl shadow-xl group-hover:shadow-2xl transition-all duration-300">
                         4
                       </div>
-                      <div className="absolute -inset-2 bg-purple-200 rounded-2xl -z-10 opacity-0 group-hover:opacity-30 transition-all duration-300"></div>
+                      <div className="hidden md:block absolute -inset-2 bg-purple-200 rounded-2xl -z-10 opacity-0 group-hover:opacity-30 transition-all duration-300"></div>
                     </div>
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-3 mb-3">
-                        <h4 className="text-xl font-bold text-gray-800">TASKS / Tugas Harian</h4>
-                        <div className="px-3 py-1 bg-purple-500 text-white rounded-full text-xs font-bold">EKSEKUSI</div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3 mb-3">
+                        <h4 className="text-lg md:text-xl font-bold text-gray-800">TASKS / Tugas Harian</h4>
+                        <div className="px-2 py-1 md:px-3 md:py-1 bg-purple-500 text-white rounded-full text-xs font-bold self-start">EKSEKUSI</div>
                       </div>
-                      <p className="text-gray-600 mb-4 text-lg">Aktivitas konkret yang dikerjakan setiap hari</p>
-                      <div className="bg-gradient-to-r from-purple-50 to-purple-100 rounded-xl p-4 border-l-4 border-purple-400 shadow-md">
+                      <p className="text-gray-600 mb-3 md:mb-4 text-base md:text-lg">Aktivitas konkret yang dikerjakan setiap hari</p>
+                      <div className="bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg md:rounded-xl p-3 md:p-4 border-l-4 border-purple-400 shadow-md">
                         <div className="flex items-center space-x-2 mb-3">
-                          <CheckCircle className="w-4 h-4 text-purple-500" />
+                          <CheckCircle className="w-4 h-4 text-purple-500 flex-shrink-0" />
                           <span className="text-sm font-bold text-purple-700">Action Items:</span>
                         </div>
                         <div className="space-y-2">
-                          <div className="flex items-center space-x-2">
-                            <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                            <span className="text-gray-800">Posting konten di Instagram setiap hari</span>
+                          <div className="flex items-start space-x-2">
+                            <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
+                            <span className="text-gray-800 text-sm md:text-base">Posting konten di Instagram setiap hari</span>
                           </div>
-                          <div className="flex items-center space-x-2">
-                            <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                            <span className="text-gray-800">Menelpon 10 calon pelanggan</span>
+                          <div className="flex items-start space-x-2">
+                            <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
+                            <span className="text-gray-800 text-sm md:text-base">Menelpon 10 calon pelanggan</span>
                           </div>
-                          <div className="flex items-center space-x-2">
-                            <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                            <span className="text-gray-800">Update website dengan produk baru</span>
+                          <div className="flex items-start space-x-2">
+                            <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
+                            <span className="text-gray-800 text-sm md:text-base">Update website dengan produk baru</span>
                           </div>
                         </div>
                       </div>
@@ -1840,39 +1840,43 @@ export default function CompanyOnboarding() {
                 </div>
               </div>
               
-              {/* Attractive Summary */}
-              <div className="mt-10 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-6 shadow-xl relative overflow-hidden">
+              {/* Mobile-Optimized Summary */}
+              <div className="mt-8 md:mt-10 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg md:rounded-xl p-4 md:p-6 shadow-xl relative overflow-hidden">
                 <div className="absolute inset-0 bg-black/10"></div>
                 <div className="relative">
-                  <div className="flex items-center justify-center space-x-2 mb-4">
-                    <Zap className="w-5 h-5 text-white" />
-                    <h4 className="text-xl font-bold text-white">Formula Sukses OKR</h4>
+                  <div className="flex items-center justify-center space-x-2 mb-3 md:mb-4">
+                    <Zap className="w-4 h-4 md:w-5 md:h-5 text-white" />
+                    <h4 className="text-lg md:text-xl font-bold text-white">Formula Sukses OKR</h4>
                   </div>
-                  <div className="flex items-center justify-center space-x-3 mb-4 flex-wrap">
-                    <span className="px-4 py-2 bg-white/20 backdrop-blur-sm text-white rounded-full font-bold text-sm shadow-lg">
+                  
+                  {/* Mobile: Stack vertically, Desktop: Horizontal */}
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-center space-y-2 sm:space-y-0 sm:space-x-2 md:space-x-3 mb-3 md:mb-4">
+                    <span className="px-3 py-2 md:px-4 md:py-2 bg-white/20 backdrop-blur-sm text-white rounded-full font-bold text-xs md:text-sm shadow-lg text-center">
                       🎯 Tujuan
                     </span>
-                    <ArrowRight className="w-4 h-4 text-white/80" />
-                    <span className="px-4 py-2 bg-white/20 backdrop-blur-sm text-white rounded-full font-bold text-sm shadow-lg">
+                    <ArrowRight className="w-4 h-4 text-white/80 self-center hidden sm:block" />
+                    <ArrowDown className="w-4 h-4 text-white/80 self-center sm:hidden" />
+                    <span className="px-3 py-2 md:px-4 md:py-2 bg-white/20 backdrop-blur-sm text-white rounded-full font-bold text-xs md:text-sm shadow-lg text-center">
                       📊 Target
                     </span>
-                    <ArrowRight className="w-4 h-4 text-white/80" />
-                    <span className="px-4 py-2 bg-white/20 backdrop-blur-sm text-white rounded-full font-bold text-sm shadow-lg">
+                    <ArrowRight className="w-4 h-4 text-white/80 self-center hidden sm:block" />
+                    <ArrowDown className="w-4 h-4 text-white/80 self-center sm:hidden" />
+                    <span className="px-3 py-2 md:px-4 md:py-2 bg-white/20 backdrop-blur-sm text-white rounded-full font-bold text-xs md:text-sm shadow-lg text-center">
                       🚀 Strategi
                     </span>
-                    <ArrowRight className="w-4 h-4 text-white/80" />
-                    <span className="px-4 py-2 bg-white/20 backdrop-blur-sm text-white rounded-full font-bold text-sm shadow-lg">
+                    <ArrowRight className="w-4 h-4 text-white/80 self-center hidden sm:block" />
+                    <ArrowDown className="w-4 h-4 text-white/80 self-center sm:hidden" />
+                    <span className="px-3 py-2 md:px-4 md:py-2 bg-white/20 backdrop-blur-sm text-white rounded-full font-bold text-xs md:text-sm shadow-lg text-center">
                       ✅ Eksekusi
                     </span>
                   </div>
-                  <p className="text-white/90 text-center leading-relaxed">
+                  
+                  <p className="text-white/90 text-center leading-relaxed text-sm md:text-base px-2">
                     <strong>Kunci keberhasilan:</strong> Setiap tugas harian mendukung strategi → strategi mencapai target → target mewujudkan tujuan besar
                   </p>
                 </div>
               </div>
             </div>
-
-            
 
             <div className="text-center">
               <p className="text-sm text-gray-600">
