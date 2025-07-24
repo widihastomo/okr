@@ -1474,8 +1474,7 @@ export default function CompanyOnboarding() {
                 Pilih fokus bisnis Anda:
               </Label>
               <p className="text-sm text-gray-600">
-                Pilih area yang paling ingin Anda tingkatkan dalam 1 - 3 bulan
-                kedepan.
+                Pilih area yang paling ingin Anda tingkatkan dalam 3 bulan kedepan.
               </p>
             </div>
             <RadioGroup
@@ -1657,41 +1656,78 @@ export default function CompanyOnboarding() {
         return (
           <div className="space-y-6">
 
-            {/* Strategy Mapping Visual with Zoom */}
-            <div className="relative rounded-xl overflow-hidden shadow-2xl bg-gradient-to-br from-purple-600 to-indigo-800">
-              <img 
-                src={strategyMappingImage} 
-                alt="Strategy Mapping - Hirarki OKR dari Goal ke Target ke Inisiatif ke Task"
-                className="w-full h-auto md:h-auto sm:h-screen object-contain cursor-zoom-in transition-transform duration-300 hover:scale-110"
-                style={{
-                  width: '100%',
-                  minHeight: '400px'
-                }}
-                onClick={(e) => {
-                  const img = e.target as HTMLImageElement;
-                  const modal = document.createElement('div');
-                  modal.className = 'fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4';
-                  modal.onclick = () => modal.remove();
-                  
-                  const zoomedImg = document.createElement('img');
-                  zoomedImg.src = img.src;
-                  zoomedImg.className = 'max-w-full max-h-full object-contain cursor-zoom-out';
-                  zoomedImg.alt = img.alt;
-                  
-                  const closeBtn = document.createElement('button');
-                  closeBtn.innerHTML = '✕';
-                  closeBtn.className = 'absolute top-4 right-4 text-white text-2xl bg-black/50 rounded-full w-10 h-10 flex items-center justify-center hover:bg-black/70';
-                  closeBtn.onclick = () => modal.remove();
-                  
-                  modal.appendChild(zoomedImg);
-                  modal.appendChild(closeBtn);
-                  document.body.appendChild(modal);
-                }}
-              />
+            {/* OKR Hierarchy Tree View */}
+            <div className="relative rounded-xl overflow-hidden shadow-2xl bg-gradient-to-br from-purple-600 to-indigo-800 p-6">
+              <div className="text-center mb-6">
+                <h3 className="text-xl font-bold text-white mb-2">Hirarki OKR Strategy</h3>
+                <p className="text-purple-100 text-sm">Struktur lengkap dari Goal sampai Task</p>
+              </div>
               
-              {/* Zoom Indicator */}
-              <div className="absolute top-4 right-4 bg-black/50 text-white px-2 py-1 rounded text-sm">
-                🔍 Klik untuk zoom
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6">
+                {/* Goal Level */}
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center">
+                    <Target className="w-4 h-4 text-white" />
+                  </div>
+                  <div className="text-white">
+                    <div className="font-semibold">Goal / Objective</div>
+                    <div className="text-sm text-purple-100">Tujuan utama yang ingin dicapai</div>
+                  </div>
+                </div>
+                
+                {/* Connector Line */}
+                <div className="ml-4 w-px h-8 bg-white/30"></div>
+                
+                {/* Key Results Level */}
+                <div className="flex items-center space-x-3 mb-4 ml-4">
+                  <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                    <TrendingUp className="w-4 h-4 text-white" />
+                  </div>
+                  <div className="text-white">
+                    <div className="font-semibold">Key Results / Angka Target</div>
+                    <div className="text-sm text-purple-100">Metrik kuantitatif untuk mengukur pencapaian</div>
+                  </div>
+                </div>
+                
+                {/* Connector Line */}
+                <div className="ml-8 w-px h-8 bg-white/30"></div>
+                
+                {/* Initiatives Level */}
+                <div className="flex items-center space-x-3 mb-4 ml-8">
+                  <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                    <Lightbulb className="w-4 h-4 text-white" />
+                  </div>
+                  <div className="text-white">
+                    <div className="font-semibold">Initiatives / Inisiatif</div>
+                    <div className="text-sm text-purple-100">Strategi atau proyek untuk mencapai target</div>
+                  </div>
+                </div>
+                
+                {/* Connector Line */}
+                <div className="ml-12 w-px h-8 bg-white/30"></div>
+                
+                {/* Tasks Level */}
+                <div className="flex items-center space-x-3 ml-12">
+                  <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center">
+                    <ListTodo className="w-4 h-4 text-white" />
+                  </div>
+                  <div className="text-white">
+                    <div className="font-semibold">Tasks / Tugas</div>
+                    <div className="text-sm text-purple-100">Aktivitas konkret yang harus dikerjakan</div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Interactive Hover Overlay */}
+              <div className="absolute inset-0 bg-black/0 hover:bg-black/10 transition-all duration-300 rounded-xl flex items-center justify-center opacity-0 hover:opacity-100">
+                <div className="bg-white/90 backdrop-blur-sm rounded-lg p-4 text-center max-w-md">
+                  <h4 className="font-semibold text-gray-800 mb-2">Alur Kerja OKR</h4>
+                  <p className="text-sm text-gray-600">
+                    Goal → Angka Target → Inisiatif → Task
+                    <br />
+                    Setiap level membantu mencapai level di atasnya
+                  </p>
+                </div>
               </div>
             </div>
 
