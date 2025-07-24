@@ -2374,9 +2374,22 @@ export default function CompanyOnboarding() {
         // Get selected template based on objective
         const selectedTemplate = goalTemplates?.find(template => template.title === onboardingData.objective);
         
+        // Debug logging
+        console.log("🔍 Step 5 Debug:", {
+          objective: onboardingData.objective,
+          templateCount: goalTemplates?.length || 0,
+          templateTitles: goalTemplates?.map(t => t.title) || [],
+          selectedTemplate: selectedTemplate ? selectedTemplate.title : "NOT FOUND",
+          selectedTemplateInitiatives: selectedTemplate?.initiatives || "NO INITIATIVES"
+        });
+        
         // Get initiatives from selected template
         const getTemplateInitiatives = () => {
           if (!selectedTemplate || !selectedTemplate.initiatives) {
+            console.log("❌ No template or initiatives found:", {
+              hasTemplate: !!selectedTemplate,
+              hasInitiatives: selectedTemplate?.initiatives?.length || 0
+            });
             return [];
           }
           return selectedTemplate.initiatives.map((initiative: any) => ({
