@@ -452,13 +452,14 @@ The system now includes a comprehensive dummy data generation feature that creat
 
 ## Changelog
 ```
-- July 24, 2025. **TERMINOLOGY UPDATE COMPLETED** - Successfully changed all instances of "Key Result" to "Angka Target" throughout onboarding page:
+- July 24, 2025. **COMPREHENSIVE TERMINOLOGY UPDATE COMPLETED** - Successfully changed all instances of "Key Result" to "Angka Target" throughout entire onboarding page:
   * UPDATED: All modal titles, labels, headers, and descriptive text to use "Angka Target" terminology
-  * REPLACED: "Edit Goal & Key Results" → "Edit Goal & Angka Target"
-  * CHANGED: "Edit Key Results:" → "Edit Angka Target:", "Judul Key Result" → "Judul Angka Target"  
-  * UPDATED: Comments and variable names from keyResult to angkaTarget for consistency
-  * ENHANCED: Better Indonesian localization and terminology alignment throughout interface
-  * RESULT: Complete terminology consistency using "Angka Target" instead of "Key Result" for better user experience
+  * REPLACED: "Edit Goal & Key Results" → "Edit Goal & Angka Target", "Key Results:" → "Angka Target:"
+  * CHANGED: "Edit Key Results:" → "Edit Angka Target:", "key results lainnya" → "angka target lainnya"  
+  * UPDATED: Comments and variable names from keyResult to angkaTarget for comprehensive consistency
+  * CONVERTED: All variable names (salesKeyResults → salesAngkaTarget, operationalKeyResults → operationalAngkaTarget, etc.)
+  * ENHANCED: Complete Indonesian localization and terminology alignment throughout interface including template cards and selection areas
+  * RESULT: 100% terminology consistency using "Angka Target" instead of "Key Result" for optimal Indonesian user experience
 - July 24, 2025. **GOAL EDIT DESCRIPTION BUG FIXED** - Successfully resolved issue where goal description was not populated in edit modal:
   * IDENTIFIED: objectiveDescription was not being saved to onboardingData when template was selected
   * FIXED: Added objectiveDescription: template.description to setOnboardingData when template is selected

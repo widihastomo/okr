@@ -2152,12 +2152,12 @@ export default function CompanyOnboarding() {
                           ) : null;
                         })()}
                         
-                        {/* Display Key Results */}
+                        {/* Display Angka Target */}
                         {template.keyResults && template.keyResults.length > 0 && (
                           <div className="space-y-2">
                             <div className="flex items-center justify-between">
                               <p className="text-xs font-medium text-orange-600 uppercase tracking-wide">
-                                Key Results:
+                                Angka Target:
                               </p>
                             </div>
                             <div className="space-y-1">
@@ -2236,7 +2236,7 @@ export default function CompanyOnboarding() {
                                 <div className="flex items-center space-x-2">
                                   <div className="w-1.5 h-1.5 bg-gray-300 rounded-full flex-shrink-0"></div>
                                   <span className="text-xs text-gray-500">
-                                    +{template.keyResults.length - 3} key results lainnya
+                                    +{template.keyResults.length - 3} angka target lainnya
                                   </span>
                                 </div>
                               )}
@@ -2359,7 +2359,7 @@ export default function CompanyOnboarding() {
                       <span className="text-sm font-medium text-blue-800">Tips Kustomisasi:</span>
                     </div>
                     <p className="text-sm text-blue-700">
-                      Anda dapat menyesuaikan goal dan ukuran target dengan mengklik tombol <strong>"Edit Goal"</strong> dan <strong>ikon edit</strong> di samping setiap key result untuk personalisasi yang lebih detail.
+                      Anda dapat menyesuaikan goal dan ukuran target dengan mengklik tombol <strong>"Edit Goal"</strong> dan <strong>ikon edit</strong> di samping setiap angka target untuk personalisasi yang lebih detail.
                     </p>
                   </div>
                 )}
@@ -2373,8 +2373,8 @@ export default function CompanyOnboarding() {
       case 5: // Ukuran Keberhasilan
         const getKeyResultOptions = (objective: string | undefined) => {
           if (!objective) return [];
-          // Key Results untuk objective penjualan
-          const salesKeyResults: Record<string, string[]> = {
+          // Angka Target untuk objective penjualan
+          const salesAngkaTarget: Record<string, string[]> = {
             "Menciptakan pertumbuhan penjualan yang berkelanjutan dan signifikan":
               [
                 "Mencapai target penjualan Rp 500 juta per bulan",
@@ -2393,8 +2393,8 @@ export default function CompanyOnboarding() {
             ],
           };
 
-          // Key Results untuk objective operasional
-          const operationalKeyResults: Record<string, string[]> = {
+          // Angka Target untuk objective operasional
+          const operationalAngkaTarget: Record<string, string[]> = {
             "Mencapai efisiensi operasional yang optimal dan berkelanjutan": [
               "Mengurangi waktu proses produksi menjadi 4 jam per unit",
               "Meningkatkan utilitas mesin menjadi 85%",
@@ -2412,8 +2412,8 @@ export default function CompanyOnboarding() {
             ],
           };
 
-          // Key Results untuk objective customer service
-          const customerServiceKeyResults: Record<string, string[]> = {
+          // Angka Target untuk objective customer service
+          const customerServiceAngkaTarget: Record<string, string[]> = {
             "Mencapai kepuasan pelanggan yang luar biasa dan berkelanjutan": [
               "Mencapai CSAT score 4.8/5 dalam survey bulanan",
               "Meningkatkan customer retention rate menjadi 95%",
@@ -2432,7 +2432,7 @@ export default function CompanyOnboarding() {
           };
 
           // Angka Target untuk objective marketing
-          const marketingKeyResults: Record<string, string[]> = {
+          const marketingAngkaTarget: Record<string, string[]> = {
             "Meningkatkan kesadaran merek di pasar target": [
               "Mencapai brand recall 60% dalam market research",
               "Meningkatkan social media reach menjadi 100,000 per post",
@@ -2451,14 +2451,14 @@ export default function CompanyOnboarding() {
           };
 
           // Gabungkan semua angka target
-          const allKeyResults: Record<string, string[]> = {
-            ...salesKeyResults,
-            ...operationalKeyResults,
-            ...customerServiceKeyResults,
-            ...marketingKeyResults,
+          const allAngkaTarget: Record<string, string[]> = {
+            ...salesAngkaTarget,
+            ...operationalAngkaTarget,
+            ...customerServiceAngkaTarget,
+            ...marketingAngkaTarget,
           };
 
-          return allKeyResults[objective] || [];
+          return allAngkaTarget[objective] || [];
         };
 
         const angkaTargetOptions = getKeyResultOptions(onboardingData.objective);
@@ -2513,7 +2513,7 @@ export default function CompanyOnboarding() {
               </div>
             )}
 
-            {selectedKeyResults.length > 0 && (
+            {selectedAngkaTarget.length > 0 && (
               <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
                 <div className="flex items-center space-x-2 mb-2">
                   <Award className="w-4 h-4 text-blue-600" />
@@ -2522,7 +2522,7 @@ export default function CompanyOnboarding() {
                   </p>
                 </div>
                 <ul className="text-sm text-blue-700 space-y-1">
-                  {selectedKeyResults.map((kr: string, index: number) => (
+                  {selectedAngkaTarget.map((kr: string, index: number) => (
                     <li key={index} className="flex items-start space-x-2">
                       <Star className="w-3 h-3 text-blue-500 mt-1 flex-shrink-0" />
                       <span>{kr}</span>
