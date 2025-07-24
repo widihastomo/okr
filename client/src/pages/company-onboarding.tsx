@@ -4148,7 +4148,7 @@ export default function CompanyOnboarding() {
                               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-300 ${
                                 onboardingData.currentStep >= 4 ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-600'
                               }`}>
-                                <Target className="w-4 h-4" />
+                                1
                               </div>
                               <div className="mt-2 text-center">
                                 <div className="flex items-center justify-center gap-1 mb-1">
@@ -4176,7 +4176,7 @@ export default function CompanyOnboarding() {
                               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-300 ${
                                 onboardingData.currentStep >= 5 ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-600'
                               }`}>
-                                <TrendingUp className="w-4 h-4" />
+                                2
                               </div>
                               <div className="mt-2 text-center">
                                 <div className="flex items-center justify-center gap-1 mb-1">
@@ -4204,7 +4204,7 @@ export default function CompanyOnboarding() {
                               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-300 ${
                                 onboardingData.currentStep >= 6 ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-600'
                               }`}>
-                                <Lightbulb className="w-4 h-4" />
+                                3
                               </div>
                               <div className="mt-2 text-center">
                                 <div className="flex items-center justify-center gap-1 mb-1">
@@ -4232,7 +4232,7 @@ export default function CompanyOnboarding() {
                               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-300 ${
                                 onboardingData.currentStep >= 7 ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-600'
                               }`}>
-                                <ListTodo className="w-4 h-4" />
+                                4
                               </div>
                               <div className="mt-2 text-center">
                                 <div className="flex items-center justify-center gap-1 mb-1">
