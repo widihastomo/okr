@@ -1564,12 +1564,6 @@ export default function CompanyOnboarding() {
                     ? "border-orange-500 bg-orange-50 shadow-md"
                     : "border-gray-200 bg-white hover:border-orange-300"
                 }`}
-                onClick={() =>
-                  setOnboardingData({
-                    ...onboardingData,
-                    teamFocus: "penjualan",
-                  })
-                }
               >
                 <div className="flex items-start space-x-3">
                   <RadioGroupItem
@@ -1600,12 +1594,6 @@ export default function CompanyOnboarding() {
                     ? "border-orange-500 bg-orange-50 shadow-md"
                     : "border-gray-200 bg-white hover:border-orange-300"
                 }`}
-                onClick={() =>
-                  setOnboardingData({
-                    ...onboardingData,
-                    teamFocus: "operasional",
-                  })
-                }
               >
                 <div className="flex items-start space-x-3">
                   <RadioGroupItem
@@ -1637,12 +1625,6 @@ export default function CompanyOnboarding() {
                     ? "border-orange-500 bg-orange-50 shadow-md"
                     : "border-gray-200 bg-white hover:border-orange-300"
                 }`}
-                onClick={() =>
-                  setOnboardingData({
-                    ...onboardingData,
-                    teamFocus: "customer_service",
-                  })
-                }
               >
                 <div className="flex items-start space-x-3">
                   <RadioGroupItem
@@ -1673,12 +1655,6 @@ export default function CompanyOnboarding() {
                     ? "border-orange-500 bg-orange-50 shadow-md"
                     : "border-gray-200 bg-white hover:border-orange-300"
                 }`}
-                onClick={() =>
-                  setOnboardingData({
-                    ...onboardingData,
-                    teamFocus: "marketing",
-                  })
-                }
               >
                 <div className="flex items-start space-x-3">
                   <RadioGroupItem
