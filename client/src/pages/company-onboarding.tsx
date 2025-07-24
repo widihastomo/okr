@@ -1952,10 +1952,35 @@ export default function CompanyOnboarding() {
                             {template.description}
                           </p>
                         )}
-                        {template.targetValue && template.unit && (
-                          <div className="ml-6 flex items-center space-x-2">
-                            <div className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-medium">
-                              Target: {template.targetValue} {template.unit}
+                        
+                        {/* Display Key Results */}
+                        {template.keyResults && template.keyResults.length > 0 && (
+                          <div className="ml-6 space-y-2">
+                            <p className="text-xs font-medium text-orange-600 uppercase tracking-wide">
+                              Key Results:
+                            </p>
+                            <div className="space-y-1">
+                              {template.keyResults.slice(0, 3).map((keyResult: any, krIndex: number) => (
+                                <div key={krIndex} className="flex items-center space-x-2">
+                                  <div className="w-1.5 h-1.5 bg-orange-400 rounded-full flex-shrink-0"></div>
+                                  <span className="text-xs text-gray-600">
+                                    {keyResult.title}
+                                    {keyResult.targetValue && keyResult.unit && (
+                                      <span className="ml-1 px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded text-[10px] font-medium">
+                                        {keyResult.targetValue} {keyResult.unit}
+                                      </span>
+                                    )}
+                                  </span>
+                                </div>
+                              ))}
+                              {template.keyResults.length > 3 && (
+                                <div className="flex items-center space-x-2">
+                                  <div className="w-1.5 h-1.5 bg-gray-300 rounded-full flex-shrink-0"></div>
+                                  <span className="text-xs text-gray-500">
+                                    +{template.keyResults.length - 3} key results lainnya
+                                  </span>
+                                </div>
+                              )}
                             </div>
                           </div>
                         )}
