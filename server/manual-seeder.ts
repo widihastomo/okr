@@ -287,9 +287,9 @@ async function createGoalTemplates() {
         { title: "Training sales team professional", description: "Pelatihan teknik closing dan product knowledge" }
       ],
       tasks: [
-        { title: "Buat content calendar bulanan", description: "Rencanakan konten promosi untuk seluruh bulan" },
-        { title: "Setup Google Ads campaign", description: "Konfigurasi iklan dengan targeting yang tepat" },
-        { title: "Analisis kompetitor pricing", description: "Riset harga pesaing untuk strategi pricing" }
+        { title: "Buat content calendar bulanan", description: "Rencanakan konten promosi untuk seluruh bulan", initiativeId: "0" },
+        { title: "Setup Google Ads campaign", description: "Konfigurasi iklan dengan targeting yang tepat", initiativeId: "0" },
+        { title: "Analisis kompetitor pricing", description: "Riset harga pesaing untuk strategi pricing", initiativeId: "1" }
       ]
     },
     {
@@ -306,9 +306,9 @@ async function createGoalTemplates() {
         { title: "Member exclusive benefits", description: "Privilege khusus untuk member program loyalty" }
       ],
       tasks: [
-        { title: "Design struktur reward program", description: "Tentukan sistem poin dan benefit yang menarik" },
-        { title: "Setup CRM untuk member tracking", description: "Implementasi sistem tracking member behavior" },
-        { title: "Campaign launch member program", description: "Promosi program loyalty ke existing customers" }
+        { title: "Design struktur reward program", description: "Tentukan sistem poin dan benefit yang menarik", initiativeId: "0" },
+        { title: "Setup CRM untuk member tracking", description: "Implementasi sistem tracking member behavior", initiativeId: "1" },
+        { title: "Campaign launch member program", description: "Promosi program loyalty ke existing customers", initiativeId: "1" }
       ]
     },
     // Marketing Templates  
@@ -326,9 +326,9 @@ async function createGoalTemplates() {
         { title: "Influencer partnership program", description: "Kolaborasi dengan micro-influencer relevant" }
       ],
       tasks: [
-        { title: "Content calendar planning", description: "Rencanakan konten untuk 3 bulan ke depan" },
-        { title: "Influencer outreach campaign", description: "Identifikasi dan approach influencer potensial" },
-        { title: "SEO optimization website", description: "Optimasi konten website untuk organic traffic" }
+        { title: "Content calendar planning", description: "Rencanakan konten untuk 3 bulan ke depan", initiativeId: "0" },
+        { title: "Influencer outreach campaign", description: "Identifikasi dan approach influencer potensial", initiativeId: "1" },
+        { title: "SEO optimization website", description: "Optimasi konten website untuk organic traffic", initiativeId: "0" }
       ]
     },
     {
@@ -345,9 +345,9 @@ async function createGoalTemplates() {
         { title: "Multi-channel advertising strategy", description: "Integrasi iklan di berbagai platform digital" }
       ],
       tasks: [
-        { title: "Lead magnet content creation", description: "Buat ebook, webinar, dan content premium" },
-        { title: "Landing page optimization", description: "A/B test dan optimasi conversion rate" },
-        { title: "Marketing automation setup", description: "Email nurturing sequence untuk leads" }
+        { title: "Lead magnet content creation", description: "Buat ebook, webinar, dan content premium", initiativeId: "0" },
+        { title: "Landing page optimization", description: "A/B test dan optimasi conversion rate", initiativeId: "0" },
+        { title: "Marketing automation setup", description: "Email nurturing sequence untuk leads", initiativeId: "1" }
       ]
     },
     // Operasional Templates
@@ -365,9 +365,9 @@ async function createGoalTemplates() {
         { title: "Lean management methodology", description: "Implementasi lean principles untuk eliminate waste" }
       ],
       tasks: [
-        { title: "Process mapping dan analisis", description: "Identifikasi bottleneck dalam current process" },
-        { title: "Automation tools selection", description: "Pilih dan implementasi tools otomatisasi" },
-        { title: "Team training on new processes", description: "Pelatihan tim untuk adopsi proses baru" }
+        { title: "Process mapping dan analisis", description: "Identifikasi bottleneck dalam current process", initiativeId: "0" },
+        { title: "Automation tools selection", description: "Pilih dan implementasi tools otomatisasi", initiativeId: "0" },
+        { title: "Team training on new processes", description: "Pelatihan tim untuk adopsi proses baru", initiativeId: "1" }
       ]
     },
     {
@@ -384,9 +384,9 @@ async function createGoalTemplates() {
         { title: "Supplier relationship optimization", description: "Negosiasi dan optimasi partnership dengan supplier" }
       ],
       tasks: [
-        { title: "Current inventory analysis", description: "Analisis pattern demand dan inventory level" },
-        { title: "Supplier performance evaluation", description: "Review dan scoring supplier performance" },
-        { title: "Demand forecasting model", description: "Buat model prediksi demand yang akurat" }
+        { title: "Current inventory analysis", description: "Analisis pattern demand dan inventory level", initiativeId: "0" },
+        { title: "Supplier performance evaluation", description: "Review dan scoring supplier performance", initiativeId: "1" },
+        { title: "Demand forecasting model", description: "Buat model prediksi demand yang akurat", initiativeId: "0" }
       ]
     },
     // Customer Service Templates
@@ -404,9 +404,9 @@ async function createGoalTemplates() {
         { title: "Customer feedback system improvement", description: "Sistem feedback yang proactive dan actionable" }
       ],
       tasks: [
-        { title: "Customer journey mapping", description: "Identifikasi pain points dalam customer experience" },
-        { title: "Service standard documentation", description: "Buat SOP untuk consistent service quality" },
-        { title: "Feedback collection automation", description: "Automate feedback collection di setiap touchpoint" }
+        { title: "Customer journey mapping", description: "Identifikasi pain points dalam customer experience", initiativeId: "0" },
+        { title: "Service standard documentation", description: "Buat SOP untuk consistent service quality", initiativeId: "0" },
+        { title: "Feedback collection automation", description: "Automate feedback collection di setiap touchpoint", initiativeId: "1" }
       ]
     },
     {
@@ -423,9 +423,9 @@ async function createGoalTemplates() {
         { title: "Customer loyalty rewards program", description: "Program reward untuk meningkatkan customer loyalty" }
       ],
       tasks: [
-        { title: "Churn prediction model", description: "Buat model untuk prediksi customer yang akan churn" },
-        { title: "Customer success metrics tracking", description: "Setup tracking untuk customer health score" },
-        { title: "Retention campaign automation", description: "Campaign otomatis untuk customer retention" }
+        { title: "Churn prediction model", description: "Buat model untuk prediksi customer yang akan churn", initiativeId: "0" },
+        { title: "Customer success metrics tracking", description: "Setup tracking untuk customer health score", initiativeId: "0" },
+        { title: "Retention campaign automation", description: "Campaign otomatis untuk customer retention", initiativeId: "1" }
       ]
     }
   ];
