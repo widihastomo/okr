@@ -55,6 +55,8 @@ import {
   Share2,
   Send,
   Smile,
+  LayoutDashboard,
+  Activity,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -1930,9 +1932,21 @@ export default function DailyFocusPage() {
       
       {/* Main Content Tabs */}
       <Tabs defaultValue="daily-focus" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="daily-focus">Daily Focus</TabsTrigger>
-          <TabsTrigger value="timeline">Timeline</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-1">
+          <TabsTrigger 
+            value="daily-focus" 
+            className="flex items-center gap-2 text-blue-700 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-md hover:bg-blue-100 transition-all duration-200"
+          >
+            <LayoutDashboard className="h-4 w-4" />
+            <span className="font-medium">Daily Focus</span>
+          </TabsTrigger>
+          <TabsTrigger 
+            value="timeline" 
+            className="flex items-center gap-2 text-blue-700 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-md hover:bg-blue-100 transition-all duration-200"
+          >
+            <Activity className="h-4 w-4" />
+            <span className="font-medium">Timeline</span>
+          </TabsTrigger>
         </TabsList>
 
         {/* Daily Focus Tab Content */}
