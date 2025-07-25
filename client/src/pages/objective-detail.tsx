@@ -1846,8 +1846,9 @@ export default function GoalDetail() {
             <p className="text-green-700 text-sm leading-relaxed">Inisiatif adalah langkah-langkah strategis untuk mencapai ukuran keberhasilan.</p>
           </div>
           <Button
+            variant="outline"
             onClick={() => setShowInitiativeFormModal(true)}
-            className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white w-full sm:w-auto sm:ml-4 shrink-0"
+            className="border-orange-600 text-orange-600 hover:bg-orange-50 w-full sm:w-auto sm:ml-4 shrink-0"
           >
             <Plus className="w-4 h-4 mr-2" />
             <span className="sm:hidden">Tambah</span>
