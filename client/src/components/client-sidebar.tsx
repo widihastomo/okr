@@ -191,6 +191,7 @@ export default function Sidebar({
       icon: FileText,
       path: "/goal-templates",
       active: location === "/goal-templates",
+      tourId: "template-goals",
     },
     {
       label: "Pencapaian",
@@ -267,7 +268,7 @@ export default function Sidebar({
                 const menuItem = (
                   <Link href={item.path}>
                     <button
-                      data-tour={item.tourId}
+                      data-tour={item.tourId || undefined}
                       className={cn(
                         "flex items-center rounded-lg text-sm font-medium transition-colors w-full text-left",
                         item.active
