@@ -2087,309 +2087,131 @@ export default function GoalDetail() {
           )}
         </div>
       </div>
+      {/* Header with Description */}
+      <div className="bg-gradient-to-r from-purple-50 to-violet-50 p-4 md:p-6 rounded-lg border border-purple-200">
+        <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-4 space-y-3 md:space-y-0">
+          <div className="flex-1">
+            <h3 className="text-lg md:text-xl font-semibold text-purple-900 mb-2 flex items-center gap-2">
+              <CheckSquare className="w-5 h-5 md:w-6 md:h-6 text-purple-600" />
+              Tugas & Aktivitas
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button 
+                    type="button" 
+                    className="inline-flex items-center justify-center ml-1"
+                  >
+                    <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent side="right" className="max-w-sm">
+                  <div className="space-y-2">
+                    <h4 className="font-medium text-sm">Tugas & Aktivitas</h4>
+                    <p className="text-sm text-gray-600">
+                      Tugas adalah aktivitas operasional harian yang mendukung pelaksanaan inisiatif strategis. 
+                      Setiap tugas memiliki:
+                    </p>
+                    <ul className="text-sm text-gray-600 space-y-1 list-disc pl-4">
+                      <li>Deskripsi yang jelas dan actionable</li>
+                      <li>PIC (Person In Charge) yang bertanggung jawab</li>
+                      <li>Deadline untuk penyelesaian</li>
+                      <li>Tingkat prioritas (rendah, sedang, tinggi, kritis)</li>
+                      <li>Status tracking (belum mulai, berjalan, selesai, dibatalkan)</li>
+                    </ul>
+                    <p className="text-sm text-gray-600 mt-2">
+                      <strong>Contoh:</strong> Membuat konten sosial media untuk kampanye produk baru
+                    </p>
+                  </div>
+                </PopoverContent>
+              </Popover>
+            </h3>
+            <p className="text-purple-700 text-sm leading-relaxed hidden md:block">Tugas adalah aktivitas operasional yang mendukung pelaksanaan inisiatif. </p>
+          </div>
+          <Button
+            variant="outline"
+            onClick={() => setShowTaskModal(true)}
+            className="border-purple-600 text-purple-600 hover:bg-purple-50 w-full md:w-auto"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Tambah Task
+          </Button>
+        </div>
 
 
 
-
-
-
-
-
-
-          {/* Header with Description */}
-          <div className="bg-gradient-to-r from-purple-50 to-violet-50 p-4 md:p-6 rounded-lg border border-purple-200">
-            <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-4 space-y-3 md:space-y-0">
-              <div className="flex-1">
-                <h3 className="text-lg md:text-xl font-semibold text-purple-900 mb-2 flex items-center gap-2">
-                  <CheckSquare className="w-5 h-5 md:w-6 md:h-6 text-purple-600" />
-                  Tugas & Aktivitas
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <button 
-                        type="button" 
-                        className="inline-flex items-center justify-center ml-1"
-                      >
-                        <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                      </button>
-                    </PopoverTrigger>
-                    <PopoverContent side="right" className="max-w-sm">
-                      <div className="space-y-2">
-                        <h4 className="font-medium text-sm">Tugas & Aktivitas</h4>
-                        <p className="text-sm text-gray-600">
-                          Tugas adalah aktivitas operasional harian yang mendukung pelaksanaan inisiatif strategis. 
-                          Setiap tugas memiliki:
-                        </p>
-                        <ul className="text-sm text-gray-600 space-y-1 list-disc pl-4">
-                          <li>Deskripsi yang jelas dan actionable</li>
-                          <li>PIC (Person In Charge) yang bertanggung jawab</li>
-                          <li>Deadline untuk penyelesaian</li>
-                          <li>Tingkat prioritas (rendah, sedang, tinggi, kritis)</li>
-                          <li>Status tracking (belum mulai, berjalan, selesai, dibatalkan)</li>
-                        </ul>
-                        <p className="text-sm text-gray-600 mt-2">
-                          <strong>Contoh:</strong> Membuat konten sosial media untuk kampanye produk baru
-                        </p>
-                      </div>
-                    </PopoverContent>
-                  </Popover>
-                </h3>
-                <p className="text-purple-700 text-sm leading-relaxed hidden md:block">
-                  Tugas adalah aktivitas operasional yang mendukung pelaksanaan
-                  inisiatif. Setiap tugas memiliki PIC, deadline, dan tingkat
-                  prioritas untuk memastikan eksekusi yang efektif.
-                </p>
-              </div>
-              <Button
-                variant="outline"
-                onClick={() => setShowTaskModal(true)}
-                className="border-purple-600 text-purple-600 hover:bg-purple-50 w-full md:w-auto"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Tambah Task
-              </Button>
+        {/* Tugas List */}
+        <div className="mt-6 space-y-4">
+          {tugas.length === 0 ? (
+            <div className="border-2 border-dashed border-purple-200 bg-purple-50/50 rounded-lg p-8 text-center">
+              <CheckSquare className="w-12 h-12 mx-auto mb-4 text-purple-400" />
+              <h3 className="text-lg font-medium text-purple-900 mb-2">
+                Belum ada tugas
+              </h3>
+              <p className="text-purple-700 mb-4">
+                Tugas akan muncul ketika inisiatif dibuat dan dijabarkan ke
+                aktivitas operasional.
+              </p>
             </div>
-
-
-
-            {/* Tugas List */}
-            <div className="mt-6 space-y-4">
-              {tugas.length === 0 ? (
-                <div className="border-2 border-dashed border-purple-200 bg-purple-50/50 rounded-lg p-8 text-center">
-                  <CheckSquare className="w-12 h-12 mx-auto mb-4 text-purple-400" />
-                  <h3 className="text-lg font-medium text-purple-900 mb-2">
-                    Belum ada tugas
-                  </h3>
-                  <p className="text-purple-700 mb-4">
-                    Tugas akan muncul ketika inisiatif dibuat dan dijabarkan ke
-                    aktivitas operasional.
-                  </p>
-                </div>
-              ) : (
-                <Card>
-                  <CardContent className="p-0">
-                    {/* Desktop Table View */}
-                    <div className="hidden md:block overflow-x-auto">
-                      <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
-                          <tr>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Task
-                            </th>
-                            <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Prioritas
-                            </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Status
-                            </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Tenggat
-                            </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              PIC
-                            </th>
-                            <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Aksi
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                          {tugas.map((task) => (
-                            <tr key={task.id} className="hover:bg-gray-50">
-                              <td className="px-4 py-4">
-                                <div className="flex items-center gap-2">
-                                  <Clock className="h-4 w-4 text-blue-600" />
-                                  <div>
-                                    <Link
-                                      href={`/tasks/${task.id}`}
-                                      className="font-medium text-gray-900 hover:text-blue-600 hover:underline cursor-pointer"
-                                    >
-                                      {task.title}
-                                    </Link>
-                                    {task.initiative && (
-                                      <div className="text-xs text-blue-700 bg-blue-100 px-2 py-1 rounded mt-1 inline-block">
-                                        Inisiatif: {task.initiative.title}
-                                      </div>
-                                    )}
-                                  </div>
-                                </div>
-                              </td>
-                              <td className="px-4 py-4 text-center">
-                                <Badge
-                                  className={getTaskPriorityColor(task.priority || "medium")}
-                                >
-                                  {getTaskPriorityLabel(task.priority || "medium")}
-                                </Badge>
-                              </td>
-                              <td className="px-4 py-4">
-                                <DropdownMenu>
-                                  <DropdownMenuTrigger asChild>
-                                    <button
-                                      className={`${getTaskStatusColor(task.status)} text-xs px-2 py-1 cursor-pointer hover:opacity-80 flex items-center gap-1 rounded-full border font-medium`}
-                                    >
-                                      {getTaskStatusLabel(task.status)}
-                                      <ChevronDown className="h-3 w-3" />
-                                    </button>
-                                  </DropdownMenuTrigger>
-                                  <DropdownMenuContent align="end">
-                                    <DropdownMenuItem
-                                      onClick={() => handleTaskStatusUpdate(task.id, "not_started")}
-                                      className="cursor-pointer"
-                                    >
-                                      <div className="flex items-center gap-2">
-                                        {task.status === "not_started" && (
-                                          <Check className="h-3 w-3" />
-                                        )}
-                                        <span>Belum Dimulai</span>
-                                      </div>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem
-                                      onClick={() => handleTaskStatusUpdate(task.id, "in_progress")}
-                                      className="cursor-pointer"
-                                    >
-                                      <div className="flex items-center gap-2">
-                                        {task.status === "in_progress" && (
-                                          <Check className="h-3 w-3" />
-                                        )}
-                                        <span>Sedang Berjalan</span>
-                                      </div>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem
-                                      onClick={() => handleTaskStatusUpdate(task.id, "completed")}
-                                      className="cursor-pointer"
-                                    >
-                                      <div className="flex items-center gap-2">
-                                        {task.status === "completed" && (
-                                          <Check className="h-3 w-3" />
-                                        )}
-                                        <span>Selesai</span>
-                                      </div>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem
-                                      onClick={() => handleTaskStatusUpdate(task.id, "cancelled")}
-                                      className="cursor-pointer"
-                                    >
-                                      <div className="flex items-center gap-2">
-                                        {task.status === "cancelled" && (
-                                          <Check className="h-3 w-3" />
-                                        )}
-                                        <span>Dibatalkan</span>
-                                      </div>
-                                    </DropdownMenuItem>
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
-                              </td>
-                              <td className="px-4 py-4">
-                                {task.dueDate ? (
-                                  <span
-                                    className={`text-sm ${
-                                      new Date(task.dueDate) < new Date()
-                                        ? "text-red-600 font-medium"
-                                        : "text-gray-900"
-                                    }`}
-                                  >
-                                    {new Date(task.dueDate).toLocaleDateString("id-ID", {
-                                      day: "2-digit",
-                                      month: "short",
-                                      year: "numeric",
-                                    })}
-                                  </span>
-                                ) : (
-                                  <span className="text-gray-400">-</span>
-                                )}
-                              </td>
-                              <td className="px-4 py-4">
-                                {task.assignedTo ? (
-                                  <div className="flex items-center gap-2">
-                                    <Avatar className="w-8 h-8">
-                                      <AvatarImage
-                                        src={getUserProfileImage(task.assignedTo)} alt={getUserName(task.assignedTo)}
-                                      />
-                                      <AvatarFallback className="bg-blue-100 text-blue-700 text-xs font-medium">
-                                        {getUserInitials(task.assignedTo)}
-                                      </AvatarFallback>
-                                    </Avatar>
-                                    <span className="text-sm font-medium text-gray-900">
-                                      {getUserName(task.assignedTo)}
-                                    </span>
-                                  </div>
-                                ) : (
-                                  <span className="text-gray-400">Belum Ditugaskan</span>
-                                )}
-                              </td>
-                              <td className="px-4 py-4 text-center">
-                                <DropdownMenu>
-                                  <DropdownMenuTrigger asChild>
-                                    <Button
-                                      variant="ghost"
-                                      size="icon"
-                                      className="h-8 w-8 p-0"
-                                    >
-                                      <MoreVertical className="h-4 w-4" />
-                                    </Button>
-                                  </DropdownMenuTrigger>
-                                  <DropdownMenuContent align="end">
-                                    <DropdownMenuItem asChild>
-                                      <Link
-                                        href={`/tasks/${task.id}`}
-                                        className="cursor-pointer flex items-center"
-                                      >
-                                        <Eye className="w-3 h-3 mr-2" />
-                                        Lihat Detail
-                                      </Link>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem
-                                      onClick={() => handleEditTask(task)}
-                                      className="cursor-pointer"
-                                    >
-                                      <Edit className="w-3 h-3 mr-2" />
-                                      Edit
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem
-                                      onClick={() => handleTaskDelete(task)}
-                                      className="cursor-pointer text-red-600"
-                                    >
-                                      <Trash2 className="w-3 h-3 mr-2" />
-                                      Hapus
-                                    </DropdownMenuItem>
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-
-                    {/* Mobile Card View */}
-                    <div className="md:hidden space-y-3 p-3">
+          ) : (
+            <Card>
+              <CardContent className="p-0">
+                {/* Desktop Table View */}
+                <div className="hidden md:block overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Task
+                        </th>
+                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Prioritas
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Status
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Tenggat
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          PIC
+                        </th>
+                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Aksi
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
                       {tugas.map((task) => (
-                        <div
-                          key={task.id}
-                          className={`p-4 bg-white border rounded-lg space-y-3 ${
-                            task.dueDate && new Date(task.dueDate) < new Date() && task.status !== "completed" 
-                              ? 'border-red-200 bg-red-50' 
-                              : 'border-gray-200'
-                          }`}
-                        >
-                          {/* Header with title and status */}
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1 pr-3">
-                              <Link
-                                href={`/tasks/${task.id}`}
-                                className="font-medium text-gray-900 hover:text-blue-600 hover:underline cursor-pointer text-sm line-clamp-2"
-                              >
-                                {task.title}
-                              </Link>
-                              {task.initiative && (
-                                <div className="text-xs text-blue-700 bg-blue-100 px-2 py-1 rounded mt-2 inline-block">
-                                  Inisiatif: {task.initiative.title}
-                                </div>
-                              )}
+                        <tr key={task.id} className="hover:bg-gray-50">
+                          <td className="px-4 py-4">
+                            <div className="flex items-center gap-2">
+                              <Clock className="h-4 w-4 text-blue-600" />
+                              <div>
+                                <Link
+                                  href={`/tasks/${task.id}`}
+                                  className="font-medium text-gray-900 hover:text-blue-600 hover:underline cursor-pointer"
+                                >
+                                  {task.title}
+                                </Link>
+                                {task.initiative && (
+                                  <div className="text-xs text-blue-700 bg-blue-100 px-2 py-1 rounded mt-1 inline-block">
+                                    Inisiatif: {task.initiative.title}
+                                  </div>
+                                )}
+                              </div>
                             </div>
+                          </td>
+                          <td className="px-4 py-4 text-center">
+                            <Badge
+                              className={getTaskPriorityColor(task.priority || "medium")}
+                            >
+                              {getTaskPriorityLabel(task.priority || "medium")}
+                            </Badge>
+                          </td>
+                          <td className="px-4 py-4">
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
                                 <button
-                                  className={`${getTaskStatusColor(task.status)} text-xs px-2 py-1 cursor-pointer hover:opacity-80 flex items-center gap-1 rounded-full border font-medium flex-shrink-0`}
+                                  className={`${getTaskStatusColor(task.status)} text-xs px-2 py-1 cursor-pointer hover:opacity-80 flex items-center gap-1 rounded-full border font-medium`}
                                 >
                                   {getTaskStatusLabel(task.status)}
                                   <ChevronDown className="h-3 w-3" />
@@ -2442,62 +2264,55 @@ export default function GoalDetail() {
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
-                          </div>
-
-                          {/* Priority and Due Date */}
-                          <div className="flex items-center justify-between">
-                            <Badge
-                              className={getTaskPriorityColor(task.priority || "medium")}
-                            >
-                              {getTaskPriorityLabel(task.priority || "medium")}
-                            </Badge>
-                            <div className="text-xs text-gray-600 flex items-center gap-1">
-                              <Calendar className="w-3 h-3" />
+                          </td>
+                          <td className="px-4 py-4">
+                            {task.dueDate ? (
                               <span
-                                className={`${
-                                  task.dueDate && new Date(task.dueDate) < new Date() && task.status !== "completed"
+                                className={`text-sm ${
+                                  new Date(task.dueDate) < new Date()
                                     ? "text-red-600 font-medium"
-                                    : "text-gray-600"
+                                    : "text-gray-900"
                                 }`}
                               >
-                                {task.dueDate
-                                  ? new Date(task.dueDate).toLocaleDateString("id-ID", {
-                                      day: "2-digit",
-                                      month: "short",
-                                    })
-                                  : "Tidak ada"}
+                                {new Date(task.dueDate).toLocaleDateString("id-ID", {
+                                  day: "2-digit",
+                                  month: "short",
+                                  year: "numeric",
+                                })}
                               </span>
-                            </div>
-                          </div>
-
-                          {/* Assignee */}
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <span className="text-xs text-gray-500">PIC:</span>
-                              {task.assignedTo ? (
-                                <div className="flex items-center gap-2">
-                                  <Avatar className="w-5 h-5">
-                                    <AvatarImage
-                                      src={getUserProfileImage(task.assignedTo)} alt={getUserName(task.assignedTo)}
-                                    />
-                                    <AvatarFallback className="bg-blue-100 text-blue-700 text-xs font-medium">
-                                      {getUserInitials(task.assignedTo)}
-                                    </AvatarFallback>
-                                  </Avatar>
-                                  <span className="text-xs text-gray-700 font-medium">
-                                    {getUserName(task.assignedTo)}
-                                  </span>
-                                </div>
-                              ) : (
-                                <span className="text-xs text-gray-400">Belum ditugaskan</span>
-                              )}
-                            </div>
-                            
+                            ) : (
+                              <span className="text-gray-400">-</span>
+                            )}
+                          </td>
+                          <td className="px-4 py-4">
+                            {task.assignedTo ? (
+                              <div className="flex items-center gap-2">
+                                <Avatar className="w-8 h-8">
+                                  <AvatarImage
+                                    src={getUserProfileImage(task.assignedTo)} alt={getUserName(task.assignedTo)}
+                                  />
+                                  <AvatarFallback className="bg-blue-100 text-blue-700 text-xs font-medium">
+                                    {getUserInitials(task.assignedTo)}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <span className="text-sm font-medium text-gray-900">
+                                  {getUserName(task.assignedTo)}
+                                </span>
+                              </div>
+                            ) : (
+                              <span className="text-gray-400">Belum Ditugaskan</span>
+                            )}
+                          </td>
+                          <td className="px-4 py-4 text-center">
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <button className="p-1 hover:bg-gray-100 rounded-full">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8 p-0"
+                                >
                                   <MoreVertical className="h-4 w-4" />
-                                </button>
+                                </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
                                 <DropdownMenuItem asChild>
@@ -2525,16 +2340,187 @@ export default function GoalDetail() {
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
-                          </div>
-                        </div>
+                          </td>
+                        </tr>
                       ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-            </div>
-          </div>
+                    </tbody>
+                  </table>
+                </div>
 
+                {/* Mobile Card View */}
+                <div className="md:hidden space-y-3 p-3">
+                  {tugas.map((task) => (
+                    <div
+                      key={task.id}
+                      className={`p-4 bg-white border rounded-lg space-y-3 ${
+                        task.dueDate && new Date(task.dueDate) < new Date() && task.status !== "completed" 
+                          ? 'border-red-200 bg-red-50' 
+                          : 'border-gray-200'
+                      }`}
+                    >
+                      {/* Header with title and status */}
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1 pr-3">
+                          <Link
+                            href={`/tasks/${task.id}`}
+                            className="font-medium text-gray-900 hover:text-blue-600 hover:underline cursor-pointer text-sm line-clamp-2"
+                          >
+                            {task.title}
+                          </Link>
+                          {task.initiative && (
+                            <div className="text-xs text-blue-700 bg-blue-100 px-2 py-1 rounded mt-2 inline-block">
+                              Inisiatif: {task.initiative.title}
+                            </div>
+                          )}
+                        </div>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <button
+                              className={`${getTaskStatusColor(task.status)} text-xs px-2 py-1 cursor-pointer hover:opacity-80 flex items-center gap-1 rounded-full border font-medium flex-shrink-0`}
+                            >
+                              {getTaskStatusLabel(task.status)}
+                              <ChevronDown className="h-3 w-3" />
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                              onClick={() => handleTaskStatusUpdate(task.id, "not_started")}
+                              className="cursor-pointer"
+                            >
+                              <div className="flex items-center gap-2">
+                                {task.status === "not_started" && (
+                                  <Check className="h-3 w-3" />
+                                )}
+                                <span>Belum Dimulai</span>
+                              </div>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => handleTaskStatusUpdate(task.id, "in_progress")}
+                              className="cursor-pointer"
+                            >
+                              <div className="flex items-center gap-2">
+                                {task.status === "in_progress" && (
+                                  <Check className="h-3 w-3" />
+                                )}
+                                <span>Sedang Berjalan</span>
+                              </div>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => handleTaskStatusUpdate(task.id, "completed")}
+                              className="cursor-pointer"
+                            >
+                              <div className="flex items-center gap-2">
+                                {task.status === "completed" && (
+                                  <Check className="h-3 w-3" />
+                                )}
+                                <span>Selesai</span>
+                              </div>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => handleTaskStatusUpdate(task.id, "cancelled")}
+                              className="cursor-pointer"
+                            >
+                              <div className="flex items-center gap-2">
+                                {task.status === "cancelled" && (
+                                  <Check className="h-3 w-3" />
+                                )}
+                                <span>Dibatalkan</span>
+                              </div>
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+
+                      {/* Priority and Due Date */}
+                      <div className="flex items-center justify-between">
+                        <Badge
+                          className={getTaskPriorityColor(task.priority || "medium")}
+                        >
+                          {getTaskPriorityLabel(task.priority || "medium")}
+                        </Badge>
+                        <div className="text-xs text-gray-600 flex items-center gap-1">
+                          <Calendar className="w-3 h-3" />
+                          <span
+                            className={`${
+                              task.dueDate && new Date(task.dueDate) < new Date() && task.status !== "completed"
+                                ? "text-red-600 font-medium"
+                                : "text-gray-600"
+                            }`}
+                          >
+                            {task.dueDate
+                              ? new Date(task.dueDate).toLocaleDateString("id-ID", {
+                                  day: "2-digit",
+                                  month: "short",
+                                })
+                              : "Tidak ada"}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Assignee */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-gray-500">PIC:</span>
+                          {task.assignedTo ? (
+                            <div className="flex items-center gap-2">
+                              <Avatar className="w-5 h-5">
+                                <AvatarImage
+                                  src={getUserProfileImage(task.assignedTo)} alt={getUserName(task.assignedTo)}
+                                />
+                                <AvatarFallback className="bg-blue-100 text-blue-700 text-xs font-medium">
+                                  {getUserInitials(task.assignedTo)}
+                                </AvatarFallback>
+                              </Avatar>
+                              <span className="text-xs text-gray-700 font-medium">
+                                {getUserName(task.assignedTo)}
+                              </span>
+                            </div>
+                          ) : (
+                            <span className="text-xs text-gray-400">Belum ditugaskan</span>
+                          )}
+                        </div>
+                        
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <button className="p-1 hover:bg-gray-100 rounded-full">
+                              <MoreVertical className="h-4 w-4" />
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem asChild>
+                              <Link
+                                href={`/tasks/${task.id}`}
+                                className="cursor-pointer flex items-center"
+                              >
+                                <Eye className="w-3 h-3 mr-2" />
+                                Lihat Detail
+                              </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => handleEditTask(task)}
+                              className="cursor-pointer"
+                            >
+                              <Edit className="w-3 h-3 mr-2" />
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => handleTaskDelete(task)}
+                              className="cursor-pointer text-red-600"
+                            >
+                              <Trash2 className="w-3 h-3 mr-2" />
+                              Hapus
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      </div>
       {/* Modals */}
       {checkInModal.keyResult && (
         <CheckInModal
