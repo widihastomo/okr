@@ -37,6 +37,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLocation } from "wouter";
+import { useAuth } from "@/hooks/useAuth";
 import WelcomeScreen from "./WelcomeScreen";
 import TourCompletionModal from "./TourCompletionModal";
 
@@ -471,7 +472,8 @@ export default function TourSystem() {
   const [location, setLocation] = useLocation();
   const [showWelcomeScreen, setShowWelcomeScreen] = useState(false);
   const [showCompletionModal, setShowCompletionModal] = useState(false);
-
+  
+  const { user, isLoading } = useAuth();
   const totalSteps = TOUR_STEPS.length;
 
   // Function to check if two steps are on the same page
@@ -544,6 +546,30 @@ export default function TourSystem() {
 
   console.log("TourSystemNew state:", { isActive, currentStep, totalSteps });
 
+  // Check user tour completion status and show welcome screen if needed
+  useEffect(() => {
+    console.log("🔍 Company details check:", {
+      companyDetailsCompleted: localStorage.getItem("company-details-completed"),
+      onboardingCompleted: localStorage.getItem("onboarding-completed"),
+      welcomeShown: localStorage.getItem("welcome-screen-shown"),
+      tourStarted: localStorage.getItem("tour-started"),
+      tourCompleted: localStorage.getItem("tour-completed")
+    });
+    
+    console.log("🔍 Current user data:", user);
+    console.log("🔍 Is loading:", isLoading);
+    
+    if (!isLoading && user) {
+      // Check if user hasn't completed the tour
+      if (!(user as any).tourCompleted) {
+        console.log("🔍 User hasn't completed tour, showing welcome screen");
+        setShowWelcomeScreen(true);
+      } else {
+        console.log("🔍 User has completed tour, not showing welcome screen");
+      }
+    }
+  }, [user, isLoading]);
+
   useEffect(() => {
     if (isActive) {
       setIsVisible(true);
@@ -563,12 +589,11 @@ export default function TourSystem() {
   // Tour control functions for welcome screen
   const handleWelcomeScreenClose = () => {
     setShowWelcomeScreen(false);
-    localStorage.setItem("welcome-screen-shown", "true");
+    // Don't set localStorage flag so welcome screen can appear again for incomplete tours
   };
 
   const handleStartTourFromWelcome = () => {
     setShowWelcomeScreen(false);
-    localStorage.setItem("welcome-screen-shown", "true");
     setIsActive(true);
     setCurrentStep(0);
   };
