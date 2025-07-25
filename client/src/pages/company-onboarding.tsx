@@ -2590,7 +2590,7 @@ export default function CompanyOnboarding() {
               onValueChange={(value) =>
                 setOnboardingData({ ...onboardingData, updateFrequency: value })
               }
-              className="space-y-4"
+              className="grid grid-cols-1 md:grid-cols-3 gap-4"
             >
               <div
                 className={`relative p-6 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
@@ -4729,8 +4729,6 @@ export default function CompanyOnboarding() {
                     className="shadow-lg transition-all duration-500 ease-in-out transform hover:shadow-xl animate-in fade-in slide-in-from-bottom-4"
                   >
                     <CardHeader className="transition-all duration-300">
-                      
-
                       <div className="flex items-center gap-3">
                         <div className="p-2 bg-orange-100 rounded-lg transition-all duration-300 hover:bg-orange-200 hover:scale-105">
                           <currentStepData.icon className="w-5 h-5 text-orange-600 transition-all duration-300" />
