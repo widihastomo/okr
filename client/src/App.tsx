@@ -312,6 +312,10 @@ function Router() {
                 component={TemplateManagement}
               />
               <Route
+                path="/goal-templates"
+                component={TemplateManagement}
+              />
+              <Route
                 path="/template/:id"
                 component={TemplateDetail}
               />
