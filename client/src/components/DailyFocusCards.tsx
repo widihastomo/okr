@@ -136,8 +136,8 @@ export function DailyFocusCards({
 
   return (
     <>
-      {/* Task Prioritas and Update Progress Row */}
-      <div className="flex flex-col lg:flex-row gap-6">
+      {/* 3 Cards Row: Task Prioritas, Update Progress, Kelola Inisiatif */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Task Prioritas Card */}
         <div className="flex-1">
           <Card data-tour="task-prioritas">
@@ -424,10 +424,10 @@ export function DailyFocusCards({
             </CardContent>
           </Card>
         </div>
-      </div>
 
-      {/* Kelola Inisiatif Card */}
-      <Card data-tour="kelola-inisiatif-tab">
+        {/* Kelola Inisiatif Card (3rd Card) */}
+        <div className="flex-1">
+          <Card data-tour="kelola-inisiatif-tab">
         <CardHeader>
           <CardTitle>Kelola Inisiatif ({activeInitiatives.length})</CardTitle>
           <CardDescription>
@@ -541,6 +541,8 @@ export function DailyFocusCards({
           )}
         </CardContent>
       </Card>
+        </div>
+      </div>
     </>
   );
 }
