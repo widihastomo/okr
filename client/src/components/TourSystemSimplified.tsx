@@ -432,6 +432,20 @@ export default function TourSystem() {
     };
   }, []);
 
+  // Listen for startTourDirect custom event from tour-start-button
+  useEffect(() => {
+    const handleStartTourDirect = () => {
+      console.log("🎯 Received startTourDirect event, starting tour...");
+      restartTour();
+    };
+    
+    window.addEventListener('startTourDirect', handleStartTourDirect);
+    
+    return () => {
+      window.removeEventListener('startTourDirect', handleStartTourDirect);
+    };
+  }, []);
+
   // Debug tour elements
   useEffect(() => {
     const elements = TOUR_STEPS.map(step => step.id).map(id => 

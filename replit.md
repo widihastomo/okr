@@ -452,6 +452,14 @@ The system now includes a comprehensive dummy data generation feature that creat
 
 ## Changelog
 ```
+- July 25, 2025. **TOUR START BUTTON CONNECTION FIXED** - Successfully connected tour-start-button to TourSystemSimplified component:
+  * ADDED: Event listener for 'startTourDirect' custom event in TourSystemSimplified component
+  * CONNECTED: tour-start-button component properly dispatches event that triggers tour restart
+  * ENHANCED: Pulse effects restored with stronger visibility (1.5s animation, border, background highlight)
+  * IMPROVED: Mobile pulse animation with 3px border and enhanced glow effects
+  * FIXED: TypeScript errors on element casting for proper highlight application
+  * DEBUGGED: Added comprehensive logging for highlighting step tracking
+  * RESULT: "Mulai Tur" button now properly starts tour with visible pulse effects on highlighted elements
 - July 25, 2025. **TOUR SYSTEM CLICK REQUIREMENT REMOVAL COMPLETED** - Successfully removed all requiresClick properties from tour system for automatic flow:
   * REMOVED: requiresClick property from all 10 tour steps (goals, tasks, timeline, cycles, achievements, analytics, users, settings, help) 
   * ELIMINATED: waitingForClick state variable and all related UI handling logic
