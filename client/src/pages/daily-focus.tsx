@@ -1933,22 +1933,30 @@ export default function DailyFocusPage() {
       
       {/* Main Content Tabs */}
       <Tabs defaultValue="daily-focus" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 bg-white border border-gray-200 rounded-lg p-2 shadow-sm gap-1">
-          <TabsTrigger 
-            value="daily-focus" 
-            className="flex items-center justify-center gap-2 py-2 px-3 text-gray-600 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-sm hover:bg-gray-50 transition-all duration-200 rounded-md"
-          >
-            <LayoutDashboard className="h-4 w-4" />
-            <span className="font-medium text-sm">Daily Focus</span>
-          </TabsTrigger>
-          <TabsTrigger 
-            value="timeline" 
-            className="flex items-center justify-center gap-2 py-2 px-3 text-gray-600 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-sm hover:bg-gray-50 transition-all duration-200 rounded-md"
-          >
-            <Activity className="h-4 w-4" />
-            <span className="font-medium text-sm">Timeline</span>
-          </TabsTrigger>
-        </TabsList>
+        <div className="flex items-center justify-between border-b border-gray-200">
+          <TabsList className="flex space-x-8 bg-transparent p-0 h-auto">
+            <TabsTrigger
+              value="daily-focus"
+              className="pb-2 px-1 border-b-2 font-medium text-sm data-[state=active]:border-orange-500 data-[state=active]:text-orange-600 data-[state=inactive]:border-transparent data-[state=inactive]:text-gray-500 hover:text-gray-700 hover:border-gray-300 bg-transparent"
+              data-tour="daily-focus-tab"
+            >
+              <div className="flex items-center space-x-2">
+                <LayoutDashboard className="w-4 h-4" />
+                <span>Daily Focus</span>
+              </div>
+            </TabsTrigger>
+            <TabsTrigger
+              value="timeline"
+              className="pb-2 px-1 border-b-2 font-medium text-sm data-[state=active]:border-orange-500 data-[state=active]:text-orange-600 data-[state=inactive]:border-transparent data-[state=inactive]:text-gray-500 hover:text-gray-700 hover:border-gray-300 bg-transparent"
+              data-tour="timeline-tab"
+            >
+              <div className="flex items-center space-x-2">
+                <Activity className="w-4 h-4" />
+                <span>Timeline</span>
+              </div>
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
         {/* Daily Focus Tab Content */}
         <TabsContent value="daily-focus" className="space-y-6">
