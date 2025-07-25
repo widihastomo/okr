@@ -2345,7 +2345,7 @@ export default function GoalDetail() {
                 </PopoverContent>
               </Popover>
             </h3>
-            <p className="text-purple-700 text-sm leading-relaxed hidden md:block">Tugas adalah aktivitas operasional yang mendukung pelaksanaan inisiatif. </p>
+            <p className="text-purple-700 text-sm leading-relaxed">Tugas adalah aktivitas operasional yang mendukung pelaksanaan inisiatif. </p>
           </div>
           <Button
             variant="outline"
