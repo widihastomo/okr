@@ -2008,11 +2008,7 @@ export default function GoalDetail() {
                                     {initiative.title}
                                   </div>
                                 </Link>
-                                {initiative.description && (
-                                  <div className="text-sm text-gray-500 mt-1 line-clamp-2">
-                                    {initiative.description}
-                                  </div>
-                                )}
+                                
                                 {initiative.keyResultId && (
                                   <div className="flex items-center gap-1 mt-1">
                                     <TooltipProvider>
