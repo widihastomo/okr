@@ -1641,7 +1641,7 @@ export function KeyResultModal({
       currentValue: "0",
       unit: "",
       status: "in_progress",
-      assignedTo: "",
+      assignedTo: "unassigned",
     },
   });
 
@@ -1662,7 +1662,7 @@ export function KeyResultModal({
           currentValue: "0",
           unit: "",
           status: "in_progress",
-          assignedTo: "",
+          assignedTo: "unassigned",
         });
       }
     }
@@ -2419,7 +2419,7 @@ export function KeyResultModal({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="">
+                      <SelectItem value="unassigned">
                         <div className="flex items-center gap-2">
                           <UserIcon className="w-4 h-4" />
                           Tidak ditentukan (Default: Goal Owner)
