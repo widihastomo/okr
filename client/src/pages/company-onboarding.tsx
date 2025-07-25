@@ -2897,81 +2897,103 @@ export default function CompanyOnboarding() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-yellow-50">
       <div className="max-w-4xl mx-auto px-4 py-8">
-        <div
-          className="rounded-2xl shadow-xl border-2 p-8 transition-all duration-700 ease-in-out bg-gradient-to-br from-white to-gray-50"
-        >
-          {/* Logo Header */}
-          <div className="flex items-center justify-center mb-8 animate-in fade-in slide-in-from-top-4 duration-700">
-            <img
-              src={refokusLogo}
-              alt="Refokus Logo"
-              className="h-12 transition-all duration-300 hover:scale-105"
-            />
-          </div>
+        {/* Logo Header */}
+        <div className="flex items-center justify-center mb-8 animate-in fade-in slide-in-from-top-4 duration-700">
+          <img
+            src={refokusLogo}
+            alt="Refokus Logo"
+            className="h-12 transition-all duration-300 hover:scale-105"
+          />
+        </div>
 
-          {/* Virtual Assistant - Only on welcome screen */}
-          {onboardingData.currentStep === 0 && getVirtualAssistantMessage() && (
-            <div className="mb-8 animate-in fade-in slide-in-from-left-4 duration-500 delay-200">
-              <div className="bg-white/80 backdrop-blur-sm border border-orange-200 rounded-2xl p-6 shadow-lg">
-                <div className="flex items-start space-x-4">
-                  <div className="flex-shrink-0">
-                    <div className="w-12 h-12 bg-gradient-to-r from-orange-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg animate-bounce">
-                      <Sparkles className="w-6 h-6 text-white" />
-                    </div>
+        {/* Virtual Assistant - Only on welcome screen */}
+        {onboardingData.currentStep === 0 && getVirtualAssistantMessage() && (
+          <div className="mb-8 animate-in fade-in slide-in-from-left-4 duration-500 delay-200">
+            <div className="bg-white/80 backdrop-blur-sm border border-orange-200 rounded-2xl p-6 shadow-lg">
+              <div className="flex items-start space-x-4">
+                <div className="flex-shrink-0">
+                  <div className="w-12 h-12 bg-gradient-to-r from-orange-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg animate-bounce">
+                    <Sparkles className="w-6 h-6 text-white" />
                   </div>
-                  <div className="flex-1">
-                    <div className="bg-gradient-to-r from-orange-50 to-yellow-50 rounded-xl p-4 border border-orange-100">
-                      <p className="text-sm text-gray-700 leading-relaxed">
-                        {getVirtualAssistantMessage()}
-                      </p>
-                    </div>
-                    <div className="mt-2 flex items-center text-xs text-orange-600">
-                      <User className="w-3 h-3 mr-1" />
-                      <span className="font-medium">Orby - Virtual Assistant</span>
-                    </div>
+                </div>
+                <div className="flex-1">
+                  <div className="bg-gradient-to-r from-orange-50 to-yellow-50 rounded-xl p-4 border border-orange-100">
+                    <p className="text-sm text-gray-700 leading-relaxed">
+                      {getVirtualAssistantMessage()}
+                    </p>
+                  </div>
+                  <div className="mt-2 flex items-center text-xs text-orange-600">
+                    <User className="w-3 h-3 mr-1" />
+                    <span className="font-medium">Orby - Virtual Assistant</span>
                   </div>
                 </div>
               </div>
             </div>
-          )}
+          </div>
+        )}
 
-          {/* Progress Bar */}
-          {onboardingData.currentStep > 0 && (
-            <div className="mb-8 animate-in fade-in slide-in-from-top-2 duration-500">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-sm text-gray-600 transition-all duration-300">
-                  Langkah {onboardingData.currentStep} dari 6
-                </span>
-                <span className="text-sm text-gray-600 transition-all duration-300">
-                  {Math.round(progressPercentage)}% selesai
-                </span>
-              </div>
-              <Progress
-                value={progressPercentage}
-                className="h-2 transition-all duration-700 ease-out"
-              />
+        {/* Progress Bar */}
+        {onboardingData.currentStep > 0 && (
+          <div className="mb-8 animate-in fade-in slide-in-from-top-2 duration-500">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-sm text-gray-600 transition-all duration-300">
+                Langkah {onboardingData.currentStep} dari 6
+              </span>
+              <span className="text-sm text-gray-600 transition-all duration-300">
+                {Math.round(progressPercentage)}% selesai
+              </span>
             </div>
-          )}
+            <Progress
+              value={progressPercentage}
+              className="h-2 transition-all duration-700 ease-out"
+            />
+          </div>
+        )}
 
-          <div className="space-y-8">
-            {/* Step Content */}
-            <div className="space-y-6">
-              {onboardingData.currentStep === 0 ? (
+        <div className="space-y-8">
+          {/* Step Content */}
+          <div className="space-y-6">
+            {onboardingData.currentStep === 0 ? (
+              <Card
+                key="welcome"
+                className="shadow-lg transition-all duration-500 ease-in-out transform hover:shadow-xl animate-in fade-in slide-in-from-bottom-4"
+              >
+                <CardHeader className="transition-all duration-300">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-orange-100 rounded-lg transition-all duration-300 hover:bg-orange-200">
+                      <welcomeScreenData.icon className="w-5 h-5 text-orange-600 transition-all duration-300" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg transition-all duration-300">
+                        {welcomeScreenData.title}
+                      </CardTitle>
+                      <CardDescription className="transition-all duration-300">
+                        {welcomeScreenData.description}
+                      </CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="transition-all duration-300">
+                  {renderStepContent()}
+                </CardContent>
+              </Card>
+            ) : (
+              currentStepData && (
                 <Card
-                  key="welcome"
+                  key={`step-${onboardingData.currentStep}`}
                   className="shadow-lg transition-all duration-500 ease-in-out transform hover:shadow-xl animate-in fade-in slide-in-from-bottom-4"
                 >
                   <CardHeader className="transition-all duration-300">
                     <div className="flex items-center gap-3">
-                      <div className="p-2 bg-orange-100 rounded-lg transition-all duration-300 hover:bg-orange-200">
-                        <welcomeScreenData.icon className="w-5 h-5 text-orange-600 transition-all duration-300" />
+                      <div className="p-2 bg-orange-100 rounded-lg transition-all duration-300 hover:bg-orange-200 hover:scale-105">
+                        <currentStepData.icon className="w-5 h-5 text-orange-600 transition-all duration-300" />
                       </div>
                       <div>
                         <CardTitle className="text-lg transition-all duration-300">
-                          {welcomeScreenData.title}
+                          {currentStepData.title}
                         </CardTitle>
                         <CardDescription className="transition-all duration-300">
-                          {welcomeScreenData.description}
+                          {currentStepData.description}
                         </CardDescription>
                       </div>
                     </div>
@@ -2980,94 +3002,68 @@ export default function CompanyOnboarding() {
                     {renderStepContent()}
                   </CardContent>
                 </Card>
-              ) : (
-                currentStepData && (
-                  <Card
-                    key={`step-${onboardingData.currentStep}`}
-                    className="shadow-lg transition-all duration-500 ease-in-out transform hover:shadow-xl animate-in fade-in slide-in-from-bottom-4"
-                  >
-                    <CardHeader className="transition-all duration-300">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 bg-orange-100 rounded-lg transition-all duration-300 hover:bg-orange-200 hover:scale-105">
-                          <currentStepData.icon className="w-5 h-5 text-orange-600 transition-all duration-300" />
-                        </div>
-                        <div>
-                          <CardTitle className="text-lg transition-all duration-300">
-                            {currentStepData.title}
-                          </CardTitle>
-                          <CardDescription className="transition-all duration-300">
-                            {currentStepData.description}
-                          </CardDescription>
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="transition-all duration-300">
-                      {renderStepContent()}
-                    </CardContent>
-                  </Card>
-                )
+              )
+            )}
+
+            {/* Navigation */}
+            <div
+              className={
+                onboardingData.currentStep === 0
+                  ? "flex justify-center"
+                  : "flex justify-between"
+              }
+            >
+              {onboardingData.currentStep > 0 && (
+                <Button
+                  variant="outline"
+                  onClick={handlePrevious}
+                  className="transition-all duration-300 transform hover:scale-105 hover:shadow-md"
+                >
+                  Sebelumnya
+                </Button>
               )}
 
-              {/* Navigation */}
-              <div
-                className={
-                  onboardingData.currentStep === 0
-                    ? "flex justify-center"
-                    : "flex justify-between"
-                }
-              >
-                {onboardingData.currentStep > 0 && (
-                  <Button
-                    variant="outline"
-                    onClick={handlePrevious}
-                    className="transition-all duration-300 transform hover:scale-105 hover:shadow-md"
-                  >
-                    Sebelumnya
-                  </Button>
-                )}
-
-                {onboardingData.currentStep === 6 ? (
-                  <Button
-                    onClick={handleComplete}
-                    disabled={
-                      completeOnboardingMutation.isPending || isRedirecting
-                    }
-                    className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 transition-all duration-300 transform hover:scale-105 hover:shadow-lg disabled:hover:scale-100 disabled:hover:shadow-none disabled:opacity-70 min-w-[140px] relative overflow-hidden"
-                  >
-                    <div className="flex items-center justify-center gap-2">
-                      {completeOnboardingMutation.isPending || isRedirecting ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <PlayCircle className="w-4 h-4" />
-                      )}
-                      <span className="transition-all duration-300">
-                        {completeOnboardingMutation.isPending
-                          ? "Menyimpan..."
-                          : isRedirecting
-                            ? "Menuju Dashboard..."
-                            : "Mulai Tur"}
-                      </span>
-                    </div>
-                    {/* Animated background overlay during loading */}
-                    {(completeOnboardingMutation.isPending ||
-                      isRedirecting) && (
-                      <div className="absolute inset-0 bg-gradient-to-r from-orange-700 to-orange-600 animate-pulse" />
+              {onboardingData.currentStep === 6 ? (
+                <Button
+                  onClick={handleComplete}
+                  disabled={
+                    completeOnboardingMutation.isPending || isRedirecting
+                  }
+                  className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 transition-all duration-300 transform hover:scale-105 hover:shadow-lg disabled:hover:scale-100 disabled:hover:shadow-none disabled:opacity-70 min-w-[140px] relative overflow-hidden"
+                >
+                  <div className="flex items-center justify-center gap-2">
+                    {completeOnboardingMutation.isPending || isRedirecting ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <PlayCircle className="w-4 h-4" />
                     )}
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={handleNext}
-                    className={`bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 transition-all duration-300 transform hover:scale-105 hover:shadow-lg ${
-                      onboardingData.currentStep === 0 ? "w-full sm:w-auto" : ""
-                    }`}
-                  >
-                    {onboardingData.currentStep === 0
-                      ? "Mulai Onboarding"
-                      : "Selanjutnya"}
-                    <ArrowRight className="w-4 h-4 ml-2 transition-transform duration-300 group-hover:translate-x-1" />
-                  </Button>
-                )}
-              </div>
+                    <span className="transition-all duration-300">
+                      {completeOnboardingMutation.isPending
+                        ? "Menyimpan..."
+                        : isRedirecting
+                          ? "Menuju Dashboard..."
+                          : "Mulai Tur"}
+                    </span>
+                  </div>
+                  {/* Animated background overlay during loading */}
+                  {(completeOnboardingMutation.isPending ||
+                    isRedirecting) && (
+                    <div className="absolute inset-0 bg-gradient-to-r from-orange-700 to-orange-600 animate-pulse" />
+                  )}
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleNext}
+                  className={`bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 transition-all duration-300 transform hover:scale-105 hover:shadow-lg ${
+                    onboardingData.currentStep === 0 ? "w-full sm:w-auto" : ""
+                  }`}
+                >
+                  {onboardingData.currentStep === 0
+                    ? "Mulai Onboarding"
+                    : "Selanjutnya"}
+                  <ArrowRight className="w-4 h-4 ml-2 transition-transform duration-300 group-hover:translate-x-1" />
+                </Button>
+              )}
             </div>
           </div>
         </div>
