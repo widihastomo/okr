@@ -169,16 +169,7 @@ const TOUR_STEPS: TourStep[] = [
     category: "navigation",
     targetPath: "/analytics",
   },
-  {
-    id: "analytics-filters",
-    title: "Analytics Filters - Filter Data",
-    description:
-      "Filter ini memungkinkan Anda menyaring data analytics berdasarkan Cycle (periode waktu) dan Team tertentu. Gunakan filter untuk fokus pada analisis periode atau tim spesifik yang ingin dievaluasi performanya.",
-    icon: Filter,
-    selector: '[data-tour="analytics-filters"]',
-    position: "bottom",
-    category: "feature",
-  },
+
 
   {
     id: "users-tab",
