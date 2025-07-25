@@ -452,6 +452,16 @@ The system now includes a comprehensive dummy data generation feature that creat
 
 ## Changelog
 ```
+- July 25, 2025. **TOUR STEPS 5-10 REMOVAL COMPLETED** - Successfully removed tour steps 5 through 10 to streamline user experience:
+  * REMOVED: update-harian-instan (Update Harian Instan button explanation)
+  * REMOVED: overview-cards (Overview Cards explanation)
+  * REMOVED: goal-terkait-aktivitas (Goal Terkait section explanation)
+  * REMOVED: task-prioritas-tab (Task Prioritas tab explanation)
+  * REMOVED: update-progress-tab (Update Progress tab explanation)
+  * REMOVED: kelola-inisiatif-tab (Kelola Inisiatif tab explanation)
+  * OPTIMIZED: Tour system reduced from 38 to 32 total steps for streamlined navigation
+  * ENHANCED: Tour now flows more directly from basic navigation to core feature sections
+  * RESULT: More focused tour experience eliminating detailed daily focus tab explanations
 - July 25, 2025. **WELCOME SCREEN DISPLAY BASED ON TOUR COMPLETION COMPLETED** - Successfully implemented welcome screen display logic based on user tour completion status:
   * ENHANCED: Welcome screen now automatically displays when user hasn't completed tour (tourCompleted: false)
   * IMPLEMENTED: Added useAuth hook integration to check user tour completion status

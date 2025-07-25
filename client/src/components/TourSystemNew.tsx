@@ -95,67 +95,6 @@ const TOUR_STEPS: TourStep[] = [
     category: "action",
     targetPath: "/daily-focus",
   },
-
-  {
-    id: "update-harian-instan",
-    title: "Update Harian Instan - Pencatatan Progress Cepat",
-    description:
-      'Tombol "Update Harian Instan" memungkinkan Anda mencatat progress harian dengan mudah dan cepat. Klik tombol ini untuk melakukan update status task dan mencatat pencapaian harian. Fitur ini membantu mempertahankan momentum dan konsistensi dalam pelacakan progress.',
-    icon: Zap,
-    selector: '[data-tour="update-harian-instan"]',
-    position: "bottom",
-    category: "action",
-  },
-  {
-    id: "overview-cards",
-    title: "Overview Cards - Ringkasan Aktivitas",
-    description:
-      "Kartu overview memberikan gambaran cepat tentang aktivitas harian Anda. Lihat jumlah task yang harus diselesaikan, progress angka target, inisiatif yang sedang berjalan, dan statistik gamifikasi. Informasi ini membantu Anda memahami beban kerja dan prioritas untuk hari ini.",
-    icon: BarChart3,
-    selector: '[data-tour="overview-cards"]',
-    position: "bottom",
-    category: "feature",
-  },
-  {
-    id: "goal-terkait-aktivitas",
-    title: "Goal Terkait - Hubungan Aktivitas dengan Tujuan",
-    description:
-      "Bagian ini menampilkan goal yang terkait dengan aktivitas harian Anda. Fitur ini membantu Anda tetap fokus pada tujuan utama dan memahami bagaimana aktivitas harian berkontribusi pada pencapaian goal organisasi.",
-    icon: Target,
-    selector: '[data-tour="goal-terkait-aktivitas"]',
-    position: "bottom",
-    category: "feature",
-  },
-  {
-    id: "task-prioritas-tab",
-    title: "Tab Task Prioritas - Manajemen Tugas Harian",
-    description:
-      "Tab Task Prioritas menampilkan semua tugas yang perlu diselesaikan, diurutkan berdasarkan prioritas dan deadline. Anda dapat melihat task yang terlambat, task hari ini, dan task yang akan datang. Klik tab ini untuk mengelola dan mengubah status tugas sesuai progress aktual.",
-    icon: CheckSquare,
-    selector: '[data-tour="task-prioritas"]',
-    position: "bottom",
-    category: "action",
-  },
-  {
-    id: "update-progress-tab",
-    title: "Tab Update Progress - Update Capaian Angka Target",
-    description:
-      "Tab Update Progress memungkinkan Anda memperbarui capaian angka target yang sedang aktif. Tab ini menampilkan angka target yang memerlukan update. Fitur ini penting untuk melacak kemajuan menuju target yang telah ditetapkan.",
-    icon: TrendingUp,
-    selector: '[data-tour="update-progress-tab"]',
-    position: "bottom",
-    category: "action",
-  },
-  {
-    id: "kelola-inisiatif-tab",
-    title: "Tab Kelola Inisiatif - Manajemen Proyek",
-    description:
-      "Tab Kelola Inisiatif menampilkan semua inisiatif (proyek) yang sedang berjalan dan memerlukan perhatian. Tab ini menampilkan inisiatif yang dapat dikelola, success metrics yang dapat diperbarui, dan progress proyek. Fitur ini membantu koordinasi tim dalam menjalankan inisiatif strategis.",
-    icon: Rocket,
-    selector: '[data-tour="kelola-inisiatif-tab"]',
-    position: "bottom",
-    category: "action",
-  },
   {
     id: "goals",
     title: "Goals - Manajemen Tujuan",
