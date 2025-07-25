@@ -143,16 +143,7 @@ const TOUR_STEPS: TourStep[] = [
     category: "feature",
     targetPath: "/cycles",
   },
-  {
-    id: "cycles-content",
-    title: "Siklus - Kelola Periode",
-    description:
-      "Tabel siklus menampilkan semua periode waktu yang telah dibuat. Anda dapat melihat tanggal mulai, berakhir, dan status setiap siklus untuk perencanaan yang lebih baik.",
-    icon: Calendar,
-    selector: '[data-tour="cycles-table"]',
-    position: "top",
-    category: "feature",
-  },
+
   {
     id: "achievements",
     title: "Pencapaian - Sistem Reward",
@@ -163,7 +154,6 @@ const TOUR_STEPS: TourStep[] = [
     position: "right",
     category: "feature",
     targetPath: "/achievements",
-    requiresClick: true,
   },
   {
     id: "achievement-progress-tab",
