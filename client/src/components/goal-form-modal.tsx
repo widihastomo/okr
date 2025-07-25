@@ -68,6 +68,7 @@ import {
   MoveDown,
   ChevronsUpDown,
   Check,
+  User as UserIcon,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
@@ -1640,6 +1641,7 @@ export function KeyResultModal({
       currentValue: "0",
       unit: "",
       status: "in_progress",
+      assignedTo: "",
     },
   });
 
@@ -1660,6 +1662,7 @@ export function KeyResultModal({
           currentValue: "0",
           unit: "",
           status: "in_progress",
+          assignedTo: "",
         });
       }
     }
@@ -2383,6 +2386,73 @@ export function KeyResultModal({
                 </div>
               );
             })()}
+
+            {/* PIC/Assigned To Field */}
+            <FormField
+              control={keyResultForm.control}
+              name="assignedTo"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center gap-2">
+                    Penanggung Jawab (PIC)
+                    <Popover>
+                      <PopoverTrigger>
+                        <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                      </PopoverTrigger>
+                      <PopoverContent side="right" className="max-w-xs">
+                        <p>
+                          <strong>Pilih penanggung jawab untuk angka target ini</strong>
+                          <br />
+                          <br />
+                          Penanggung jawab akan bertanggung jawab untuk memantau, melaporkan progress, dan memastikan pencapaian angka target ini.
+                          <br />
+                          <br />
+                          <strong>Opsional:</strong> Jika tidak dipilih, goal owner akan menjadi penanggung jawab default.
+                        </p>
+                      </PopoverContent>
+                    </Popover>
+                  </FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Pilih penanggung jawab..." />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="">
+                        <div className="flex items-center gap-2">
+                          <UserIcon className="w-4 h-4" />
+                          Tidak ditentukan (Default: Goal Owner)
+                        </div>
+                      </SelectItem>
+                      {users?.map((user) => (
+                        <SelectItem key={user.id} value={user.id}>
+                          <div className="flex items-center gap-2">
+                            <div className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-medium">
+                              {user.name
+                                ? user.name
+                                    .split(" ")
+                                    .map((n) => n[0])
+                                    .join("")
+                                    .toUpperCase()
+                                    .slice(0, 2)
+                                : user.email
+                                    ?.split("@")[0]
+                                    .slice(0, 2)
+                                    .toUpperCase() || "U"}
+                            </div>
+                            {user.name && user.name.trim() !== "" 
+                              ? user.name 
+                              : user.email?.split("@")[0] || "User"}
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             {/* Action Buttons */}
             <div className="flex justify-end gap-4">
