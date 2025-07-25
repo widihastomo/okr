@@ -9,66 +9,61 @@ import { CalendarIcon, Save, X } from "lucide-react";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import { cn } from "@/lib/utils";
-import { useToast } from "@/hooks/use-toast";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
 
 interface EditCycleModalProps {
-  cycle: any;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  isOpen: boolean;
+  onClose: () => void;
+  onSave: (data: { periodName: string; startDate: string; endDate: string }) => void;
+  initialData: {
+    periodName: string;
+    startDate: string;
+    endDate: string;
+  };
 }
 
 const EditCycleModal: React.FC<EditCycleModalProps> = ({
-  cycle,
-  open,
-  onOpenChange,
+  isOpen,
+  onClose,
+  onSave,
+  initialData,
 }) => {
-  const [name, setName] = useState("");
-  const [startDate, setStartDate] = useState<Date | undefined>();
-  const [endDate, setEndDate] = useState<Date | undefined>();
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const { toast } = useToast();
+  // Convert cycleDuration to proper period name for display
+  const getCyclePeriodName = (duration: string) => {
+    switch (duration) {
+      case "1bulan":
+        return "1 Bulan";
+      case "3bulan":
+        return "3 Bulan";
+      case "1tahun":
+        return "1 Tahun";
+      default:
+        return duration;
+    }
+  };
 
-  const queryClient = useQueryClient();
+  const [periodName, setPeriodName] = useState(getCyclePeriodName(initialData.periodName));
+  const [startDate, setStartDate] = useState<Date | undefined>(
+    initialData.startDate ? new Date(initialData.startDate) : undefined
+  );
+  const [endDate, setEndDate] = useState<Date | undefined>(
+    initialData.endDate ? new Date(initialData.endDate) : undefined
+  );
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    if (open && cycle) {
-      setName(cycle.name || "");
-      setStartDate(cycle.startDate ? new Date(cycle.startDate) : undefined);
-      setEndDate(cycle.endDate ? new Date(cycle.endDate) : undefined);
+    if (isOpen) {
+      setPeriodName(getCyclePeriodName(initialData.periodName));
+      setStartDate(initialData.startDate ? new Date(initialData.startDate) : undefined);
+      setEndDate(initialData.endDate ? new Date(initialData.endDate) : undefined);
       setErrors({});
     }
-  }, [open, cycle]);
-
-  const updateCycleMutation = useMutation({
-    mutationFn: async (data: { name: string; startDate: string; endDate: string }) => {
-      const response = await apiRequest("PATCH", `/api/cycles/${cycle.id}`, data);
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/cycles"] });
-      toast({
-        title: "Berhasil",
-        description: "Siklus berhasil diperbarui",
-        variant: "default",
-      });
-      onOpenChange(false);
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Gagal",
-        description: error.message || "Terjadi kesalahan saat memperbarui siklus",
-        variant: "destructive",
-      });
-    },
-  });
+  }, [isOpen, initialData]);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    if (!name.trim()) {
-      newErrors.name = "Nama siklus harus diisi";
+    if (!periodName.trim()) {
+      newErrors.periodName = "Nama periode harus diisi";
     }
 
     if (!startDate) {
@@ -89,11 +84,12 @@ const EditCycleModal: React.FC<EditCycleModalProps> = ({
 
   const handleSave = () => {
     if (validateForm()) {
-      updateCycleMutation.mutate({
-        name: name.trim(),
+      onSave({
+        periodName: periodName.trim(),
         startDate: startDate ? startDate.toISOString().split('T')[0] : "",
         endDate: endDate ? endDate.toISOString().split('T')[0] : "",
       });
+      onClose();
     }
   };
 
@@ -104,31 +100,31 @@ const EditCycleModal: React.FC<EditCycleModalProps> = ({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md" onKeyDown={handleKeyDown}>
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
             <CalendarIcon className="w-5 h-5 text-purple-600" />
-            <span>Edit Siklus</span>
+            <span>Edit Periode Siklus</span>
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
-          {/* Cycle Name */}
+          {/* Period Name */}
           <div className="space-y-2">
-            <Label htmlFor="cycle-name">Nama Siklus</Label>
+            <Label htmlFor="period-name">Nama Periode</Label>
             <Input
-              id="cycle-name"
+              id="period-name"
               type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={periodName}
+              onChange={(e) => setPeriodName(e.target.value)}
               placeholder="Contoh: Kuartal 1 2025"
               className={`focus:ring-2 focus:ring-purple-500 ${
-                errors.name ? "border-red-500" : ""
+                errors.periodName ? "border-red-500" : ""
               }`}
             />
-            {errors.name && (
-              <p className="text-xs text-red-600">{errors.name}</p>
+            {errors.periodName && (
+              <p className="text-xs text-red-600">{errors.periodName}</p>
             )}
           </div>
 
@@ -227,17 +223,16 @@ const EditCycleModal: React.FC<EditCycleModalProps> = ({
         </div>
 
         <div className="flex justify-end space-x-2 pt-4 border-t">
-          <Button variant="outline" onClick={() => onOpenChange(false)} className="flex items-center space-x-1">
+          <Button variant="outline" onClick={onClose} className="flex items-center space-x-1">
             <X className="w-4 h-4" />
             <span>Batal</span>
           </Button>
           <Button 
             onClick={handleSave}
-            disabled={updateCycleMutation.isPending}
             className="bg-purple-600 hover:bg-purple-700 text-white flex items-center space-x-1"
           >
             <Save className="w-4 h-4" />
-            <span>{updateCycleMutation.isPending ? "Menyimpan..." : "Simpan Perubahan"}</span>
+            <span>Simpan Perubahan</span>
           </Button>
         </div>
 

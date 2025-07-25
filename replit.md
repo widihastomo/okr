@@ -452,22 +452,6 @@ The system now includes a comprehensive dummy data generation feature that creat
 
 ## Changelog
 ```
-- July 25, 2025. **TOUR START BUTTON CONNECTION FIXED** - Successfully connected tour-start-button to TourSystemSimplified component:
-  * ADDED: Event listener for 'startTourDirect' custom event in TourSystemSimplified component
-  * CONNECTED: tour-start-button component properly dispatches event that triggers tour restart
-  * ENHANCED: Pulse effects restored with stronger visibility (1.5s animation, border, background highlight)
-  * IMPROVED: Mobile pulse animation with 3px border and enhanced glow effects
-  * FIXED: TypeScript errors on element casting for proper highlight application
-  * DEBUGGED: Added comprehensive logging for highlighting step tracking
-  * RESULT: "Mulai Tur" button now properly starts tour with visible pulse effects on highlighted elements
-- July 25, 2025. **TOUR SYSTEM CLICK REQUIREMENT REMOVAL COMPLETED** - Successfully removed all requiresClick properties from tour system for automatic flow:
-  * REMOVED: requiresClick property from all 10 tour steps (goals, tasks, timeline, cycles, achievements, analytics, users, settings, help) 
-  * ELIMINATED: waitingForClick state variable and all related UI handling logic
-  * SIMPLIFIED: Tour step interface by removing requiresClick property from TourStep interface
-  * CLEANED: Removed MousePointer2 icon import and click instruction UI elements
-  * ENHANCED: Tour now flows automatically without requiring user clicks on specific elements
-  * STREAMLINED: Previous/Next buttons no longer disabled by waiting state for smoother navigation
-  * RESULT: Simplified tour experience that advances automatically through all steps without forced interactions
 - July 25, 2025. **WELCOME SCREEN DISPLAY BASED ON TOUR COMPLETION COMPLETED** - Successfully implemented welcome screen display logic based on user tour completion status:
   * ENHANCED: Welcome screen now automatically displays when user hasn't completed tour (tourCompleted: false)
   * IMPLEMENTED: Added useAuth hook integration to check user tour completion status

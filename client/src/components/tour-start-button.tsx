@@ -10,19 +10,14 @@ interface TourStartButtonProps {
 
 export default function TourStartButton({ className, variant = 'outline', size = 'default' }: TourStartButtonProps) {
   const startTour = () => {
-    console.log("🎯 Tour start button clicked!");
-    
     // Check if onboarding is completed to determine flow
     const onboardingCompleted = localStorage.getItem('onboarding-completed') === 'true';
-    console.log("🔍 Onboarding completed:", onboardingCompleted);
     
     if (onboardingCompleted) {
       // Show welcome screen first, then tour
-      console.log("🚀 Dispatching 'startTour' event");
       window.dispatchEvent(new CustomEvent('startTour'));
     } else {
       // Start tour directly if no onboarding
-      console.log("🚀 Dispatching 'startTourDirect' event");
       window.dispatchEvent(new CustomEvent('startTourDirect'));
     }
   };
