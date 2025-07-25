@@ -452,6 +452,11 @@ The system now includes a comprehensive dummy data generation feature that creat
 
 ## Changelog
 ```
+- July 25, 2025. **ANGKA TARGET AND INISIATIF BACKGROUND COLORS APPLIED** - Successfully updated section backgrounds to match overview card styling:
+  * UPDATED: Angka Target section background from bg-white to bg-blue-50 with border-blue-200 to match overview card Key Results styling
+  * UPDATED: Inisiatif section background from bg-white to bg-green-50 with border-green-200 to match overview card Initiatives styling
+  * ENHANCED: Visual consistency between overview cards and detail section cards using matching color schemes
+  * RESULT: Unified color theming across Angka Target (blue) and Inisiatif (green) sections throughout the application
 - July 25, 2025. **TASK BUTTON OUTLINE STYLE APPLIED** - Successfully converted "Tambah Task" button to outline variant per user request:
   * CHANGED: Button variant from gradient style (bg-gradient-to-r from-orange-600 to-orange-500) to outline style
   * UPDATED: Styling to border-orange-600 text-orange-600 hover:bg-orange-50 for consistent outline design
