@@ -96,6 +96,7 @@ import { useTour } from "@/hooks/useTour";
 import { KeyResultModal } from "@/components/goal-form-modal";
 import EditCycleModal from "@/components/edit-cycle-modal";
 import TourCompletionModal from "@/components/TourCompletionModal";
+import WelcomeScreen from "@/components/WelcomeScreen";
 
 // Onboarding steps following the reference structure
 const ONBOARDING_STEPS = [
@@ -225,6 +226,7 @@ export default function CompanyOnboarding() {
   }>({ open: false, index: -1, keyResult: null });
   const [editCycleModal, setEditCycleModal] = useState(false);
   const [showCompletionModal, setShowCompletionModal] = useState(false);
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
 
   // Separate states for individual editing
   const [editObjectiveModal, setEditObjectiveModal] = useState(false);
@@ -1392,22 +1394,38 @@ export default function CompanyOnboarding() {
       // Complete the onboarding process
       await completeOnboardingMutation.mutateAsync();
 
-      // Set onboarding completed flag to trigger welcome screen flow
+      // Set onboarding completed flag
       localStorage.setItem("onboarding-completed", "true");
 
-      // Start the tour system (which will show welcome screen first)
-      startTour();
-
-      // Navigate to dashboard
-      setTimeout(() => {
-        setIsRedirecting(true);
-        setTimeout(() => {
-          navigate("/");
-        }, 1000);
-      }, 500);
+      // Show welcome modal instead of immediately starting tour
+      setShowWelcomeModal(true);
     } catch (error) {
       console.error("Failed to complete onboarding:", error);
     }
+  };
+
+  const handleCloseWelcomeModal = () => {
+    setShowWelcomeModal(false);
+    // Navigate to dashboard after closing the welcome modal
+    setTimeout(() => {
+      setIsRedirecting(true);
+      setTimeout(() => {
+        navigate("/");
+      }, 1000);
+    }, 500);
+  };
+
+  const handleStartTourFromWelcome = () => {
+    setShowWelcomeModal(false);
+    // Start the tour system
+    startTour();
+    // Navigate to dashboard after starting tour
+    setTimeout(() => {
+      setIsRedirecting(true);
+      setTimeout(() => {
+        navigate("/");
+      }, 1000);
+    }, 500);
   };
 
   const renderStepContent = () => {
