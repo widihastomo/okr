@@ -1733,54 +1733,54 @@ export default function GoalDetail() {
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mt-4">
-          <div className="bg-white p-4 rounded-lg border border-green-100">
-            <div className="flex items-center gap-2 mb-1">
-              <CheckCircle2 className="w-4 h-4 text-green-600" />
-              <span className="text-sm font-medium text-gray-700">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mt-4">
+          <div className="bg-white p-3 md:p-4 rounded-lg border border-green-100">
+            <div className="flex items-center gap-1 md:gap-2 mb-1">
+              <CheckCircle2 className="w-3 h-3 md:w-4 md:h-4 text-green-600" />
+              <span className="text-xs md:text-sm font-medium text-gray-700">
                 Selesai
               </span>
             </div>
-            <div className="text-2xl font-bold text-green-600">
+            <div className="text-lg md:text-2xl font-bold text-green-600">
               {inisiatif.filter((r) => r.status === "completed").length}
             </div>
           </div>
 
-          <div className="bg-white p-4 rounded-lg border border-green-100">
-            <div className="flex items-center gap-2 mb-1">
-              <Clock className="w-4 h-4 text-blue-600" />
-              <span className="text-sm font-medium text-gray-700">
-                Berlangsung
+          <div className="bg-white p-3 md:p-4 rounded-lg border border-green-100">
+            <div className="flex items-center gap-1 md:gap-2 mb-1">
+              <Clock className="w-3 h-3 md:w-4 md:h-4 text-blue-600" />
+              <span className="text-xs md:text-sm font-medium text-gray-700">
+                Berjalan
               </span>
             </div>
-            <div className="text-2xl font-bold text-blue-600">
+            <div className="text-lg md:text-2xl font-bold text-blue-600">
               {inisiatif.filter((r) => r.status === "in_progress").length}
             </div>
           </div>
 
-          <div className="bg-white p-4 rounded-lg border border-green-100">
-            <div className="flex items-center gap-2 mb-1">
-              <Building className="w-4 h-4 text-purple-600" />
-              <span className="text-sm font-medium text-gray-700">
-                Total Budget
+          <div className="bg-white p-3 md:p-4 rounded-lg border border-green-100">
+            <div className="flex items-center gap-1 md:gap-2 mb-1">
+              <Building className="w-3 h-3 md:w-4 md:h-4 text-purple-600" />
+              <span className="text-xs md:text-sm font-medium text-gray-700">
+                Budget
               </span>
             </div>
-            <div className="text-lg font-bold text-purple-600">
+            <div className="text-sm md:text-lg font-bold text-purple-600">
               Rp{" "}
               {inisiatif
                 .reduce((sum, r) => sum + parseFloat(r.budget || "0"), 0)
-                .toLocaleString("id-ID")}
+                .toLocaleString("id-ID", { notation: "compact" })}
             </div>
           </div>
 
-          <div className="bg-white p-4 rounded-lg border border-green-100">
-            <div className="flex items-center gap-2 mb-1">
-              <TrendingUp className="w-4 h-4 text-orange-600" />
-              <span className="text-sm font-medium text-gray-700">
-                Rata-rata Progress
+          <div className="bg-white p-3 md:p-4 rounded-lg border border-green-100">
+            <div className="flex items-center gap-1 md:gap-2 mb-1">
+              <TrendingUp className="w-3 h-3 md:w-4 md:h-4 text-orange-600" />
+              <span className="text-xs md:text-sm font-medium text-gray-700">
+                Progress
               </span>
             </div>
-            <div className="text-2xl font-bold text-orange-600">
+            <div className="text-lg md:text-2xl font-bold text-orange-600">
               {inisiatif.length > 0
                 ? Math.round(
                     inisiatif.reduce(
@@ -2085,7 +2085,7 @@ export default function GoalDetail() {
                 </div>
 
                 {/* Mobile Card View */}
-                <div className="md:hidden space-y-3 p-4">
+                <div className="md:hidden space-y-2 p-3">
                   {inisiatif
                     .sort((a, b) => {
                       const scoreA = parseFloat(a.priorityScore || "0");
@@ -2114,49 +2114,25 @@ export default function GoalDetail() {
                     }
 
                     return (
-                      <div key={initiative.id} className="bg-white rounded-lg border border-gray-200 p-4 space-y-3">
-                        {/* Title and Status Row */}
-                        <div className="flex items-start justify-between gap-3">
+                      <div key={initiative.id} className="bg-white rounded-lg border border-gray-200 p-3 space-y-2">
+                        {/* Title and Status */}
+                        <div className="flex items-start justify-between gap-2">
                           <div className="flex-1 min-w-0">
                             <Link href={`/initiatives/${initiative.id}`}>
-                              <h4 className="font-medium text-gray-900 hover:text-blue-600 cursor-pointer truncate">
+                              <h4 className="font-medium text-sm text-gray-900 hover:text-blue-600 cursor-pointer line-clamp-2">
                                 {initiative.title}
                               </h4>
                             </Link>
-                            {initiative.keyResultId && (
-                              <div className="flex items-center gap-1 mt-1">
-                                <Target className="w-3 h-3 text-blue-600" />
-                                <span className="text-xs text-blue-600 font-medium truncate">
-                                  {goal?.keyResults?.find((kr: any) => kr.id === initiative.keyResultId)?.title || 'Unknown'}
-                                </span>
-                              </div>
-                            )}
                           </div>
-                          <div className="flex items-center gap-2 flex-shrink-0">
+                          <div className="flex items-center gap-1 flex-shrink-0">
                             {(() => {
                               const status = initiative.status || "draft";
                               const getStatusInfo = (status: string) => {
                                 const statusMap = {
-                                  'draft': {
-                                    label: 'Draft',
-                                    bgColor: 'bg-gray-100',
-                                    textColor: 'text-gray-800',
-                                  },
-                                  'sedang_berjalan': {
-                                    label: 'Berjalan',
-                                    bgColor: 'bg-blue-100',
-                                    textColor: 'text-blue-800',
-                                  },
-                                  'selesai': {
-                                    label: 'Selesai',
-                                    bgColor: 'bg-green-100',
-                                    textColor: 'text-green-800',
-                                  },
-                                  'dibatalkan': {
-                                    label: 'Batal',
-                                    bgColor: 'bg-red-100',
-                                    textColor: 'text-red-800',
-                                  }
+                                  'draft': { label: 'Draft', bgColor: 'bg-gray-100', textColor: 'text-gray-800' },
+                                  'sedang_berjalan': { label: 'Berjalan', bgColor: 'bg-blue-100', textColor: 'text-blue-800' },
+                                  'selesai': { label: 'Selesai', bgColor: 'bg-green-100', textColor: 'text-green-800' },
+                                  'dibatalkan': { label: 'Batal', bgColor: 'bg-red-100', textColor: 'text-red-800' }
                                 };
                                 return statusMap[status as keyof typeof statusMap] || statusMap['draft'];
                               };
@@ -2164,141 +2140,88 @@ export default function GoalDetail() {
                               const statusInfo = getStatusInfo(status);
                               
                               return (
-                                <Badge className={`${statusInfo.bgColor} ${statusInfo.textColor} text-xs`}>
+                                <Badge className={`${statusInfo.bgColor} ${statusInfo.textColor} text-xs px-1.5 py-0.5`}>
                                   {statusInfo.label}
                                 </Badge>
                               );
                             })()}
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-8 w-8 p-0"
-                                >
-                                  <MoreHorizontal className="h-4 w-4" />
+                                <Button variant="ghost" size="icon" className="h-6 w-6 p-0">
+                                  <MoreHorizontal className="h-3 w-3" />
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
-                                <DropdownMenuItem
-                                  onClick={() => window.location.href = `/initiatives/${initiative.id}`}
-                                >
-                                  <Eye className="mr-2 h-4 w-4" />
-                                  Lihat Detail
+                                <DropdownMenuItem onClick={() => window.location.href = `/initiatives/${initiative.id}`}>
+                                  <Eye className="mr-2 h-3 w-3" />Lihat Detail
                                 </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  onClick={() => {
-                                    setEditingInitiative(initiative);
-                                    setShowInitiativeFormModal(true);
-                                  }}
-                                >
-                                  <Edit className="mr-2 h-4 w-4" />
-                                  Ubah
+                                <DropdownMenuItem onClick={() => { setEditingInitiative(initiative); setShowInitiativeFormModal(true); }}>
+                                  <Edit className="mr-2 h-3 w-3" />Ubah
                                 </DropdownMenuItem>
-                                <DropdownMenuItem 
-                                  className="text-red-600"
-                                  onClick={() => setDeletingInitiative(initiative)}
-                                >
-                                  <Trash2 className="mr-2 h-4 w-4" />
-                                  Hapus
+                                <DropdownMenuItem className="text-red-600" onClick={() => setDeletingInitiative(initiative)}>
+                                  <Trash2 className="mr-2 h-3 w-3" />Hapus
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
                           </div>
                         </div>
 
-                        {/* Priority and Progress Row */}
-                        <div className="flex items-center justify-between gap-4">
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs text-gray-500">Prioritas:</span>
-                            <Badge className={`${color} text-xs`}>
+                        {/* Priority, Progress & PIC Row */}
+                        <div className="flex items-center justify-between gap-2 text-xs">
+                          <div className="flex items-center gap-1">
+                            <Badge className={`${color} text-xs px-1.5 py-0.5`}>
                               {label}
                             </Badge>
-                            <span className="text-xs text-gray-400">
-                              {score.toFixed(1)}/5.0
-                            </span>
+                            <span className="text-gray-400">{score.toFixed(1)}</span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <div className="w-16 bg-gray-200 rounded-full h-2">
+                            <div className="w-12 bg-gray-200 rounded-full h-1.5">
                               <div
-                                className={`h-2 rounded-full ${(() => {
+                                className={`h-1.5 rounded-full ${(() => {
                                   const progress = initiative.progressPercentage || 0;
                                   if (progress >= 100) return "bg-green-600";
                                   if (progress >= 80) return "bg-green-500";
                                   if (progress >= 60) return "bg-orange-500";
                                   return "bg-red-500";
                                 })()}`}
-                                style={{
-                                  width: `${initiative.progressPercentage || 0}%`,
-                                }}
+                                style={{ width: `${initiative.progressPercentage || 0}%` }}
                               ></div>
                             </div>
-                            <span className="text-xs font-medium text-gray-900">
+                            <span className="text-xs font-medium text-gray-900 min-w-8">
                               {initiative.progressPercentage || 0}%
                             </span>
                           </div>
                         </div>
 
-                        {/* Dates and PIC Row */}
-                        <div className="flex items-center justify-between gap-4 text-xs">
-                          <div className="space-y-1">
-                            {initiative.startDate && (
-                              <div className="text-gray-500">
-                                Mulai: {new Date(initiative.startDate).toLocaleDateString("id-ID", {
-                                  day: "numeric",
-                                  month: "short",
-                                })}
-                              </div>
-                            )}
+                        {/* Date & PIC */}
+                        <div className="flex items-center justify-between gap-2 text-xs">
+                          <div className="text-gray-500">
                             {initiative.dueDate ? (
-                              <div
-                                className={`${
-                                  new Date(initiative.dueDate) < new Date()
-                                    ? "text-red-600 font-medium"
-                                    : "text-gray-900"
-                                }`}
-                              >
-                                Selesai: {new Date(initiative.dueDate).toLocaleDateString("id-ID", {
-                                  day: "numeric",
-                                  month: "short",
-                                })}
-                              </div>
+                              <span className={new Date(initiative.dueDate) < new Date() ? "text-red-600 font-medium" : ""}>
+                                {new Date(initiative.dueDate).toLocaleDateString("id-ID", { day: "numeric", month: "short" })}
+                              </span>
                             ) : (
-                              <div className="text-gray-400">
-                                Selesai: -
-                              </div>
+                              <span className="text-gray-400">No deadline</span>
                             )}
                           </div>
-                          <div className="text-right">
+                          <div className="flex items-center gap-1">
                             {initiative.picId ? (
-                              <div className="flex items-center gap-2">
-                                <Avatar className="w-6 h-6">
-                                  <AvatarImage 
-                                    src={getUserProfileImage(initiative.picId)} 
-                                    alt={getUserName(initiative.picId)}
-                                  />
+                              <>
+                                <Avatar className="w-4 h-4">
+                                  <AvatarImage src={getUserProfileImage(initiative.picId)} alt={getUserName(initiative.picId)} />
                                   <AvatarFallback className="bg-blue-500 text-white text-xs font-medium">
                                     {getUserInitials(initiative.picId)}
                                   </AvatarFallback>
                                 </Avatar>
-                                <span className="text-xs text-gray-900 truncate max-w-20">
+                                <span className="text-xs text-gray-900 truncate max-w-16">
                                   {getUserName(initiative.picId)}
                                 </span>
-                              </div>
+                              </>
                             ) : (
-                              <span className="text-gray-400 text-xs">
-                                Tidak ditugaskan
-                              </span>
+                              <span className="text-gray-400 text-xs">Unassigned</span>
                             )}
                           </div>
                         </div>
-
-                        {/* Budget if exists */}
-                        {initiative.budget && (
-                          <div className="text-xs text-gray-500 pt-1 border-t border-gray-100">
-                            Budget: Rp {parseFloat(initiative.budget).toLocaleString("id-ID")}
-                          </div>
-                        )}
                       </div>
                     );
                   })}
