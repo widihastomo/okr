@@ -309,8 +309,7 @@ function MissionCard({
 
 // Timeline Feed Component
 function TimelineFeedComponent() {
-  // const { user } = useAuth(); // Temporarily disabled
-  const user = null;
+  const { user } = useAuth();
   const queryClient = useQueryClient();
 
   // Timeline states
@@ -828,8 +827,7 @@ function TimelineFeedComponent() {
 }
 
 export default function DailyFocusPage() {
-  // const { user } = useAuth(); // Temporarily disabled
-  const user = null;
+  const { user } = useAuth();
   const userId =
     user && typeof user === "object" && "id" in user ? (user as any).id : null;
 

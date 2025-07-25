@@ -77,10 +77,7 @@ import TemplateDetail from "@/pages/template-detail";
 import ClientTemplates from "@/components/ClientTemplates";
 
 const Router = () => {
-  // Temporarily bypass useAuth to test app functionality
-  const isAuthenticated = false;
-  const isLoading = false;
-  const user = null;
+  const { isAuthenticated, isLoading, user } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   const [location, navigate] = useLocation();
