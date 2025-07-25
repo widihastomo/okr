@@ -452,6 +452,16 @@ The system now includes a comprehensive dummy data generation feature that creat
 
 ## Changelog
 ```
+- July 25, 2025. **ONBOARDING FLOW SHORTENED TO 6 STEPS COMPLETED** - Successfully removed steps 7, 8, and 9 from company onboarding per user request "hapus langkah 7 kebelakang":
+  * REMOVED: Case 7 (Pilih Inisiatif Prioritas) - eliminated comprehensive initiative selection step
+  * REMOVED: Case 9 (Pilih Cadence) - eliminated progress check-in frequency selection step
+  * UPDATED: handleNext function condition changed from "currentStep < 8" to "currentStep < 6" for proper completion flow
+  * UPDATED: Completion button now shows "Mulai Tur" at step 6 with correct condition checking
+  * CLEANED: Removed all validation cases for steps 7, 8, and 9 from validation logic
+  * CLEANED: Removed step message references for steps 7, 8, and 9 from getVirtualAssistantMessage function
+  * CLEANED: Removed all orphaned code fragments left from case deletion to prevent compilation errors
+  * FINALIZED: Onboarding now definitively ends at step 6 (initiative selection) followed by completion sequence
+  * RESULT: Streamlined 6-step onboarding flow: Welcome → Company Profile → Business Focus → Goal Hierarchy → Objective Creation → Initiative Selection → Complete
 - July 25, 2025. **SKIP INITIATIVE SELECTION OPTION COMPLETED** - Successfully implemented skip functionality for initiative selection step:
   * ADDED: Skip option card with Info icon and informative messaging allowing users to bypass initiative selection
   * ENHANCED: Blue-themed skip card with "Lewati & Lanjutkan" button to clear initiatives array and proceed
