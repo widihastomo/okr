@@ -281,9 +281,9 @@ export default function CompanyOnboarding() {
   });
 
   // Fetch all goal templates for step 5 (initiative selection needs access to all templates)
-  const { data: allGoalTemplates } = useQuery({
+  const { data: allGoalTemplates, isLoading: isLoadingAllTemplates } = useQuery({
     queryKey: ["/api/goal-templates/all"],
-    enabled: onboardingData.currentStep === 5
+    enabled: !!user
   });
 
   // Fetch users for key result assignment
@@ -2383,10 +2383,13 @@ export default function CompanyOnboarding() {
         // Debug logging
         console.log("🔍 Step 5 Debug:", {
           objective: onboardingData.objective,
+          isLoadingAllTemplates,
           allTemplateCount: allGoalTemplates?.length || 0,
           allTemplateTitles: allGoalTemplates?.map(t => t.title) || [],
           selectedTemplate: selectedTemplate ? selectedTemplate.title : "NOT FOUND",
-          selectedTemplateInitiatives: selectedTemplate?.initiatives || "NO INITIATIVES"
+          selectedTemplateInitiatives: selectedTemplate?.initiatives || "NO INITIATIVES",
+          currentStep: onboardingData.currentStep,
+          user: !!user
         });
         
         // Get initiatives from selected template

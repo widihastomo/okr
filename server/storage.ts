@@ -3513,10 +3513,13 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getAllGoalTemplates(organizationId: string): Promise<GoalTemplate[]> {
+    // Return both organization-specific templates and system-wide templates (null organizationId)
     return await db
       .select()
       .from(goalTemplates)
-      .where(eq(goalTemplates.organizationId, organizationId))
+      .where(
+        sql`${goalTemplates.organizationId} = ${organizationId} OR ${goalTemplates.organizationId} IS NULL`
+      )
       .orderBy(asc(goalTemplates.title));
   }
 
