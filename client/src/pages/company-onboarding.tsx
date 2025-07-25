@@ -313,6 +313,9 @@ export default function CompanyOnboarding() {
     enabled: !!user,
   });
 
+  // Combined loading state
+  const isLoading = isLoadingTemplates || isLoadingAllTemplates;
+
   // Options for searchable select boxes
   const provinces = [
     "Aceh",
