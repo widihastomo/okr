@@ -1706,18 +1706,8 @@ export default function DailyFocusPage() {
               <h1 className="text-xl md:text-2xl font-bold text-gray-900">
                 Dashboard
               </h1>
-              {/* Date display and Daily Check-in - top-right on mobile, positioned at title level */}
+              {/* Daily Check-in - top-right on mobile, positioned at title level */}
               <div className="flex items-center gap-2 sm:hidden">
-                <div className="flex items-center gap-2 text-sm text-gray-500">
-                  <Calendar className="h-4 w-4" />
-                  <span>
-                    {today.toLocaleDateString("id-ID", {
-                      weekday: "short",
-                      month: "short",
-                      day: "numeric",
-                    })}
-                  </span>
-                </div>
                 <div data-tour="update-harian-instan">
                   <DailyUpdateSimple />
                 </div>
@@ -1730,17 +1720,6 @@ export default function DailyFocusPage() {
 
           {/* User Filter, Daily Check-in, and Tour Button - desktop */}
           <div className="flex items-center gap-3 relative z-10">
-            <div className="hidden sm:flex items-center gap-2 text-sm text-gray-500">
-              <Calendar className="h-4 w-4" />
-              <span>
-                {today.toLocaleDateString("id-ID", {
-                  weekday: "long",
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </span>
-            </div>
             <div className="hidden sm:flex items-center gap-2">
               <User className="h-4 w-4 text-gray-500" />
               <Select value={selectedUserId} onValueChange={setSelectedUserId}>
