@@ -632,56 +632,176 @@ export default function TourSystem() {
         const rect = element.getBoundingClientRect();
         const tooltipWidth = isMobile() ? Math.min(window.innerWidth - 30, 380) : 380;
         const tooltipHeight = 300; // Increased height to accommodate content
+        const padding = 20;
+        let x, y;
 
-        let x = rect.left + rect.width / 2 - tooltipWidth / 2;
-        let y = rect.top - tooltipHeight - 150; // Moved tooltip even higher up
-
-        // Mobile-specific positioning for menu items
+        // Smart positioning logic to avoid covering highlighted element
         if (isMobile() && isMenuStep(currentStepData.id)) {
           // For mobile menu items, position tooltip far to the right or bottom
-          // Check if we have enough space to the right of the sidebar
           const sidebarWidth = 280; // Approximate sidebar width
           if (window.innerWidth > sidebarWidth + tooltipWidth + 30) {
             // Position to the right of sidebar
             x = sidebarWidth + 15;
             y = rect.top + rect.height / 2 - tooltipHeight / 2;
           } else {
-            // Position at bottom with full width
-            x = 15; // Left edge with padding
-            y = Math.max(rect.bottom + 20, window.innerHeight - tooltipHeight - 15); // Below menu or at bottom
+            // Position at bottom with full width, ensuring it doesn't cover element
+            x = 15;
+            y = Math.max(rect.bottom + padding, window.innerHeight - tooltipHeight - 15);
           }
         } else if (isMobile()) {
-          // For mobile non-menu items, position at bottom or top based on available space
+          // For mobile non-menu items, use smart positioning
           x = 15; // Left edge with padding
-          if (rect.bottom + tooltipHeight + 30 > window.innerHeight) {
-            // Position above if not enough space below
-            y = Math.max(15, rect.top - tooltipHeight - 15);
+
+          const spaceAbove = rect.top;
+          const spaceBelow = window.innerHeight - rect.bottom;
+          
+          // Check if element is in center, top, or bottom of screen
+          const elementCenter = rect.top + rect.height / 2;
+          const screenCenter = window.innerHeight / 2;
+          
+          if (elementCenter < screenCenter && spaceBelow >= tooltipHeight + padding) {
+            // Element in top half, position below
+            y = rect.bottom + padding;
+          } else if (elementCenter >= screenCenter && spaceAbove >= tooltipHeight + padding) {
+            // Element in bottom half, position above
+            y = rect.top - tooltipHeight - padding;
           } else {
-            // Position below if enough space
-            y = rect.bottom + 15;
+            // Use the side with more space
+            if (spaceBelow > spaceAbove) {
+              y = rect.bottom + padding;
+            } else {
+              y = Math.max(15, rect.top - tooltipHeight - padding);
+            }
           }
         } else {
-          // Desktop positioning - adjust based on step position
+          // Desktop smart positioning with collision avoidance
+          const spaceRight = window.innerWidth - rect.right;
+          const spaceLeft = rect.left;
+          const spaceAbove = rect.top;
+          const spaceBelow = window.innerHeight - rect.bottom;
+          
+          // Determine best position based on available space and preference
           switch (currentStepData.position) {
             case "right":
-              x = rect.right + 15;
-              y = rect.top + rect.height / 2 - tooltipHeight / 2;
+              if (spaceRight >= tooltipWidth + padding) {
+                x = rect.right + padding;
+                y = Math.max(15, Math.min(rect.top + rect.height / 2 - tooltipHeight / 2, window.innerHeight - tooltipHeight - 15));
+              } else if (spaceLeft >= tooltipWidth + padding) {
+                // Fallback to left
+                x = rect.left - tooltipWidth - padding;
+                y = Math.max(15, Math.min(rect.top + rect.height / 2 - tooltipHeight / 2, window.innerHeight - tooltipHeight - 15));
+              } else if (spaceBelow >= tooltipHeight + padding) {
+                // Fallback to bottom
+                x = Math.max(15, Math.min(rect.left + rect.width / 2 - tooltipWidth / 2, window.innerWidth - tooltipWidth - 15));
+                y = rect.bottom + padding;
+              } else {
+                // Fallback to top
+                x = Math.max(15, Math.min(rect.left + rect.width / 2 - tooltipWidth / 2, window.innerWidth - tooltipWidth - 15));
+                y = Math.max(15, rect.top - tooltipHeight - padding);
+              }
               break;
+              
             case "left":
-              x = rect.left - tooltipWidth - 15;
-              y = rect.top + rect.height / 2 - tooltipHeight / 2;
+              if (spaceLeft >= tooltipWidth + padding) {
+                x = rect.left - tooltipWidth - padding;
+                y = Math.max(15, Math.min(rect.top + rect.height / 2 - tooltipHeight / 2, window.innerHeight - tooltipHeight - 15));
+              } else if (spaceRight >= tooltipWidth + padding) {
+                // Fallback to right
+                x = rect.right + padding;
+                y = Math.max(15, Math.min(rect.top + rect.height / 2 - tooltipHeight / 2, window.innerHeight - tooltipHeight - 15));
+              } else if (spaceBelow >= tooltipHeight + padding) {
+                // Fallback to bottom
+                x = Math.max(15, Math.min(rect.left + rect.width / 2 - tooltipWidth / 2, window.innerWidth - tooltipWidth - 15));
+                y = rect.bottom + padding;
+              } else {
+                // Fallback to top
+                x = Math.max(15, Math.min(rect.left + rect.width / 2 - tooltipWidth / 2, window.innerWidth - tooltipWidth - 15));
+                y = Math.max(15, rect.top - tooltipHeight - padding);
+              }
               break;
+              
             case "bottom":
-              y = rect.bottom + 30; // Increased spacing for bottom positioning
+              if (spaceBelow >= tooltipHeight + padding) {
+                x = Math.max(15, Math.min(rect.left + rect.width / 2 - tooltipWidth / 2, window.innerWidth - tooltipWidth - 15));
+                y = rect.bottom + padding;
+              } else if (spaceAbove >= tooltipHeight + padding) {
+                // Fallback to top
+                x = Math.max(15, Math.min(rect.left + rect.width / 2 - tooltipWidth / 2, window.innerWidth - tooltipWidth - 15));
+                y = rect.top - tooltipHeight - padding;
+              } else if (spaceRight >= tooltipWidth + padding) {
+                // Fallback to right
+                x = rect.right + padding;
+                y = Math.max(15, Math.min(rect.top + rect.height / 2 - tooltipHeight / 2, window.innerHeight - tooltipHeight - 15));
+              } else {
+                // Fallback to left
+                x = Math.max(15, rect.left - tooltipWidth - padding);
+                y = Math.max(15, Math.min(rect.top + rect.height / 2 - tooltipHeight / 2, window.innerHeight - tooltipHeight - 15));
+              }
               break;
+              
             case "top":
             default:
-              // Keep default values
+              if (spaceAbove >= tooltipHeight + padding) {
+                x = Math.max(15, Math.min(rect.left + rect.width / 2 - tooltipWidth / 2, window.innerWidth - tooltipWidth - 15));
+                y = rect.top - tooltipHeight - padding;
+              } else if (spaceBelow >= tooltipHeight + padding) {
+                // Fallback to bottom
+                x = Math.max(15, Math.min(rect.left + rect.width / 2 - tooltipWidth / 2, window.innerWidth - tooltipWidth - 15));
+                y = rect.bottom + padding;
+              } else if (spaceRight >= tooltipWidth + padding) {
+                // Fallback to right
+                x = rect.right + padding;
+                y = Math.max(15, Math.min(rect.top + rect.height / 2 - tooltipHeight / 2, window.innerHeight - tooltipHeight - 15));
+              } else {
+                // Fallback to left
+                x = Math.max(15, rect.left - tooltipWidth - padding);
+                y = Math.max(15, Math.min(rect.top + rect.height / 2 - tooltipHeight / 2, window.innerHeight - tooltipHeight - 15));
+              }
               break;
           }
         }
 
-        // Ensure tooltip stays within viewport
+        // Final viewport boundary check with collision detection
+        // Ensure modal doesn't overlap with highlighted element
+        const modalRect = {
+          left: x,
+          top: y,
+          right: x + tooltipWidth,
+          bottom: y + tooltipHeight
+        };
+        
+        // Check for overlap with highlighted element
+        const hasOverlap = !(modalRect.right < rect.left || 
+                            modalRect.left > rect.right || 
+                            modalRect.bottom < rect.top || 
+                            modalRect.top > rect.bottom);
+        
+        if (hasOverlap) {
+          // If there's still overlap, push modal away from element
+          const centerX = rect.left + rect.width / 2;
+          const centerY = rect.top + rect.height / 2;
+          const modalCenterX = x + tooltipWidth / 2;
+          const modalCenterY = y + tooltipHeight / 2;
+          
+          // Determine which direction to move modal
+          if (Math.abs(modalCenterX - centerX) > Math.abs(modalCenterY - centerY)) {
+            // Move horizontally
+            if (modalCenterX < centerX) {
+              x = Math.max(15, rect.left - tooltipWidth - padding);
+            } else {
+              x = Math.min(window.innerWidth - tooltipWidth - 15, rect.right + padding);
+            }
+          } else {
+            // Move vertically
+            if (modalCenterY < centerY) {
+              y = Math.max(15, rect.top - tooltipHeight - padding);
+            } else {
+              y = Math.min(window.innerHeight - tooltipHeight - 15, rect.bottom + padding);
+            }
+          }
+        }
+
+        // Final boundary check
         x = Math.max(15, Math.min(x, window.innerWidth - tooltipWidth - 15));
         y = Math.max(15, Math.min(y, window.innerHeight - tooltipHeight - 15));
 
