@@ -95,6 +95,7 @@ import { type CompanyOnboardingData } from "@shared/schema";
 import { useTour } from "@/hooks/useTour";
 import { KeyResultModal } from "@/components/goal-form-modal";
 import EditCycleModal from "@/components/edit-cycle-modal";
+import TourCompletionModal from "@/components/TourCompletionModal";
 
 // Onboarding steps following the reference structure
 const ONBOARDING_STEPS = [
@@ -223,6 +224,7 @@ export default function CompanyOnboarding() {
     keyResult: any;
   }>({ open: false, index: -1, keyResult: null });
   const [editCycleModal, setEditCycleModal] = useState(false);
+  const [showCompletionModal, setShowCompletionModal] = useState(false);
 
   // Separate states for individual editing
   const [editObjectiveModal, setEditObjectiveModal] = useState(false);
@@ -1251,24 +1253,15 @@ export default function CompanyOnboarding() {
       return apiRequest("POST", "/api/onboarding/complete", { onboardingData });
     },
     onSuccess: () => {
-      // Set redirecting state first to prevent double clicks
-      setIsRedirecting(true);
-
-      toast({
-        title: "Selamat!",
-        description:
-          "Onboarding berhasil diselesaikan. Goal pertama telah dibuat!",
-        variant: "success",
-      });
+      // Set onboarding completed flag to trigger welcome screen flow
+      localStorage.setItem("onboarding-completed", "true");
 
       // Immediate cache invalidation
       queryClient.invalidateQueries({ queryKey: ["/api/onboarding/status"] });
       queryClient.invalidateQueries({ queryKey: ["/api/onboarding/progress"] });
 
-      // Redirect using wouter
-      console.log("🔄 Redirecting to dashboard using wouter...");
-      navigate("/");
-      console.log("✅ Wouter navigation completed successfully");
+      // Show completion modal instead of immediate navigation
+      setShowCompletionModal(true);
     },
     onError: (error) => {
       toast({
@@ -1388,6 +1381,20 @@ export default function CompanyOnboarding() {
         top: 0,
         behavior: "smooth",
       });
+    } else {
+      // Final step (step 8) - Complete the onboarding
+      const finalData = {
+        ...onboardingData,
+        completedSteps: Array.from(
+          new Set([...onboardingData.completedSteps, onboardingData.currentStep]),
+        ),
+        isCompleted: true,
+      };
+
+      setOnboardingData(finalData);
+
+      // Trigger completion
+      completeOnboardingMutation.mutate();
     }
   };
 
@@ -5710,6 +5717,23 @@ export default function CompanyOnboarding() {
           periodName: onboardingData.cycleDuration,
           startDate: onboardingData.cycleStartDate,
           endDate: onboardingData.cycleEndDate,
+        }}
+      />
+
+      {/* Tour Completion Modal */}
+      <TourCompletionModal
+        isOpen={showCompletionModal}
+        onClose={() => {
+          setShowCompletionModal(false);
+          // Start the tour system after closing completion modal
+          startTour();
+          // Navigate to dashboard
+          setTimeout(() => {
+            setIsRedirecting(true);
+            setTimeout(() => {
+              navigate("/");
+            }, 1000);
+          }, 500);
         }}
       />
     </div>
