@@ -2412,43 +2412,16 @@ export function KeyResultModal({
                       </PopoverContent>
                     </Popover>
                   </FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Pilih penanggung jawab..." />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="unassigned">
-                        <div className="flex items-center gap-2">
-                          <UserIcon className="w-4 h-4" />
-                          Tidak ditentukan (Default: Goal Owner)
-                        </div>
-                      </SelectItem>
-                      {users?.map((user) => (
-                        <SelectItem key={user.id} value={user.id}>
-                          <div className="flex items-center gap-2">
-                            <div className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-medium">
-                              {user.name
-                                ? user.name
-                                    .split(" ")
-                                    .map((n) => n[0])
-                                    .join("")
-                                    .toUpperCase()
-                                    .slice(0, 2)
-                                : user.email
-                                    ?.split("@")[0]
-                                    .slice(0, 2)
-                                    .toUpperCase() || "U"}
-                            </div>
-                            {user.name && user.name.trim() !== "" 
-                              ? user.name 
-                              : user.email?.split("@")[0] || "User"}
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <FormControl>
+                    <SearchableUserSelect
+                      users={users || []}
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      placeholder="Pilih penanggung jawab..."
+                      emptyMessage="Tidak ada user ditemukan"
+                      allowUnassigned={true}
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
