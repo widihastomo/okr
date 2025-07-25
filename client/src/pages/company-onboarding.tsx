@@ -4987,7 +4987,12 @@ export default function CompanyOnboarding() {
                   </Button>
                 )}
 
-                {onboardingData.currentStep === 8 ? (
+                {(() => {
+                  console.log("🎯 DEBUG: currentStep =", onboardingData.currentStep, "type:", typeof onboardingData.currentStep);
+                  console.log("🎯 DEBUG: currentStep === 8?", onboardingData.currentStep === 8);
+                  console.log("🎯 DEBUG: currentStep == 8?", onboardingData.currentStep == 8);
+                  return onboardingData.currentStep === 8 || onboardingData.currentStep == 8;
+                })() ? (
                   <Button
                     onClick={handleComplete}
                     disabled={
