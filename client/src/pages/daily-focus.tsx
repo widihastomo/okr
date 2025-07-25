@@ -383,7 +383,7 @@ export default function DailyFocusPage() {
 
   // Extract key results from objectives data (includes calculated status)
   const keyResults = React.useMemo(() => {
-    return objectives.flatMap((obj: any) => obj.keyResults || []);
+    return (objectives as any[]).flatMap((obj: any) => obj.keyResults || []);
   }, [objectives]);
 
   const { data: initiatives = [], isLoading: isLoadingInitiatives } = useQuery({
@@ -398,7 +398,7 @@ export default function DailyFocusPage() {
   const { data: allTasks = [], isLoading: isLoadingAllTasks } = useQuery({
     queryKey: ["/api/tasks"],
     staleTime: 0, // Always fetch fresh data
-    cacheTime: 0, // Don't cache
+    gcTime: 0, // Don't cache
   });
 
   const { data: users = [], isLoading: isLoadingUsers } = useQuery({
@@ -406,7 +406,7 @@ export default function DailyFocusPage() {
   });
   
   // Filter active users for better performance
-  const activeUsers = users.filter((user: any) => user.isActive === true);
+  const activeUsers = (users as any[]).filter((user: any) => user.isActive === true);
 
   const { data: cycles = [], isLoading: isLoadingCycles } = useQuery({
     queryKey: ["/api/cycles"],
@@ -426,7 +426,7 @@ export default function DailyFocusPage() {
       enabled: !!taskId,
       staleTime: 30000, // Cache for 30 seconds
     });
-    return comments.length;
+    return (comments as any[]).length;
   };
 
   // Task Comment Count Component

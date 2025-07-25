@@ -452,6 +452,12 @@ The system now includes a comprehensive dummy data generation feature that creat
 
 ## Changelog
 ```
+- July 25, 2025. **OVERVIEW CARDS SECTION REMOVED** - Successfully removed Overview Cards section from Dashboard per user request:
+  * REMOVED: Complete overview cards section (Task Hari Ini, Task Terlambat, Total Angka Target, Level & Progress)
+  * FIXED: EditCycleModal periodName undefined error with proper null checks and default values
+  * CLEANED: Removed data-tour="overview-cards" references from tour system
+  * STREAMLINED: Dashboard now flows directly from user filter to progress section
+  * RESULT: Cleaner Dashboard interface without redundant overview statistics cards
 - July 25, 2025. **TEMPLATE GOALS MENU TOUR COMPLETED** - Successfully implemented minimal tour functionality for Template Goals menu highlighting:
   * ADDED: Single template-goals tour step positioned after cycles step in tour sequence
   * POSITIONED: Template Goals menu tour placed at step 7 (after cycles, before achievements)

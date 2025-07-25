@@ -41,18 +41,18 @@ const EditCycleModal: React.FC<EditCycleModalProps> = ({
     }
   };
 
-  const [periodName, setPeriodName] = useState(getCyclePeriodName(initialData.periodName));
+  const [periodName, setPeriodName] = useState(getCyclePeriodName(initialData?.periodName || ""));
   const [startDate, setStartDate] = useState<Date | undefined>(
-    initialData.startDate ? new Date(initialData.startDate) : undefined
+    initialData?.startDate ? new Date(initialData.startDate) : undefined
   );
   const [endDate, setEndDate] = useState<Date | undefined>(
-    initialData.endDate ? new Date(initialData.endDate) : undefined
+    initialData?.endDate ? new Date(initialData.endDate) : undefined
   );
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    if (isOpen) {
-      setPeriodName(getCyclePeriodName(initialData.periodName));
+    if (isOpen && initialData) {
+      setPeriodName(getCyclePeriodName(initialData.periodName || ""));
       setStartDate(initialData.startDate ? new Date(initialData.startDate) : undefined);
       setEndDate(initialData.endDate ? new Date(initialData.endDate) : undefined);
       setErrors({});
