@@ -656,6 +656,18 @@ export default function GoalDetail() {
     createKeyResultMutation.mutate(processedData);
   };
 
+  const toggleKeyResultExpand = (keyResultId: string) => {
+    setExpandedKeyResults((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(keyResultId)) {
+        newSet.delete(keyResultId);
+      } else {
+        newSet.add(keyResultId);
+      }
+      return newSet;
+    });
+  };
+
   // Mutation for deleting key result
   const deleteKeyResultMutation = useMutation({
     mutationFn: async (keyResultId: string) => {
@@ -1044,18 +1056,6 @@ export default function GoalDetail() {
     setEditKeyResultModal({ open: true, keyResult });
   };
 
-  const toggleKeyResultExpand = (keyResultId: string) => {
-    setExpandedKeyResults((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(keyResultId)) {
-        newSet.delete(keyResultId);
-      } else {
-        newSet.add(keyResultId);
-      }
-      return newSet;
-    });
-  };
-
   const getOwnerDisplay = () => {
     if (!owner) {
       return "Memuat...";
@@ -1424,32 +1424,455 @@ export default function GoalDetail() {
             </div>
           </div>
         )}
+
+        {/* Key Results List - moved from tab */}
+        <div className="mt-6 space-y-4">
+          {goal?.keyResults?.length === 0 ? (
+            <div className="border-2 border-dashed border-blue-200 bg-blue-50/50 rounded-lg p-8 text-center">
+              <Target className="w-12 h-12 text-blue-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-blue-900 mb-2">
+                Belum ada Angka Target
+              </h3>
+              <p className="text-blue-700 mb-4">
+                Mulai tambahkan Angka Target untuk mengukur progress goal
+                ini
+              </p>
+              <Button
+                onClick={() => setAddKeyResultModal({ open: true })}
+                className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Tambah Angka Target Pertama
+              </Button>
+            </div>
+          ) : (
+            goal?.keyResults?.map((kr) => {
+              const progress = calculateProgress(
+                kr.currentValue,
+                kr.targetValue,
+                kr.keyResultType,
+                kr.baseValue,
+              );
+
+              const getKeyResultTypeIcon = (type: string) => {
+                switch (type) {
+                  case "increase_to":
+                    return {
+                      icon: TrendingUp,
+                      tooltip:
+                        "Target Peningkatan - Progress dihitung dari nilai awal ke target",
+                    };
+                  case "decrease_to":
+                    return {
+                      icon: TrendingDown,
+                      tooltip:
+                        "Target Penurunan - Progress dihitung dari nilai awal ke bawah",
+                    };
+                  case "achieve_or_not":
+                    return {
+                      icon: Target,
+                      tooltip:
+                        "Target Binary - Berhasil atau tidak berhasil (100% atau 0%)",
+                    };
+                  case "should_stay_above":
+                    return {
+                      icon: Plus,
+                      tooltip:
+                        "Target Minimum - Nilai harus tetap di atas batas yang ditentukan",
+                    };
+                  case "should_stay_below":
+                    return {
+                      icon: Minus,
+                      tooltip:
+                        "Target Maksimum - Nilai harus tetap di bawah batas yang ditentukan",
+                    };
+                  default:
+                    return { icon: Target, tooltip: "Key Result" };
+                }
+              };
+
+              const typeConfig = getKeyResultTypeIcon(kr.keyResultType);
+              const IconComponent = typeConfig.icon;
+
+              const isExpanded = expandedKeyResults.has(kr.id);
+              const krInitiatives = inisiatif.filter(
+                (r) => r.keyResultId === kr.id,
+              );
+
+              return (
+                <div
+                  key={kr.id}
+                  className="p-3 sm:p-4 bg-white border border-gray-200 rounded-lg space-y-2 sm:space-y-3"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        {/* Expand/Collapse Button */}
+                        {krInitiatives.length > 0 && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-6 w-6 p-0 hover:bg-gray-100"
+                            onClick={() => toggleKeyResultExpand(kr.id)}
+                          >
+                            {isExpanded ? (
+                              <ChevronDown className="w-4 h-4 text-gray-500" />
+                            ) : (
+                              <ChevronRight className="w-4 h-4 text-gray-500" />
+                            )}
+                          </Button>
+                        )}
+                        <Link
+                          href={`/key-results/${kr.id}`}
+                          className="font-medium text-gray-900 hover:text-blue-600 hover:underline cursor-pointer text-left"
+                        >
+                          {kr.title}
+                        </Link>
+                        <div className="relative group">
+                          <IconComponent className="w-4 h-4 text-gray-500 hover:text-gray-700 cursor-help" />
+                          <div className="absolute left-full top-1/2 transform -translate-y-1/2 ml-2 px-3 py-2 bg-black text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50 whitespace-nowrap">
+                            {typeConfig.tooltip}
+                            <div className="absolute right-full top-1/2 transform -translate-y-1/2 w-0 h-0 border-t-4 border-b-4 border-r-4 border-transparent border-r-black"></div>
+                          </div>
+                        </div>
+                      </div>
+                      <p className="text-sm text-gray-600 mb-2">
+                        {kr.description}
+                      </p>
+
+                      <div className="text-xs text-gray-500">
+                        {(() => {
+                          // Handle achieve_or_not type
+                          if (kr.keyResultType === "achieve_or_not") {
+                            return progress >= 100
+                              ? "Status: Tercapai"
+                              : "Status: Belum tercapai";
+                          }
+
+                          // Handle should_stay types
+                          if (
+                            kr.keyResultType === "should_stay_above" ||
+                            kr.keyResultType === "should_stay_below"
+                          ) {
+                            const currentVal = parseFloat(kr.currentValue);
+                            const targetVal = parseFloat(kr.targetValue);
+                            const unitDisplay =
+                              kr.unit === "Rp"
+                                ? "Rp "
+                                : kr.unit === "%"
+                                  ? ""
+                                  : "";
+                            const unitSuffix = kr.unit === "%" ? "%" : "";
+
+                            return `Saat ini: ${unitDisplay}${currentVal.toLocaleString("id-ID")}${unitSuffix} | Threshold: ${unitDisplay}${targetVal.toLocaleString("id-ID")}${unitSuffix}`;
+                          }
+
+                          // Handle increase_to and decrease_to types
+                          const currentVal = parseFloat(kr.currentValue);
+                          const targetVal = parseFloat(kr.targetValue);
+                          const baseVal = kr.baseValue
+                            ? parseFloat(kr.baseValue)
+                            : 0;
+
+                          if (kr.keyResultType === "decrease_to") {
+                            if (kr.unit === "Rp") {
+                              return `Rp ${baseVal.toLocaleString("id-ID")} → Rp ${targetVal.toLocaleString("id-ID")} (capaian: Rp ${currentVal.toLocaleString("id-ID")})`;
+                            } else if (kr.unit === "%") {
+                              return `${baseVal.toLocaleString("id-ID")}% → ${targetVal.toLocaleString("id-ID")}% (capaian: ${currentVal.toLocaleString("id-ID")}%)`;
+                            } else {
+                              return `${baseVal.toLocaleString("id-ID")} → ${targetVal.toLocaleString("id-ID")} ${kr.unit || ""} (capaian: ${currentVal.toLocaleString("id-ID")})`;
+                            }
+                          } else {
+                            // increase_to type
+                            if (kr.unit === "Rp") {
+                              return `Rp ${baseVal.toLocaleString("id-ID")} → Rp ${targetVal.toLocaleString("id-ID")} (capaian: Rp ${currentVal.toLocaleString("id-ID")})`;
+                            } else if (kr.unit === "%") {
+                              return `${baseVal.toLocaleString("id-ID")}% → ${targetVal.toLocaleString("id-ID")}% (capaian: ${currentVal.toLocaleString("id-ID")}%)`;
+                            } else {
+                              return `${baseVal.toLocaleString("id-ID")} → ${targetVal.toLocaleString("id-ID")} ${kr.unit || ""} (capaian: ${currentVal.toLocaleString("id-ID")})`;
+                            }
+                          }
+                        })()}
+                      </div>
+                    </div>
+
+                    {/* Action Buttons - Top Right */}
+                    <div className="flex items-center gap-1 shrink-0">
+                      <Button
+                        variant="default"
+                        size="sm"
+                        onClick={() => handleCheckIn(kr)}
+                        className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white tour-check-in"
+                      >
+                        <TrendingUp className="w-4 h-4 mr-1" />
+                        <span className="sm:hidden">Update</span>
+                        <span className="hidden sm:inline">Update</span>
+                      </Button>
+                      <Link href={`/key-results/${kr.id}`}>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0 shrink-0"
+                          title="Lihat Detail"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                      </Link>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0 shrink-0"
+                          >
+                            <MoreVertical className="w-4 h-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <DropdownMenuItem
+                            onClick={() => handleEditKeyResult(kr)}
+                          >
+                            <Settings className="w-4 h-4 mr-2" />
+                            Edit Angka Target
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => handleDeleteKeyResult(kr)}
+                            className="text-red-600 hover:text-red-700"
+                          >
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            Hapus Angka Target
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </div>
+
+                  {/* Progress section with last check-in - consistent with dashboard */}
+                  <div className="space-y-3 sm:space-y-0 sm:flex sm:items-center sm:justify-between">
+                    <div className="w-full sm:flex-1 sm:mr-4">
+                      {/* Mobile: Use compact mode, Desktop: Use full progress bar */}
+                      <div className="block sm:hidden">
+                        <SimpleProgressStatus
+                          status={kr.status}
+                          progressPercentage={progress}
+                          timeProgressPercentage={
+                            kr.timeProgressPercentage || 0
+                          }
+                          dueDate={null}
+                          startDate={cycle?.startDate}
+                          compact={true}
+                          keyResultType={kr.type}
+                        />
+                      </div>
+                      <div className="hidden sm:block">
+                        <SimpleProgressStatus
+                          status={kr.status}
+                          progressPercentage={progress}
+                          timeProgressPercentage={
+                            kr.timeProgressPercentage || 0
+                          }
+                          dueDate={null}
+                          startDate={cycle?.startDate}
+                          compact={false}
+                          keyResultType={kr.type}
+                        />
+                      </div>
+                    </div>
+                    {kr.lastCheckIn && (
+                      <div className="text-xs text-gray-500 sm:text-right sm:ml-4 sm:shrink-0">
+                        <div className="flex items-center gap-1 sm:justify-end">
+                          <span className="text-gray-400">
+                            Terakhir update:
+                          </span>
+                          <span className="text-gray-600">
+                            {kr.lastCheckIn.createdAt &&
+                              new Date(
+                                kr.lastCheckIn.createdAt,
+                              ).toLocaleDateString("id-ID", {
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric",
+                              })}
+                          </span>
+                        </div>
+                        {kr.lastCheckIn.notes && (
+                          <div className="relative group mt-1">
+                            <div className="text-gray-400 italic text-xs max-w-xs truncate sm:text-right cursor-help">
+                              "{kr.lastCheckIn.notes}"
+                            </div>
+                            {/* Custom tooltip */}
+                            <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-black text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50 max-w-sm min-w-0 break-words">
+                              {kr.lastCheckIn.notes}
+                              <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-black"></div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Bottom section - Assignee and Initiative count */}
+                  <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+                    {/* Assignee information - Left */}
+                    <div className="relative group text-xs text-gray-600 flex items-center gap-2">
+                      {kr.assignedTo ? (
+                        <>
+                          <Avatar className="w-5 h-5">
+                            <AvatarImage 
+                              src={getUserProfileImage(kr.assignedTo)} 
+                              alt={getUserName(kr.assignedTo)}
+                            />
+                            <AvatarFallback className="bg-blue-500 text-white text-xs font-medium cursor-help">
+                              {getUserInitials(kr.assignedTo)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <span className="font-medium text-gray-800">
+                            {getUserName(kr.assignedTo)}
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          <div className="w-5 h-5 bg-gray-300 rounded-full flex items-center justify-center cursor-help">
+                            <UserIcon className="w-3 h-3 text-gray-500" />
+                          </div>
+                          <span className="text-gray-500 italic">
+                            Belum ditentukan
+                          </span>
+                        </>
+                      )}
+
+                      {/* Tooltip for assignee info */}
+                      <div className="absolute bottom-full left-0 mb-2 px-3 py-2 bg-black text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50 whitespace-nowrap">
+                        {kr.assignedTo
+                          ? `Penanggung jawab: ${getUserName(kr.assignedTo)} - Bertanggung jawab untuk memantau dan melaporkan progress angka target ini`
+                          : "Belum ada penanggung jawab - Assign seseorang untuk memantau progress angka target ini"}
+                        <div className="absolute top-full left-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-black"></div>
+                      </div>
+                    </div>
+
+                    {/* Initiative count - Right */}
+                    <div className="text-xs text-gray-500 flex items-center gap-1">
+                      <Target className="w-3 h-3" />
+                      <span>
+                        {
+                          inisiatif.filter((r) => r.keyResultId === kr.id)
+                            .length
+                        }
+                      </span>
+                      <span>inisiatif</span>
+                    </div>
+                  </div>
+
+                  {/* Expanded Initiatives Section */}
+                  {isExpanded && krInitiatives.length > 0 && (
+                    <div className="mt-4 pt-4 border-t border-gray-100">
+                      <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
+                        <FileText className="w-4 h-4" />
+                        Inisiatif Terkait ({krInitiatives.length})
+                      </h4>
+                      <div className="space-y-2">
+                        {krInitiatives.map((initiative) => (
+                          <div
+                            key={initiative.id}
+                            className="p-3 bg-gray-50 rounded-md border border-gray-200"
+                          >
+                            <div className="flex items-start justify-between mb-2">
+                              <div className="flex gap-2">
+                                <Badge
+                                  className={
+                                    initiative.status === "completed"
+                                      ? "bg-green-100 text-green-800"
+                                      : initiative.status === "in_progress"
+                                        ? "bg-blue-100 text-blue-800"
+                                        : initiative.status === "on_hold"
+                                          ? "bg-yellow-100 text-yellow-800"
+                                          : "bg-gray-100 text-gray-800"
+                                  }
+                                >
+                                  {initiative.status?.replace("_", " ") ||
+                                    "pending"}
+                                </Badge>
+                                <Badge
+                                  className={
+                                    initiative.priority === "critical"
+                                      ? "bg-red-100 text-red-800"
+                                      : initiative.priority === "high"
+                                        ? "bg-orange-100 text-orange-800"
+                                        : initiative.priority === "medium"
+                                          ? "bg-yellow-100 text-yellow-800"
+                                          : "bg-green-100 text-green-800"
+                                  }
+                                >
+                                  {initiative.priority || "medium"}
+                                </Badge>
+                              </div>
+                              <Link href={`/initiatives/${initiative.id}`}>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-6 px-2 text-xs text-blue-600 hover:text-blue-800"
+                                >
+                                  <Eye className="w-3 h-3 mr-1" />
+                                  Detail
+                                </Button>
+                              </Link>
+                            </div>
+                            <div className="mb-2">
+                              <Link href={`/initiatives/${initiative.id}`}>
+                                <h5 className="font-medium text-gray-900 hover:text-blue-600 cursor-pointer">
+                                  {initiative.title}
+                                </h5>
+                              </Link>
+                              {initiative.description && (
+                                <p className="text-xs text-gray-600 mt-1 line-clamp-2">
+                                  {initiative.description}
+                                </p>
+                              )}
+                            </div>
+                            <div className="flex items-center justify-between text-xs text-gray-500">
+                              <div className="flex items-center gap-4">
+                                <span>
+                                  Progress:{" "}
+                                  {initiative.progressPercentage || 0}%
+                                </span>
+                                {initiative.dueDate && (
+                                  <span
+                                    className={
+                                      new Date(initiative.dueDate) <
+                                      new Date()
+                                        ? "text-red-600"
+                                        : ""
+                                    }
+                                  >
+                                    Due:{" "}
+                                    {new Date(
+                                      initiative.dueDate,
+                                    ).toLocaleDateString("id-ID")}
+                                  </span>
+                                )}
+                              </div>
+                              {initiative.picId && (
+                                <span>
+                                  PIC: {getUserName(initiative.picId)}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          )}
+        </div>
       </div>
 
       {/* Tabs Section */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="flex w-full h-auto p-0 bg-transparent gap-0 rounded-none mb-4 sm:mb-6 relative tour-tabs">
-          {/* Tab 1 */}
-          <TabsTrigger
-            value="key-results"
-            className="relative bg-gray-100 border border-gray-300 px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-medium text-gray-700 hover:bg-gray-50 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:border-blue-600 flex items-center gap-2 sm:gap-3 justify-start flex-1"
-            style={{
-              clipPath:
-                "polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%)",
-              marginRight: "-15px",
-              zIndex: 3,
-            }}
-          >
-            <span className="bg-white text-blue-600 rounded-full w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center text-xs sm:text-sm font-bold shrink-0">
-              1
-            </span>
-            <span className="hidden sm:inline">
-              Angka Target ({goal?.keyResults?.length || 0})
-            </span>
-            <span className="sm:hidden">Target ({goal?.keyResults?.length || 0})</span>
-          </TabsTrigger>
-
-          {/* Tab 2 */}
+          {/* Tab 1 - Inisiatif */}
           <TabsTrigger
             value="initiatives"
             className="relative bg-gray-100 border border-gray-300 px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-medium text-gray-700 hover:bg-gray-50 data-[state=active]:bg-green-600 data-[state=active]:text-white data-[state=active]:border-green-600 flex items-center gap-2 sm:gap-3 justify-start flex-1"
@@ -1457,18 +1880,17 @@ export default function GoalDetail() {
               clipPath:
                 "polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%)",
               marginRight: "-15px",
-              paddingLeft: "24px",
               zIndex: 2,
             }}
           >
             <span className="bg-white text-green-600 rounded-full w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center text-xs sm:text-sm font-bold shrink-0">
-              2
+              1
             </span>
             <span className="hidden sm:inline">Inisiatif ({inisiatif.length})</span>
             <span className="sm:hidden">Inisiatif ({inisiatif.length})</span>
           </TabsTrigger>
 
-          {/* Tab 3 */}
+          {/* Tab 2 - Tugas */}
           <TabsTrigger
             value="tasks"
             className="relative bg-gray-100 border border-gray-300 px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-medium text-gray-700 hover:bg-gray-50 data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=active]:border-purple-600 flex items-center gap-2 sm:gap-3 justify-start flex-1"
@@ -1479,7 +1901,7 @@ export default function GoalDetail() {
             }}
           >
             <span className="bg-white text-purple-600 rounded-full w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center text-xs sm:text-sm font-bold shrink-0">
-              3
+              2
             </span>
             <span className="hidden sm:inline">Tugas ({tugas.length})</span>
             <span className="sm:hidden">Tugas ({tugas.length})</span>
