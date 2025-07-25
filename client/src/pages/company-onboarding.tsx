@@ -2392,6 +2392,15 @@ export default function CompanyOnboarding() {
           currentStep: onboardingData.currentStep,
           user: !!user
         });
+
+        // Additional debug for tasks
+        if (selectedTemplate?.tasks) {
+          console.log("🔍 Tasks Debug:", {
+            totalTasks: selectedTemplate.tasks.length,
+            taskStructure: selectedTemplate.tasks,
+            initiativeIds: selectedTemplate.tasks.map((t: any) => t.initiativeId)
+          });
+        }
         
         // Get initiatives from selected template
         const getTemplateInitiatives = () => {
@@ -2459,7 +2468,7 @@ export default function CompanyOnboarding() {
                         
                         {/* Display tasks for this initiative */}
                         {selectedTemplate?.tasks && selectedTemplate.tasks
-                          .filter((task: any) => task.initiativeTitle === initiative.title)
+                          .filter((task: any) => task.initiativeId === index.toString())
                           .length > 0 && (
                           <div className="mt-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
                             <p className="text-xs font-medium text-gray-700 flex items-center mb-2">
@@ -2468,7 +2477,7 @@ export default function CompanyOnboarding() {
                             </p>
                             <div className="space-y-2">
                               {selectedTemplate.tasks
-                                .filter((task: any) => task.initiativeTitle === initiative.title)
+                                .filter((task: any) => task.initiativeId === index.toString())
                                 .map((task: any, taskIndex: number) => (
                                   <div key={taskIndex} className="flex items-start space-x-2 text-xs">
                                     <CheckCircle className="w-3 h-3 text-green-500 mt-0.5 flex-shrink-0" />
