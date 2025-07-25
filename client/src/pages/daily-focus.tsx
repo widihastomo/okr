@@ -1936,17 +1936,17 @@ export default function DailyFocusPage() {
       
       {/* Main Content Tabs */}
       <Tabs defaultValue="daily-focus" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 bg-white border border-gray-200 rounded-lg p-1 shadow-sm">
+        <TabsList className="grid w-full grid-cols-2 bg-white border border-gray-200 rounded-lg p-2 shadow-sm gap-2">
           <TabsTrigger 
             value="daily-focus" 
-            className="flex items-center justify-center gap-2 py-3 px-4 text-gray-600 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-sm hover:bg-gray-50 transition-all duration-200 rounded-md"
+            className="flex items-center justify-center gap-2 py-2 px-3 text-gray-600 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-sm hover:bg-gray-50 transition-all duration-200 rounded-md"
           >
             <LayoutDashboard className="h-4 w-4" />
             <span className="font-medium">Daily Focus</span>
           </TabsTrigger>
           <TabsTrigger 
             value="timeline" 
-            className="flex items-center justify-center gap-2 py-3 px-4 text-gray-600 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-sm hover:bg-gray-50 transition-all duration-200 rounded-md"
+            className="flex items-center justify-center gap-2 py-2 px-3 text-gray-600 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-sm hover:bg-gray-50 transition-all duration-200 rounded-md"
           >
             <Activity className="h-4 w-4" />
             <span className="font-medium">Timeline</span>
