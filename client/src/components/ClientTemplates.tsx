@@ -281,9 +281,9 @@ export default function ClientTemplates() {
                     {categoryOptions.find(c => c.value === template.category)?.label || template.category}
                   </Badge>
                   
-                  {template.isDefault && (
+                  {template.initiatives && template.initiatives.length > 0 && (
                     <Badge variant="secondary" className="text-xs">
-                      System
+                      {template.initiatives.length} Inisiatif
                     </Badge>
                   )}
                 </div>
