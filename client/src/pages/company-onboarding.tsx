@@ -1089,6 +1089,16 @@ export default function CompanyOnboarding() {
     console.log("🎯 TeamFocus changed to:", onboardingData.teamFocus);
   }, [onboardingData.teamFocus]);
 
+  // Initialize company name from organization data if not already set
+  useEffect(() => {
+    if (organizationData?.organization?.name && !onboardingData.companyName) {
+      setOnboardingData((prevData) => ({
+        ...prevData,
+        companyName: organizationData.organization.name,
+      }));
+    }
+  }, [organizationData, onboardingData.companyName]);
+
   // Validation function for each step
   const validateStep = (
     step: number,
@@ -1097,7 +1107,8 @@ export default function CompanyOnboarding() {
     switch (step) {
       case 1:
         // Step 1 is now company profile form - validate all required fields
-        if (!data.companyName?.trim()) {
+        const companyName = data.companyName?.trim() || (organizationData as any)?.organization?.name?.trim();
+        if (!companyName) {
           return {
             isValid: false,
             message: "Silakan isi nama perusahaan",
