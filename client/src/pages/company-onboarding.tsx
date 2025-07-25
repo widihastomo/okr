@@ -131,25 +131,31 @@ const ONBOARDING_STEPS = [
   },
   {
     id: 6,
+    title: "Frekuensi Update Goal",
+    description: "Seberapa sering Anda ingin memperbarui progress goal?",
+    icon: Clock,
+  },
+  {
+    id: 7,
     title: "Pilih Inisiatif Prioritas",
     description:
       "Tentukan langkah-langkah strategis untuk mencapai angka target",
     icon: CheckCircle,
   },
   {
-    id: 7,
+    id: 8,
     title: "Tugas untuk Inisiatif",
     description: "Tentukan tugas-tugas yang harus dikerjakan",
     icon: BarChart,
   },
   {
-    id: 8,
+    id: 9,
     title: "Pilih Ritme",
     description: "Seberapa sering Anda ingin update progress?",
     icon: Clock,
   },
   {
-    id: 9,
+    id: 10,
     title: "Ringkasan",
     description:
       "Lihat ringkasan dari goal dan strategi eksekusi yang sudah anda buat",
@@ -1141,6 +1147,14 @@ export default function CompanyOnboarding() {
         // Users can add initiatives later through goal settings
         break;
       case 6:
+        if (!data.updateFrequency) {
+          return {
+            isValid: false,
+            message: "Silakan pilih frekuensi update goal",
+          };
+        }
+        break;
+      case 7:
         if (data.initiatives.length === 0) {
           return {
             isValid: false,
@@ -1148,7 +1162,7 @@ export default function CompanyOnboarding() {
           };
         }
         break;
-      case 7:
+      case 8:
         if (data.tasks.length === 0) {
           return {
             isValid: false,
@@ -1156,7 +1170,7 @@ export default function CompanyOnboarding() {
           };
         }
         break;
-      case 8:
+      case 9:
         if (!data.cadence) {
           return { isValid: false, message: "Silakan pilih ritme check-in" };
         }
@@ -2558,7 +2572,137 @@ export default function CompanyOnboarding() {
           </div>
         );
 
-      case 8: // Pilih Cadence
+      case 6: // Frekuensi Update Goal
+        return (
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <Label className="text-lg font-semibold flex items-center gap-2">
+                <Clock className="w-5 h-5 text-blue-600" />
+                Pilih frekuensi update goal:
+              </Label>
+              <p className="text-sm text-gray-600">
+                Seberapa sering Anda ingin memperbarui progress goal? Setting ini akan menentukan ritme monitoring dan evaluasi pencapaian Anda.
+              </p>
+            </div>
+            
+            <RadioGroup
+              value={onboardingData.updateFrequency}
+              onValueChange={(value) =>
+                setOnboardingData({ ...onboardingData, updateFrequency: value })
+              }
+              className="space-y-4"
+            >
+              <div
+                className={`relative p-6 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
+                  onboardingData.updateFrequency === "harian"
+                    ? "border-blue-500 bg-blue-50 shadow-md"
+                    : "border-gray-200 bg-white hover:border-blue-300"
+                }`}
+                onClick={() =>
+                  setOnboardingData({ ...onboardingData, updateFrequency: "harian" })
+                }
+              >
+                <div className="flex items-start space-x-4">
+                  <RadioGroupItem value="harian" id="freq-harian" className="mt-1" />
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <Clock className="w-5 h-5 text-red-600" />
+                      <Label
+                        htmlFor="freq-harian"
+                        className="font-semibold text-lg cursor-pointer"
+                      >
+                        Update Harian
+                      </Label>
+                    </div>
+                    <p className="text-sm text-gray-600 mb-2">
+                      Pembaruan progress setiap hari untuk monitoring ketat dan progress yang cepat.
+                    </p>
+                    <div className="text-xs text-gray-500">
+                      <strong>Cocok untuk:</strong> Goal dengan target jangka pendek, perlu monitoring ketat, atau dalam fase kritis
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                className={`relative p-6 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
+                  onboardingData.updateFrequency === "mingguan"
+                    ? "border-blue-500 bg-blue-50 shadow-md"
+                    : "border-gray-200 bg-white hover:border-blue-300"
+                }`}
+                onClick={() =>
+                  setOnboardingData({ ...onboardingData, updateFrequency: "mingguan" })
+                }
+              >
+                <div className="flex items-start space-x-4">
+                  <RadioGroupItem value="mingguan" id="freq-mingguan" className="mt-1" />
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <Calendar className="w-5 h-5 text-yellow-600" />
+                      <Label
+                        htmlFor="freq-mingguan"
+                        className="font-semibold text-lg cursor-pointer"
+                      >
+                        Update Mingguan
+                      </Label>
+                    </div>
+                    <p className="text-sm text-gray-600 mb-2">
+                      Pembaruan progress setiap minggu untuk keseimbangan antara monitoring dan fokus eksekusi.
+                    </p>
+                    <div className="text-xs text-gray-500">
+                      <strong>Cocok untuk:</strong> Goal menengah, tim yang sudah terbiasa, atau fokus strategis reguler
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                className={`relative p-6 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
+                  onboardingData.updateFrequency === "bulanan"
+                    ? "border-blue-500 bg-blue-50 shadow-md"
+                    : "border-gray-200 bg-white hover:border-blue-300"
+                }`}
+                onClick={() =>
+                  setOnboardingData({ ...onboardingData, updateFrequency: "bulanan" })
+                }
+              >
+                <div className="flex items-start space-x-4">
+                  <RadioGroupItem value="bulanan" id="freq-bulanan" className="mt-1" />
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <TrendingUp className="w-5 h-5 text-green-600" />
+                      <Label
+                        htmlFor="freq-bulanan"
+                        className="font-semibold text-lg cursor-pointer"
+                      >
+                        Update Bulanan
+                      </Label>
+                    </div>
+                    <p className="text-sm text-gray-600 mb-2">
+                      Pembaruan progress setiap bulan untuk goal jangka panjang dan evaluasi strategis.
+                    </p>
+                    <div className="text-xs text-gray-500">
+                      <strong>Cocok untuk:</strong> Goal strategis jangka panjang, eksekutif level, atau review berkala
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </RadioGroup>
+
+            {onboardingData.updateFrequency && (
+              <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <div className="flex items-start space-x-2">
+                  <Info className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                  <div className="text-sm text-blue-700">
+                    <strong>Pilihan Anda:</strong> Update {onboardingData.updateFrequency} akan menentukan frekuensi reminder dan monitoring progress goal Anda. Anda dapat mengubah setting ini kapan saja di pengaturan goal.
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        );
+
+      case 9: // Pilih Cadence
         return (
           <div className="space-y-6">
             <div className="space-y-2">
@@ -2955,7 +3099,7 @@ export default function CompanyOnboarding() {
           </div>
         );
 
-      case 6: // Pilih Inisiatif Prioritas
+      case 7: // Pilih Inisiatif Prioritas
         const initiativeMapping = {
           // Penjualan - Omzet
           "Mencapai target penjualan Rp 500 juta per bulan": [
@@ -3942,7 +4086,7 @@ export default function CompanyOnboarding() {
           </div>
         );
 
-      case 9: // Dashboard Ringkas
+      case 10: // Dashboard Ringkas
         return (
           <div className="space-y-4">
             <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">

@@ -1619,7 +1619,7 @@ export type UpdateOnboardingProgress = z.infer<typeof updateOnboardingProgressSc
 
 // Company onboarding data schema
 export const companyOnboardingDataSchema = z.object({
-  currentStep: z.number().min(0).max(10).default(0), // Allow 0 for welcome screen
+  currentStep: z.number().min(0).max(11).default(0), // Allow 0 for welcome screen
   completedSteps: z.array(z.number()).default([]),
   // Company profile fields
   companyName: z.string().optional(),
@@ -1638,6 +1638,7 @@ export const companyOnboardingDataSchema = z.object({
   objective: z.string().optional(),
   objectiveDescription: z.string().optional(),
   keyResults: z.array(z.string()).default([]),
+  updateFrequency: z.string().optional(), // "harian", "mingguan", "bulanan"
   cadence: z.string().optional(),
   reminderTime: z.string().optional(),
   reminderDay: z.string().optional(), // For weekly reminders
