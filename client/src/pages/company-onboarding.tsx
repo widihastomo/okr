@@ -2896,19 +2896,11 @@ export default function CompanyOnboarding() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        {/* Logo Header */}
-        <div className="flex items-center justify-center mb-8 animate-in fade-in slide-in-from-top-4 duration-700">
-          <img
-            src={refokusLogo}
-            alt="Refokus Logo"
-            className="h-12 transition-all duration-300 hover:scale-105"
-          />
-        </div>
+      <div className="max-w-4xl mx-auto px-6 py-4">
 
         {/* Virtual Assistant - Only on welcome screen */}
         {onboardingData.currentStep === 0 && getVirtualAssistantMessage() && (
-          <div className="mb-8 animate-in fade-in slide-in-from-left-4 duration-500 delay-200">
+          <div className="mb-6 animate-in fade-in slide-in-from-left-4 duration-500 delay-200">
             <div className="bg-white/80 backdrop-blur-sm border border-orange-200 rounded-2xl p-6 shadow-lg">
               <div className="flex items-start space-x-4">
                 <div className="flex-shrink-0">
@@ -2934,7 +2926,7 @@ export default function CompanyOnboarding() {
 
         {/* Progress Bar */}
         {onboardingData.currentStep > 0 && (
-          <div className="mb-8 animate-in fade-in slide-in-from-top-2 duration-500">
+          <div className="mb-6 animate-in fade-in slide-in-from-top-2 duration-500">
             <div className="flex justify-between items-center mb-2">
               <span className="text-sm text-gray-600 transition-all duration-300">
                 Langkah {onboardingData.currentStep} dari 6
@@ -2950,9 +2942,9 @@ export default function CompanyOnboarding() {
           </div>
         )}
 
-        <div className="space-y-8">
+        <div className="space-y-6">
           {/* Step Content */}
-          <div className="space-y-6">
+          <div className="space-y-4">
             {onboardingData.currentStep === 0 ? (
               <Card
                 key="welcome"
