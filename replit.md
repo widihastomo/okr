@@ -452,6 +452,16 @@ The system now includes a comprehensive dummy data generation feature that creat
 
 ## Changelog
 ```
+- July 25, 2025. **TIMELINE TAB LEFT SIDEBAR LAYOUT COMPLETED** - Successfully restructured Timeline tab with left sidebar filters for desktop view:
+  * RESTRUCTURED: Timeline tab layout changed from top filters to left sidebar layout for desktop screens (lg breakpoint)
+  * ENHANCED: Added dedicated filter section on the left (lg:w-64) with proper labels and spacing for Activity Filter and User Filter
+  * MAINTAINED: Mobile responsiveness - filters automatically stack on top for small screens using flex-col lg:flex-row layout
+  * ADDED: Filter summary display showing "X aktivitas ditampilkan" at bottom of filter sidebar
+  * ORGANIZED: Main timeline content now flows on the right side (flex-1 lg:overflow-y-auto) for desktop view
+  * FIXED: Complex div structure issues and JSX closing tag mismatches during layout restructuring
+  * PRESERVED: All existing timeline functionality including social engagement, expandable details, and filtering logic
+  * RESPONSIVE: Clean desktop layout with left sidebar while maintaining identical mobile experience
+  * RESULT: Professional desktop timeline interface with organized left sidebar filters and improved space utilization
 - July 25, 2025. **OVERVIEW CARDS SECTION REMOVED** - Successfully removed Overview Cards section from Dashboard per user request:
   * REMOVED: Complete overview cards section (Task Hari Ini, Task Terlambat, Total Angka Target, Level & Progress)
   * FIXED: EditCycleModal periodName undefined error with proper null checks and default values

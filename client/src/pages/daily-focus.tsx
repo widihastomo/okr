@@ -393,7 +393,7 @@ function TimelineFeedComponent() {
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="pb-4">
         <CardTitle className="flex items-center gap-2">
           <MessageSquare className="h-5 w-5" />
           Timeline Feed
@@ -401,38 +401,57 @@ function TimelineFeedComponent() {
         <CardDescription>
           Activity feed dari update harian dan progress tim
         </CardDescription>
-        
-        {/* Filters */}
-        <div className="flex flex-col sm:flex-row gap-2 pt-4">
-          <Select value={timelineFilter} onValueChange={setTimelineFilter}>
-            <SelectTrigger className="w-full sm:w-40">
-              <SelectValue placeholder="Semua Aktivitas" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Semua Aktivitas</SelectItem>
-              <SelectItem value="daily_update">Update Harian</SelectItem>
-              <SelectItem value="check_in">Check-in Target</SelectItem>
-            </SelectContent>
-          </Select>
-          
-          <Select value={userFilter} onValueChange={setUserFilter}>
-            <SelectTrigger className="w-full sm:w-40">
-              <SelectValue placeholder="Semua User" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Semua User</SelectItem>
-              {(users as any[]).map((u: any) => (
-                <SelectItem key={u.id} value={u.id}>
-                  {u.name || u.email}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
       </CardHeader>
       
       <CardContent className="p-0">
-        {filteredTimeline.length === 0 ? (
+        <div className="flex flex-col lg:flex-row min-h-[600px]">
+          {/* Left Sidebar - Filters (Desktop) */}
+          <div className="lg:w-64 lg:flex-shrink-0 border-b lg:border-b-0 lg:border-r border-gray-200">
+            <div className="p-4 space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Filter Aktivitas</label>
+                <Select value={timelineFilter} onValueChange={setTimelineFilter}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Semua Aktivitas" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Semua Aktivitas</SelectItem>
+                    <SelectItem value="daily_update">Update Harian</SelectItem>
+                    <SelectItem value="check_in">Check-in Target</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Filter User</label>
+                <Select value={userFilter} onValueChange={setUserFilter}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Semua User" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Semua User</SelectItem>
+                    {(users as any[]).map((u: any) => (
+                      <SelectItem key={u.id} value={u.id}>
+                        {u.name || u.email}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Filter Summary */}
+              <div className="pt-2 border-t border-gray-100">
+                <div className="text-xs text-gray-500">
+                  {filteredTimeline.length} aktivitas ditampilkan
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Main Content Area */}
+          <div className="flex-1 lg:overflow-y-auto">
+            <div className="p-4">
+              {filteredTimeline.length === 0 ? (
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 text-center py-8 md:py-12 px-4">
             <MessageSquare className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-3 md:mb-4 text-gray-400" />
             <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-2">
@@ -798,6 +817,9 @@ function TimelineFeedComponent() {
             )}
           </div>
         )}
+        </div>
+      </div>
+    </div>
       </CardContent>
     </Card>
   );
