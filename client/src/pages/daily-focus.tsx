@@ -1706,16 +1706,21 @@ export default function DailyFocusPage() {
               <h1 className="text-xl md:text-2xl font-bold text-gray-900">
                 Dashboard
               </h1>
-              {/* Date display - top-right on mobile, positioned at title level */}
-              <div className="flex items-center gap-2 text-sm text-gray-500 sm:hidden">
-                <Calendar className="h-4 w-4" />
-                <span>
-                  {today.toLocaleDateString("id-ID", {
-                    weekday: "short",
-                    month: "short",
-                    day: "numeric",
-                  })}
-                </span>
+              {/* Date display and Daily Check-in - top-right on mobile, positioned at title level */}
+              <div className="flex items-center gap-2 sm:hidden">
+                <div className="flex items-center gap-2 text-sm text-gray-500">
+                  <Calendar className="h-4 w-4" />
+                  <span>
+                    {today.toLocaleDateString("id-ID", {
+                      weekday: "short",
+                      month: "short",
+                      day: "numeric",
+                    })}
+                  </span>
+                </div>
+                <div data-tour="update-harian-instan">
+                  <DailyUpdateSimple />
+                </div>
               </div>
             </div>
             <p className="text-sm md:text-base text-gray-600">
@@ -1723,7 +1728,7 @@ export default function DailyFocusPage() {
             </p>
           </div>
 
-          {/* Date display - desktop */}
+          {/* Date display and Daily Check-in - desktop */}
           <div className="flex items-center gap-3 relative z-10">
             <div className="hidden sm:flex items-center gap-2 text-sm text-gray-500">
               <Calendar className="h-4 w-4" />
@@ -1735,6 +1740,9 @@ export default function DailyFocusPage() {
                   day: "numeric",
                 })}
               </span>
+            </div>
+            <div data-tour="update-harian-instan">
+              <DailyUpdateSimple />
             </div>
           </div>
         </div>
@@ -1775,10 +1783,6 @@ export default function DailyFocusPage() {
 
           {/* Action buttons */}
           <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
-            <div data-tour="update-harian-instan">
-              <DailyUpdateSimple />
-            </div>
-
             <TourStartButton variant="outline" size="sm" />
           </div>
         </div>
