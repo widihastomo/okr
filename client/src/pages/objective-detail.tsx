@@ -1307,6 +1307,125 @@ export default function GoalDetail() {
           <ActivityLogCard objectiveId={goal?.id} />
         </div>
       </div>
+
+      {/* Angka Target Summary Card */}
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 sm:p-6 rounded-lg border border-blue-200 mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 gap-3 sm:gap-4">
+          <div className="flex-1">
+            <h3 className="text-lg sm:text-xl font-semibold text-blue-900 mb-2 flex items-center gap-2">
+              <Target className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 shrink-0" />
+              Angka Target
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button 
+                    type="button" 
+                    className="inline-flex items-center justify-center ml-1"
+                  >
+                    <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent side="right" className="max-w-sm">
+                  <div className="space-y-2">
+                    <h4 className="font-medium text-sm">Angka Target</h4>
+                    <p className="text-sm text-gray-600">
+                      Angka target adalah metrik kuantitatif yang mengukur keberhasilan goal secara objektif. 
+                      Setiap angka target memiliki:
+                    </p>
+                    <ul className="text-sm text-gray-600 space-y-1 list-disc pl-4">
+                      <li>Nilai baseline (titik awal pengukuran)</li>
+                      <li>Nilai target (hasil yang ingin dicapai)</li>
+                      <li>Nilai saat ini (progress terkini)</li>
+                      <li>Tipe target (increase, decrease, binary, threshold)</li>
+                      <li>Unit pengukuran (%, Rp, jumlah, dll)</li>
+                    </ul>
+                    <p className="text-sm text-gray-600 mt-2">
+                      <strong>Contoh:</strong> Meningkatkan penjualan dari 100 juta menjadi 150 juta per bulan
+                    </p>
+                  </div>
+                </PopoverContent>
+              </Popover>
+            </h3>
+            <p className="text-blue-700 text-sm leading-relaxed">Angka target menentukan bagaimana goal ini akan diukur. Setiap angka target memiliki target yang spesifik dan dapat diukur untuk memastikan pencapaian yang objektif.</p>
+          </div>
+          {goal?.keyResults?.length > 0 && (
+            <Button
+              onClick={() => setAddKeyResultModal({ open: true })}
+              className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white w-full sm:w-auto sm:ml-4 shrink-0"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              <span className="sm:hidden">Tambah</span>
+              <span className="hidden sm:inline">Tambah Angka Target</span>
+            </Button>
+          )}
+        </div>
+
+        {/* Quick Stats - only show when there are key results */}
+        {goal?.keyResults?.length > 0 && (
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+            <div className="bg-white p-4 rounded-lg border border-blue-100">
+              <div className="flex items-center gap-2 mb-1">
+                <CheckCircle2 className="w-4 h-4 text-green-600" />
+                <span className="text-sm font-medium text-gray-700">
+                  Tercapai
+                </span>
+              </div>
+              <div className="text-2xl font-bold text-green-600">
+                {
+                  goal?.keyResults?.filter((kr) => {
+                    const progress = calculateProgress(
+                      kr.currentValue,
+                      kr.targetValue,
+                      kr.keyResultType,
+                      kr.baseValue,
+                    );
+                    return progress >= 100;
+                  }).length || 0
+                }
+              </div>
+              <div className="text-xs text-gray-500">
+                dari {goal?.keyResults?.length || 0} ukuran
+              </div>
+            </div>
+
+            <div className="bg-white p-4 rounded-lg border border-blue-100">
+              <div className="flex items-center gap-2 mb-1">
+                <Clock className="w-4 h-4 text-orange-600" />
+                <span className="text-sm font-medium text-gray-700">
+                  Dalam Progress
+                </span>
+              </div>
+              <div className="text-2xl font-bold text-orange-600">
+                {
+                  goal?.keyResults?.filter((kr) => {
+                    const progress = calculateProgress(
+                      kr.currentValue,
+                      kr.targetValue,
+                      kr.keyResultType,
+                      kr.baseValue,
+                    );
+                    return progress > 0 && progress < 100;
+                  }).length || 0
+                }
+              </div>
+              <div className="text-xs text-gray-500">sedang berjalan</div>
+            </div>
+
+            <div className="bg-white p-4 rounded-lg border border-blue-100">
+              <div className="flex items-center gap-2 mb-1">
+                <BarChart3 className="w-4 h-4 text-blue-600" />
+                <span className="text-sm font-medium text-gray-700">
+                  Rata-rata Progress
+                </span>
+              </div>
+              <div className="text-2xl font-bold text-blue-600">
+                {overallProgress}%
+              </div>
+              <div className="text-xs text-gray-500">dari semua ukuran</div>
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* Tabs Section */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="flex w-full h-auto p-0 bg-transparent gap-0 rounded-none mb-4 sm:mb-6 relative tour-tabs">
@@ -1376,125 +1495,8 @@ export default function GoalDetail() {
               : ""
           }`}
         >
-          {/* Header with Description and Add Button */}
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 sm:p-6 rounded-lg border border-blue-200">
-            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 gap-3 sm:gap-4">
-              <div className="flex-1">
-                <h3 className="text-lg sm:text-xl font-semibold text-blue-900 mb-2 flex items-center gap-2">
-                  <Target className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 shrink-0" />
-                  Angka Target
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <button 
-                        type="button" 
-                        className="inline-flex items-center justify-center ml-1"
-                      >
-                        <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                      </button>
-                    </PopoverTrigger>
-                    <PopoverContent side="right" className="max-w-sm">
-                      <div className="space-y-2">
-                        <h4 className="font-medium text-sm">Angka Target</h4>
-                        <p className="text-sm text-gray-600">
-                          Angka target adalah metrik kuantitatif yang mengukur keberhasilan goal secara objektif. 
-                          Setiap angka target memiliki:
-                        </p>
-                        <ul className="text-sm text-gray-600 space-y-1 list-disc pl-4">
-                          <li>Nilai baseline (titik awal pengukuran)</li>
-                          <li>Nilai target (hasil yang ingin dicapai)</li>
-                          <li>Nilai saat ini (progress terkini)</li>
-                          <li>Tipe target (increase, decrease, binary, threshold)</li>
-                          <li>Unit pengukuran (%, Rp, jumlah, dll)</li>
-                        </ul>
-                        <p className="text-sm text-gray-600 mt-2">
-                          <strong>Contoh:</strong> Meningkatkan penjualan dari 100 juta menjadi 150 juta per bulan
-                        </p>
-                      </div>
-                    </PopoverContent>
-                  </Popover>
-                </h3>
-                <p className="text-blue-700 text-sm leading-relaxed">Angka target menentukan bagaimana goal ini akan diukur. Setiap angka target memiliki target yang spesifik dan dapat diukur untuk memastikan pencapaian yang objektif.</p>
-              </div>
-              {goal?.keyResults?.length > 0 && (
-                <Button
-                  onClick={() => setAddKeyResultModal({ open: true })}
-                  className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white w-full sm:w-auto sm:ml-4 shrink-0"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  <span className="sm:hidden">Tambah</span>
-                  <span className="hidden sm:inline">Tambah Angka Target</span>
-                </Button>
-              )}
-            </div>
-
-            {/* Quick Stats - only show when there are key results */}
-            {goal?.keyResults?.length > 0 && (
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
-                <div className="bg-white p-4 rounded-lg border border-blue-100">
-                  <div className="flex items-center gap-2 mb-1">
-                    <CheckCircle2 className="w-4 h-4 text-green-600" />
-                    <span className="text-sm font-medium text-gray-700">
-                      Tercapai
-                    </span>
-                  </div>
-                  <div className="text-2xl font-bold text-green-600">
-                    {
-                      goal?.keyResults?.filter((kr) => {
-                        const progress = calculateProgress(
-                          kr.currentValue,
-                          kr.targetValue,
-                          kr.keyResultType,
-                          kr.baseValue,
-                        );
-                        return progress >= 100;
-                      }).length || 0
-                    }
-                  </div>
-                  <div className="text-xs text-gray-500">
-                    dari {goal?.keyResults?.length || 0} ukuran
-                  </div>
-                </div>
-
-                <div className="bg-white p-4 rounded-lg border border-blue-100">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Clock className="w-4 h-4 text-orange-600" />
-                    <span className="text-sm font-medium text-gray-700">
-                      Dalam Progress
-                    </span>
-                  </div>
-                  <div className="text-2xl font-bold text-orange-600">
-                    {
-                      goal?.keyResults?.filter((kr) => {
-                        const progress = calculateProgress(
-                          kr.currentValue,
-                          kr.targetValue,
-                          kr.keyResultType,
-                          kr.baseValue,
-                        );
-                        return progress > 0 && progress < 100;
-                      }).length || 0
-                    }
-                  </div>
-                  <div className="text-xs text-gray-500">sedang berjalan</div>
-                </div>
-
-                <div className="bg-white p-4 rounded-lg border border-blue-100">
-                  <div className="flex items-center gap-2 mb-1">
-                    <BarChart3 className="w-4 h-4 text-blue-600" />
-                    <span className="text-sm font-medium text-gray-700">
-                      Rata-rata Progress
-                    </span>
-                  </div>
-                  <div className="text-2xl font-bold text-blue-600">
-                    {overallProgress}%
-                  </div>
-                  <div className="text-xs text-gray-500">dari semua ukuran</div>
-                </div>
-              </div>
-            )}
-
-            {/* Key Results List */}
-            <div className="mt-6 space-y-4">
+          {/* Key Results List */}
+          <div className="space-y-4">
               {goal?.keyResults?.length === 0 ? (
                 <div className="border-2 border-dashed border-blue-200 bg-blue-50/50 rounded-lg p-8 text-center">
                   <Target className="w-12 h-12 text-blue-400 mx-auto mb-4" />
@@ -1936,7 +1938,6 @@ export default function GoalDetail() {
                   );
                 })
               )}
-            </div>
           </div>
         </TabsContent>
 

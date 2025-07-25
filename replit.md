@@ -452,6 +452,13 @@ The system now includes a comprehensive dummy data generation feature that creat
 
 ## Changelog
 ```
+- July 25, 2025. **ANGKA TARGET SUMMARY CARD EXTRACTED** - Successfully extracted blue header section from Angka Target tab into separate standalone card positioned below overview cards:
+  * EXTRACTED: Blue header section from Angka Target tab (lines 1498-1615) into standalone card
+  * POSITIONED: Angka Target Summary Card placed between overview cards and tabs section
+  * MAINTAINED: All existing functionality including help popover, add button, and quick stats
+  * LAYOUT: New flow - Page Header → Mission Card → Overview Cards → Angka Target Summary Card → Tabs
+  * CLEANED: Removed duplicate header content from within Angka Target tab to avoid redundancy
+  * RESULT: Better visual separation and organization with dedicated Angka Target information card
 - July 25, 2025. **MISSION CARD REPOSITIONED ABOVE OVERVIEW CARDS** - Successfully moved Mission Card to appear before overview cards in objective detail page:
   * REPOSITIONED: Mission Card moved from position after overview cards (line 1310) to before overview cards (line 1256)
   * IMPROVED: Better visual hierarchy with mission guidance appearing immediately after page header
