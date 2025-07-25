@@ -452,6 +452,12 @@ The system now includes a comprehensive dummy data generation feature that creat
 
 ## Changelog
 ```
+- July 25, 2025. **OUTLINE BUTTON STYLE APPLIED** - Successfully converted "Tambah Angka Target" button to outline variant per user request:
+  * CHANGED: Button variant from default gradient style to outline style on line 1355
+  * UPDATED: Styling from bg-gradient-to-r orange background to border-orange-600 outline with orange text
+  * ENHANCED: Added subtle hover effect with light orange background (hover:bg-orange-50)
+  * MAINTAINED: All existing functionality while updating visual style to outline design
+  * RESULT: Clean outline button styling matching user preference for minimal, professional interface
 - July 25, 2025. **ANGKA TARGET SUMMARY CARD EXTRACTED** - Successfully extracted blue header section from Angka Target tab into separate standalone card positioned below overview cards:
   * EXTRACTED: Blue header section from Angka Target tab (lines 1498-1615) into standalone card
   * POSITIONED: Angka Target Summary Card placed between overview cards and tabs section
