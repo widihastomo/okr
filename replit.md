@@ -461,7 +461,8 @@ The system now includes a comprehensive dummy data generation feature that creat
   * FIXED: Complex div structure issues and JSX closing tag mismatches during layout restructuring
   * PRESERVED: All existing timeline functionality including social engagement, expandable details, and filtering logic
   * RESPONSIVE: Clean desktop layout with left sidebar while maintaining identical mobile experience
-  * RESULT: Professional desktop timeline interface with organized left sidebar filters and improved space utilization
+  * OPTIMIZED: Added max-w-2xl mx-auto to main content area to prevent cards from being too wide on desktop screens
+  * RESULT: Professional desktop timeline interface with organized left sidebar filters, improved space utilization, and optimal card width
 - July 25, 2025. **OVERVIEW CARDS SECTION REMOVED** - Successfully removed Overview Cards section from Dashboard per user request:
   * REMOVED: Complete overview cards section (Task Hari Ini, Task Terlambat, Total Angka Target, Level & Progress)
   * FIXED: EditCycleModal periodName undefined error with proper null checks and default values

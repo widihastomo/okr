@@ -450,7 +450,7 @@ function TimelineFeedComponent() {
 
           {/* Main Content Area */}
           <div className="flex-1 lg:overflow-y-auto">
-            <div className="p-4">
+            <div className="p-4 max-w-2xl mx-auto">
               {filteredTimeline.length === 0 ? (
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 text-center py-8 md:py-12 px-4">
             <MessageSquare className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-3 md:mb-4 text-gray-400" />
