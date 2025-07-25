@@ -1137,12 +1137,8 @@ export default function CompanyOnboarding() {
         }
         break;
       case 5:
-        if (!data.initiatives || data.initiatives.length === 0) {
-          return {
-            isValid: false,
-            message: "Silakan pilih minimal 1 inisiatif strategis",
-          };
-        }
+        // Allow skipping initiatives selection - no validation required
+        // Users can add initiatives later through goal settings
         break;
       case 6:
         if (data.initiatives.length === 0) {
@@ -2530,6 +2526,35 @@ export default function CompanyOnboarding() {
                 </p>
               </div>
             )}
+            
+            {/* Skip option */}
+            <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <div className="flex items-start space-x-3">
+                <Info className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                <div className="flex-1">
+                  <h4 className="font-medium text-blue-900 mb-2">
+                    Belum siap memilih inisiatif?
+                  </h4>
+                  <p className="text-sm text-blue-700 mb-3">
+                    Anda dapat melewati langkah ini dan menambahkan inisiatif strategis nanti melalui pengaturan goal.
+                  </p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setOnboardingData({
+                        ...onboardingData,
+                        initiatives: []
+                      });
+                    }}
+                    className="border-blue-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400"
+                  >
+                    <ArrowRight className="w-4 h-4 mr-2" />
+                    Lewati & Lanjutkan
+                  </Button>
+                </div>
+              </div>
+            </div>
           </div>
         );
 

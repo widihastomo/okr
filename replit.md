@@ -452,6 +452,12 @@ The system now includes a comprehensive dummy data generation feature that creat
 
 ## Changelog
 ```
+- July 25, 2025. **SKIP INITIATIVE SELECTION OPTION COMPLETED** - Successfully implemented skip functionality for initiative selection step:
+  * ADDED: Skip option card with Info icon and informative messaging allowing users to bypass initiative selection
+  * ENHANCED: Blue-themed skip card with "Lewati & Lanjutkan" button to clear initiatives array and proceed
+  * REMOVED: Step 5 validation requirement - users can now proceed without selecting any initiatives
+  * IMPROVED: Flexible onboarding flow accommodating users who want to set up initiatives later through goal settings
+  * RESULT: Users can complete onboarding without mandatory initiative selection while maintaining option to add them later
 - July 25, 2025. **INITIATIVE CARDS 2-COLUMN LAYOUT COMPLETED** - Successfully implemented responsive 2-column grid layout for initiative selection:
   * ENHANCED: Changed initiative cards from single column (space-y-4) to responsive 2-column grid (grid-cols-1 md:grid-cols-2 gap-4)
   * OPTIMIZED: Added h-fit class to ensure cards adjust height based on content for better visual balance
