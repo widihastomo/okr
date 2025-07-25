@@ -4858,8 +4858,8 @@ export default function CompanyOnboarding() {
             )}
           </div>
 
-          {/* Virtual Assistant - Show only on steps 0 and 1 */}
-          {onboardingData.currentStep <= 1 && (
+          {/* Virtual Assistant - Show only on step 0 (welcome screen) */}
+          {onboardingData.currentStep === 0 && (
             <div className="mb-6 animate-in fade-in slide-in-from-left-4 duration-500">
               <div
                 className={`bg-gradient-to-r ${getContainerBackgroundColor()} rounded-lg p-4 shadow-sm transition-all duration-500 hover:shadow-md hover:scale-[1.02] animate-pulse-gentle`}
