@@ -1728,8 +1728,37 @@ export default function DailyFocusPage() {
             </p>
           </div>
 
-          {/* Daily Check-in - desktop */}
+          {/* User Filter and Daily Check-in - desktop */}
           <div className="flex items-center gap-3 relative z-10">
+            <div className="hidden sm:flex items-center gap-2 text-sm text-gray-500">
+              <Calendar className="h-4 w-4" />
+              <span>
+                {today.toLocaleDateString("id-ID", {
+                  weekday: "long",
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </span>
+            </div>
+            <div className="hidden sm:flex items-center gap-2">
+              <User className="h-4 w-4 text-gray-500" />
+              <Select value={selectedUserId} onValueChange={setSelectedUserId}>
+                <SelectTrigger className="w-48">
+                  <SelectValue placeholder="Pilih anggota tim" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua Anggota Tim</SelectItem>
+                  {activeUsers?.map((user: any) => (
+                    <SelectItem key={user.id} value={user.id}>
+                      {user.name && user.name.trim() !== ''
+                        ? user.name.trim()
+                        : user.email?.split('@')[0] || user.username || "Unknown"}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             <div data-tour="update-harian-instan">
               <DailyUpdateSimple />
             </div>
@@ -1748,13 +1777,13 @@ export default function DailyFocusPage() {
           </div>
         )}
 
-        {/* Controls */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-          {/* User Filter */}
+        {/* Controls - Mobile User Filter */}
+        <div className="flex flex-col sm:hidden gap-3">
+          {/* User Filter - Mobile only */}
           <div className="flex items-center gap-2">
             <User className="h-4 w-4 text-gray-500" />
             <Select value={selectedUserId} onValueChange={setSelectedUserId}>
-              <SelectTrigger className="w-full sm:w-48">
+              <SelectTrigger className="w-full">
                 <SelectValue placeholder="Pilih anggota tim" />
               </SelectTrigger>
               <SelectContent>
@@ -1770,10 +1799,15 @@ export default function DailyFocusPage() {
             </Select>
           </div>
 
-          {/* Action buttons */}
-          <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
+          {/* Action buttons - Mobile */}
+          <div className="flex items-center gap-2 justify-end">
             <TourStartButton variant="outline" size="sm" />
           </div>
+        </div>
+
+        {/* Desktop Action buttons */}
+        <div className="hidden sm:flex items-center justify-end">
+          <TourStartButton variant="outline" size="sm" />
         </div>
       </div>
       {/* Filter Indicator - Only show when viewing another user's data */}
