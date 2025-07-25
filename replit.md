@@ -452,6 +452,12 @@ The system now includes a comprehensive dummy data generation feature that creat
 
 ## Changelog
 ```
+- July 25, 2025. **ULTIMATE TOUR STREAMLINING COMPLETED** - Successfully removed steps 10, 11, 12 for final optimization:
+  * REMOVED: achievement-progress-tab (Progress Tab - Personal Statistics)
+  * REMOVED: achievement-medals-tab (Achievements Tab - Badge & Medals)  
+  * REMOVED: achievement-leaderboard-tab (Leaderboard Tab - Team Rankings)
+  * OPTIMIZED: Tour system reduced from 22 to 19 total steps for ultimate minimal experience
+  * RESULT: Tour now covers only core navigation without any sub-tab explanations
 - July 25, 2025. **FINAL TOUR OPTIMIZATION COMPLETED** - Successfully removed step 9 and made step 10 click-free for ultimate streamlined experience:
   * REMOVED: cycles-content (Siklus Kelola Periode table explanation)
   * ENHANCED: achievements step now shows tooltip without requiring user click
