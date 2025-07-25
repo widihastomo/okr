@@ -452,6 +452,18 @@ The system now includes a comprehensive dummy data generation feature that creat
 
 ## Changelog
 ```
+- July 25, 2025. **ADDITIONAL TOUR STEPS REMOVAL COMPLETED** - Successfully removed tour steps 6, 7, 8, 10, 11, 12, 13, 15, 16 for ultra-streamlined experience:
+  * REMOVED: goals-filter (Goals Filter & Pencarian)
+  * REMOVED: goals-list-view-tab (Goals Tampilan List)
+  * REMOVED: goals-hierarchy-view-tab (Goals Tampilan Hierarchy)
+  * REMOVED: tasks-list-view (Tasks Tampilan List)
+  * REMOVED: tasks-kanban-view (Tasks Tampilan Kanban)
+  * REMOVED: tasks-timeline-view (Tasks Tampilan Timeline)
+  * REMOVED: tasks-calendar-view (Tasks Tampilan Calendar)
+  * REMOVED: timeline-daily-checkin (Timeline Daily Check-in button)
+  * REMOVED: timeline-feed (Timeline Activity Feed)
+  * OPTIMIZED: Tour system further reduced from 32 to 25 total steps for minimal, focused experience
+  * RESULT: Ultra-streamlined tour focusing only on core navigation and main feature introductions
 - July 25, 2025. **CLICK-FREE TOUR STEPS COMPLETED** - Successfully removed requiresClick property from tour steps 5, 9, 14, 17 for smoother navigation:
   * ENHANCED: Step 5 (Goals) now shows tooltip without requiring user click
   * ENHANCED: Step 9 (Tasks) now shows tooltip without requiring user click  

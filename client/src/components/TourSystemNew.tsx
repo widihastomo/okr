@@ -107,37 +107,7 @@ const TOUR_STEPS: TourStep[] = [
     targetPath: "/goals",
   },
 
-  {
-    id: "goals-filter",
-    title: "Goals - Filter & Pencarian",
-    description:
-      "Gunakan filter untuk mencari goals berdasarkan status, siklus, dan penanggungjawab. Filter membantu Anda fokus pada goals yang relevan dengan prioritas saat ini.",
-    icon: Target,
-    selector: '[data-tour="goals-filter"]',
-    position: "bottom",
-    category: "feature",
-  },
 
-  {
-    id: "goals-list-view-tab",
-    title: "Goals - Tampilan List",
-    description:
-      "Tampilan List menampilkan semua goals dalam format kartu yang mudah dipahami. Setiap kartu menunjukkan detail lengkap termasuk progress, key results, dan informasi penanggungjawab.",
-    icon: Target,
-    selector: '[data-tour="goals-list-view"]',
-    position: "bottom",
-    category: "feature",
-  },
-  {
-    id: "goals-hierarchy-view-tab",
-    title: "Goals - Tampilan Hierarchy",
-    description:
-      "Tampilan Hierarchy menunjukkan struktur hubungan antar goals dalam bentuk visual yang mudah dipahami. Fitur ini membantu Anda memahami bagaimana goals saling terkait dan mendukung satu sama lain.",
-    icon: Target,
-    selector: '[data-tour="goals-hierarchy-view"]',
-    position: "bottom",
-    category: "feature",
-  },
   {
     id: "tasks",
     title: "Tasks - Manajemen Tugas",
@@ -149,46 +119,7 @@ const TOUR_STEPS: TourStep[] = [
     category: "feature",
     targetPath: "/tasks",
   },
-  {
-    id: "tasks-list-view",
-    title: "Tasks - Tampilan List",
-    description:
-      "Tampilan List menampilkan semua tugas dalam format tabel yang mudah dibaca. Anda dapat melihat detail task, status, prioritas, deadline, dan penanggungjawab dalam satu view yang komprehensif. Ideal untuk mendapatkan overview lengkap dari semua tugas.",
-    icon: CheckSquare,
-    selector: '[data-tour="tasks-list-tab"]',
-    position: "bottom",
-    category: "feature",
-  },
-  {
-    id: "tasks-kanban-view",
-    title: "Tasks - Tampilan Kanban",
-    description:
-      "Tampilan Kanban mengorganisir tugas berdasarkan status dalam kolom-kolom yang visual. Anda dapat drag & drop task antar kolom untuk mengubah status dengan mudah. View ini sangat efektif untuk workflow management dan tracking progress secara visual.",
-    icon: CheckSquare,
-    selector: '[data-tour="tasks-kanban-tab"]',
-    position: "bottom",
-    category: "feature",
-  },
-  {
-    id: "tasks-timeline-view",
-    title: "Tasks - Tampilan Timeline",
-    description:
-      "Tampilan Timeline menunjukkan tugas dalam format kronologis berdasarkan tanggal mulai dan deadline. View ini membantu Anda memahami urutan pekerjaan, mendeteksi potensi konflik jadwal, dan merencanakan resource allocation yang optimal.",
-    icon: Clock,
-    selector: '[data-tour="tasks-timeline-tab"]',
-    position: "bottom",
-    category: "feature",
-  },
-  {
-    id: "tasks-calendar-view",
-    title: "Tasks - Tampilan Calendar",
-    description:
-      "Tampilan Calendar menampilkan tugas dalam format kalender bulanan yang familiar. Anda dapat melihat distribusi beban kerja harian, deadline yang mendekat, dan merencanakan jadwal dengan lebih efektif. View ini sangat berguna untuk time management dan perencanaan kapasitas tim.",
-    icon: Calendar,
-    selector: '[data-tour="tasks-calendar-tab"]',
-    position: "bottom",
-    category: "feature",
-  },
+
   {
     id: "timeline",
     title: "Timeline - Riwayat Progress",
@@ -200,27 +131,7 @@ const TOUR_STEPS: TourStep[] = [
     category: "feature",
     targetPath: "/timeline",
   },
-  {
-    id: "timeline-daily-checkin",
-    title: "Timeline - Daily Check-in",
-    description:
-      "Tombol Daily Check-in memungkinkan Anda mencatat progress harian dengan mudah. Klik untuk membuka form update harian dimana Anda dapat melaporkan kemajuan task, key results, dan aktivitas lainnya. Setiap check-in akan ditampilkan dalam timeline kronologis untuk tracking yang lebih baik.",
-    icon: Clock,
-    selector: '[data-tour="daily-checkin-button"]',
-    position: "bottom",
-    category: "action",
-  },
 
-  {
-    id: "timeline-feed",
-    title: "Timeline - Activity Feed",
-    description:
-      "Area utama timeline menampilkan semua aktivitas tim dalam urutan kronologis. Anda dapat melihat update harian, check-in progress, pencapaian milestone, dan aktivitas kolaboratif lainnya. Setiap kartu menampilkan detail lengkap dengan fitur interaksi seperti like, komentar, dan reaksi.",
-    icon: Activity,
-    selector: '[data-tour="timeline-feed"]',
-    position: "top",
-    category: "feature",
-  },
   {
     id: "cycles",
     title: "Siklus - Periode Waktu",
