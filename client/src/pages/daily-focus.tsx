@@ -1702,16 +1702,10 @@ export default function DailyFocusPage() {
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div className="flex-1">
-            <div className="flex items-center justify-between sm:block" data-tour="dashboard">
+            <div data-tour="dashboard">
               <h1 className="text-xl md:text-2xl font-bold text-gray-900">
                 Dashboard
               </h1>
-              {/* Daily Check-in - top-right on mobile, positioned at title level */}
-              <div className="flex items-center gap-2 sm:hidden">
-                <div data-tour="update-harian-instan">
-                  <DailyUpdateSimple />
-                </div>
-              </div>
             </div>
             <p className="text-sm md:text-base text-gray-600">
               Pusat kendali produktivitas dan progress Anda
@@ -1738,7 +1732,7 @@ export default function DailyFocusPage() {
                 </SelectContent>
               </Select>
             </div>
-            <div data-tour="update-harian-instan">
+            <div className="hidden sm:block" data-tour="update-harian-instan">
               <DailyUpdateSimple />
             </div>
             <div className="hidden sm:block">
@@ -1783,6 +1777,9 @@ export default function DailyFocusPage() {
 
           {/* Action buttons - Mobile */}
           <div className="flex items-center gap-2 justify-end">
+            <div data-tour="update-harian-instan">
+              <DailyUpdateSimple />
+            </div>
             <TourStartButton variant="outline" size="sm" />
           </div>
         </div>
