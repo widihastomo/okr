@@ -21,6 +21,7 @@ interface User {
   id: string;
   name: string | null;
   email: string;
+  profileImageUrl?: string | null;
 }
 
 interface SearchableUserSelectProps {
@@ -85,7 +86,29 @@ export function SearchableUserSelect({
             ) : effectiveValue === "unassigned" ? (
               <User className="mr-2 h-4 w-4 text-gray-600" />
             ) : selectedUser ? (
-              <User className="mr-2 h-4 w-4 text-blue-600" />
+              <div className="mr-2 flex-shrink-0">
+                {selectedUser.profileImageUrl ? (
+                  <img
+                    src={selectedUser.profileImageUrl}
+                    alt={selectedUser.name || selectedUser.email}
+                    className="w-4 h-4 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-4 h-4 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-medium">
+                    {selectedUser.name
+                      ? selectedUser.name
+                          .split(" ")
+                          .map((n) => n[0])
+                          .join("")
+                          .toUpperCase()
+                          .slice(0, 1)
+                      : selectedUser.email
+                          ?.split("@")[0]
+                          .slice(0, 1)
+                          .toUpperCase() || "U"}
+                  </div>
+                )}
+              </div>
             ) : (
               <User className="mr-2 h-4 w-4 text-gray-400" />
             )}
@@ -197,10 +220,32 @@ export function SearchableUserSelect({
                           : "hover:bg-gray-50"
                       )}
                     >
-                      <User className={cn(
-                        "mr-3 h-4 w-4 flex-shrink-0",
-                        effectiveValue === user.id ? "text-blue-600" : "text-gray-400"
-                      )} />
+                      <div className="mr-3 flex-shrink-0">
+                        {user.profileImageUrl ? (
+                          <img
+                            src={user.profileImageUrl}
+                            alt={user.name || user.email}
+                            className="w-6 h-6 rounded-full object-cover"
+                          />
+                        ) : (
+                          <div className={cn(
+                            "w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium text-white",
+                            effectiveValue === user.id ? "bg-blue-500" : "bg-gray-400"
+                          )}>
+                            {user.name
+                              ? user.name
+                                  .split(" ")
+                                  .map((n) => n[0])
+                                  .join("")
+                                  .toUpperCase()
+                                  .slice(0, 2)
+                              : user.email
+                                  ?.split("@")[0]
+                                  .slice(0, 2)
+                                  .toUpperCase() || "U"}
+                          </div>
+                        )}
+                      </div>
                       <div className="flex flex-col min-w-0 flex-1">
                         <span className={cn(
                           "font-medium truncate",
