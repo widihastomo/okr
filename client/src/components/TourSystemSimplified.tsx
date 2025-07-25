@@ -8,7 +8,7 @@ import {
   ChevronRight,
   CheckSquare,
   X,
-  MousePointer2,
+
   Sun,
   Target,
   CheckSquare as TaskIcon,
@@ -35,7 +35,6 @@ interface TourStep {
   position: "top" | "bottom" | "left" | "right";
   category: "navigation" | "feature" | "action";
   targetPath?: string;
-  requiresClick?: boolean;
 }
 
 const TOUR_STEPS: TourStep[] = [
@@ -60,7 +59,6 @@ const TOUR_STEPS: TourStep[] = [
     position: "right",
     category: "navigation",
     targetPath: "/goals",
-    requiresClick: true,
   },
   {
     id: "tasks",
@@ -72,7 +70,6 @@ const TOUR_STEPS: TourStep[] = [
     position: "right",
     category: "navigation",
     targetPath: "/tasks",
-    requiresClick: true,
   },
   {
     id: "timeline",
@@ -84,7 +81,6 @@ const TOUR_STEPS: TourStep[] = [
     position: "right",
     category: "navigation",
     targetPath: "/timeline",
-    requiresClick: true,
   },
   {
     id: "cycles",
@@ -96,7 +92,6 @@ const TOUR_STEPS: TourStep[] = [
     position: "right",
     category: "navigation",
     targetPath: "/cycles",
-    requiresClick: true,
   },
   {
     id: "achievements",
@@ -108,7 +103,6 @@ const TOUR_STEPS: TourStep[] = [
     position: "right",
     category: "navigation",
     targetPath: "/achievements",
-    requiresClick: true,
   },
   {
     id: "analytics",
@@ -120,7 +114,6 @@ const TOUR_STEPS: TourStep[] = [
     position: "right",
     category: "navigation",
     targetPath: "/analytics",
-    requiresClick: true,
   },
   {
     id: "users",
@@ -132,7 +125,6 @@ const TOUR_STEPS: TourStep[] = [
     position: "right", 
     category: "navigation",
     targetPath: "/client-users",
-    requiresClick: true,
   },
   {
     id: "settings",
@@ -143,8 +135,7 @@ const TOUR_STEPS: TourStep[] = [
     selector: '[data-tour="settings"]',
     position: "right",
     category: "navigation",
-    targetPath: "/organization-settings", 
-    requiresClick: true,
+    targetPath: "/organization-settings",
   },
   {
     id: "help",
@@ -156,7 +147,6 @@ const TOUR_STEPS: TourStep[] = [
     position: "right",
     category: "navigation",
     targetPath: "/help",
-    requiresClick: true,
   },
 ];
 
@@ -165,7 +155,6 @@ export default function TourSystem() {
   const [currentStep, setCurrentStep] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
-  const [waitingForClick, setWaitingForClick] = useState(false);
   const [location, setLocation] = useLocation();
   const [showWelcomeScreen, setShowWelcomeScreen] = useState(false);
   const [showCompletionModal, setShowCompletionModal] = useState(false);
@@ -258,30 +247,9 @@ export default function TourSystem() {
     // Position tooltip
     positionTooltip(targetElement as HTMLElement, currentStepData.position);
 
-    // Check if this step requires a click
-    if (currentStepData.requiresClick) {
-      setWaitingForClick(true);
-      
-      // Add click listener
-      const clickHandler = () => {
-        console.log(`Element clicked for step: ${currentStepData.id}`);
-        setWaitingForClick(false);
-        
-        // Navigate if needed
-        if (currentStepData.targetPath && location !== currentStepData.targetPath) {
-          setLocation(currentStepData.targetPath);
-        }
-        
-        // Clean up listener
-        targetElement.removeEventListener('click', clickHandler);
-        
-        // Auto advance after navigation
-        setTimeout(() => {
-          nextStep();
-        }, 500);
-      };
-      
-      targetElement.addEventListener('click', clickHandler);
+    // Navigate if needed for this step
+    if (currentStepData.targetPath && location !== currentStepData.targetPath) {
+      setLocation(currentStepData.targetPath);
     }
   };
 
@@ -500,16 +468,6 @@ export default function TourSystem() {
             <div className="flex-1 overflow-y-auto">
               <CardDescription className="text-sm text-gray-600 mb-3">
                 {currentStepData.description}
-                {currentStepData.requiresClick && waitingForClick && (
-                  <div className="mt-3 p-3 bg-orange-50 border border-orange-200 rounded-lg">
-                    <div className="flex items-center gap-2">
-                      <MousePointer2 className="w-4 h-4 text-orange-600" />
-                      <span className="text-sm font-medium text-orange-800">
-                        Klik menu ini untuk melanjutkan tour
-                      </span>
-                    </div>
-                  </div>
-                )}
               </CardDescription>
 
               <Progress value={progress} className="h-1 mb-3" />
@@ -520,11 +478,8 @@ export default function TourSystem() {
                 variant="outline"
                 size="sm"
                 onClick={previousStep}
-                disabled={currentStep === 0 || waitingForClick}
-                className={cn(
-                  "flex items-center gap-1",
-                  waitingForClick && "opacity-50 cursor-not-allowed",
-                )}
+                disabled={currentStep === 0}
+                className="flex items-center gap-1"
               >
                 <ChevronLeft className="h-4 w-4" />
                 Sebelumnya
@@ -543,11 +498,7 @@ export default function TourSystem() {
                 <Button
                   size="sm"
                   onClick={nextStep}
-                  disabled={waitingForClick}
-                  className={cn(
-                    "bg-orange-600 hover:bg-orange-700 text-white flex items-center gap-1",
-                    waitingForClick && "opacity-50 cursor-not-allowed",
-                  )}
+                  className="bg-orange-600 hover:bg-orange-700 text-white flex items-center gap-1"
                 >
                   {currentStep === totalSteps - 1 ? (
                     <>
