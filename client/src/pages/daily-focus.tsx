@@ -1936,22 +1936,36 @@ export default function DailyFocusPage() {
       
       {/* Main Content Tabs */}
       <Tabs defaultValue="daily-focus" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-1">
-          <TabsTrigger 
-            value="daily-focus" 
-            className="flex items-center gap-2 text-blue-700 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-md hover:bg-blue-100 transition-all duration-200"
-          >
-            <LayoutDashboard className="h-4 w-4" />
-            <span className="font-medium">Daily Focus</span>
-          </TabsTrigger>
-          <TabsTrigger 
-            value="timeline" 
-            className="flex items-center gap-2 text-blue-700 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-md hover:bg-blue-100 transition-all duration-200"
-          >
-            <Activity className="h-4 w-4" />
-            <span className="font-medium">Timeline</span>
-          </TabsTrigger>
-        </TabsList>
+        <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 border border-slate-200 rounded-xl p-1 shadow-sm">
+          <TabsList className="grid w-full grid-cols-2 bg-transparent gap-1">
+            <TabsTrigger 
+              value="daily-focus" 
+              className="flex flex-col items-center gap-1 py-3 px-4 text-slate-600 data-[state=active]:bg-gradient-to-br data-[state=active]:from-blue-600 data-[state=active]:via-blue-700 data-[state=active]:to-indigo-700 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-white/70 hover:shadow-md transition-all duration-300 rounded-lg border-0"
+            >
+              <div className="flex items-center gap-2">
+                <LayoutDashboard className="h-5 w-5" />
+                <span className="font-semibold text-sm md:text-base">Daily Focus</span>
+              </div>
+              <div className="text-xs opacity-75 text-center leading-tight">
+                <span className="hidden sm:inline">Kelola aktivitas & target harian</span>
+                <span className="sm:hidden">Aktivitas harian</span>
+              </div>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="timeline" 
+              className="flex flex-col items-center gap-1 py-3 px-4 text-slate-600 data-[state=active]:bg-gradient-to-br data-[state=active]:from-blue-600 data-[state=active]:via-blue-700 data-[state=active]:to-indigo-700 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-white/70 hover:shadow-md transition-all duration-300 rounded-lg border-0"
+            >
+              <div className="flex items-center gap-2">
+                <Activity className="h-5 w-5" />
+                <span className="font-semibold text-sm md:text-base">Timeline</span>
+              </div>
+              <div className="text-xs opacity-75 text-center leading-tight">
+                <span className="hidden sm:inline">Update progress & aktivitas tim</span>
+                <span className="sm:hidden">Aktivitas tim</span>
+              </div>
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
         {/* Daily Focus Tab Content */}
         <TabsContent value="daily-focus" className="space-y-6">
