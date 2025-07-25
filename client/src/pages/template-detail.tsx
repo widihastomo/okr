@@ -391,7 +391,7 @@ function InitiativesCard({ initiatives, onAddInitiative }: { initiatives: any[],
 }
 
 // Tasks Card Component
-function TasksCard({ tasks, onAddTask, keyResults }: { tasks: any[], onAddTask: () => void, keyResults: any[] }) {
+function TasksCard({ tasks, onAddTask, initiatives }: { tasks: any[], onAddTask: () => void, initiatives: any[] }) {
   return (
     <Card>
       <CardHeader>
@@ -415,15 +415,15 @@ function TasksCard({ tasks, onAddTask, keyResults }: { tasks: any[], onAddTask: 
         {tasks && tasks.length > 0 ? (
           <div className="space-y-4">
             {tasks.map((task: any, index: number) => {
-              const relatedKeyResult = keyResults && task.keyResultId ? keyResults[parseInt(task.keyResultId)] : null;
+              const relatedInitiative = initiatives && task.initiativeId ? initiatives[parseInt(task.initiativeId)] : null;
               return (
                 <div key={index} className="border rounded-lg p-4">
                   <div className="flex items-start justify-between mb-2">
                     <h4 className="font-medium">{task.title}</h4>
-                    {relatedKeyResult && (
+                    {relatedInitiative && (
                       <Badge variant="outline" className="text-xs">
-                        <Target className="h-3 w-3 mr-1" />
-                        {relatedKeyResult.title}
+                        <Lightbulb className="h-3 w-3 mr-1" />
+                        {relatedInitiative.title}
                       </Badge>
                     )}
                   </div>
@@ -467,7 +467,7 @@ export default function TemplateDetailPage() {
   const [newTask, setNewTask] = useState({
     title: "",
     description: "",
-    keyResultId: "" // Add key result relation
+    initiativeId: "" // Add initiative relation
   });
 
   const [newInitiative, setNewInitiative] = useState({
@@ -582,7 +582,7 @@ export default function TemplateDetailPage() {
     const updatedTasks = [...(template?.tasks || []), newTask];
     updateMutation.mutate({ tasks: updatedTasks });
     
-    setNewTask({ title: "", description: "", keyResultId: "" });
+    setNewTask({ title: "", description: "", initiativeId: "" });
     setIsAddTaskModalOpen(false);
   };
 
@@ -773,7 +773,7 @@ export default function TemplateDetailPage() {
             <TasksCard 
               tasks={template?.tasks} 
               onAddTask={() => setIsAddTaskModalOpen(true)}
-              keyResults={template?.keyResults || []}
+              initiatives={template?.initiatives || []}
             />
           </TabsContent>
         </Tabs>
@@ -867,27 +867,27 @@ export default function TemplateDetailPage() {
               </div>
 
               <div>
-                <Label htmlFor="task-key-result">Angka Target Terkait</Label>
-                <Select value={newTask.keyResultId} onValueChange={(value) => setNewTask({ ...newTask, keyResultId: value })}>
+                <Label htmlFor="task-initiative">Inisiatif Terkait</Label>
+                <Select value={newTask.initiativeId} onValueChange={(value) => setNewTask({ ...newTask, initiativeId: value })}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Pilih angka target..." />
+                    <SelectValue placeholder="Pilih inisiatif..." />
                   </SelectTrigger>
                   <SelectContent>
-                    {template?.keyResults && template.keyResults.length > 0 ? (
-                      template.keyResults.map((kr: any, index: number) => (
+                    {template?.initiatives && template.initiatives.length > 0 ? (
+                      template.initiatives.map((initiative: any, index: number) => (
                         <SelectItem key={index} value={index.toString()}>
-                          {kr.title}
+                          {initiative.title}
                         </SelectItem>
                       ))
                     ) : (
-                      <SelectItem value="no-key-results" disabled>
-                        Belum ada angka target tersedia
+                      <SelectItem value="no-initiatives" disabled>
+                        Belum ada inisiatif tersedia
                       </SelectItem>
                     )}
                   </SelectContent>
                 </Select>
                 <p className="text-sm text-gray-500 mt-1">
-                  Pilih angka target yang akan didukung oleh tugas ini
+                  Pilih inisiatif yang akan didukung oleh tugas ini
                 </p>
               </div>
             </div>
@@ -898,7 +898,7 @@ export default function TemplateDetailPage() {
               </Button>
               <Button 
                 onClick={handleAddTask}
-                disabled={!newTask.title || !newTask.keyResultId || updateMutation.isPending}
+                disabled={!newTask.title || !newTask.initiativeId || updateMutation.isPending}
                 className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
               >
                 {updateMutation.isPending ? "Menambahkan..." : "Tambah Tugas"}
