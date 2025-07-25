@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 import {
   ArrowLeft,
   Edit,
@@ -434,7 +434,7 @@ export default function GoalDetail() {
   const [tourStep, setTourStep] = useState<number>(0);
   const [showTour, setShowTour] = useState(false);
   const [tourForceUpdate, setTourForceUpdate] = useState(0);
-  const [activeTab, setActiveTab] = useState("tasks");
+
 
 
   // Check for highlight parameter in URL
@@ -628,7 +628,7 @@ export default function GoalDetail() {
       setAddKeyResultModal({ open: false });
       
       // Switch to key-results tab after successful creation
-      setActiveTab("key-results");
+
       
       // Reset form handled by KeyResultModal
     },
@@ -2211,32 +2211,15 @@ export default function GoalDetail() {
           )}
         </div>
       </div>
-      {/* Tabs Section */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="flex w-full h-auto p-0 bg-transparent gap-0 rounded-none mb-4 sm:mb-6 relative tour-tabs">
-          {/* Tab 1 - Tugas */}
-          <TabsTrigger
-            value="tasks"
-            className="relative bg-gray-100 border border-gray-300 px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-medium text-gray-700 hover:bg-gray-50 data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=active]:border-purple-600 flex items-center gap-2 sm:gap-3 justify-start flex-1"
-            style={{
-              clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%)",
-              zIndex: 1,
-            }}
-          >
-            <span className="bg-white text-purple-600 rounded-full w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center text-xs sm:text-sm font-bold shrink-0">
-              1
-            </span>
-            <span className="hidden sm:inline">Tugas ({tugas.length})</span>
-            <span className="sm:hidden">Tugas ({tugas.length})</span>
-          </TabsTrigger>
-        </TabsList>
 
 
 
 
 
-        {/* Tugas Tab */}
-        <TabsContent value="tasks" className="space-y-6 tour-tasks">
+
+
+
+
           {/* Header with Description */}
           <div className="bg-gradient-to-r from-purple-50 to-violet-50 p-4 md:p-6 rounded-lg border border-purple-200">
             <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-4 space-y-3 md:space-y-0">
@@ -2742,8 +2725,7 @@ export default function GoalDetail() {
               )}
             </div>
           </div>
-        </TabsContent>
-      </Tabs>
+
       {/* Modals */}
       {checkInModal.keyResult && (
         <CheckInModal
@@ -2807,8 +2789,7 @@ export default function GoalDetail() {
           queryClient.invalidateQueries({ queryKey: ['/api/objectives'] });
           queryClient.invalidateQueries({ queryKey: ['/api/okrs'] });
           
-          // Switch to initiatives tab after successful creation/update
-          setActiveTab("initiatives");
+
         }}
         keyResultId=""
         objectiveId={id}
