@@ -277,10 +277,6 @@ export default function ClientTemplates() {
                     {template.focusAreaTag.charAt(0).toUpperCase() + template.focusAreaTag.slice(1)}
                   </Badge>
                   
-                  <Badge variant="outline" className="text-xs">
-                    {categoryOptions.find(c => c.value === template.category)?.label || template.category}
-                  </Badge>
-                  
                   {template.initiatives && template.initiatives.length > 0 && (
                     <Badge variant="secondary" className="text-xs">
                       {template.initiatives.length} Inisiatif
