@@ -432,19 +432,26 @@ export default function TourSystem() {
     };
   }, []);
 
-  // Listen for startTourDirect custom event from tour-start-button
+  // Listen for both startTour and startTourDirect custom events from tour-start-button
   useEffect(() => {
+    const handleStartTour = () => {
+      console.log("🎯 Received startTour event, starting tour...");
+      restartTour();
+    };
+    
     const handleStartTourDirect = () => {
       console.log("🎯 Received startTourDirect event, starting tour...");
       restartTour();
     };
     
+    window.addEventListener('startTour', handleStartTour);
     window.addEventListener('startTourDirect', handleStartTourDirect);
     
     return () => {
+      window.removeEventListener('startTour', handleStartTour);
       window.removeEventListener('startTourDirect', handleStartTourDirect);
     };
-  }, []);
+  }, [restartTour]);
 
   // Debug tour elements
   useEffect(() => {
