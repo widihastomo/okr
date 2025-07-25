@@ -2027,7 +2027,7 @@ export default function CompanyOnboarding() {
                           EKSEKUSI
                         </div>
                       </div>
-                      <p className="text-gray-300 mb-2 md:mb-3 text-base md:text-lg">
+                      <p className="text-gray-300 mb-1 md:mb-2 text-base md:text-lg">
                         Aktivitas konkret yang dikerjakan setiap hari
                       </p>
                       <div className="bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg md:rounded-xl p-2 md:p-3 border-l-4 border-purple-400 shadow-md">
