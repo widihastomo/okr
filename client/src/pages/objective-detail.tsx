@@ -108,6 +108,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { SearchableUserSelect } from "@/components/ui/searchable-user-select";
 import { KeyResultModal } from "@/components/goal-form-modal";
 import {
@@ -121,7 +122,6 @@ import {
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import TaskModal from "@/components/task-modal";
 
 import ObjectiveOverviewCard from "@/components/objective-overview-card";
@@ -1942,195 +1942,279 @@ export default function GoalDetail() {
               </Button>
             </div>
           ) : (
-            <div className="space-y-4">
-              {inisiatif
-                .sort((a, b) => {
-                  const scoreA = parseFloat(a.priorityScore || "0");
-                  const scoreB = parseFloat(b.priorityScore || "0");
-                  return scoreB - scoreA; // Sort by priority score descending
-                })
-                .map((initiative) => {
-                const rawScore = initiative.priorityScore;
-                const score = parseFloat(rawScore || "0");
-                
-                let color: string;
-                let label: string;
-                
-                if (score >= 4.0) {
-                  color = "bg-red-100 text-red-800";
-                  label = "Kritis";
-                } else if (score >= 3.0) {
-                  color = "bg-orange-100 text-orange-800";
-                  label = "Tinggi";
-                } else if (score >= 2.0) {
-                  color = "bg-yellow-100 text-yellow-800";
-                  label = "Sedang";
-                } else {
-                  color = "bg-green-100 text-green-800";
-                  label = "Rendah";
-                }
+            <Card>
+              <CardContent className="p-0">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-gray-50 border-b">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Inisiatif
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Status
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Prioritas
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Progress
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Tenggat
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          PIC
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Aksi
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {inisiatif
+                        .sort((a, b) => {
+                          const scoreA = parseFloat(a.priorityScore || "0");
+                          const scoreB = parseFloat(b.priorityScore || "0");
+                          return scoreB - scoreA; // Sort by priority score descending
+                        })
+                        .map((initiative) => {
+                        const rawScore = initiative.priorityScore;
+                        const score = parseFloat(rawScore || "0");
+                        
+                        let color: string;
+                        let label: string;
+                        
+                        if (score >= 4.0) {
+                          color = "bg-red-100 text-red-800";
+                          label = "Kritis";
+                        } else if (score >= 3.0) {
+                          color = "bg-orange-100 text-orange-800";
+                          label = "Tinggi";
+                        } else if (score >= 2.0) {
+                          color = "bg-yellow-100 text-yellow-800";
+                          label = "Sedang";
+                        } else {
+                          color = "bg-green-100 text-green-800";
+                          label = "Rendah";
+                        }
 
-                return (
-                  <div key={initiative.id} className="p-3 sm:p-4 bg-white border border-gray-200 rounded-lg">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex-1 min-w-0">
-                        <Link href={`/initiatives/${initiative.id}`}>
-                          <h4 className="font-medium text-gray-900 hover:text-blue-600 cursor-pointer line-clamp-2 text-sm mb-1">
-                            {initiative.title}
-                          </h4>
-                        </Link>
-                        {initiative.description && (
-                          <p className="text-xs text-gray-500 mb-2 line-clamp-2">
-                            {initiative.description}
-                          </p>
-                        )}
-                        {initiative.keyResultId && (
-                          <div className="flex items-center gap-1 mb-2">
-                            <Target className="w-3 h-3 text-blue-600" />
-                            <span className="text-xs text-blue-600 font-medium">
-                              {goal?.keyResults?.find((kr: any) => kr.id === initiative.keyResultId)?.title || 'Unknown'}
-                            </span>
-                          </div>
-                        )}
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <Badge className={color}>
-                            {label}
-                          </Badge>
-                          {(() => {
-                            const status = initiative.status || "draft";
-                            const getStatusInfo = (status: string) => {
-                              const statusMap = {
-                                'draft': {
-                                  label: 'Draft',
-                                  bgColor: 'bg-gray-100',
-                                  textColor: 'text-gray-800',
-                                },
-                                'sedang_berjalan': {
-                                  label: 'Sedang Berjalan',
-                                  bgColor: 'bg-blue-100',
-                                  textColor: 'text-blue-800',
-                                },
-                                'selesai': {
-                                  label: 'Selesai',
-                                  bgColor: 'bg-green-100',
-                                  textColor: 'text-green-800',
-                                },
-                                'dibatalkan': {
-                                  label: 'Dibatalkan',
-                                  bgColor: 'bg-red-100',
-                                  textColor: 'text-red-800',
-                                }
-                              };
-                              return statusMap[status as keyof typeof statusMap] || statusMap['draft'];
-                            };
-                            
-                            const statusInfo = getStatusInfo(status);
-                            
-                            return (
-                              <Badge className={`${statusInfo.bgColor} ${statusInfo.textColor}`}>
-                                {statusInfo.label}
-                              </Badge>
-                            );
-                          })()}
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-1 ml-2">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-6 w-6 p-0 flex-shrink-0"
-                            >
-                              <MoreHorizontal className="h-3 w-3" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem
-                              onClick={() => window.location.href = `/initiatives/${initiative.id}`}
-                            >
-                              <Eye className="mr-2 h-4 w-4" />
-                              Lihat Detail
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => {
-                                setEditingInitiative(initiative);
-                                setShowInitiativeFormModal(true);
-                              }}
-                            >
-                              <Edit className="mr-2 h-4 w-4" />
-                              Ubah
-                            </DropdownMenuItem>
-                            <DropdownMenuItem 
-                              className="text-red-600"
-                              onClick={() => setDeletingInitiative(initiative)}
-                            >
-                              <Trash2 className="mr-2 h-4 w-4" />
-                              Hapus
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                    </div>
-                    
-                    {/* Progress and Details */}
-                    <div className="flex items-center justify-between text-xs text-gray-500">
-                      <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-2">
-                          <div className="w-12 bg-gray-200 rounded-full h-1.5">
-                            <div
-                              className={`h-1.5 rounded-full ${(() => {
-                                const progress = initiative.progressPercentage || 0;
-                                if (progress >= 100) return "bg-green-600";
-                                if (progress >= 80) return "bg-green-500";
-                                if (progress >= 60) return "bg-orange-500";
-                                return "bg-red-500";
-                              })()}`}
-                              style={{
-                                width: `${initiative.progressPercentage || 0}%`,
-                              }}
-                            ></div>
-                          </div>
-                          <span className="text-xs font-medium text-gray-900">
-                            {initiative.progressPercentage || 0}%
-                          </span>
-                        </div>
-                        {initiative.dueDate && (
-                          <span
-                            className={
-                              new Date(initiative.dueDate) < new Date()
-                                ? "text-red-600 font-medium"
-                                : "text-gray-600"
-                            }
+                        return (
+                          <tr
+                            key={initiative.id}
+                            className="hover:bg-gray-50"
                           >
-                            Due: {new Date(initiative.dueDate).toLocaleDateString("id-ID", {
-                              day: "numeric",
-                              month: "short",
-                            })}
-                          </span>
-                        )}
-                      </div>
-                      {initiative.picId && (
-                        <div className="flex items-center gap-1">
-                          <Avatar className="w-5 h-5">
-                            <AvatarImage 
-                              src={getUserProfileImage(initiative.picId)} 
-                              alt={getUserName(initiative.picId)}
-                            />
-                            <AvatarFallback className="bg-blue-500 text-white text-xs font-medium">
-                              {getUserInitials(initiative.picId)}
-                            </AvatarFallback>
-                          </Avatar>
-                          <span className="text-xs text-gray-600 truncate">
-                            {getUserName(initiative.picId)}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+                            <td className="px-4 py-4">
+                              <div>
+                                <Link href={`/initiatives/${initiative.id}`}>
+                                  <div className="font-medium text-gray-900 hover:text-blue-600 cursor-pointer">
+                                    {initiative.title}
+                                  </div>
+                                </Link>
+                                {initiative.description && (
+                                  <div className="text-sm text-gray-500 mt-1 line-clamp-2">
+                                    {initiative.description}
+                                  </div>
+                                )}
+                                {initiative.keyResultId && (
+                                  <div className="flex items-center gap-1 mt-1">
+                                    <TooltipProvider>
+                                      <Tooltip>
+                                        <TooltipTrigger>
+                                          <Target className="w-3 h-3 text-blue-600" />
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                          <p>Angka Target</p>
+                                        </TooltipContent>
+                                      </Tooltip>
+                                    </TooltipProvider>
+                                    <span className="text-xs text-blue-600 font-medium">
+                                      {goal?.keyResults?.find((kr: any) => kr.id === initiative.keyResultId)?.title || 'Unknown'}
+                                    </span>
+                                  </div>
+                                )}
+                                {initiative.budget && (
+                                  <div className="text-sm text-gray-500 mt-1">
+                                    Budget: Rp{" "}
+                                    {parseFloat(
+                                      initiative.budget,
+                                    ).toLocaleString("id-ID")}
+                                  </div>
+                                )}
+                              </div>
+                            </td>
+                            <td className="px-4 py-4">
+                              {(() => {
+                                const status = initiative.status || "draft";
+                                const getStatusInfo = (status: string) => {
+                                  const statusMap = {
+                                    'draft': {
+                                      label: 'Draft',
+                                      bgColor: 'bg-gray-100',
+                                      textColor: 'text-gray-800',
+                                    },
+                                    'sedang_berjalan': {
+                                      label: 'Sedang Berjalan',
+                                      bgColor: 'bg-blue-100',
+                                      textColor: 'text-blue-800',
+                                    },
+                                    'selesai': {
+                                      label: 'Selesai',
+                                      bgColor: 'bg-green-100',
+                                      textColor: 'text-green-800',
+                                    },
+                                    'dibatalkan': {
+                                      label: 'Dibatalkan',
+                                      bgColor: 'bg-red-100',
+                                      textColor: 'text-red-800',
+                                    }
+                                  };
+                                  return statusMap[status as keyof typeof statusMap] || statusMap['draft'];
+                                };
+                                
+                                const statusInfo = getStatusInfo(status);
+                                
+                                return (
+                                  <Badge className={`${statusInfo.bgColor} ${statusInfo.textColor}`}>
+                                    {statusInfo.label}
+                                  </Badge>
+                                );
+                              })()}
+                            </td>
+                            <td className="px-4 py-4">
+                              <div className="flex flex-col items-center gap-1">
+                                <Badge className={color}>
+                                  {label}
+                                </Badge>
+                                <span className="text-xs text-gray-500">
+                                  {score.toFixed(1)}/5.0
+                                </span>
+                              </div>
+                            </td>
+                            <td className="px-4 py-4">
+                              <div className="flex items-center gap-2">
+                                <div className="w-16 bg-gray-200 rounded-full h-2">
+                                  <div
+                                    className={`h-2 rounded-full ${(() => {
+                                      const progress =
+                                        initiative.progressPercentage || 0;
+                                      if (progress >= 100)
+                                        return "bg-green-600";
+                                      if (progress >= 80)
+                                        return "bg-green-500";
+                                      if (progress >= 60)
+                                        return "bg-orange-500";
+                                      return "bg-red-500";
+                                    })()}`}
+                                    style={{
+                                      width: `${initiative.progressPercentage || 0}%`,
+                                    }}
+                                  ></div>
+                                </div>
+                                <span className="text-sm font-medium text-gray-900">
+                                  {initiative.progressPercentage || 0}%
+                                </span>
+                              </div>
+                            </td>
+                            <td className="px-4 py-4">
+                              <div className="space-y-1">
+                                {initiative.startDate && (
+                                  <div className="text-xs text-gray-500">
+                                    Mulai: {new Date(initiative.startDate).toLocaleDateString("id-ID", {
+                                      day: "numeric",
+                                      month: "short",
+                                    })}
+                                  </div>
+                                )}
+                                {initiative.dueDate ? (
+                                  <div
+                                    className={`text-sm ${
+                                      new Date(initiative.dueDate) < new Date()
+                                        ? "text-red-600 font-medium"
+                                        : "text-gray-900"
+                                    }`}
+                                  >
+                                    Selesai: {new Date(initiative.dueDate).toLocaleDateString("id-ID", {
+                                      day: "numeric",
+                                      month: "short",
+                                    })}
+                                  </div>
+                                ) : (
+                                  <div className="text-gray-400 text-sm">
+                                    Selesai: -
+                                  </div>
+                                )}
+                              </div>
+                            </td>
+                            <td className="px-4 py-4">
+                              {initiative.picId ? (
+                                <div className="flex items-center gap-2">
+                                  <Avatar className="w-8 h-8">
+                                    <AvatarImage 
+                                      src={getUserProfileImage(initiative.picId)} 
+                                      alt={getUserName(initiative.picId)}
+                                    />
+                                    <AvatarFallback className="bg-blue-500 text-white text-xs font-medium">
+                                      {getUserInitials(initiative.picId)}
+                                    </AvatarFallback>
+                                  </Avatar>
+                                  <span className="text-sm text-gray-900 truncate">
+                                    {getUserName(initiative.picId)}
+                                  </span>
+                                </div>
+                              ) : (
+                                <span className="text-gray-400 text-sm">
+                                  Tidak ditugaskan
+                                </span>
+                              )}
+                            </td>
+                            <td className="px-4 py-4">
+                              <div className="flex items-center gap-1">
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-8 w-8 p-0"
+                                    >
+                                      <MoreHorizontal className="h-4 w-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    <DropdownMenuItem
+                                      onClick={() => window.location.href = `/initiatives/${initiative.id}`}
+                                    >
+                                      <Eye className="mr-2 h-4 w-4" />
+                                      Lihat Detail
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                      onClick={() => {
+                                        setEditingInitiative(initiative);
+                                        setShowInitiativeFormModal(true);
+                                      }}
+                                    >
+                                      <Edit className="mr-2 h-4 w-4" />
+                                      Ubah
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem 
+                                      className="text-red-600"
+                                      onClick={() => setDeletingInitiative(initiative)}
+                                    >
+                                      <Trash2 className="mr-2 h-4 w-4" />
+                                      Hapus
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
           )}
         </div>
       </div>
