@@ -1971,7 +1971,7 @@ export default function DailyFocusPage() {
               {relatedObjectives.length > 0 ? (
                 <>
                   <div className="overflow-x-auto">
-                    <div className="flex gap-4 pb-2 min-w-max">
+                    <div className="grid grid-cols-12 gap-4 pb-2 min-w-max">
                       {relatedObjectives.map((obj: any) => {
                         const objKeyResults = (keyResults as any[]).filter(
                           (kr) => kr.objectiveId === obj.id,
@@ -1987,7 +1987,7 @@ export default function DailyFocusPage() {
                         return (
                           <div
                             key={obj.id}
-                            className="p-4 bg-white border border-blue-200 rounded-lg flex-shrink-0 w-80 sm:w-72"
+                            className="p-4 bg-white border border-blue-200 rounded-lg col-span-4"
                           >
                             <div className="space-y-3">
                               <div>
