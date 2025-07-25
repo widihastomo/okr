@@ -1352,7 +1352,7 @@ export default function GoalDetail() {
                 </PopoverContent>
               </Popover>
             </h3>
-            
+            <p className="text-blue-700 text-sm leading-relaxed">Angka target menentukan bagaimana goal ini akan diukur. Setiap angka target memiliki target yang spesifik dan dapat diukur untuk memastikan pencapaian yang objektif.</p>
           </div>
           {goal?.keyResults?.length > 0 && (
             <Button
