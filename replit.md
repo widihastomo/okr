@@ -452,6 +452,12 @@ The system now includes a comprehensive dummy data generation feature that creat
 
 ## Changelog
 ```
+- July 25, 2025. **MISSION CARD REPOSITIONED ABOVE OVERVIEW CARDS** - Successfully moved Mission Card to appear before overview cards in objective detail page:
+  * REPOSITIONED: Mission Card moved from position after overview cards (line 1310) to before overview cards (line 1256)
+  * IMPROVED: Better visual hierarchy with mission guidance appearing immediately after page header
+  * MAINTAINED: All existing Mission Card functionality including task completion tracking and auto-expansion
+  * LAYOUT: Mission Card now appears in logical flow: Page Header → Mission Card → Overview Cards → Tabs
+  * RESULT: Enhanced user experience with mission guidance positioned prominently for better goal setup workflow
 - July 25, 2025. **TIMELINE TAB LEFT SIDEBAR LAYOUT COMPLETED** - Successfully restructured Timeline tab with left sidebar filters for desktop view:
   * RESTRUCTURED: Timeline tab layout changed from top filters to left sidebar layout for desktop screens (lg breakpoint)
   * ENHANCED: Added dedicated filter section on the left (lg:w-64) with proper labels and spacing for Activity Filter and User Filter

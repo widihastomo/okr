@@ -1249,24 +1249,7 @@ export default function GoalDetail() {
           </div>
         </div>
       </div>
-      {/* Visual Overview Section for easy understanding */}
-      <div className="flex flex-col lg:grid lg:grid-cols-3 gap-6 mb-6">
-        <div className="lg:col-span-2 h-full tour-objective-info">
-          <ObjectiveOverviewCard
-            objective={goal}
-            initiatives={inisiatif}
-            tasks={tugas}
-            daysRemaining={daysRemaining}
-            cycle={cycle}
-            parentObjective={parentObjective}
-            owner={owner}
-            team={undefined}
-          />
-        </div>
-        <div className="lg:col-span-1 h-full">
-          <ActivityLogCard objectiveId={goal?.id} />
-        </div>
-      </div>
+
       {/* Mission Card - Show when not all missions completed */}
       {goal && !(goal.keyResults?.length > 0 && inisiatif.length > 0 && tugas.length > 0) && (
         <MissionCard
@@ -1305,6 +1288,25 @@ export default function GoalDetail() {
           className="mb-6"
         />
       )}
+
+      {/* Visual Overview Section for easy understanding */}
+      <div className="flex flex-col lg:grid lg:grid-cols-3 gap-6 mb-6">
+        <div className="lg:col-span-2 h-full tour-objective-info">
+          <ObjectiveOverviewCard
+            objective={goal}
+            initiatives={inisiatif}
+            tasks={tugas}
+            daysRemaining={daysRemaining}
+            cycle={cycle}
+            parentObjective={parentObjective}
+            owner={owner}
+            team={undefined}
+          />
+        </div>
+        <div className="lg:col-span-1 h-full">
+          <ActivityLogCard objectiveId={goal?.id} />
+        </div>
+      </div>
       {/* Tabs Section */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="flex w-full h-auto p-0 bg-transparent gap-0 rounded-none mb-4 sm:mb-6 relative tour-tabs">
