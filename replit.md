@@ -452,6 +452,13 @@ The system now includes a comprehensive dummy data generation feature that creat
 
 ## Changelog
 ```
+- July 25, 2025. **TEMPLATE GOALS MENU FOR CLIENTS COMPLETED** - Successfully added Template Goals menu to regular client sidebar navigation:
+  * ADDED: "Template Goals" menu item to regular user sidebar (not system owner only)
+  * POSITIONED: Template menu after Analytics in client navigation for logical flow
+  * CONFIGURED: Route /goal-templates pointing to existing TemplateManagement component
+  * ACCESSIBLE: All regular users can now access goal templates functionality
+  * ICON: Uses FileText icon for consistent visual representation
+  * RESULT: Template Goals now accessible to all clients through main sidebar navigation
 - July 25, 2025. **NAVIGATION MENU TOUR ENHANCEMENT COMPLETED** - Successfully added back tour steps for team management, settings, and help menu navigation:
   * ADDED: Step 11 (users) - "Manajemen Tim - Kelola Pengguna" for team member and permission management
   * ADDED: Step 12 (settings) - "Pengaturan - Konfigurasi Sistem" for organization and system configuration

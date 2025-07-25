@@ -110,12 +110,7 @@ export default function Sidebar({
       path: "/system-admin/subscriptions",
       active: location === "/system-admin/subscriptions",
     },
-    {
-      label: "Template Goals",
-      icon: FileText,
-      path: "/goal-templates",
-      active: location === "/goal-templates",
-    },
+
     {
       label: "Kode Referral",
       icon: Gift,
@@ -204,6 +199,12 @@ export default function Sidebar({
       path: "/analytics",
       active: location === "/analytics",
       tourId: "analytics",
+    },
+    {
+      label: "Template Goals",
+      icon: FileText,
+      path: "/goal-templates",
+      active: location === "/goal-templates",
     },
   ];
 
