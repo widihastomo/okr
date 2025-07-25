@@ -2272,75 +2272,7 @@ export default function GoalDetail() {
               </Button>
             </div>
 
-            {/* Quick Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4 mt-4">
-              <div className="bg-white p-3 md:p-4 rounded-lg border border-purple-100">
-                <div className="flex items-center gap-2 mb-1">
-                  <CheckCircle2 className="w-4 h-4 text-green-600" />
-                  <span className="text-xs md:text-sm font-medium text-gray-700">
-                    Selesai
-                  </span>
-                </div>
-                <div className="text-xl md:text-2xl font-bold text-green-600">
-                  {tugas.filter((t) => t.status === "completed").length}
-                </div>
-              </div>
 
-              <div className="bg-white p-3 md:p-4 rounded-lg border border-purple-100">
-                <div className="flex items-center gap-2 mb-1">
-                  <Clock className="w-4 h-4 text-blue-600" />
-                  <span className="text-xs md:text-sm font-medium text-gray-700">
-                    Berlangsung
-                  </span>
-                </div>
-                <div className="text-xl md:text-2xl font-bold text-blue-600">
-                  {tugas.filter((t) => t.status === "in_progress").length}
-                </div>
-              </div>
-
-              <div className="bg-white p-3 md:p-4 rounded-lg border border-purple-100">
-                <div className="flex items-center gap-2 mb-1">
-                  <AlertTriangle className="w-4 h-4 text-red-600" />
-                  <span className="text-xs md:text-sm font-medium text-gray-700">
-                    Terlambat
-                  </span>
-                </div>
-                <div className="text-xl md:text-2xl font-bold text-red-600">
-                  {
-                    tugas.filter(
-                      (t) =>
-                        t.dueDate &&
-                        new Date(t.dueDate) < new Date() &&
-                        t.status !== "completed",
-                    ).length
-                  }
-                </div>
-              </div>
-
-              <div className="bg-white p-3 md:p-4 rounded-lg border border-purple-100">
-                <div className="flex items-center gap-2 mb-1">
-                  <TrendingUp className="w-4 h-4 text-orange-600" />
-                  <span className="text-xs md:text-sm font-medium text-gray-700">
-                    Prioritas Tinggi
-                  </span>
-                </div>
-                <div className="text-xl md:text-2xl font-bold text-orange-600">
-                  {tugas.filter((t) => t.priority === "high").length}
-                </div>
-              </div>
-
-              <div className="bg-white p-3 md:p-4 rounded-lg border border-purple-100 md:col-span-1 col-span-2">
-                <div className="flex items-center gap-2 mb-1">
-                  <UserIcon className="w-4 h-4 text-indigo-600" />
-                  <span className="text-xs md:text-sm font-medium text-gray-700">
-                    Ditugaskan
-                  </span>
-                </div>
-                <div className="text-xl md:text-2xl font-bold text-indigo-600">
-                  {tugas.filter((t) => t.assignedTo).length}
-                </div>
-              </div>
-            </div>
 
             {/* Tugas List */}
             <div className="mt-6 space-y-4">
