@@ -1483,7 +1483,7 @@ export default function GoalDetail() {
                         {kr.description}
                       </p>
 
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs text-gray-500 mb-3">
                         {(() => {
                           // Handle achieve_or_not type
                           if (kr.keyResultType === "achieve_or_not") {
@@ -1537,9 +1537,73 @@ export default function GoalDetail() {
                           }
                         })()}
                       </div>
+
+                      {/* Progress section - positioned between title/description and buttons */}
+                      <div className="space-y-3 sm:space-y-0 sm:flex sm:items-center sm:justify-between mb-3">
+                        <div className="w-full sm:flex-1 sm:mr-4">
+                          {/* Mobile: Use compact mode, Desktop: Use full progress bar */}
+                          <div className="block sm:hidden">
+                            <SimpleProgressStatus
+                              status={kr.status}
+                              progressPercentage={progress}
+                              timeProgressPercentage={
+                                kr.timeProgressPercentage || 0
+                              }
+                              dueDate={null}
+                              startDate={cycle?.startDate}
+                              compact={true}
+                              keyResultType={kr.type}
+                            />
+                          </div>
+                          <div className="hidden sm:block">
+                            <SimpleProgressStatus
+                              status={kr.status}
+                              progressPercentage={progress}
+                              timeProgressPercentage={
+                                kr.timeProgressPercentage || 0
+                              }
+                              dueDate={null}
+                              startDate={cycle?.startDate}
+                              compact={false}
+                              keyResultType={kr.type}
+                            />
+                          </div>
+                        </div>
+                        {kr.lastCheckIn && (
+                          <div className="text-xs text-gray-500 sm:text-right sm:ml-4 sm:shrink-0">
+                            <div className="flex items-center gap-1 sm:justify-end">
+                              <span className="text-gray-400">
+                                Terakhir update:
+                              </span>
+                              <span className="text-gray-600">
+                                {kr.lastCheckIn.createdAt &&
+                                  new Date(
+                                    kr.lastCheckIn.createdAt,
+                                  ).toLocaleDateString("id-ID", {
+                                    day: "numeric",
+                                    month: "short",
+                                    year: "numeric",
+                                  })}
+                              </span>
+                            </div>
+                            {kr.lastCheckIn.notes && (
+                              <div className="relative group mt-1">
+                                <div className="text-gray-400 italic text-xs max-w-xs truncate sm:text-right cursor-help">
+                                  "{kr.lastCheckIn.notes}"
+                                </div>
+                                {/* Custom tooltip */}
+                                <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-black text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50 max-w-sm min-w-0 break-words">
+                                  {kr.lastCheckIn.notes}
+                                  <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-black"></div>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </div>
 
-                    {/* Action Buttons - Top Right */}
+                    {/* Action Buttons - Now positioned after progress */}
                     <div className="flex items-center gap-1 shrink-0">
                       <Button
                         variant="default"
@@ -1588,70 +1652,6 @@ export default function GoalDetail() {
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
-                  </div>
-
-                  {/* Progress section with last check-in - consistent with dashboard */}
-                  <div className="space-y-3 sm:space-y-0 sm:flex sm:items-center sm:justify-between">
-                    <div className="w-full sm:flex-1 sm:mr-4">
-                      {/* Mobile: Use compact mode, Desktop: Use full progress bar */}
-                      <div className="block sm:hidden">
-                        <SimpleProgressStatus
-                          status={kr.status}
-                          progressPercentage={progress}
-                          timeProgressPercentage={
-                            kr.timeProgressPercentage || 0
-                          }
-                          dueDate={null}
-                          startDate={cycle?.startDate}
-                          compact={true}
-                          keyResultType={kr.type}
-                        />
-                      </div>
-                      <div className="hidden sm:block">
-                        <SimpleProgressStatus
-                          status={kr.status}
-                          progressPercentage={progress}
-                          timeProgressPercentage={
-                            kr.timeProgressPercentage || 0
-                          }
-                          dueDate={null}
-                          startDate={cycle?.startDate}
-                          compact={false}
-                          keyResultType={kr.type}
-                        />
-                      </div>
-                    </div>
-                    {kr.lastCheckIn && (
-                      <div className="text-xs text-gray-500 sm:text-right sm:ml-4 sm:shrink-0">
-                        <div className="flex items-center gap-1 sm:justify-end">
-                          <span className="text-gray-400">
-                            Terakhir update:
-                          </span>
-                          <span className="text-gray-600">
-                            {kr.lastCheckIn.createdAt &&
-                              new Date(
-                                kr.lastCheckIn.createdAt,
-                              ).toLocaleDateString("id-ID", {
-                                day: "numeric",
-                                month: "short",
-                                year: "numeric",
-                              })}
-                          </span>
-                        </div>
-                        {kr.lastCheckIn.notes && (
-                          <div className="relative group mt-1">
-                            <div className="text-gray-400 italic text-xs max-w-xs truncate sm:text-right cursor-help">
-                              "{kr.lastCheckIn.notes}"
-                            </div>
-                            {/* Custom tooltip */}
-                            <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-black text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50 max-w-sm min-w-0 break-words">
-                              {kr.lastCheckIn.notes}
-                              <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-black"></div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    )}
                   </div>
 
                   {/* Bottom section - Assignee and Initiative count */}
