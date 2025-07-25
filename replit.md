@@ -452,6 +452,13 @@ The system now includes a comprehensive dummy data generation feature that creat
 
 ## Changelog
 ```
+- July 25, 2025. **EXPANDABLE FUNCTIONALITY REMOVED FROM KEY RESULTS** - Successfully eliminated expandable functionality from key results cards per user request:
+  * REMOVED: Expand/collapse buttons from key results cards that showed ChevronDown/ChevronRight icons
+  * REMOVED: Expanded initiatives sections that displayed related initiatives under each key result
+  * CLEANED: Removed expandedKeyResults state management and toggleKeyResultExpand function
+  * CLEANED: Removed ChevronDown and ChevronRight icon imports as they're no longer needed
+  * SIMPLIFIED: Key results cards now display in consistent compact format without expandable sections
+  * RESULT: Cleaner key results interface without complex expand/collapse functionality for simplified user experience
 - July 25, 2025. **OVERVIEW CARDS REMOVED FROM TASK SECTION** - Successfully removed Quick Stats overview cards from Tugas & Aktivitas section per user request:
   * REMOVED: Complete Quick Stats grid with 5 overview cards (Selesai, Berlangsung, Terlambat, Prioritas Tinggi, Ditugaskan)
   * SIMPLIFIED: Task section now flows directly from header to task list without statistical overview

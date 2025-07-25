@@ -41,8 +41,6 @@ import {
   MoveDown,
   Settings,
   ExternalLink,
-  ChevronDown,
-  ChevronRight,
   AlertTriangle,
   Rocket,
   Trophy,
@@ -420,9 +418,7 @@ export default function GoalDetail() {
   });
   const [editObjectiveModal, setEditObjectiveModal] = useState(false);
   const [shouldHighlight, setShouldHighlight] = useState(false);
-  const [expandedKeyResults, setExpandedKeyResults] = useState<Set<string>>(
-    new Set(),
-  );
+
   const [showInitiativeFormModal, setShowInitiativeFormModal] = useState(false);
   const [editingInitiative, setEditingInitiative] = useState<Initiative | null>(null);
   const [deletingInitiative, setDeletingInitiative] = useState<Initiative | null>(null);
@@ -663,17 +659,7 @@ export default function GoalDetail() {
     createKeyResultMutation.mutate(processedData);
   };
 
-  const toggleKeyResultExpand = (keyResultId: string) => {
-    setExpandedKeyResults((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(keyResultId)) {
-        newSet.delete(keyResultId);
-      } else {
-        newSet.add(keyResultId);
-      }
-      return newSet;
-    });
-  };
+
 
   // Mutation for deleting key result
   const deleteKeyResultMutation = useMutation({
@@ -1435,7 +1421,6 @@ export default function GoalDetail() {
               const typeConfig = getKeyResultTypeIcon(kr.keyResultType);
               const IconComponent = typeConfig.icon;
 
-              const isExpanded = expandedKeyResults.has(kr.id);
               const krInitiatives = inisiatif.filter(
                 (r) => r.keyResultId === kr.id,
               );
@@ -1448,21 +1433,7 @@ export default function GoalDetail() {
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        {/* Expand/Collapse Button */}
-                        {krInitiatives.length > 0 && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-6 w-6 p-0 hover:bg-gray-100"
-                            onClick={() => toggleKeyResultExpand(kr.id)}
-                          >
-                            {isExpanded ? (
-                              <ChevronDown className="w-4 h-4 text-gray-500" />
-                            ) : (
-                              <ChevronRight className="w-4 h-4 text-gray-500" />
-                            )}
-                          </Button>
-                        )}
+
                         <Link
                           href={`/key-results/${kr.id}`}
                           className="font-medium text-gray-900 hover:text-blue-600 hover:underline cursor-pointer text-left"
@@ -1701,105 +1672,7 @@ export default function GoalDetail() {
                     </div>
                   </div>
 
-                  {/* Expanded Initiatives Section */}
-                  {isExpanded && krInitiatives.length > 0 && (
-                    <div className="mt-4 pt-4 border-t border-gray-100">
-                      <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
-                        <FileText className="w-4 h-4" />
-                        Inisiatif Terkait ({krInitiatives.length})
-                      </h4>
-                      <div className="space-y-2">
-                        {krInitiatives.map((initiative) => (
-                          <div
-                            key={initiative.id}
-                            className="p-3 bg-gray-50 rounded-md border border-gray-200"
-                          >
-                            <div className="flex items-start justify-between mb-2">
-                              <div className="flex gap-2">
-                                <Badge
-                                  className={
-                                    initiative.status === "completed"
-                                      ? "bg-green-100 text-green-800"
-                                      : initiative.status === "in_progress"
-                                        ? "bg-blue-100 text-blue-800"
-                                        : initiative.status === "on_hold"
-                                          ? "bg-yellow-100 text-yellow-800"
-                                          : "bg-gray-100 text-gray-800"
-                                  }
-                                >
-                                  {initiative.status?.replace("_", " ") ||
-                                    "pending"}
-                                </Badge>
-                                <Badge
-                                  className={
-                                    initiative.priority === "critical"
-                                      ? "bg-red-100 text-red-800"
-                                      : initiative.priority === "high"
-                                        ? "bg-orange-100 text-orange-800"
-                                        : initiative.priority === "medium"
-                                          ? "bg-yellow-100 text-yellow-800"
-                                          : "bg-green-100 text-green-800"
-                                  }
-                                >
-                                  {initiative.priority || "medium"}
-                                </Badge>
-                              </div>
-                              <Link href={`/initiatives/${initiative.id}`}>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-6 px-2 text-xs text-blue-600 hover:text-blue-800"
-                                >
-                                  <Eye className="w-3 h-3 mr-1" />
-                                  Detail
-                                </Button>
-                              </Link>
-                            </div>
-                            <div className="mb-2">
-                              <Link href={`/initiatives/${initiative.id}`}>
-                                <h5 className="font-medium text-gray-900 hover:text-blue-600 cursor-pointer">
-                                  {initiative.title}
-                                </h5>
-                              </Link>
-                              {initiative.description && (
-                                <p className="text-xs text-gray-600 mt-1 line-clamp-2">
-                                  {initiative.description}
-                                </p>
-                              )}
-                            </div>
-                            <div className="flex items-center justify-between text-xs text-gray-500">
-                              <div className="flex items-center gap-4">
-                                <span>
-                                  Progress:{" "}
-                                  {initiative.progressPercentage || 0}%
-                                </span>
-                                {initiative.dueDate && (
-                                  <span
-                                    className={
-                                      new Date(initiative.dueDate) <
-                                      new Date()
-                                        ? "text-red-600"
-                                        : ""
-                                    }
-                                  >
-                                    Due:{" "}
-                                    {new Date(
-                                      initiative.dueDate,
-                                    ).toLocaleDateString("id-ID")}
-                                  </span>
-                                )}
-                              </div>
-                              {initiative.picId && (
-                                <span>
-                                  PIC: {getUserName(initiative.picId)}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+
                 </div>
               );
             })
