@@ -35,6 +35,7 @@ export const goalTemplates = pgTable("goal_templates", {
   title: text("title").notNull(),
   description: text("description"),
   focusAreaTag: text("focus_area_tag").notNull(), // "penjualan", "operasional", "customer_service", "marketing"
+  category: text("category").notNull().default("general"), // "sales", "marketing", "hr", "ceo", "cfo", "manufacturing", "operations", "customer_service", "it", "finance", "general"
   keyResults: jsonb("key_results").notNull(), // Array of key result templates
   initiatives: jsonb("initiatives").notNull(), // Array of initiative templates  
   tasks: jsonb("tasks").notNull(), // Array of task templates

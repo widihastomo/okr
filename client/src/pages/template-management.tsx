@@ -39,10 +39,25 @@ const keyResultTypeOptions = [
   { value: "should_stay_below", label: "Tetap di bawah", icon: TrendingDown }
 ];
 
+const categoryOptions = [
+  { value: "general", label: "Umum", color: "bg-gray-100 text-gray-800" },
+  { value: "sales", label: "Sales", color: "bg-green-100 text-green-800" },
+  { value: "marketing", label: "Marketing", color: "bg-orange-100 text-orange-800" },
+  { value: "operations", label: "Operasional", color: "bg-blue-100 text-blue-800" },
+  { value: "customer_service", label: "Customer Service", color: "bg-purple-100 text-purple-800" },
+  { value: "hr", label: "HR", color: "bg-pink-100 text-pink-800" },
+  { value: "finance", label: "Finance", color: "bg-yellow-100 text-yellow-800" },
+  { value: "it", label: "IT", color: "bg-indigo-100 text-indigo-800" },
+  { value: "ceo", label: "CEO", color: "bg-red-100 text-red-800" },
+  { value: "cfo", label: "CFO", color: "bg-emerald-100 text-emerald-800" },
+  { value: "manufacturing", label: "Manufacturing", color: "bg-slate-100 text-slate-800" }
+];
+
 interface TemplateFormData {
   title: string;
   description: string;
   focusAreaTag: string;
+  category: string;
   keyResults: Array<{
     title: string;
     description: string;
@@ -69,10 +84,12 @@ export default function TemplateManagement() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<any>(null);
+  const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [formData, setFormData] = useState<TemplateFormData>({
     title: "",
     description: "",
     focusAreaTag: "",
+    category: "general",
     keyResults: [],
     initiatives: [],
     tasks: []
@@ -153,6 +170,7 @@ export default function TemplateManagement() {
       title: "",
       description: "",
       focusAreaTag: "",
+      category: "general",
       keyResults: [],
       initiatives: [],
       tasks: []
@@ -190,6 +208,7 @@ export default function TemplateManagement() {
       title: template.title || "",
       description: template.description || "",
       focusAreaTag: template.focusAreaTag || "",
+      category: template.category || "general",
       keyResults: template.keyResults || [],
       initiatives: template.initiatives || [],
       tasks: template.tasks || []
@@ -270,6 +289,12 @@ export default function TemplateManagement() {
     setFormData({ ...formData, tasks: updatedTasks });
   };
 
+  // Filter templates based on selected category
+  const filteredTemplates = templates?.filter((template: any) => {
+    if (categoryFilter === "all") return true;
+    return template.category === categoryFilter;
+  }) || [];
+
   if (!(user as any)?.isSystemOwner) {
     return (
       <div className="p-8 text-center">
@@ -339,6 +364,24 @@ export default function TemplateManagement() {
                             <option.icon className="w-4 h-4" />
                             <span>{option.label}</span>
                           </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div>
+                  <Label htmlFor="category">Department Category</Label>
+                  <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select department category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categoryOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          <Badge className={`${option.color} border-0`}>
+                            {option.label}
+                          </Badge>
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -530,6 +573,33 @@ export default function TemplateManagement() {
         </Dialog>
       </div>
 
+      {/* Category Filter */}
+      <div className="flex items-center justify-between bg-gray-50 p-4 rounded-lg">
+        <div className="flex items-center space-x-4">
+          <Label className="text-sm font-medium text-gray-700">Filter by Department:</Label>
+          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+            <SelectTrigger className="w-48">
+              <SelectValue placeholder="Select category" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">
+                <Badge className="bg-slate-100 text-slate-800 border-0">All Departments</Badge>
+              </SelectItem>
+              {categoryOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  <Badge className={`${option.color} border-0`}>
+                    {option.label}
+                  </Badge>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="text-sm text-gray-600">
+          {filteredTemplates.length} template{filteredTemplates.length !== 1 ? 's' : ''} found
+        </div>
+      </div>
+
       {/* Templates List */}
       {isLoading ? (
         <div className="flex items-center justify-center p-8">
@@ -538,8 +608,9 @@ export default function TemplateManagement() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {Array.isArray(templates) && templates.map((template: any) => {
+          {Array.isArray(filteredTemplates) && filteredTemplates.map((template: any) => {
             const focusArea = focusAreaOptions.find(f => f.value === template.focusAreaTag);
+            const category = categoryOptions.find(c => c.value === template.category);
             const FocusIcon = focusArea?.icon || Target;
             
             return (
@@ -554,10 +625,13 @@ export default function TemplateManagement() {
                     </div>
                   </div>
                   
-                  <div className="flex items-center justify-between mt-4">
+                  <div className="flex items-center justify-between mt-4 space-x-2">
                     <Badge className={focusArea?.color || "bg-gray-100 text-gray-800"}>
                       <FocusIcon className="w-3 h-3 mr-1" />
                       {focusArea?.label || template.focusAreaTag}
+                    </Badge>
+                    <Badge className={category?.color || "bg-gray-100 text-gray-800"}>
+                      {category?.label || template.category || "General"}
                     </Badge>
                   </div>
                 </CardHeader>
@@ -610,16 +684,16 @@ export default function TemplateManagement() {
             );
           })}
           
-          {!Array.isArray(templates) || templates.length === 0 && (
+          {!Array.isArray(filteredTemplates) || filteredTemplates.length === 0 && (
             <div className="col-span-full text-center py-12">
               <div className="text-gray-400 mb-4">
                 <Target className="w-16 h-16 mx-auto" />
               </div>
               <h3 className="text-lg font-medium text-gray-900 mb-2">
-                No templates found
+                {categoryFilter === "all" ? "No templates found" : `No templates found for ${categoryOptions.find(c => c.value === categoryFilter)?.label || categoryFilter} category`}
               </h3>
               <p className="text-gray-600">
-                Create your first template to get started.
+                {categoryFilter === "all" ? "Create your first template to get started." : "Try selecting a different category or create a new template."}
               </p>
             </div>
           )}
@@ -674,6 +748,24 @@ export default function TemplateManagement() {
                           <option.icon className="w-4 h-4" />
                           <span>{option.label}</span>
                         </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div>
+                <Label htmlFor="edit-category">Department Category</Label>
+                <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select department category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categoryOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        <Badge className={`${option.color} border-0`}>
+                          {option.label}
+                        </Badge>
                       </SelectItem>
                     ))}
                   </SelectContent>

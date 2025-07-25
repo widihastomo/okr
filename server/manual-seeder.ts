@@ -277,6 +277,7 @@ async function createGoalTemplates() {
       title: "Meningkatkan penjualan produk skincare sebesar 40%",
       description: "Fokus pada peningkatan revenue melalui strategi penjualan yang lebih efektif dan ekspansi market reach untuk produk skincare premium",
       focusAreaTag: "penjualan",
+      category: "sales",
       keyResults: [
         { title: "Penjualan naik 40% dari bulan sebelumnya", targetValue: "40", unit: "%", keyResultType: "increase_to" },
         { title: "Mendapat 300 pelanggan baru per bulan", targetValue: "300", unit: "orang", keyResultType: "increase_to" },
@@ -296,6 +297,7 @@ async function createGoalTemplates() {
       title: "Membangun basis pelanggan loyal dengan 500 member baru",
       description: "Menciptakan program membership yang menarik untuk meningkatkan customer retention dan lifetime value pelanggan skincare",
       focusAreaTag: "penjualan",
+      category: "sales",
       keyResults: [
         { title: "Mendapat 500 member baru program loyalty", targetValue: "500", unit: "orang", keyResultType: "increase_to" },
         { title: "Tingkat retensi member mencapai 85%", targetValue: "85", unit: "%", keyResultType: "increase_to" },
@@ -316,6 +318,7 @@ async function createGoalTemplates() {
       title: "Meningkatkan brand awareness melalui digital marketing",
       description: "Kampanye marketing digital yang komprehensif untuk meningkatkan visibility dan recognition brand di target market",
       focusAreaTag: "marketing",
+      category: "marketing",
       keyResults: [
         { title: "Social media followers naik 50%", targetValue: "50", unit: "%", keyResultType: "increase_to" },
         { title: "Website traffic organik naik 60%", targetValue: "60", unit: "%", keyResultType: "increase_to" },
@@ -335,6 +338,7 @@ async function createGoalTemplates() {
       title: "Mengoptimalkan lead generation melalui content marketing",
       description: "Strategi lead generation melalui content marketing, social media, dan digital advertising untuk memperbesar sales funnel",
       focusAreaTag: "marketing",
+      category: "marketing",
       keyResults: [
         { title: "Generate 1000 qualified leads per bulan", targetValue: "1000", unit: "leads", keyResultType: "increase_to" },
         { title: "Cost per lead turun 30%", targetValue: "30", unit: "%", keyResultType: "decrease_to" },
@@ -355,6 +359,7 @@ async function createGoalTemplates() {
       title: "Meningkatkan efisiensi operasional perusahaan 35%",
       description: "Optimasi seluruh proses bisnis untuk mengurangi waste, meningkatkan produktivitas, dan mempercepat delivery time",
       focusAreaTag: "operasional",
+      category: "operations",
       keyResults: [
         { title: "Waktu proses order turun 35%", targetValue: "35", unit: "%", keyResultType: "decrease_to" },
         { title: "Tingkat error operasional di bawah 2%", targetValue: "2", unit: "%", keyResultType: "should_stay_below" },
@@ -374,6 +379,7 @@ async function createGoalTemplates() {
       title: "Optimasi supply chain dan inventory management",
       description: "Streamline supply chain operations untuk mengurangi cost, meningkatkan availability, dan mempercepat fulfillment",
       focusAreaTag: "operasional",
+      category: "operations",
       keyResults: [
         { title: "Inventory turnover ratio naik 25%", targetValue: "25", unit: "%", keyResultType: "increase_to" },
         { title: "Stockout incidents turun 80%", targetValue: "80", unit: "%", keyResultType: "decrease_to" },
@@ -394,6 +400,7 @@ async function createGoalTemplates() {
       title: "Meningkatkan kepuasan pelanggan hingga 95%",
       description: "Transformasi customer experience melalui service excellence, response time improvement, dan proactive customer care",
       focusAreaTag: "customer_service",
+      category: "customer_service",
       keyResults: [
         { title: "Customer satisfaction score 95%", targetValue: "95", unit: "%", keyResultType: "increase_to" },
         { title: "First response time di bawah 2 jam", targetValue: "2", unit: "jam", keyResultType: "should_stay_below" },
@@ -412,7 +419,8 @@ async function createGoalTemplates() {
     {
       title: "Membangun sistem customer retention yang efektif",
       description: "Comprehensive customer retention strategy untuk mengurangi churn rate dan meningkatkan customer lifetime value",
-      focusAreaTag: "customer_service", 
+      focusAreaTag: "customer_service",
+      category: "customer_service", 
       keyResults: [
         { title: "Customer churn rate turun 50%", targetValue: "50", unit: "%", keyResultType: "decrease_to" },
         { title: "Customer lifetime value naik 35%", targetValue: "35", unit: "%", keyResultType: "increase_to" },
