@@ -1526,6 +1526,7 @@ export interface KeyResultModalProps {
   editingKeyResult?: KeyResultFormData;
   isEditing?: boolean;
   users?: User[];
+  goalOwner?: User;
 }
 
 export function KeyResultModal({
@@ -1535,6 +1536,7 @@ export function KeyResultModal({
   editingKeyResult,
   isEditing,
   users,
+  goalOwner,
 }: KeyResultModalProps) {
   const { user } = useAuth();
   const keyResultForm = useForm<KeyResultFormData>({
@@ -2420,6 +2422,7 @@ export function KeyResultModal({
                       placeholder="Pilih penanggung jawab..."
                       emptyMessage="Tidak ada user ditemukan"
                       allowUnassigned={true}
+                      goalOwner={goalOwner}
                     />
                   </FormControl>
                   <FormMessage />

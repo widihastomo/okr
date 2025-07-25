@@ -118,6 +118,7 @@ interface EditKeyResultModalProps {
   keyResult?: KeyResult;
   objectiveId?: string;
   onSuccess?: () => void;
+  goalOwner?: any;
 }
 
 export default function EditKeyResultModal({
@@ -126,6 +127,7 @@ export default function EditKeyResultModal({
   keyResult,
   objectiveId,
   onSuccess,
+  goalOwner,
 }: EditKeyResultModalProps) {
 
   const { toast } = useToast();
@@ -371,11 +373,12 @@ export default function EditKeyResultModal({
                           </Popover>
                         </FormLabel>
                         <SearchableUserSelect
-                          users={users?.filter(user => user.isActive === true) || []}
+                          users={users?.filter((user: any) => user.isActive === true) || []}
                           value={field.value}
                           onValueChange={field.onChange}
                           placeholder="Pilih penanggung jawab"
                           allowUnassigned={true}
+                          goalOwner={goalOwner}
                         />
                         <FormMessage />
                       </FormItem>

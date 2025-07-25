@@ -36,6 +36,7 @@ interface SearchableUserSelectProps {
   className?: string;
   defaultValue?: string;
   currentUser?: User; // Add currentUser prop
+  goalOwner?: User; // Add goalOwner prop for default selection
 }
 
 export function SearchableUserSelect({
@@ -50,18 +51,19 @@ export function SearchableUserSelect({
   className,
   defaultValue,
   currentUser,
+  goalOwner,
 }: SearchableUserSelectProps) {
   const [open, setOpen] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const scrollState = useScrollProgress(scrollContainerRef);
 
-  // Use currentUser as default if no value is provided and currentUser is set
-  const effectiveValue = value || (currentUser && !defaultValue ? currentUser.id : defaultValue);
+  // Use goalOwner as default, then currentUser, then defaultValue, then "unassigned"
+  const effectiveValue = value || (goalOwner ? goalOwner.id : (currentUser && !defaultValue ? currentUser.id : defaultValue || "unassigned"));
   const selectedUser = users.find(user => user.id === effectiveValue);
 
   const getDisplayText = () => {
     if (effectiveValue === "all") return "Semua User";
-    if (effectiveValue === "unassigned") return "Belum Ditugaskan";
+    if (effectiveValue === "unassigned") return goalOwner ? `Default: ${goalOwner.name || goalOwner.email.split('@')[0]} (Goal Owner)` : "Belum Ditugaskan";
     if (selectedUser) {
       return selectedUser.name && selectedUser.name.trim() !== '' 
         ? selectedUser.name.trim() 
@@ -195,7 +197,7 @@ export function SearchableUserSelect({
                         "font-medium",
                         effectiveValue === "unassigned" ? "text-gray-900" : "text-gray-900"
                       )}>
-                        Belum Ditugaskan
+                        {goalOwner ? `Default: ${goalOwner.name || goalOwner.email.split('@')[0]} (Goal Owner)` : "Belum Ditugaskan"}
                       </span>
                       <Check
                         className={cn(

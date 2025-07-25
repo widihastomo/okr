@@ -2989,6 +2989,7 @@ export default function GoalDetail() {
         onOpenChange={(open) => setEditKeyResultModal({ open })}
         keyResult={editKeyResultModal.keyResult}
         objectiveId={id}
+        goalOwner={userOwner}
         onSuccess={() => {
           // Invalidate cache to refresh the data
           console.log("🔄 Starting cache invalidation for objective:", id);
@@ -3009,6 +3010,7 @@ export default function GoalDetail() {
         onOpenChange={(open) => setAddKeyResultModal({ open })}
         onSubmit={(data) => handleCreateKeyResult(data as any)}
         users={users}
+        goalOwner={userOwner}
       />
       {/* Initiative Form Modal */}
       <InitiativeFormModal
