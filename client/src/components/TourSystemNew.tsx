@@ -34,6 +34,7 @@ import {
   Medal,
   Briefcase,
   HelpCircle,
+  LayoutDashboard,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLocation } from "wouter";
@@ -85,15 +86,15 @@ const TOUR_STEPS: TourStep[] = [
     category: "feature",
   },
   {
-    id: "daily-focus",
-    title: "Daily Focus - Fokus Harian",
+    id: "dashboard",
+    title: "Dashboard - Pusat Kendali",
     description:
-      "Pusat kendali produktivitas harian Anda. Di sini Anda dapat melihat tugas yang harus diselesaikan hari ini, update progress angka target, dan mengelola inisiatif yang sedang berjalan. Fitur ini membantu Anda tetap fokus pada prioritas utama dan tidak kehilangan momentum dalam mencapai tujuan.",
-    icon: Sun,
-    selector: '[data-tour="daily-focus"]',
+      "Pusat kendali produktivitas harian Anda. Di sini Anda dapat melihat tugas yang harus diselesaikan hari ini, update progress angka target, dan mengelola inisiatif yang sedang berjalan. Dashboard ini membantu Anda tetap fokus pada prioritas utama dan tidak kehilangan momentum dalam mencapai tujuan.",
+    icon: LayoutDashboard,
+    selector: '[data-tour="dashboard"]',
     position: "right",
     category: "action",
-    targetPath: "/daily-focus",
+    targetPath: "/",
   },
   {
     id: "goals",

@@ -1147,9 +1147,9 @@ export default function DailyFocusPage() {
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div className="flex-1">
-            <div className="flex items-center justify-between sm:block">
+            <div className="flex items-center justify-between sm:block" data-tour="dashboard">
               <h1 className="text-xl md:text-2xl font-bold text-gray-900">
-                Daily Focus
+                Dashboard
               </h1>
               {/* Date display - top-right on mobile, positioned at title level */}
               <div className="flex items-center gap-2 text-sm text-gray-500 sm:hidden">
@@ -1164,7 +1164,7 @@ export default function DailyFocusPage() {
               </div>
             </div>
             <p className="text-sm md:text-base text-gray-600">
-              Kelola aktivitas harian Anda hari ini
+              Pusat kendali produktivitas dan progress Anda
             </p>
           </div>
 

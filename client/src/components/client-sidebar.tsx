@@ -152,11 +152,11 @@ export default function Sidebar({
 
   const regularUserMenuItems = [
     {
-      label: "Daily Focus",
-      icon: Sun,
+      label: "Dashboard",
+      icon: LayoutDashboard,
       path: "/",
       active: location === "/" || location === "/daily-focus",
-      tourId: "daily-focus",
+      tourId: "dashboard",
     },
     {
       label: "Goals",

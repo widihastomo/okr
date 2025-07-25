@@ -452,6 +452,14 @@ The system now includes a comprehensive dummy data generation feature that creat
 
 ## Changelog
 ```
+- July 25, 2025. **DAILY FOCUS TO DASHBOARD RENAME COMPLETED** - Successfully renamed "Daily Focus" to "Dashboard" throughout the application:
+  * UPDATED: Sidebar menu label from "Daily Focus" to "Dashboard" with LayoutDashboard icon
+  * UPDATED: Tour system step from "daily-focus" to "dashboard" with updated title and description
+  * UPDATED: Page header title from "Daily Focus" to "Dashboard" in daily-focus.tsx
+  * UPDATED: Page description to "Pusat kendali produktivitas dan progress Anda" for dashboard theme
+  * UPDATED: Tour selector from data-tour="daily-focus" to data-tour="dashboard"
+  * MAINTAINED: All existing functionality while updating branding and terminology
+  * RESULT: Consistent "Dashboard" terminology across application interface, navigation, and tour system
 - July 25, 2025. **CLIENT TEMPLATE UI SIMPLIFICATION COMPLETED** - Successfully removed initiatives and tasks display from template cards per user feedback:
   * REMOVED: Initiatives section display from template cards for cleaner interface
   * REMOVED: Tasks section display from template cards to focus on essential content
