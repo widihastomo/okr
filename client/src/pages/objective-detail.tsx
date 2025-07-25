@@ -1343,7 +1343,7 @@ export default function GoalDetail() {
             <Button
               variant="outline"
               onClick={() => setAddKeyResultModal({ open: true })}
-              className="border-orange-600 text-orange-600 hover:bg-orange-50 w-full sm:w-auto sm:ml-4 shrink-0"
+              className="border-blue-600 text-blue-600 hover:bg-blue-100 w-full sm:w-auto sm:ml-4 shrink-0"
             >
               <Plus className="w-4 h-4 mr-2" />
               <span className="sm:hidden">Tambah</span>
@@ -1367,8 +1367,9 @@ export default function GoalDetail() {
                 ini
               </p>
               <Button
+                variant="outline"
                 onClick={() => setAddKeyResultModal({ open: true })}
-                className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
+                className="border-blue-600 text-blue-600 hover:bg-blue-100"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Tambah Angka Target Pertama
@@ -1723,7 +1724,7 @@ export default function GoalDetail() {
           <Button
             variant="outline"
             onClick={() => setShowInitiativeFormModal(true)}
-            className="border-orange-600 text-orange-600 hover:bg-orange-50 w-full sm:w-auto sm:ml-4 shrink-0"
+            className="border-green-600 text-green-600 hover:bg-green-100 w-full sm:w-auto sm:ml-4 shrink-0"
           >
             <Plus className="w-4 h-4 mr-2" />
             <span className="sm:hidden">Tambah</span>
@@ -2141,7 +2142,7 @@ export default function GoalDetail() {
               <Button
                 variant="outline"
                 onClick={() => setShowTaskModal(true)}
-                className="border-orange-600 text-orange-600 hover:bg-orange-50 w-full md:w-auto"
+                className="border-purple-600 text-purple-600 hover:bg-purple-50 w-full md:w-auto"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Tambah Task
