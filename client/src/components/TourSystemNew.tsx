@@ -165,7 +165,7 @@ const TOUR_STEPS: TourStep[] = [
       "Halaman Analytics menyediakan dashboard komprehensif untuk monitor progress dan performa Goal, Initiative, serta Tim. Anda dapat melihat berbagai grafik, chart, dan statistik untuk evaluasi pencapaian organisasi secara data-driven.",
     icon: Activity,
     selector: '[data-tour="analytics"]',
-    position: "bottom",
+    position: "right",
     category: "navigation",
     targetPath: "/analytics",
   },
