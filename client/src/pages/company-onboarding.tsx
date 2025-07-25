@@ -2388,6 +2388,7 @@ export default function CompanyOnboarding() {
           allTemplateTitles: allGoalTemplates?.map(t => t.title) || [],
           selectedTemplate: selectedTemplate ? selectedTemplate.title : "NOT FOUND",
           selectedTemplateInitiatives: selectedTemplate?.initiatives || "NO INITIATIVES",
+          selectedTemplateTasks: selectedTemplate?.tasks || "NO TASKS",
           currentStep: onboardingData.currentStep,
           user: !!user
         });
@@ -2452,9 +2453,51 @@ export default function CompanyOnboarding() {
                         <h4 className="font-medium text-gray-900 mb-1">
                           {initiative.title}
                         </h4>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-gray-600 mb-3">
                           {initiative.description}
                         </p>
+                        
+                        {/* Display tasks for this initiative */}
+                        {selectedTemplate?.tasks && selectedTemplate.tasks
+                          .filter((task: any) => task.initiativeTitle === initiative.title)
+                          .length > 0 && (
+                          <div className="mt-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                            <p className="text-xs font-medium text-gray-700 flex items-center mb-2">
+                              <ListTodo className="w-3 h-3 mr-1" />
+                              Tugas yang terkait:
+                            </p>
+                            <div className="space-y-2">
+                              {selectedTemplate.tasks
+                                .filter((task: any) => task.initiativeTitle === initiative.title)
+                                .map((task: any, taskIndex: number) => (
+                                  <div key={taskIndex} className="flex items-start space-x-2 text-xs">
+                                    <CheckCircle className="w-3 h-3 text-green-500 mt-0.5 flex-shrink-0" />
+                                    <div className="flex-1">
+                                      <div className="flex items-start justify-between">
+                                        <span className="text-gray-800 leading-relaxed font-medium">{task.title}</span>
+                                        {task.priority && (
+                                          <Badge variant="outline" className="text-xs ml-2 flex-shrink-0">
+                                            {task.priority === 'high' ? '🔴 Tinggi' : 
+                                             task.priority === 'medium' ? '🟡 Sedang' : 
+                                             '🟢 Rendah'}
+                                          </Badge>
+                                        )}
+                                      </div>
+                                      {task.description && (
+                                        <p className="text-gray-600 mt-1 text-xs leading-relaxed">{task.description}</p>
+                                      )}
+                                      {task.dueDate && (
+                                        <div className="flex items-center mt-1 text-xs text-gray-500">
+                                          <Clock className="w-3 h-3 mr-1" />
+                                          Target: {task.dueDate}
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>

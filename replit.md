@@ -452,6 +452,14 @@ The system now includes a comprehensive dummy data generation feature that creat
 
 ## Changelog
 ```
+- July 25, 2025. **INITIATIVE TASKS DISPLAY SYSTEM COMPLETED** - Successfully implemented tasks display for each initiative in company onboarding step 5:
+  * FIXED: Database query issue where getAllGoalTemplates() only searched organization-specific templates, missing system-wide templates (null organizationId)
+  * ENHANCED: Modified getAllGoalTemplates() method to return both organization-specific AND system-wide templates using SQL OR condition
+  * IMPLEMENTED: Task display under each initiative showing related tasks with title, description, priority badges, and due dates
+  * STYLED: Professional task cards with CheckCircle icons, gray background containers, and responsive badges for priority levels
+  * INTEGRATED: Tasks filtered by initiativeTitle to show only relevant tasks under each initiative
+  * VALIDATED: Debug logging confirms templates and initiatives are now properly loaded and displayed
+  * RESULT: Users can now see detailed breakdown of tasks for each strategic initiative during onboarding process
 - July 24, 2025. **TEMPLATE ADD FUNCTIONALITY WITH EXISTING FORMS COMPLETED** - Successfully integrated existing KeyResultModal with template management system:
   * REPLACED: Custom Dialog forms with existing KeyResultModal from goal-form-modal.tsx for better consistency
   * INTEGRATED: Existing form validation, field types, and data structure from KeyResultModal
