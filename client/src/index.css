@@ -47,18 +47,21 @@
 .tour-highlight {
   position: relative !important;
   z-index: 50 !important;
-  animation: tourPulse 2s infinite !important;
+  animation: tourPulse 1.5s infinite !important;
   border-radius: 8px !important;
   pointer-events: auto !important;
   cursor: pointer !important;
+  box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.9) !important;
+  border: 2px solid rgba(249, 115, 22, 0.8) !important;
+  background: rgba(249, 115, 22, 0.1) !important;
 }
 
 /* Mobile Tour Highlight - Enhanced for sidebar menu items */
 @media (max-width: 768px) {
   .tour-highlight {
     animation: mobileTourPulse 1.2s ease 0s infinite normal none running !important;
-    box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.8) !important;
-    border: 2px solid rgba(249, 115, 22, 0.6) !important;
+    box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.9) !important;
+    border: 3px solid rgba(249, 115, 22, 0.7) !important;
   }
   
   /* Enhanced mobile tour highlight for sidebar menu items */
@@ -76,6 +79,19 @@
   }
 }
 
+/* Mobile Tour Pulse Animation */
+@keyframes mobileTourPulse {
+  0% { 
+    box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.9);
+  }
+  70% { 
+    box-shadow: 0 0 0 12px rgba(249, 115, 22, 0);
+  }
+  100% { 
+    box-shadow: 0 0 0 0 rgba(249, 115, 22, 0);
+  }
+}
+
 /* Mobile Tour Glow Animation */
 @keyframes mobileTourGlow {
   0%, 100% { 
@@ -90,10 +106,10 @@
 
 @keyframes tourPulse {
   0% { 
-    box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.7);
+    box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.8);
   }
   70% { 
-    box-shadow: 0 0 0 10px rgba(249, 115, 22, 0);
+    box-shadow: 0 0 0 15px rgba(249, 115, 22, 0);
   }
   100% { 
     box-shadow: 0 0 0 0 rgba(249, 115, 22, 0);

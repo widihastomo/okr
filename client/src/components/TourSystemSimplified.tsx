@@ -231,18 +231,26 @@ export default function TourSystem() {
     const currentStepData = TOUR_STEPS[currentStep];
     if (!currentStepData) return;
 
+    console.log(`🎯 Highlighting step ${currentStep + 1}: ${currentStepData.title}`);
+    console.log(`🔍 Looking for selector: ${currentStepData.selector}`);
+
     // Clean up previous highlights
     cleanupHighlights();
 
     // Find the target element
     const targetElement = document.querySelector(currentStepData.selector);
     if (!targetElement) {
-      console.warn(`Element not found for selector: ${currentStepData.selector}`);
+      console.warn(`❌ Element not found for selector: ${currentStepData.selector}`);
       return;
     }
 
+    console.log(`✅ Found element for ${currentStepData.selector}, adding highlight class`);
+    
     // Add highlight class
     targetElement.classList.add("tour-highlight");
+    
+    // Force style refresh for immediate visual feedback
+    (targetElement as HTMLElement).style.cssText += ';position: relative !important; z-index: 50 !important;';
 
     // Position tooltip
     positionTooltip(targetElement as HTMLElement, currentStepData.position);
@@ -296,8 +304,15 @@ export default function TourSystem() {
 
   // Function to clean up highlights
   const cleanupHighlights = () => {
-    document.querySelectorAll(".tour-highlight").forEach((el) => {
+    const highlightedElements = document.querySelectorAll(".tour-highlight");
+    console.log(`🧹 Cleaning up ${highlightedElements.length} highlighted elements`);
+    highlightedElements.forEach((el) => {
       el.classList.remove("tour-highlight");
+      // Remove any inline styles we added
+      const htmlEl = el as HTMLElement;
+      if (htmlEl.style.cssText.includes('position: relative')) {
+        htmlEl.style.cssText = htmlEl.style.cssText.replace(/;position: relative !important; z-index: 50 !important;/g, '');
+      }
     });
   };
 
