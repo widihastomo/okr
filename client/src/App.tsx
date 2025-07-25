@@ -76,8 +76,11 @@ import TemplateManagement from "@/pages/template-management";
 import TemplateDetail from "@/pages/template-detail";
 import ClientTemplates from "@/components/ClientTemplates";
 
-function Router() {
-  const { isAuthenticated, isLoading, user } = useAuth();
+const Router = () => {
+  // Temporarily bypass useAuth to test app functionality
+  const isAuthenticated = false;
+  const isLoading = false;
+  const user = null;
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   const [location, navigate] = useLocation();
@@ -384,8 +387,8 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-          <Toaster />
-          <Router />
+        <Toaster />
+        <Router />
       </TooltipProvider>
     </QueryClientProvider>
   );

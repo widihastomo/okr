@@ -309,7 +309,8 @@ function MissionCard({
 
 // Timeline Feed Component
 function TimelineFeedComponent() {
-  const { user } = useAuth();
+  // const { user } = useAuth(); // Temporarily disabled
+  const user = null;
   const queryClient = useQueryClient();
 
   // Timeline states
@@ -827,7 +828,8 @@ function TimelineFeedComponent() {
 }
 
 export default function DailyFocusPage() {
-  const { user } = useAuth();
+  // const { user } = useAuth(); // Temporarily disabled
+  const user = null;
   const userId =
     user && typeof user === "object" && "id" in user ? (user as any).id : null;
 
@@ -1665,6 +1667,35 @@ export default function DailyFocusPage() {
 
   const relatedObjectives = getRelatedObjectives();
 
+  // Missing function implementations
+  const handleToggleTaskStatus = (taskId: number, newStatus: string) => {
+    statusUpdateMutation.mutate({
+      id: taskId,
+      status: newStatus
+    });
+  };
+
+  const handleOpenCheckInModal = (keyResult: any) => {
+    setSelectedKeyResult(keyResult);
+    setIsCheckInModalOpen(true);
+  };
+
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString("id-ID");
+  };
+
+  const confirmDeleteTask = () => {
+    if (taskToDelete) {
+      deleteTaskMutation.mutate(taskToDelete.id);
+      setIsDeleteDialogOpen(false);
+      setTaskToDelete(null);
+    }
+  };
+
+  const handleDismissWelcome = () => {
+    setShowWelcomeScreen(false);
+  };
+
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       {/* Header */}
@@ -2070,7 +2101,7 @@ export default function DailyFocusPage() {
             activeInitiatives={activeInitiatives}
             isLoadingInitiatives={isLoadingInitiatives}
             onUpdateMetrics={handleUpdateMetrics}
-            userFilter={userFilter}
+            userFilter={selectedUserId}
             formatDate={formatDate}
           />
           {/* End Daily Focus Tab Content */}
@@ -2178,10 +2209,13 @@ export default function DailyFocusPage() {
         />
       )}
 
-      {showCompanyDetails && <CompanyDetailsModal />}
+      {showCompanyDetailsModal && (
+        <CompanyDetailsModal 
+          open={showCompanyDetailsModal}
+          onComplete={handleCompanyDetailsComplete}
+        />
+      )}
     </div>
   );
 }
-  const { user } = useAuth();
-  const queryClient = useQueryClient();
 
