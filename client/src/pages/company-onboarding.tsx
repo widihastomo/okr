@@ -2900,7 +2900,7 @@ export default function CompanyOnboarding() {
 
         {/* Virtual Assistant - Only on welcome screen */}
         {onboardingData.currentStep === 0 && getVirtualAssistantMessage() && (
-          <div className="mb-6 animate-in fade-in slide-in-from-left-4 duration-500 delay-200">
+          <div className="mt-8 mb-6 animate-in fade-in slide-in-from-left-4 duration-500 delay-200">
             <div className="bg-white/80 backdrop-blur-sm border border-orange-200 rounded-2xl p-6 shadow-lg">
               <div className="flex items-start space-x-4">
                 <div className="flex-shrink-0">
