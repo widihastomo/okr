@@ -1728,19 +1728,8 @@ export default function DailyFocusPage() {
             </p>
           </div>
 
-          {/* Date display and Daily Check-in - desktop */}
+          {/* Daily Check-in - desktop */}
           <div className="flex items-center gap-3 relative z-10">
-            <div className="hidden sm:flex items-center gap-2 text-sm text-gray-500">
-              <Calendar className="h-4 w-4" />
-              <span>
-                {today.toLocaleDateString("id-ID", {
-                  weekday: "long",
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </span>
-            </div>
             <div data-tour="update-harian-instan">
               <DailyUpdateSimple />
             </div>
