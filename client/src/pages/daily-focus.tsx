@@ -2118,7 +2118,11 @@ export default function DailyFocusPage() {
                                 <Progress value={objProgress} className="h-2" />
                               </div>
 
-                              
+                              {/* Target Ideal Information */}
+                              <div className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded">
+                                Target Ideal: {obj.targetIdeal || "70"}% pada
+                                periode ini
+                              </div>
 
                               <div className="flex items-center justify-between">
                                 <Badge
