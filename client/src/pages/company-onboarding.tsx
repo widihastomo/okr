@@ -1291,19 +1291,7 @@ export default function CompanyOnboarding() {
     return "from-green-400 to-green-500"; // 100% - Green
   };
 
-  const getContainerBackgroundColor = () => {
-    if (progressPercentage === 0)
-      return "from-gray-50 to-gray-100 border-gray-200"; // Start - Gray
-    if (progressPercentage <= 25)
-      return "from-red-50 to-pink-50 border-red-200"; // 0-25% - Red
-    if (progressPercentage <= 50)
-      return "from-orange-50 to-yellow-50 border-orange-200"; // 25-50% - Orange
-    if (progressPercentage <= 75)
-      return "from-yellow-50 to-amber-50 border-yellow-200"; // 50-75% - Yellow
-    if (progressPercentage < 100)
-      return "from-blue-50 to-indigo-50 border-blue-200"; // 75-99% - Blue
-    return "from-green-50 to-emerald-50 border-green-200"; // 100% - Green
-  };
+
 
   const handleNext = () => {
     // Validate current step before proceeding (skip validation for welcome screen)
@@ -2910,7 +2898,7 @@ export default function CompanyOnboarding() {
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-yellow-50">
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div
-          className={`rounded-2xl shadow-xl border-2 p-8 transition-all duration-700 ease-in-out bg-gradient-to-br ${getContainerBackgroundColor()}`}
+          className="rounded-2xl shadow-xl border-2 p-8 transition-all duration-700 ease-in-out bg-gradient-to-br from-white to-gray-50"
         >
           {/* Logo Header */}
           <div className="flex items-center justify-center mb-8 animate-in fade-in slide-in-from-top-4 duration-700">
