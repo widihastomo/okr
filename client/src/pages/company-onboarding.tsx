@@ -2937,6 +2937,7 @@ export default function CompanyOnboarding() {
             </div>
             <Progress
               value={progressPercentage}
+              variant="at-risk"
               className="h-2 transition-all duration-700 ease-out"
             />
           </div>
