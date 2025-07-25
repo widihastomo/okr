@@ -431,170 +431,303 @@ function TimelineFeedComponent() {
         </div>
       </CardHeader>
       
-      <CardContent>
+      <CardContent className="p-0">
         {filteredTimeline.length === 0 ? (
-          <div className="text-center py-8">
-            <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              Belum Ada Aktivitas
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 text-center py-8 md:py-12 px-4">
+            <MessageSquare className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-3 md:mb-4 text-gray-400" />
+            <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-2">
+              Belum ada activity yang ditampilkan
             </h3>
-            <p className="text-sm text-gray-600 mb-4 max-w-md mx-auto">
-              Timeline akan menampilkan update harian dan progress dari tim setelah ada aktivitas.
+            <p className="text-gray-600 mb-3 md:mb-4 text-sm md:text-base">
+              Timeline akan menampilkan update harian dan progress check-in dari tim Anda
             </p>
-            <Button
-              className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600"
-              onClick={() => window.location.href = '/timeline'}
-            >
-              <ExternalLink className="w-4 h-4 mr-2" />
-              Buka Halaman Timeline Lengkap
-            </Button>
+            <div className="text-xs md:text-sm text-gray-500">
+              Mulai dengan melakukan cek-in atau update harian untuk melihat activity feed
+            </div>
           </div>
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-3 md:space-y-4">
             {filteredTimeline.slice(0, 5).map((item: any) => (
-              <div key={item.id} className="border border-gray-200 rounded-lg bg-white">
-                {/* Timeline Card Header */}
-                <div className="p-4">
-                  <div className="flex items-start space-x-3">
-                    <Avatar className="w-10 h-10">
-                      <AvatarImage src={item.user?.profileImageUrl} />
-                      <AvatarFallback>
-                        {(item.user?.name || item.user?.email || 'U').charAt(0).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                    
+              <div key={item.id} className="w-full bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden">
+                <div className="p-3 md:p-4">
+                  <div className="flex items-start space-x-2 md:space-x-3">
+                    <div className="flex-shrink-0">
+                      {(item as any).userProfileImageUrl ? (
+                        <img 
+                          src={(item as any).userProfileImageUrl} 
+                          alt={(item as any).userName || 'User'}
+                          className="w-8 h-8 md:w-10 md:h-10 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-blue-500 to-green-500 rounded-full flex items-center justify-center text-white font-semibold text-xs md:text-sm">
+                          {((item as any).userName || item.user?.name || item.user?.email || 'U').charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                    </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <div className="font-semibold text-gray-900">
-                            {item.user?.name || item.user?.email}
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            {new Date(item.createdAt).toLocaleDateString('id-ID', {
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center space-x-1 md:space-x-2 min-w-0">
+                          <h3 className="font-semibold text-gray-900 text-xs md:text-sm truncate">
+                            {(item as any).userName || item.user?.name || item.user?.email || 'User'}
+                          </h3>
+                          <span className="text-gray-500 text-xs hidden sm:inline">•</span>
+                          <span className="text-gray-500 text-xs hidden sm:inline">
+                            {new Date(item.updateDate || item.createdAt).toLocaleDateString('id-ID', {
                               day: 'numeric',
-                              month: 'long',
-                              year: 'numeric',
+                              month: 'short',
                               hour: '2-digit',
                               minute: '2-digit'
                             })}
-                          </div>
+                          </span>
                         </div>
-                        
-                        <Badge variant={item.type === 'check_in' ? 'default' : 'secondary'}>
-                          {item.type === 'check_in' ? 'Check-in Target' : 'Update Harian'}
-                        </Badge>
+                        <div className="flex-shrink-0">
+                          {item.type === 'check_in' ? (
+                            <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-800 whitespace-nowrap">
+                              <span className="hidden sm:inline">Capaian Angka target</span>
+                              <span className="sm:hidden">Cek-in</span>
+                            </Badge>
+                          ) : (
+                            <Badge variant="default" className="text-xs whitespace-nowrap">
+                              <span className="hidden sm:inline">Update Harian</span>
+                              <span className="sm:hidden">Update</span>
+                            </Badge>
+                          )}
+                        </div>
                       </div>
-                      
-                      {/* Content Summary */}
-                      <div className="mt-3">
-                        {item.summary && (
-                          <p className="text-gray-700 mb-3">{item.summary}</p>
-                        )}
-                        
-                        {/* Progress Information for Check-ins */}
-                        {item.type === 'check_in' && item.keyResultTitle && (
-                          <div className="bg-blue-50 rounded-lg p-3 mb-3">
-                            <div className="flex items-center justify-between mb-2">
-                              <span className="text-sm font-medium text-blue-800">
-                                {item.keyResultTitle}
+                      <div className="mt-1">
+                        <span className="text-gray-500 text-xs sm:hidden block">
+                          {new Date(item.updateDate || item.createdAt).toLocaleDateString('id-ID', {
+                            day: 'numeric',
+                            month: 'short',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </span>
+                        <p className="text-gray-700 text-xs md:text-sm mt-1">
+                          {item.type === 'check_in' 
+                            ? (
+                              <span>
+                                Update capaian: <span className="font-medium">{item.keyResultTitle || 'Key Result'}</span>
                               </span>
-                              <span className="text-sm font-bold text-blue-900">
-                                {formatWithThousandSeparator(item.checkInValue || '')} {item.keyResultUnit || ''}
-                              </span>
-                            </div>
-                            
-                            {item.checkInNotes && (
-                              <div className="mt-2">
-                                <div className="text-xs font-medium text-blue-800 mb-1">Catatan:</div>
-                                <div className="text-xs text-blue-700 italic">"{item.checkInNotes}"</div>
-                              </div>
-                            )}
-                          </div>
-                        )}
-                        
-                        {/* Update Details */}
-                        {(item.tasksUpdated > 0 || item.keyResultsUpdated > 0) && (
-                          <div className="flex flex-wrap gap-2 mb-3">
-                            {item.tasksUpdated > 0 && (
-                              <Badge variant="outline" className="text-green-700 border-green-200">
-                                {item.tasksUpdated} task diupdate
-                              </Badge>
-                            )}
-                            {item.keyResultsUpdated > 0 && (
-                              <Badge variant="outline" className="text-blue-700 border-blue-200">
-                                {item.keyResultsUpdated} target diupdate
-                              </Badge>
-                            )}
-                          </div>
-                        )}
-                        
-                        {/* Expand Details Button */}
-                        {(item.tasksSummary || item.keyResultsSummary || item.whatWorkedWell || item.challenges) && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => toggleExpanded(item.id)}
-                            className="text-blue-600 hover:text-blue-700 p-0 h-auto"
-                          >
-                            {expandedDetails[item.id] ? (
-                              <>
-                                <ChevronDown className="w-4 h-4 mr-1" />
-                                Sembunyikan Detail
-                              </>
-                            ) : (
-                              <>
-                                <ChevronRight className="w-4 h-4 mr-1" />
-                                Lihat Detail
-                              </>
-                            )}
-                          </Button>
-                        )}
-                        
-                        {/* Expanded Details */}
-                        {expandedDetails[item.id] && (
-                          <div className="mt-4 space-y-3 p-3 bg-gray-50 rounded-lg">
-                            {item.tasksSummary && (
-                              <div>
-                                <div className="text-sm font-medium text-gray-800 mb-1">Tasks:</div>
-                                <div className="text-sm text-gray-700">{item.tasksSummary}</div>
-                              </div>
-                            )}
-                            
-                            {item.keyResultsSummary && (
-                              <div>
-                                <div className="text-sm font-medium text-gray-800 mb-1">Angka Target:</div>
-                                <div className="text-sm text-gray-700">{item.keyResultsSummary}</div>
-                              </div>
-                            )}
-                            
-                            {item.whatWorkedWell && (
-                              <div>
-                                <div className="text-sm font-medium text-green-800 mb-1">Yang Berjalan Baik:</div>
-                                <div className="text-sm text-gray-700">{item.whatWorkedWell}</div>
-                              </div>
-                            )}
-                            
-                            {item.challenges && (
-                              <div>
-                                <div className="text-sm font-medium text-red-800 mb-1">Tantangan:</div>
-                                <div className="text-sm text-gray-700">{item.challenges}</div>
-                              </div>
-                            )}
-                          </div>
-                        )}
+                            )
+                            : (item.summary || 'Membagikan update progress harian')
+                          }
+                        </p>
                       </div>
                     </div>
                   </div>
                 </div>
-                
-                {/* Social Engagement */}
-                <div className="border-t border-gray-100">
-                  <div className="px-4 py-2 flex items-center justify-between">
+
+                <div className="px-3 md:px-4 pb-3 md:pb-4">
+                  <div className="space-y-2">
+                    {/* Summary Statistics - Hide for check_in items */}
+                    {item.type !== 'check_in' && (
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-1 md:gap-2 flex-wrap">
+                            {(item.tasksUpdated + (item.tasksCompleted || 0)) > 0 && (
+                              <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-800">
+                                📋 {item.tasksUpdated + (item.tasksCompleted || 0)} tugas
+                              </Badge>
+                            )}
+                            {item.keyResultsUpdated > 0 && (
+                              <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-800">
+                                🎯 {item.keyResultsUpdated} target
+                              </Badge>
+                            )}
+                            {(item.successMetricsUpdated || 0) > 0 && (
+                              <Badge variant="secondary" className="text-xs bg-orange-100 text-orange-800">
+                                📊 {item.successMetricsUpdated} metrik
+                              </Badge>
+                            )}
+                            {(item.deliverablesUpdated || 0) > 0 && (
+                              <Badge variant="secondary" className="text-xs bg-indigo-100 text-indigo-800">
+                                📦 {item.deliverablesUpdated} output
+                              </Badge>
+                            )}
+                          </div>
+
+                          {/* Detail Toggle Button */}
+                          {((item.tasksUpdated + (item.tasksCompleted || 0)) > 0 || 
+                            item.keyResultsUpdated > 0 || 
+                            (item.successMetricsUpdated || 0) > 0 || 
+                            (item.deliverablesUpdated || 0) > 0 ||
+                            item.whatWorkedWell ||
+                            item.challenges) && (
+                            <button
+                              onClick={() => toggleExpanded(item.id)}
+                              className="flex items-center space-x-1 text-xs text-blue-600 hover:text-blue-800 transition-colors px-2 py-1 rounded hover:bg-blue-50"
+                            >
+                              <span>{expandedDetails[item.id] ? 'Sembunyikan' : 'Lihat Detail'}</span>
+                              <ChevronDown className={`w-3 h-3 transition-transform ${
+                                expandedDetails[item.id] ? 'rotate-180' : ''
+                              }`} />
+                            </button>
+                          )}
+                        </div>
+
+                        {/* Expandable Detail Section */}
+                        {expandedDetails[item.id] && (
+                          <div className="mt-3 p-3 bg-gray-50 rounded-lg border border-gray-200 space-y-3">
+                            {/* Tasks Detail */}
+                            {(item.tasksUpdated + (item.tasksCompleted || 0)) > 0 && item.tasksSummary && (
+                              <div>
+                                <div className="flex items-center gap-2 mb-2">
+                                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                  <span className="font-semibold text-sm text-blue-800">Tugas yang Diupdate:</span>
+                                </div>
+                                <div className="text-sm text-gray-700 pl-4 space-y-1">
+                                  {item.tasksSummary.split(', ').map((task: string, index: number) => {
+                                    const match = task.match(/^(.+?)\s*\((.+?)\s*->\s*(.+?)\)$/);
+                                    if (match) {
+                                      const [, taskName, oldStatus, newStatus] = match;
+                                      const statusMap: Record<string, string> = {
+                                        'belum_mulai': 'Belum Mulai',
+                                        'in_progress': 'Sedang Berjalan',
+                                        'completed': 'Selesai',
+                                        'cancelled': 'Dibatalkan'
+                                      };
+                                      return (
+                                        <div key={index} className="flex items-center gap-2">
+                                          <span className="text-xs">•</span>
+                                          <span className="font-medium">{taskName.trim()}</span>
+                                          <span className="text-xs text-gray-500">
+                                            ({statusMap[oldStatus.trim()] || oldStatus.trim()} → {statusMap[newStatus.trim()] || newStatus.trim()})
+                                          </span>
+                                        </div>
+                                      );
+                                    } else {
+                                      return (
+                                        <div key={index} className="flex items-center gap-2">
+                                          <span className="text-xs">•</span>
+                                          <span>{task.trim()}</span>
+                                        </div>
+                                      );
+                                    }
+                                  })}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Key Results Detail */}
+                            {item.keyResultsUpdated > 0 && item.keyResultsSummary && (
+                              <div>
+                                <div className="flex items-center gap-2 mb-2">
+                                  <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                                  <span className="font-semibold text-sm text-purple-800">Key Result yang Diupdate:</span>
+                                </div>
+                                <div className="text-sm text-gray-700 pl-4 space-y-1">
+                                  {item.keyResultsSummary.split(', ').map((keyResult: string, index: number) => {
+                                    const match = keyResult.match(/^(.+?)\s*\((.+?)\s*->\s*(.+?)\)$/);
+                                    if (match) {
+                                      const [, krName, oldValue, newValue] = match;
+                                      return (
+                                        <div key={index} className="flex items-center gap-2">
+                                          <span className="text-xs">•</span>
+                                          <span className="font-medium">{krName.trim()}</span>
+                                          <span className="text-xs text-gray-500">
+                                            ({oldValue.trim()} → {newValue.trim()})
+                                          </span>
+                                        </div>
+                                      );
+                                    } else {
+                                      return (
+                                        <div key={index} className="flex items-center gap-2">
+                                          <span className="text-xs">•</span>
+                                          <span>{keyResult.trim()}</span>
+                                        </div>
+                                      );
+                                    }
+                                  })}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* What Worked Well */}
+                            {item.whatWorkedWell && (
+                              <div>
+                                <div className="flex items-center gap-2 mb-2">
+                                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                  <span className="font-semibold text-sm text-green-800">Yang Berjalan Baik:</span>
+                                </div>
+                                <div className="text-sm text-gray-700 pl-4">
+                                  {item.whatWorkedWell}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Challenges */}
+                            {item.challenges && (
+                              <div>
+                                <div className="flex items-center gap-2 mb-2">
+                                  <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                                  <span className="font-semibold text-sm text-red-800">Tantangan:</span>
+                                </div>
+                                <div className="text-sm text-gray-700 pl-4">
+                                  {item.challenges}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Progress Information for Check-ins */}
+                    {item.type === 'check_in' && item.keyResultTitle && (
+                      <div className="bg-purple-50 rounded-lg p-2">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-xs font-medium text-purple-800">Progress Capaian:</span>
+                          <span className="text-xs font-bold text-purple-900">
+                            {formatWithThousandSeparator(item.checkInValue || '')} {item.keyResultUnit || ''}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-xs text-purple-700">Target:</span>
+                          <span className="text-xs text-purple-700">
+                            {formatWithThousandSeparator(item.keyResultTargetValue || '')} {item.keyResultUnit || ''}
+                          </span>
+                        </div>
+
+                        {/* Progress Bar */}
+                        {item.checkInValue && item.keyResultTargetValue && (
+                          <div className="mb-2">
+                            {(() => {
+                              const currentValue = parseFloat(item.checkInValue.toString().replace(/[^\d.-]/g, ''));
+                              const targetValue = parseFloat(item.keyResultTargetValue.toString().replace(/[^\d.-]/g, ''));
+                              const percentage = Math.min((currentValue / targetValue) * 100, 100);
+
+                              return (
+                                <div className="w-full bg-purple-200 rounded-full h-2">
+                                  <div 
+                                    className="bg-purple-600 h-2 rounded-full transition-all duration-300"
+                                    style={{ width: `${percentage}%` }}
+                                  ></div>
+                                </div>
+                              );
+                            })()}
+                          </div>
+                        )}
+
+                        {item.checkInNotes && (
+                          <div className="mt-2 pt-2 border-t border-purple-200">
+                            <div className="text-xs font-medium text-purple-800 mb-1">Catatan:</div>
+                            <div className="text-xs text-purple-700 italic">"{item.checkInNotes}"</div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Social Engagement Bar */}
+                <div className="border-t border-gray-100 px-3 md:px-4 py-2">
+                  <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="text-gray-500 hover:text-red-500"
+                        className="text-gray-500 hover:text-red-500 px-2 py-1"
                       >
                         <Heart className="w-4 h-4 mr-1" />
                         <span className="text-xs">Suka</span>
@@ -604,7 +737,7 @@ function TimelineFeedComponent() {
                         variant="ghost"
                         size="sm"
                         onClick={() => toggleComments(item.id)}
-                        className="text-gray-500 hover:text-blue-500"
+                        className="text-gray-500 hover:text-blue-500 px-2 py-1"
                       >
                         <MessageSquare className="w-4 h-4 mr-1" />
                         <span className="text-xs">Komentar</span>
@@ -614,42 +747,36 @@ function TimelineFeedComponent() {
                   
                   {/* Comments Section */}
                   {showComments[item.id] && (
-                    <div className="px-4 pb-3 border-t border-gray-50">
-                      <div className="mt-3 space-y-2">
-                        {/* Add Comment */}
-                        <div className="flex space-x-2">
-                          <Avatar className="w-6 h-6">
-                            <AvatarImage src={(user as any)?.profileImageUrl} />
-                            <AvatarFallback>
-                              {((user as any)?.name || (user as any)?.email || 'U').charAt(0).toUpperCase()}
-                            </AvatarFallback>
-                          </Avatar>
-                          
-                          <div className="flex-1 flex space-x-2">
-                            <input
-                              type="text"
-                              placeholder="Tulis komentar..."
-                              value={commentTexts[item.id] || ''}
-                              onChange={(e) => setCommentTexts(prev => ({ ...prev, [item.id]: e.target.value }))}
-                              onKeyPress={(e) => {
-                                if (e.key === 'Enter' && commentTexts[item.id]?.trim()) {
-                                  handleAddComment(item.id, commentTexts[item.id]);
-                                }
-                              }}
-                              className="flex-1 text-sm px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                            <Button
-                              size="sm"
-                              onClick={() => {
-                                if (commentTexts[item.id]?.trim()) {
-                                  handleAddComment(item.id, commentTexts[item.id]);
-                                }
-                              }}
-                              disabled={!commentTexts[item.id]?.trim() || addCommentMutation.isPending}
-                            >
-                              <Send className="w-3 h-3" />
-                            </Button>
-                          </div>
+                    <div className="mt-3 pt-3 border-t border-gray-50">
+                      <div className="flex space-x-2">
+                        <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-green-500 rounded-full flex items-center justify-center text-white font-semibold text-xs flex-shrink-0">
+                          {((user as any)?.name || (user as any)?.email || 'U').charAt(0).toUpperCase()}
+                        </div>
+                        
+                        <div className="flex-1 flex space-x-2">
+                          <input
+                            type="text"
+                            placeholder="Tulis komentar..."
+                            value={commentTexts[item.id] || ''}
+                            onChange={(e) => setCommentTexts(prev => ({ ...prev, [item.id]: e.target.value }))}
+                            onKeyPress={(e) => {
+                              if (e.key === 'Enter' && commentTexts[item.id]?.trim()) {
+                                handleAddComment(item.id, commentTexts[item.id]);
+                              }
+                            }}
+                            className="flex-1 text-sm px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                          <Button
+                            size="sm"
+                            onClick={() => {
+                              if (commentTexts[item.id]?.trim()) {
+                                handleAddComment(item.id, commentTexts[item.id]);
+                              }
+                            }}
+                            disabled={!commentTexts[item.id]?.trim() || addCommentMutation.isPending}
+                          >
+                            <Send className="w-3 h-3" />
+                          </Button>
                         </div>
                       </div>
                     </div>
