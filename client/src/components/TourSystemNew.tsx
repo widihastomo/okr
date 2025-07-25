@@ -35,6 +35,7 @@ import {
   Briefcase,
   HelpCircle,
   LayoutDashboard,
+  FileText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLocation } from "wouter";
@@ -207,7 +208,54 @@ const TOUR_STEPS: TourStep[] = [
     targetPath: "/help",
   },
 
+  // Template Goals Tour Steps
+  {
+    id: "template-header",
+    title: "Template Goals - Header",
+    description:
+      "Halaman Template Goals menyediakan koleksi template siap pakai untuk berbagai departemen dan fokus bisnis. Template ini membantu Anda memulai dengan struktur goal yang sudah terbukti efektif.",
+    icon: Target,
+    selector: '[data-tour="template-header"]',
+    position: "bottom",
+    category: "feature",
+    targetPath: "/goal-templates",
+  },
 
+  {
+    id: "template-filters",
+    title: "Filter Template - Kategori & Area Fokus",
+    description:
+      "Gunakan filter untuk menemukan template yang sesuai dengan departemen (Sales, Marketing, Operasional) dan area fokus bisnis Anda. Filter membantu menyaring template yang paling relevan.",
+    icon: Filter,
+    selector: '[data-tour="template-filters"]',
+    position: "bottom",
+    category: "feature",
+    targetPath: "/goal-templates",
+  },
+
+  {
+    id: "template-grid",
+    title: "Grid Template - Koleksi Template",
+    description:
+      "Grid ini menampilkan semua template yang tersedia dengan informasi lengkap seperti judul, deskripsi, area fokus, jumlah angka target, dan inisiatif. Setiap template dapat langsung diterapkan ke organisasi Anda.",
+    icon: Briefcase,
+    selector: '[data-tour="template-grid"]',
+    position: "top",
+    category: "feature",
+    targetPath: "/goal-templates",
+  },
+
+  {
+    id: "template-use-button",
+    title: "Gunakan Template - Terapkan Goal",
+    description:
+      "Klik tombol 'Gunakan Template' untuk menerapkan template ke organisasi Anda. Anda akan diminta memilih siklus waktu sebelum template goal beserta angka target dan inisiatif diterapkan otomatis.",
+    icon: Rocket,
+    selector: '[data-tour="template-use-button"]',
+    position: "top",
+    category: "action",
+    targetPath: "/goal-templates",
+  },
 
 ];
 

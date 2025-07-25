@@ -193,7 +193,7 @@ export default function ClientTemplates() {
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
-      <div>
+      <div data-tour="template-header">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Template Goals</h1>
         <p className="text-gray-600">
           Pilih template goal yang sesuai dengan kebutuhan departemen dan fokus bisnis Anda
@@ -201,7 +201,7 @@ export default function ClientTemplates() {
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-4 bg-gray-50 p-4 rounded-lg">
+      <div className="flex flex-col sm:flex-row gap-4 bg-gray-50 p-4 rounded-lg" data-tour="template-filters">
         <div className="flex items-center gap-2">
           <Filter className="w-4 h-4 text-gray-600" />
           <span className="text-sm font-medium text-gray-700">Filter:</span>
@@ -255,7 +255,7 @@ export default function ClientTemplates() {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" data-tour="template-grid">
           {filteredTemplates.map((template) => (
             <Card key={template.id} className="hover:shadow-lg transition-all duration-200">
               <CardHeader className="pb-3">
@@ -314,7 +314,7 @@ export default function ClientTemplates() {
 
 
                 {/* Use Template Button */}
-                <div className="pt-3 border-t">
+                <div className="pt-3 border-t" data-tour="template-use-button">
                   <Button 
                     onClick={() => handleUseTemplate(template)}
                     disabled={useTemplateMutation.isPending}
