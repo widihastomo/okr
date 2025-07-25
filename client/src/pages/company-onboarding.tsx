@@ -3781,6 +3781,13 @@ export default function CompanyOnboarding() {
           }, 500);
         }}
       />
+
+      {/* Welcome Screen Modal */}
+      <WelcomeScreen
+        isOpen={showWelcomeModal}
+        onClose={handleCloseWelcomeModal}
+        onStartTour={handleStartTourFromWelcome}
+      />
     </div>
   );
 }
