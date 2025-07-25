@@ -452,11 +452,16 @@ The system now includes a comprehensive dummy data generation feature that creat
 
 ## Changelog
 ```
+- July 25, 2025. **TASK BUTTON OUTLINE STYLE APPLIED** - Successfully converted "Tambah Task" button to outline variant per user request:
+  * CHANGED: Button variant from gradient style (bg-gradient-to-r from-orange-600 to-orange-500) to outline style
+  * UPDATED: Styling to border-orange-600 text-orange-600 hover:bg-orange-50 for consistent outline design
+  * MAINTAINED: All existing functionality while updating visual style to match user preference
+  * RESULT: Clean outline button styling consistent with other outline buttons throughout the application
 - July 25, 2025. **EXPANDABLE FUNCTIONALITY REMOVED FROM KEY RESULTS** - Successfully eliminated expandable functionality from key results cards per user request:
   * REMOVED: Expand/collapse buttons from key results cards that showed ChevronDown/ChevronRight icons
   * REMOVED: Expanded initiatives sections that displayed related initiatives under each key result
   * CLEANED: Removed expandedKeyResults state management and toggleKeyResultExpand function
-  * CLEANED: Removed ChevronDown and ChevronRight icon imports as they're no longer needed
+  * PRESERVED: ChevronDown and ChevronRight icon imports still needed for task status dropdown functionality
   * SIMPLIFIED: Key results cards now display in consistent compact format without expandable sections
   * RESULT: Cleaner key results interface without complex expand/collapse functionality for simplified user experience
 - July 25, 2025. **OVERVIEW CARDS REMOVED FROM TASK SECTION** - Successfully removed Quick Stats overview cards from Tugas & Aktivitas section per user request:

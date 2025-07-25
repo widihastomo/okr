@@ -41,6 +41,8 @@ import {
   MoveDown,
   Settings,
   ExternalLink,
+  ChevronDown,
+  ChevronRight,
   AlertTriangle,
   Rocket,
   Trophy,
@@ -2137,8 +2139,9 @@ export default function GoalDetail() {
                 </p>
               </div>
               <Button
+                variant="outline"
                 onClick={() => setShowTaskModal(true)}
-                className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white shadow-lg hover:shadow-xl transition-all duration-200 w-full md:w-auto"
+                className="border-orange-600 text-orange-600 hover:bg-orange-50 w-full md:w-auto"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Tambah Task
