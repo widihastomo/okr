@@ -170,6 +170,42 @@ const TOUR_STEPS: TourStep[] = [
     targetPath: "/analytics",
   },
 
+  {
+    id: "users",
+    title: "Manajemen Tim - Kelola Pengguna",
+    description:
+      "Menu Manajemen Tim untuk mengelola anggota organisasi. Di sini Anda dapat mengundang pengguna baru, mengatur role dan permission, mengelola tim, serta mengontrol akses pengguna ke sistem.",
+    icon: Users,
+    selector: '[data-tour="users"]',
+    position: "right",
+    category: "navigation",
+    targetPath: "/client-users",
+  },
+
+  {
+    id: "settings",
+    title: "Pengaturan - Konfigurasi Sistem",
+    description:
+      "Menu Pengaturan untuk mengonfigurasi organisasi, profil perusahaan, preferensi sistem, dan berbagai pengaturan yang mempengaruhi seluruh tim dalam organisasi.",
+    icon: Settings,
+    selector: '[data-tour="settings"]',
+    position: "right",
+    category: "navigation",
+    targetPath: "/organization-settings",
+  },
+
+  {
+    id: "help",
+    title: "Help Center - Bantuan & Dukungan",
+    description:
+      "Help Center berisi dokumentasi lengkap, FAQ, tutorial, dan berbagai sumber daya untuk membantu Anda menggunakan platform dengan optimal. Akses panduan, tips, dan dukungan teknis di sini.",
+    icon: HelpCircle,
+    selector: '[data-tour="help"]',
+    position: "right",
+    category: "navigation",
+    targetPath: "/help",
+  },
+
 
 
 ];
