@@ -1274,9 +1274,9 @@ export default function CompanyOnboarding() {
   const progressPercentage =
     onboardingData.currentStep === 0
       ? 0
-      : onboardingData.currentStep === 8
-        ? 100 // Show 100% when at the final step (step 8)
-        : (onboardingData.currentStep / ONBOARDING_STEPS.length) * 100;
+      : onboardingData.currentStep === 6
+        ? 100 // Show 100% when at the final step (step 6)
+        : (onboardingData.currentStep / 6) * 100;
 
   // Dynamic color system based on progress
   const getProgressColor = () => {
@@ -2873,739 +2873,71 @@ export default function CompanyOnboarding() {
 
         return null;
 
-        const getTaskOptions = (initiatives: string[]) => {
-          let allTasks = [];
-          initiatives.forEach((init) => {
-            if (taskMapping[init]) {
-              allTasks.push(...taskMapping[init]);
-            }
-          });
-
-          // Remove duplicates
-          return [...new Set(allTasks)];
-        };
-
-        const selectedInitiativesForTasks = onboardingData.initiatives.filter(
-          (init) => init && init.trim() !== "",
-        );
-
-        // Create task groups by initiative using the same mapping as above
-        const getTaskGroupsByInitiative = (initiatives: string[]) => {
-          const tasksByInitiative: { [key: string]: string[] } = {};
-
-          initiatives.forEach((initiative) => {
-            if (taskMapping[initiative]) {
-              tasksByInitiative[initiative] = taskMapping[initiative];
-            }
-          });
-
-          return tasksByInitiative;
-        };
-
-        const tasksByInitiative = getTaskGroupsByInitiative(
-          selectedInitiativesForTasks,
-        );
-
-        if (!onboardingData.tasks) {
-          onboardingData.tasks = [];
-        }
-
-        const selectedTasks = onboardingData.tasks.filter(
-          (task) => task && task.trim() !== "",
-        );
-
-        return (
-          <div className="space-y-6">
-            {selectedInitiativesForTasks.length > 0 && (
-              <div className="space-y-4">
-                <Label className="text-lg font-semibold">
-                  Pilih task untuk setiap inisiatif yang sudah dipilih:
-                </Label>
-
-                {Object.entries(tasksByInitiative).map(
-                  ([initiative, tasks], groupIndex) => (
-                    <div
-                      key={groupIndex}
-                      className="border border-purple-200 rounded-lg p-4 space-y-3 bg-purple-50"
-                    >
-                      <div className="flex items-center gap-2 mb-3">
-                        <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                        <h4 className="font-semibold text-purple-800">
-                          {initiative}
-                        </h4>
-                      </div>
-
-                      <div className="space-y-2 ml-4">
-                        {tasks.map((task, taskIndex) => (
-                          <div
-                            key={taskIndex}
-                            className="flex items-start space-x-2 p-3 rounded-lg border border-gray-200 hover:bg-white bg-white"
-                          >
-                            <Checkbox
-                              id={`task-${groupIndex}-${taskIndex}`}
-                              checked={selectedTasks.includes(task)}
-                              onCheckedChange={(checked) => {
-                                let newTasks = [
-                                  ...(onboardingData.tasks || []),
-                                ];
-                                if (checked) {
-                                  newTasks.push(task);
-                                } else {
-                                  newTasks = newTasks.filter((t) => t !== task);
-                                }
-                                setOnboardingData({
-                                  ...onboardingData,
-                                  tasks: newTasks,
-                                });
-                              }}
-                            />
-                            <Label
-                              htmlFor={`task-${groupIndex}-${taskIndex}`}
-                              className="flex-1 cursor-pointer leading-relaxed text-sm"
-                            >
-                              {task}
-                            </Label>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ),
-                )}
-              </div>
-            )}
-
-            {selectedTasks.length > 0 && (
-              <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-                <h4 className="font-semibold text-green-800 mb-3">
-                  📋 Task yang Dipilih ({selectedTasks.length})
-                </h4>
-                <div className="space-y-2">
-                  {Object.entries(tasksByInitiative).map(
-                    ([initiative, tasks]) => {
-                      const initiativeTasks = tasks.filter((task) =>
-                        selectedTasks.includes(task),
-                      );
-                      if (initiativeTasks.length === 0) return null;
-
-                      return (
-                        <div key={initiative} className="space-y-1">
-                          <div className="flex items-center gap-2">
-                            <div className="w-1.5 h-1.5 bg-purple-500 rounded-full"></div>
-                            <span className="text-sm font-medium text-purple-700">
-                              {initiative}
-                            </span>
-                          </div>
-                          <div className="ml-4 space-y-1">
-                            {initiativeTasks.map((task, index) => (
-                              <div
-                                key={index}
-                                className="flex items-center gap-2"
-                              >
-                                <div className="w-1 h-1 bg-orange-500 rounded-full"></div>
-                                <span className="text-sm text-gray-700">
-                                  {task}
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      );
-                    },
-                  )}
-                </div>
-                <p className="text-sm text-green-700 mt-3">
-                  <strong>Total: {selectedTasks.length} task terpilih</strong>
-                </p>
-              </div>
-            )}
-          </div>
-        );
-
-      case 10: // Dashboard Ringkas
-        return (
-          <div className="space-y-4">
-            <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
-              <div className="flex items-center space-x-2 mb-4">
-                <Trophy className="w-6 h-6 text-blue-900" />
-                <h3 className="font-semibold text-lg text-blue-900">
-                  Rekap Data Onboarding Anda
-                </h3>
-              </div>
-
-              {/* Summary Cards */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                <div className="bg-white p-3 rounded-lg border border-gray-200 text-center">
-                  <div className="flex justify-center mb-2">
-                    <Target className="w-6 h-6 text-blue-600" />
-                  </div>
-                  <div className="text-2xl font-bold text-blue-600">1</div>
-                  <div className="text-sm text-gray-600">Goal</div>
-                </div>
-                <div className="bg-white p-3 rounded-lg border border-gray-200 text-center">
-                  <div className="flex justify-center mb-2">
-                    <TrendingUp className="w-6 h-6 text-green-600" />
-                  </div>
-                  <div className="text-2xl font-bold text-green-600">
-                    {onboardingData.keyResults.length}
-                  </div>
-                  <div className="text-sm text-gray-600">Angka Target</div>
-                </div>
-                <div className="bg-white p-3 rounded-lg border border-gray-200 text-center">
-                  <div className="flex justify-center mb-2">
-                    <Lightbulb className="w-6 h-6 text-purple-600" />
-                  </div>
-                  <div className="text-2xl font-bold text-purple-600">
-                    {onboardingData.initiatives.length}
-                  </div>
-                  <div className="text-sm text-gray-600">Inisiatif</div>
-                </div>
-                <div className="bg-white p-3 rounded-lg border border-gray-200 text-center">
-                  <div className="flex justify-center mb-2">
-                    <ListTodo className="w-6 h-6 text-orange-600" />
-                  </div>
-                  <div className="text-2xl font-bold text-orange-600">
-                    {onboardingData.tasks ? onboardingData.tasks.length : 0}
-                  </div>
-                  <div className="text-sm text-gray-600">Task</div>
-                </div>
-              </div>
-
-              {/* Detailed Information */}
-              <div className="space-y-4">
-                <div className="bg-white p-4 rounded-lg border border-gray-200">
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-semibold text-blue-800">
-                      🎯 Goal Utama
-                    </h4>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setEditGoalModal(true)}
-                      className="h-8 w-8 p-0 hover:bg-blue-50"
-                    >
-                      <Edit className="w-4 h-4 text-blue-600" />
-                    </Button>
-                  </div>
-                  <p className="text-gray-700">
-                    {onboardingData.objective || "Belum diisi"}
-                  </p>
-                </div>
-
-                {onboardingData.keyResults.length > 0 && (
-                  <div className="bg-white p-4 rounded-lg border border-gray-200">
-                    <h4 className="font-semibold text-green-800 mb-3">
-                      Angka Target & Rencana Eksekusi
-                    </h4>
-                    <div className="space-y-4">
-                      {onboardingData.keyResults
-                        .filter((kr) => kr && kr !== "custom")
-                        .map((kr, krIndex) => {
-                          // Get initiatives related to this key result (simplified: divide initiatives equally)
-                          const initiativesPerKR = Math.ceil(
-                            onboardingData.initiatives.filter(
-                              (init) => init && init !== "custom",
-                            ).length /
-                              onboardingData.keyResults.filter(
-                                (kr) => kr && kr !== "custom",
-                              ).length,
-                          );
-                          const relatedInitiatives = onboardingData.initiatives
-                            .filter((init) => init && init !== "custom")
-                            .slice(
-                              krIndex * initiativesPerKR,
-                              (krIndex + 1) * initiativesPerKR,
-                            );
-
-                          return (
-                            <div
-                              key={krIndex}
-                              className="border-l-2 border-green-200 pl-4 space-y-3"
-                            >
-                              {/* Angka Target */}
-                              <div className="flex items-start justify-between">
-                                <div className="flex items-start space-x-2 flex-1">
-                                  <div className="w-2 h-2 bg-green-500 rounded-full mt-1.5"></div>
-                                  <div className="flex-1">
-                                    <span className="text-sm font-semibold text-green-800">
-                                      Angka Target {krIndex + 1}
-                                    </span>
-                                    <p className="text-sm text-gray-700">
-                                      {kr}
-                                    </p>
-                                  </div>
-                                </div>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() =>
-                                    setEditKeyResultModal({
-                                      open: true,
-                                      index: krIndex,
-                                      keyResult: kr,
-                                    })
-                                  }
-                                  className="h-8 w-8 p-0 hover:bg-green-50 ml-2"
-                                >
-                                  <Edit className="w-4 h-4 text-green-600" />
-                                </Button>
-                              </div>
-
-                              {/* Initiatives for this Angka Target */}
-                              {relatedInitiatives.map((init, initIndex) => {
-                                // Get tasks related to this specific initiative using the mapping
-                                const taskGroups = {
-                                  // Sales initiatives
-                                  "Lead scoring system untuk prioritas": [
-                                    "Setup lead scoring criteria berdasarkan behavior",
-                                    "Konfigurasi automated scoring dalam CRM",
-                                    "Training sales team untuk interpretasi score",
-                                    "Monitor dan adjust scoring algorithm",
-                                  ],
-                                  "Mempersonalisasi approach berdasarkan lead profile":
-                                    [
-                                      "Buat database profil lengkap untuk setiap lead",
-                                      "Develop template komunikasi untuk setiap persona",
-                                      "Training sales team untuk personalisasi approach",
-                                      "Track conversion rate per persona",
-                                    ],
-                                  "A/B testing untuk sales pitch": [
-                                    "Buat 2 versi sales pitch yang berbeda",
-                                    "Setup sistem tracking untuk setiap pitch",
-                                    "Eksekusi A/B test dengan sample lead",
-                                    "Analisis hasil dan implementasi pitch terbaik",
-                                  ],
-                                  "Mengotomatisasi lead notification system": [
-                                    "Setup real-time notification untuk lead baru",
-                                    "Konfigurasi assignment rule untuk sales team",
-                                    "Implementasi lead routing berdasarkan criteria",
-                                    "Monitor response time dan follow-up rate",
-                                  ],
-                                  "Dedicated lead response team": [
-                                    "Rekrut dan training specialized lead response team",
-                                    "Setup SOP untuk response time maksimal 1 jam",
-                                    "Buat dashboard monitoring untuk response metrics",
-                                    "Implementasi escalation protocol untuk urgent leads",
-                                  ],
-                                  "Mobile app untuk quick response": [
-                                    "Develop mobile app untuk notifikasi lead",
-                                    "Integrasikan dengan CRM untuk data sync",
-                                    "Training team untuk menggunakan mobile app",
-                                    "Monitor response time improvement",
-                                  ],
-                                  "Machine learning untuk lead analysis": [
-                                    "Collect historical data untuk training ML model",
-                                    "Develop predictive model untuk lead quality",
-                                    "Integrasikan ML model dengan existing system",
-                                    "Monitor akurasi dan continuous improvement",
-                                  ],
-
-                                  // Operational initiatives
-                                  "Implementasi lean manufacturing principles":
-                                    [
-                                      "Analisis current process dan identifikasi waste",
-                                      "Training karyawan tentang lean principles",
-                                      "Implementasi 5S di area produksi",
-                                      "Monitor improvement metrics",
-                                    ],
-                                  "Automated production line setup": [
-                                    "Evaluasi kebutuhan automation equipment",
-                                    "Install dan setup automated system",
-                                    "Training operator untuk automated system",
-                                    "Monitor produktivitas improvement",
-                                  ],
-                                  "Time and motion study untuk bottleneck": [
-                                    "Lakukan time study untuk setiap production step",
-                                    "Identifikasi bottleneck dalam production line",
-                                    "Buat action plan untuk eliminate bottleneck",
-                                    "Implementasi solution dan monitor hasil",
-                                  ],
-                                  "Preventive maintenance schedule": [
-                                    "Buat schedule maintenance untuk semua mesin",
-                                    "Siapkan checklist maintenance routine",
-                                    "Training teknisi untuk preventive maintenance",
-                                    "Monitor downtime reduction",
-                                  ],
-                                  "Real-time monitoring system": [
-                                    "Install sensor untuk real-time monitoring",
-                                    "Setup dashboard untuk production metrics",
-                                    "Training team untuk respond alert",
-                                    "Monitor overall equipment effectiveness",
-                                  ],
-                                  "Quality control di setiap stage produksi": [
-                                    "Buat SOP quality control untuk setiap stage",
-                                    "Setup quality checkpoint di production line",
-                                    "Training quality control inspector",
-                                    "Monitor quality metrics dan defect rate",
-                                  ],
-
-                                  // Customer service initiatives
-                                  "Training customer service excellence": [
-                                    "Buat modul training customer service",
-                                    "Conduct training session untuk CS team",
-                                    "Evaluasi performance setelah training",
-                                    "Monitor customer satisfaction improvement",
-                                  ],
-                                  "Implementasi feedback system yang real-time":
-                                    [
-                                      "Setup feedback system di website",
-                                      "Buat dashboard untuk monitoring feedback",
-                                      "Training tim untuk respond feedback",
-                                      "Monitor response time dan resolution rate",
-                                    ],
-                                  "Reward program untuk high performing agent":
-                                    [
-                                      "Buat criteria untuk high performing agent",
-                                      "Design reward system yang motivating",
-                                      "Implementasi recognition program",
-                                      "Monitor agent performance improvement",
-                                    ],
-                                  "Proactive customer outreach program": [
-                                    "Buat database customer untuk outreach",
-                                    "Buat script untuk customer outreach",
-                                    "Schedule regular customer check-in",
-                                    "Monitor customer retention rate",
-                                  ],
-                                  "Root cause analysis untuk recurring issues":
-                                    [
-                                      "Analisis data complaint untuk pattern",
-                                      "Buat action plan untuk fix root cause",
-                                      "Implementasi solution dan monitoring",
-                                      "Monitor complaint reduction rate",
-                                    ],
-                                };
-
-                                // Get all tasks for this initiative from the mapping
-                                const relatedTasks = taskGroups[init] || [];
-
-                                // Get tasks that match the predefined mapping
-                                let selectedTasksForThisInit =
-                                  relatedTasks.filter((task) =>
-                                    onboardingData.tasks?.includes(task),
-                                  );
-
-                                // If no tasks are mapped to this initiative,
-                                // distribute remaining tasks evenly among initiatives
-                                if (
-                                  selectedTasksForThisInit.length === 0 &&
-                                  onboardingData.tasks?.length > 0
-                                ) {
-                                  const tasksPerInitiative = Math.ceil(
-                                    onboardingData.tasks.length /
-                                      relatedInitiatives.length,
-                                  );
-                                  const startIndex =
-                                    initIndex * tasksPerInitiative;
-                                  const endIndex =
-                                    startIndex + tasksPerInitiative;
-                                  selectedTasksForThisInit =
-                                    onboardingData.tasks.slice(
-                                      startIndex,
-                                      endIndex,
-                                    );
-                                }
-
-                                return (
-                                  <div
-                                    key={initIndex}
-                                    className="ml-4 border-l-2 border-purple-200 pl-4 space-y-2"
-                                  >
-                                    <div className="flex items-start space-x-2">
-                                      <div className="w-1.5 h-1.5 bg-purple-500 rounded-full mt-1.5"></div>
-                                      <div>
-                                        <span className="text-xs font-medium text-purple-600">
-                                          Inisiatif {initIndex + 1}
-                                        </span>
-                                        <p className="text-sm text-purple-700">
-                                          {init}
-                                        </p>
-                                      </div>
-                                    </div>
-
-                                    {/* Tasks for this Initiative */}
-                                    {selectedTasksForThisInit.map(
-                                      (task, taskIndex) => (
-                                        <div
-                                          key={taskIndex}
-                                          className="ml-4 flex items-start space-x-2"
-                                        >
-                                          <div className="w-1 h-1 bg-orange-500 rounded-full mt-2"></div>
-                                          <div>
-                                            <span className="text-xs font-medium text-orange-600">
-                                              Task {taskIndex + 1}
-                                            </span>
-                                            <p className="text-xs text-orange-700">
-                                              {task}
-                                            </p>
-                                          </div>
-                                        </div>
-                                      ),
-                                    )}
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          );
-                        })}
-                    </div>
-                  </div>
-                )}
-
-                {onboardingData.invitedMembers.length > 0 && (
-                  <div className="bg-white p-4 rounded-lg border border-gray-200">
-                    <h4 className="font-semibold text-blue-800 mb-2">
-                      👥 Anggota Tim yang Diundang
-                    </h4>
-                    <div className="space-y-2">
-                      {onboardingData.invitedMembers.map((member, index) => (
-                        <div
-                          key={index}
-                          className="flex items-center space-x-2"
-                        >
-                          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                          <span className="text-sm text-gray-700">
-                            {member}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                <div className="bg-white p-4 rounded-lg border border-gray-200">
-                  <h4 className="font-semibold text-gray-800 mb-3">
-                    📅 Ritme Update Capaian
-                  </h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-700">
-                    <div className="space-y-2">
-                      <p>
-                        <strong>Frekuensi Check-in:</strong>{" "}
-                        <span className="inline-block bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs">
-                          {onboardingData.cadence === "harian"
-                            ? "Setiap Hari"
-                            : onboardingData.cadence === "mingguan"
-                              ? "Setiap Minggu"
-                              : onboardingData.cadence === "bulanan"
-                                ? "Setiap Bulan"
-                                : "Belum dipilih"}
-                        </span>
-                      </p>
-                      <p>
-                        <strong>Waktu Reminder:</strong>{" "}
-                        <span className="text-gray-900 font-mono">
-                          {onboardingData.reminderTime || "Belum diatur"}
-                        </span>
-                      </p>
-                    </div>
-                  </div>
-                  <div className="mt-3 p-2 bg-gray-50 rounded text-xs text-gray-600">
-                    💡 <strong>Info:</strong> Sistem akan mengirim reminder
-                    sesuai jadwal yang dipilih untuk membantu Anda melacak
-                    progress goal secara konsisten.
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
-              <h4 className="font-semibold text-yellow-800 mb-2">
-                💡 Yang Akan Terjadi Selanjutnya
-              </h4>
-              <ul className="text-sm text-yellow-700 space-y-1">
-                <li>
-                  • Goal pertama akan dibuat otomatis di sistem berdasarkan
-                  pilihan anda
-                </li>
-                <li>• Anggota tim akan diundang untuk berkolaborasi</li>
-                <li>
-                  • Reminder otomatis akan dimulai sesuai ketentuan yang sudah
-                  dimasukkan
-                </li>
-                <li>
-                  • Anda dapat menambah / merubah konfigurasi setelah onboarding
-                  selesai
-                </li>
-              </ul>
-            </div>
-          </div>
-        );
-
-        return null;
+      default:
+        return <div>Step not implemented yet</div>;
     }
   };
 
   // Get virtual assistant message based on current step
   const getVirtualAssistantMessage = () => {
-    const companyName =
-      onboardingData.companyName ||
-      (user as any)?.organization?.name ||
-      "perusahaan Anda";
-    const selectedFocus = onboardingData.teamFocus;
-    const selectedObjective = onboardingData.objective;
-    const hasKeyResults =
-      onboardingData.keyResults && onboardingData.keyResults.length > 0;
-    const hasInitiatives =
-      onboardingData.initiatives && onboardingData.initiatives.length > 0;
-    const hasTasks = onboardingData.tasks && onboardingData.tasks.length > 0;
-
-    // Step 0: Welcome screen
-    if (onboardingData.currentStep === 0) {
-      return "Halo! Saya Orby, asisten virtual yang akan membantu menyusun goal yang tepat dan terukur. Mari mulai dengan mengenal profil perusahaan Anda terlebih dahulu.";
+    // Only show virtual assistant on welcome screen (step 0)
+    if (onboardingData.currentStep !== 0) {
+      return null;
     }
 
-    // Message should explain the CURRENT step content, not guide to next step
-    const stepMessages: Record<number, string> = {
-      // Step 1: Company Profile Introduction - Explain what this step is about
-      1: `Halaman ini menampilkan profil perusahaan ${companyName} yang sudah Anda isi sebelumnya. Anda dapat melihat dan mengedit informasi seperti nama perusahaan, alamat, provinsi, kota, jenis industri, ukuran perusahaan, posisi, dan sumber referral. Data ini akan digunakan untuk rekomendasi goal yang sesuai dengan profil bisnis Anda.`,
-
-      // Step 2: Business Focus Selection - Explain what this step is about
-      2: `Halaman ini untuk memilih fokus utama bisnis ${companyName}. Ada 5 area bisnis yang bisa dipilih: Marketing, Sales, Operasional, Customer Service, dan Pengembangan Produk. Setiap area memiliki template goal yang berbeda dan sesuai dengan kebutuhan bisnis. Pilih satu area yang paling berdampak dan mendesak untuk ditingkatkan.`,
-
-      // Step 3: Hierarchy Concept - Explain the goal hierarchy structure
-      3: `Halaman ini menjelaskan konsep hirarki dalam sistem OKR untuk ${companyName}. Struktur hirarki terdiri dari: Goal (tujuan utama) → Target (Key Results/angka yang terukur) → Inisiatif (langkah strategis) → Task (tugas konkret). Memahami hirarki ini penting agar eksekusi lebih terarah dan terstruktur.`,
-
-      // Step 4: Objective Creation - Explain what this step is about
-      4: selectedFocus
-        ? `Halaman ini untuk membuat tujuan utama berdasarkan fokus ${selectedFocus} yang sudah dipilih. Anda akan merumuskan goal yang spesifik dan terukur untuk ${companyName}. Goal ini akan menjadi arah utama yang ingin dicapai dalam periode tertentu. Sistem akan memberikan rekomendasi goal yang sesuai dengan profil perusahaan.`
-        : "Halaman ini untuk membuat tujuan utama berdasarkan fokus bisnis yang sudah dipilih. Anda akan merumuskan goal yang spesifik dan terukur untuk perusahaan. Goal ini akan menjadi arah utama yang ingin dicapai dalam periode tertentu.",
-
-      // Step 5: Key Results Definition - Explain what this step is about
-      5: selectedObjective
-        ? `Halaman ini untuk menentukan Key Results dari tujuan "${selectedObjective}". Key Results adalah metrik konkret yang mengukur keberhasilan goal Anda. Setiap Key Result memiliki angka target yang spesifik dan terukur untuk ${companyName}. Sistem memberikan rekomendasi target berdasarkan fokus bisnis yang dipilih.`
-        : "Halaman ini untuk menentukan Key Results dari tujuan yang sudah dibuat. Key Results adalah metrik konkret yang mengukur keberhasilan goal Anda. Setiap Key Result memiliki angka target yang spesifik dan terukur.",
-
-      // Step 6: Initiatives Selection - Explain what this step is about
-      6: selectedObjective
-        ? `Halaman ini untuk memilih inisiatif strategis yang akan membantu mencapai "${selectedObjective}". Inisiatif adalah langkah-langkah besar atau proyek yang akan dilakukan untuk mencapai target ${selectedFocus} di ${companyName}. Anda bisa memilih beberapa inisiatif yang paling efektif dari rekomendasi sistem.`
-        : "Halaman ini untuk memilih inisiatif strategis yang akan membantu mencapai tujuan yang sudah ditetapkan. Inisiatif adalah langkah-langkah besar atau proyek yang akan dilakukan untuk mencapai target bisnis. Anda bisa memilih beberapa inisiatif yang paling efektif.",
-
-
+    const stepMessages = {
+      0: `Selamat datang di Refokus! Platform ini dirancang khusus untuk menyelaraskan visi, strategi, dan eksekusi tim Anda dengan pendekatan OKR (Objectives and Key Results). Mari kita mulai perjalanan transformasi bisnis Anda bersama-sama. 🚀`,
     };
 
-    return (
-      stepMessages[onboardingData.currentStep] ||
-      "Terus semangat! Kita hampir selesai dengan pengaturan onboarding."
-    );
+    return stepMessages[0] || null;
   };
 
-  // Use fade-up effect for virtual assistant message
-  const assistantMessage = getVirtualAssistantMessage();
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-yellow-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-orange-600" />
+          <p className="text-gray-600">Memuat onboarding...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
-      {/* Loading overlay for redirect */}
-      {isRedirecting && (
-        <div className="fixed inset-0 bg-white/90 backdrop-blur-sm z-50 flex items-center justify-center">
-          <div className="text-center">
-            <div className="w-16 h-16 mx-auto mb-4 relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-orange-600 to-orange-500 rounded-full animate-pulse"></div>
-              <div className="absolute inset-2 bg-white rounded-full flex items-center justify-center">
-                <ArrowRight className="w-6 h-6 text-orange-600 animate-bounce" />
-              </div>
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              Menuju Dashboard...
-            </h3>
-            <p className="text-gray-600">
-              Onboarding selesai! Mempersiapkan dashboard untuk Anda.
-            </p>
-          </div>
-        </div>
-      )}
-
-      <div className="container mx-auto px-4 pt-4 pb-8">
-        <div className="max-w-4xl mx-auto">
-          {/* Header */}
-          <div className="text-center mb-6">
-            {/* Welcome Screen Visual - Only show on step 0 */}
-            {onboardingData.currentStep === 0 && (
-              <div className="mt-8 mb-6">
-                <div className="relative mx-auto max-w-md">
-                  {/* Animated gradient circles */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-32 h-32 bg-gradient-to-br from-orange-200 to-orange-300 rounded-full animate-pulse opacity-20"></div>
-                  </div>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div
-                      className="w-24 h-24 bg-gradient-to-br from-orange-300 to-orange-400 rounded-full animate-pulse opacity-30"
-                      style={{ animationDelay: "0.5s" }}
-                    ></div>
-                  </div>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div
-                      className="w-16 h-16 bg-gradient-to-br from-orange-400 to-orange-500 rounded-full animate-pulse opacity-40"
-                      style={{ animationDelay: "1s" }}
-                    ></div>
-                  </div>
-
-                  {/* Central icon */}
-                  <div className="relative flex items-center justify-center h-32">
-                    <div className="p-4 bg-white rounded-full shadow-lg border border-orange-100">
-                      <Target className="w-8 h-8 text-orange-600" />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Connecting lines with icons */}
-                <div className="mt-6 flex justify-center items-center space-x-4 sm:space-x-8">
-                  <div className="flex flex-col items-center min-w-0">
-                    <div className="p-2 bg-blue-100 rounded-full mb-2">
-                      <Target className="w-4 h-4 text-blue-600" />
-                    </div>
-                    <span className="text-xs text-gray-600 text-center whitespace-nowrap">
-                      Tujuan
-                    </span>
-                  </div>
-
-                  <div className="flex-1 h-px bg-gradient-to-r from-transparent via-orange-200 to-transparent min-w-[20px]"></div>
-
-                  <div className="flex flex-col items-center min-w-0">
-                    <div className="p-2 bg-green-100 rounded-full mb-2">
-                      <Zap className="w-4 h-4 text-green-600" />
-                    </div>
-                    <span className="text-xs text-gray-600 text-center whitespace-nowrap">
-                      Eksekusi
-                    </span>
-                  </div>
-
-                  <div className="flex-1 h-px bg-gradient-to-r from-transparent via-orange-200 to-transparent min-w-[20px]"></div>
-
-                  <div className="flex flex-col items-center min-w-0">
-                    <div className="p-2 bg-purple-100 rounded-full mb-2">
-                      <CheckCircle className="w-4 h-4 text-purple-600" />
-                    </div>
-                    <span className="text-xs text-gray-600 text-center whitespace-nowrap">
-                      Hasil
-                    </span>
-                  </div>
-                </div>
-              </div>
-            )}
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-yellow-50">
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        <div
+          className={`rounded-2xl shadow-xl border-2 p-8 transition-all duration-700 ease-in-out bg-gradient-to-br ${getContainerBackgroundColor()}`}
+        >
+          {/* Logo Header */}
+          <div className="flex items-center justify-center mb-8 animate-in fade-in slide-in-from-top-4 duration-700">
+            <img
+              src={refokusLogo}
+              alt="Refokus Logo"
+              className="h-12 transition-all duration-300 hover:scale-105"
+            />
           </div>
 
-          {/* Virtual Assistant - Show only on step 0 (welcome screen) */}
-          {onboardingData.currentStep === 0 && (
-            <div className="mb-6 animate-in fade-in slide-in-from-left-4 duration-500">
-              <div
-                className={`bg-gradient-to-r ${getContainerBackgroundColor()} rounded-lg p-4 shadow-sm transition-all duration-500 hover:shadow-md hover:scale-[1.02] animate-pulse-gentle`}
-              >
-                <div className="flex items-start space-x-3">
+          {/* Virtual Assistant - Only on welcome screen */}
+          {onboardingData.currentStep === 0 && getVirtualAssistantMessage() && (
+            <div className="mb-8 animate-in fade-in slide-in-from-left-4 duration-500 delay-200">
+              <div className="bg-white/80 backdrop-blur-sm border border-orange-200 rounded-2xl p-6 shadow-lg">
+                <div className="flex items-start space-x-4">
                   <div className="flex-shrink-0">
-                    <div
-                      className={`w-10 h-10 bg-gradient-to-br ${getProgressColor()} rounded-full flex items-center justify-center transition-all duration-500 hover:scale-110 animate-bounce-gentle`}
-                    >
-                      <Sparkles className="w-5 h-5 text-white transition-all duration-300 hover:rotate-12 animate-sparkle" />
+                    <div className="w-12 h-12 bg-gradient-to-r from-orange-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg animate-bounce">
+                      <Sparkles className="w-6 h-6 text-white" />
                     </div>
                   </div>
                   <div className="flex-1">
-                    <h4 className="font-medium text-gray-900 mb-1 transition-all duration-300 animate-slide-in">
-                      Asisten Virtual
-                    </h4>
-                    <p
-                      key={`assistant-message-${onboardingData.currentStep}`}
-                      className="text-sm text-gray-700 leading-relaxed transition-all duration-700 animate-in fade-in slide-in-from-bottom-4"
-                    >
-                      {assistantMessage}
-                    </p>
+                    <div className="bg-gradient-to-r from-orange-50 to-yellow-50 rounded-xl p-4 border border-orange-100">
+                      <p className="text-sm text-gray-700 leading-relaxed">
+                        {getVirtualAssistantMessage()}
+                      </p>
+                    </div>
+                    <div className="mt-2 flex items-center text-xs text-orange-600">
+                      <User className="w-3 h-3 mr-1" />
+                      <span className="font-medium">Orby - Virtual Assistant</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -3617,8 +2949,7 @@ export default function CompanyOnboarding() {
             <div className="mb-8 animate-in fade-in slide-in-from-top-2 duration-500">
               <div className="flex justify-between items-center mb-2">
                 <span className="text-sm text-gray-600 transition-all duration-300">
-                  Langkah {onboardingData.currentStep} dari{" "}
-                  {ONBOARDING_STEPS.length}
+                  Langkah {onboardingData.currentStep} dari 6
                 </span>
                 <span className="text-sm text-gray-600 transition-all duration-300">
                   {Math.round(progressPercentage)}% selesai
@@ -3806,7 +3137,6 @@ export default function CompanyOnboarding() {
                 onboardingData.keyResults.length > 0
                   ? onboardingData.keyResults.map((kr: any) => {
                       if (typeof kr === "string") {
-                        // Convert old string format to new object format
                         return {
                           title: kr,
                           keyResultType: "increase_to",
