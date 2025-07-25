@@ -1256,7 +1256,6 @@ export default function GoalDetail() {
           </div>
         </div>
       </div>
-
       {/* Mission Card - Show when not all missions completed */}
       {goal && !(goal.keyResults?.length > 0 && inisiatif.length > 0 && tugas.length > 0) && (
         <MissionCard
@@ -1295,7 +1294,6 @@ export default function GoalDetail() {
           className="mb-6"
         />
       )}
-
       {/* Visual Overview Section for easy understanding */}
       <div className="flex flex-col lg:grid lg:grid-cols-3 gap-6 mb-6">
         <div className="lg:col-span-2 h-full tour-objective-info">
@@ -1314,7 +1312,6 @@ export default function GoalDetail() {
           <ActivityLogCard objectiveId={goal?.id} />
         </div>
       </div>
-
       {/* Angka Target Summary Card */}
       <div className="bg-white p-4 sm:p-6 rounded-lg border border-gray-200 shadow-sm mb-6">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 gap-3 sm:gap-4">
@@ -1352,7 +1349,7 @@ export default function GoalDetail() {
                 </PopoverContent>
               </Popover>
             </h3>
-            <p className="text-blue-700 text-sm leading-relaxed">Angka target menentukan bagaimana goal ini akan diukur. Setiap angka target memiliki target yang spesifik dan dapat diukur untuk memastikan pencapaian yang objektif.</p>
+            <p className="text-blue-700 text-sm leading-relaxed">Angka target menentukan bagaimana goal ini akan diukur dan memastikan kemajuan goal secara objektif.</p>
           </div>
           {goal?.keyResults?.length > 0 && (
             <Button
@@ -1808,7 +1805,6 @@ export default function GoalDetail() {
           )}
         </div>
       </div>
-
       {/* Tabs Section */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="flex w-full h-auto p-0 bg-transparent gap-0 rounded-none mb-4 sm:mb-6 relative tour-tabs">
@@ -3060,7 +3056,6 @@ export default function GoalDetail() {
         objectiveId={id}
         isAdding={!editingTask}
       />
-
       {/* Delete Key Result Confirmation Dialog */}
       <AlertDialog
         open={deleteKeyResultModal.open}
@@ -3113,7 +3108,6 @@ export default function GoalDetail() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
       {/* Delete Task Confirmation Dialog */}
       <AlertDialog open={!!deletingTask} onOpenChange={() => setDeletingTask(null)}>
         <AlertDialogContent>
@@ -3143,7 +3137,6 @@ export default function GoalDetail() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
       {/* Delete Objective Confirmation Dialog */}
       <AlertDialog open={deleteObjectiveModal} onOpenChange={setDeleteObjectiveModal}>
         <AlertDialogContent>
