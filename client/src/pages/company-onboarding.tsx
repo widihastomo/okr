@@ -113,7 +113,8 @@ const ONBOARDING_STEPS = [
   {
     id: 3,
     title: "Memahami Struktur Untuk Merubah Strategi Jadi Aksi",
-    description: "Sebelum membuat goal, mari pahami bagaimana sistem ini bekerja secara hierarkis untuk membantu Anda mencapai tujuan bisnis.",
+    description:
+      "Sebelum membuat goal, mari pahami bagaimana sistem ini bekerja secara hierarkis untuk membantu Anda mencapai tujuan bisnis.",
     icon: Star,
   },
   {
@@ -126,7 +127,8 @@ const ONBOARDING_STEPS = [
   {
     id: 5,
     title: "Pilihan Inisiatif",
-    description: "Pilih inisiatif strategis yang akan membantu mencapai tujuan Anda",
+    description:
+      "Pilih inisiatif strategis yang akan membantu mencapai tujuan Anda",
     icon: Lightbulb,
   },
   {
@@ -215,29 +217,38 @@ export default function CompanyOnboarding() {
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editGoalModal, setEditGoalModal] = useState(false);
-  const [editKeyResultModal, setEditKeyResultModal] = useState<{ open: boolean; index: number; keyResult: any }>({ open: false, index: -1, keyResult: null });
+  const [editKeyResultModal, setEditKeyResultModal] = useState<{
+    open: boolean;
+    index: number;
+    keyResult: any;
+  }>({ open: false, index: -1, keyResult: null });
   const [editCycleModal, setEditCycleModal] = useState(false);
-  
+
   // Separate states for individual editing
   const [editObjectiveModal, setEditObjectiveModal] = useState(false);
-  const [editIndividualKeyResultModal, setEditIndividualKeyResultModal] = useState<{ 
-    open: boolean; 
-    index: number; 
-    keyResult: any;
-    originalText: string;
-  }>({ open: false, index: -1, keyResult: null, originalText: '' });
-  
+  const [editIndividualKeyResultModal, setEditIndividualKeyResultModal] =
+    useState<{
+      open: boolean;
+      index: number;
+      keyResult: any;
+      originalText: string;
+    }>({ open: false, index: -1, keyResult: null, originalText: "" });
+
   // Temporary editing values
-  const [tempObjectiveTitle, setTempObjectiveTitle] = useState('');
-  const [tempObjectiveDescription, setTempObjectiveDescription] = useState('');
-  const [tempKeyResultText, setTempKeyResultText] = useState('');
-  
+  const [tempObjectiveTitle, setTempObjectiveTitle] = useState("");
+  const [tempObjectiveDescription, setTempObjectiveDescription] = useState("");
+  const [tempKeyResultText, setTempKeyResultText] = useState("");
+
   // Track originally selected template
-  const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
-  
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(
+    null,
+  );
+
   // Track edited key results to override template display
-  const [editedKeyResults, setEditedKeyResults] = useState<Record<number, any>>({});
-  
+  const [editedKeyResults, setEditedKeyResults] = useState<Record<number, any>>(
+    {},
+  );
+
   // Track edited objective for the selected template
   const [editedObjective, setEditedObjective] = useState<string | null>(null);
   const { startTour } = useTour();
@@ -283,14 +294,16 @@ export default function CompanyOnboarding() {
   // Fetch goal templates based on selected focus area
   const { data: goalTemplates, isLoading: isLoadingTemplates } = useQuery({
     queryKey: [`/api/goal-templates/${onboardingData.teamFocus}`],
-    enabled: !!onboardingData.teamFocus
+    enabled: !!onboardingData.teamFocus,
   });
 
   // Fetch all goal templates for step 5 (initiative selection needs access to all templates)
-  const { data: allGoalTemplates, isLoading: isLoadingAllTemplates } = useQuery({
-    queryKey: ["/api/goal-templates/all"],
-    enabled: !!user
-  });
+  const { data: allGoalTemplates, isLoading: isLoadingAllTemplates } = useQuery(
+    {
+      queryKey: ["/api/goal-templates/all"],
+      enabled: !!user,
+    },
+  );
 
   // Fetch users for key result assignment
   const { data: users } = useQuery({
@@ -302,7 +315,7 @@ export default function CompanyOnboarding() {
   const provinces = [
     "Aceh",
     "Sumatera Utara",
-    "Sumatera Barat", 
+    "Sumatera Barat",
     "Riau",
     "Kepulauan Riau",
     "Jambi",
@@ -366,7 +379,7 @@ export default function CompanyOnboarding() {
     ],
     "DKI Jakarta": [
       "Kota Jakarta Barat",
-      "Kota Jakarta Pusat", 
+      "Kota Jakarta Pusat",
       "Kota Jakarta Selatan",
       "Kota Jakarta Timur",
       "Kota Jakarta Utara",
@@ -713,7 +726,7 @@ export default function CompanyOnboarding() {
       "Boalemo",
       "Gorontalo Utara",
       "Bone Bolango",
-      "Pohuwato"
+      "Pohuwato",
     ],
     "Sulawesi Tengah": [
       "Palu",
@@ -825,19 +838,14 @@ export default function CompanyOnboarding() {
     "Papua Tengah": [
       "Nabire",
       "Paniai",
-      "Puncak Jaya", 
+      "Puncak Jaya",
       "Puncak",
       "Dogiyai",
       "Intan Jaya",
       "Deiyai",
       "Mimika",
     ],
-    "Papua Selatan": [
-      "Merauke",
-      "Boven Digoel",
-      "Mappi",
-      "Asmat",
-    ],
+    "Papua Selatan": ["Merauke", "Boven Digoel", "Mappi", "Asmat"],
     "Papua Pegunungan": [
       "Jayawijaya",
       "Lanny Jaya",
@@ -854,21 +862,21 @@ export default function CompanyOnboarding() {
       "Raja Ampat",
       "Tambrauw",
       "Maybrat",
-    ]
+    ],
   };
 
-  const provinceOptions = provinces.map(province => ({
+  const provinceOptions = provinces.map((province) => ({
     value: province,
-    label: province
+    label: province,
   }));
 
   const getCityOptions = (selectedProvince: string) => {
     if (!selectedProvince || !citiesByProvince[selectedProvince]) {
       return [];
     }
-    return citiesByProvince[selectedProvince].map(city => ({
+    return citiesByProvince[selectedProvince].map((city) => ({
       value: city,
-      label: city
+      label: city,
     }));
   };
 
@@ -895,8 +903,14 @@ export default function CompanyOnboarding() {
   const companySizeOptions = [
     { value: "Solo (hanya saya)", label: "Solo (hanya saya)" },
     { value: "Tim kecil (2-10 orang)", label: "Tim kecil (2-10 orang)" },
-    { value: "Tim menengah (11-50 orang)", label: "Tim menengah (11-50 orang)" },
-    { value: "Perusahaan besar (50+ orang)", label: "Perusahaan besar (50+ orang)" },
+    {
+      value: "Tim menengah (11-50 orang)",
+      label: "Tim menengah (11-50 orang)",
+    },
+    {
+      value: "Perusahaan besar (50+ orang)",
+      label: "Perusahaan besar (50+ orang)",
+    },
   ];
 
   const positionOptions = [
@@ -1031,20 +1045,28 @@ export default function CompanyOnboarding() {
 
   // Update local state when progress data is loaded, but respect local changes
   useEffect(() => {
-    console.log("🔄 Server data useEffect - hasLocalChanges:", hasLocalChanges, "progress.teamFocus:", (progress as any)?.teamFocus);
+    console.log(
+      "🔄 Server data useEffect - hasLocalChanges:",
+      hasLocalChanges,
+      "progress.teamFocus:",
+      (progress as any)?.teamFocus,
+    );
     if (progress && !hasLocalChanges) {
-      console.log("📥 Updating from server data, teamFocus will be:", (progress as any).teamFocus);
+      console.log(
+        "📥 Updating from server data, teamFocus will be:",
+        (progress as any).teamFocus,
+      );
       setOnboardingData((prevData) => ({
         ...prevData,
         ...(progress as any),
         currentStep: (progress as any).currentStep || 0, // Ensure it starts at 0 if no progress
       }));
-      
+
       // Initialize selectedTemplateId if objective exists but no template is selected
       if ((progress as any).objective && !selectedTemplateId) {
         // Find template that matches the objective
-        const matchingTemplate = (goalTemplates as any)?.find((template: any) => 
-          template.title === (progress as any).objective
+        const matchingTemplate = (goalTemplates as any)?.find(
+          (template: any) => template.title === (progress as any).objective,
         );
         if (matchingTemplate) {
           setSelectedTemplateId(matchingTemplate.id);
@@ -1258,7 +1280,11 @@ export default function CompanyOnboarding() {
   });
 
   // Handler for edit cycle modal
-  const handleEditCycle = (data: { periodName: string; startDate: string; endDate: string }) => {
+  const handleEditCycle = (data: {
+    periodName: string;
+    startDate: string;
+    endDate: string;
+  }) => {
     const newData = {
       ...onboardingData,
       cycleDuration: data.periodName,
@@ -1268,7 +1294,7 @@ export default function CompanyOnboarding() {
     setOnboardingData(newData);
     setHasLocalChanges(true);
     setEditCycleModal(false);
-    
+
     toast({
       title: "Berhasil!",
       description: "Informasi periode telah diperbarui",
@@ -1339,9 +1365,10 @@ export default function CompanyOnboarding() {
     if (onboardingData.currentStep < 8) {
       // Create proper completedSteps array based on currentStep (fixes corruption)
       const newCurrentStep = onboardingData.currentStep + 1;
-      const newCompletedSteps = newCurrentStep === 1 
-        ? [] // Welcome screen (step 0) doesn't count as completed
-        : Array.from({length: newCurrentStep - 1}, (_, i) => i + 1); // Steps 1 through currentStep-1
+      const newCompletedSteps =
+        newCurrentStep === 1
+          ? [] // Welcome screen (step 0) doesn't count as completed
+          : Array.from({ length: newCurrentStep - 1 }, (_, i) => i + 1); // Steps 1 through currentStep-1
 
       const newData = {
         ...onboardingData,
@@ -1349,7 +1376,7 @@ export default function CompanyOnboarding() {
         completedSteps: newCompletedSteps,
       };
       setOnboardingData(newData);
-      
+
       // Only save progress if we're past the welcome screen
       if (onboardingData.currentStep > 0) {
         console.log("Saving progress data:", newData);
@@ -1391,25 +1418,24 @@ export default function CompanyOnboarding() {
 
     const finalData = {
       ...onboardingData,
-      completedSteps: Array.from(new Set([
-        ...onboardingData.completedSteps,
-        onboardingData.currentStep,
-      ])),
+      completedSteps: Array.from(
+        new Set([...onboardingData.completedSteps, onboardingData.currentStep]),
+      ),
       isCompleted: true,
     };
-    
+
     setOnboardingData(finalData);
-    
+
     try {
       // Complete the onboarding process
       await completeOnboardingMutation.mutateAsync();
-      
+
       // Set onboarding completed flag to trigger welcome screen flow
-      localStorage.setItem('onboarding-completed', 'true');
-      
+      localStorage.setItem("onboarding-completed", "true");
+
       // Start the tour system (which will show welcome screen first)
       startTour();
-      
+
       // Navigate to dashboard
       setTimeout(() => {
         setIsRedirecting(true);
@@ -1429,14 +1455,16 @@ export default function CompanyOnboarding() {
       case 1: // Perkenalan - Company Profile Form
         return (
           <div className="space-y-6">
-            
-
             {/* Nama Perusahaan - full width row */}
             <div className="space-y-1">
               <Label htmlFor="companyName">Nama Perusahaan</Label>
               <Input
                 id="companyName"
-                value={onboardingData.companyName || (organizationData as any)?.organization?.name || ""}
+                value={
+                  onboardingData.companyName ||
+                  (organizationData as any)?.organization?.name ||
+                  ""
+                }
                 onChange={(e) =>
                   setOnboardingData({
                     ...onboardingData,
@@ -1464,7 +1492,6 @@ export default function CompanyOnboarding() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
               {/* Provinsi */}
               <div className="space-y-1">
                 <Label>Provinsi</Label>
@@ -1575,20 +1602,21 @@ export default function CompanyOnboarding() {
             </div>
 
             {/* Validation Message */}
-            {(onboardingData.companyName &&
-              onboardingData.companyAddress && 
-              onboardingData.province && 
-              onboardingData.city && 
+            {onboardingData.companyName &&
+              onboardingData.companyAddress &&
+              onboardingData.province &&
+              onboardingData.city &&
               onboardingData.industryType &&
               onboardingData.companySize &&
               onboardingData.position &&
-              onboardingData.referralSource) && (
-              <div className="p-3 bg-green-50 rounded-lg border border-green-200 mt-4">
-                <p className="text-sm text-green-800 font-medium">
-                  ✓ Profil perusahaan sudah lengkap! Lanjutkan ke fokus bisnis.
-                </p>
-              </div>
-            )}
+              onboardingData.referralSource && (
+                <div className="p-3 bg-green-50 rounded-lg border border-green-200 mt-4">
+                  <p className="text-sm text-green-800 font-medium">
+                    ✓ Profil perusahaan sudah lengkap! Lanjutkan ke fokus
+                    bisnis.
+                  </p>
+                </div>
+              )}
           </div>
         );
 
@@ -1600,15 +1628,19 @@ export default function CompanyOnboarding() {
                 Pilih fokus bisnis Anda:
               </Label>
               <p className="text-sm text-gray-600">
-                Pilih area yang paling ingin Anda tingkatkan dalam 3 bulan kedepan.
+                Pilih area yang paling ingin Anda tingkatkan dalam 3 bulan
+                kedepan.
               </p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div
                 onClick={() => {
-                  console.log("Clicking penjualan - current teamFocus:", onboardingData.teamFocus);
+                  console.log(
+                    "Clicking penjualan - current teamFocus:",
+                    onboardingData.teamFocus,
+                  );
                   setHasLocalChanges(true);
-                  setOnboardingData(prev => {
+                  setOnboardingData((prev) => {
                     const newData = { ...prev, teamFocus: "penjualan" };
                     console.log("Setting new teamFocus to:", newData.teamFocus);
                     return newData;
@@ -1624,9 +1656,7 @@ export default function CompanyOnboarding() {
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-2">
                       <DollarSign className="w-5 h-5 text-green-600" />
-                      <span className="font-medium">
-                        Tingkatkan Pendapatan
-                      </span>
+                      <span className="font-medium">Tingkatkan Pendapatan</span>
                     </div>
                     <p className="text-sm text-gray-600">
                       Fokus pada peningkatan omzet dan penjualan
@@ -1639,13 +1669,13 @@ export default function CompanyOnboarding() {
                           onClick={(e) => {
                             e.stopPropagation();
                             setHasLocalChanges(true);
-                            setOnboardingData({ 
-                              ...onboardingData, 
+                            setOnboardingData({
+                              ...onboardingData,
                               teamFocus: "",
                               objective: "",
                               keyResults: [],
                               initiatives: [],
-                              tasks: []
+                              tasks: [],
                             });
                             setSelectedTemplateId("");
                           }}
@@ -1662,9 +1692,12 @@ export default function CompanyOnboarding() {
 
               <div
                 onClick={() => {
-                  console.log("Clicking operasional - current teamFocus:", onboardingData.teamFocus);
+                  console.log(
+                    "Clicking operasional - current teamFocus:",
+                    onboardingData.teamFocus,
+                  );
                   setHasLocalChanges(true);
-                  setOnboardingData(prev => {
+                  setOnboardingData((prev) => {
                     const newData = { ...prev, teamFocus: "operasional" };
                     console.log("Setting new teamFocus to:", newData.teamFocus);
                     return newData;
@@ -1680,9 +1713,7 @@ export default function CompanyOnboarding() {
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-2">
                       <Settings className="w-5 h-5 text-blue-600" />
-                      <span className="font-medium">
-                        Rapikan Operasional
-                      </span>
+                      <span className="font-medium">Rapikan Operasional</span>
                     </div>
                     <p className="text-sm text-gray-600">
                       Optimalisasi proses, dan produktivitas operasional
@@ -1695,13 +1726,13 @@ export default function CompanyOnboarding() {
                           onClick={(e) => {
                             e.stopPropagation();
                             setHasLocalChanges(true);
-                            setOnboardingData({ 
-                              ...onboardingData, 
+                            setOnboardingData({
+                              ...onboardingData,
                               teamFocus: "",
                               objective: "",
                               keyResults: [],
                               initiatives: [],
-                              tasks: []
+                              tasks: [],
                             });
                             setSelectedTemplateId("");
                           }}
@@ -1718,9 +1749,12 @@ export default function CompanyOnboarding() {
 
               <div
                 onClick={() => {
-                  console.log("Clicking customer_service - current teamFocus:", onboardingData.teamFocus);
+                  console.log(
+                    "Clicking customer_service - current teamFocus:",
+                    onboardingData.teamFocus,
+                  );
                   setHasLocalChanges(true);
-                  setOnboardingData(prev => {
+                  setOnboardingData((prev) => {
                     const newData = { ...prev, teamFocus: "customer_service" };
                     console.log("Setting new teamFocus to:", newData.teamFocus);
                     return newData;
@@ -1736,9 +1770,7 @@ export default function CompanyOnboarding() {
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-2">
                       <HeartHandshake className="w-5 h-5 text-purple-600" />
-                      <span className="font-medium">
-                        Kembangkan Tim
-                      </span>
+                      <span className="font-medium">Kembangkan Tim</span>
                     </div>
                     <p className="text-sm text-gray-600">
                       Peningkatan Kapasitas dan kinerja tim
@@ -1751,13 +1783,13 @@ export default function CompanyOnboarding() {
                           onClick={(e) => {
                             e.stopPropagation();
                             setHasLocalChanges(true);
-                            setOnboardingData({ 
-                              ...onboardingData, 
+                            setOnboardingData({
+                              ...onboardingData,
                               teamFocus: "",
                               objective: "",
                               keyResults: [],
                               initiatives: [],
-                              tasks: []
+                              tasks: [],
                             });
                             setSelectedTemplateId("");
                           }}
@@ -1774,9 +1806,12 @@ export default function CompanyOnboarding() {
 
               <div
                 onClick={() => {
-                  console.log("Clicking marketing - current teamFocus:", onboardingData.teamFocus);
+                  console.log(
+                    "Clicking marketing - current teamFocus:",
+                    onboardingData.teamFocus,
+                  );
                   setHasLocalChanges(true);
-                  setOnboardingData(prev => {
+                  setOnboardingData((prev) => {
                     const newData = { ...prev, teamFocus: "marketing" };
                     console.log("Setting new teamFocus to:", newData.teamFocus);
                     return newData;
@@ -1792,9 +1827,7 @@ export default function CompanyOnboarding() {
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-2">
                       <Rocket className="w-5 h-5 text-red-600" />
-                      <span className="font-medium">
-                        Ekspansi Bisnis
-                      </span>
+                      <span className="font-medium">Ekspansi Bisnis</span>
                     </div>
                     <p className="text-sm text-gray-600">
                       Perluas pasar dan pengembangan produk
@@ -1807,13 +1840,13 @@ export default function CompanyOnboarding() {
                           onClick={(e) => {
                             e.stopPropagation();
                             setHasLocalChanges(true);
-                            setOnboardingData({ 
-                              ...onboardingData, 
+                            setOnboardingData({
+                              ...onboardingData,
                               teamFocus: "",
                               objective: "",
                               keyResults: [],
                               initiatives: [],
-                              tasks: []
+                              tasks: [],
                             });
                             setSelectedTemplateId("");
                           }}
@@ -1828,28 +1861,26 @@ export default function CompanyOnboarding() {
                 </div>
               </div>
             </div>
-
-
           </div>
         );
 
       case 3: // Pengenalan Konsep Hirarki
         return (
           <div className="space-y-6">
-
             {/* Mobile-Optimized OKR Explanation */}
             <div className="bg-gradient-to-br from-gray-900 to-slate-800 rounded-xl md:rounded-2xl shadow-xl border-2 border-gray-700 p-3 md:p-6 relative overflow-hidden">
               {/* Subtle background decoration - smaller on mobile */}
               <div className="absolute top-0 right-0 w-16 h-16 md:w-32 md:h-32 bg-blue-400 rounded-full -translate-y-8 translate-x-8 md:-translate-y-16 md:translate-x-16 opacity-10"></div>
               <div className="absolute bottom-0 left-0 w-12 h-12 md:w-24 md:h-24 bg-purple-400 rounded-full translate-y-6 -translate-x-6 md:translate-y-12 md:-translate-x-12 opacity-10"></div>
-              
+
               {/* Header */}
               <div className="text-center mb-4 md:mb-6 relative">
                 <p className="text-gray-200 text-base md:text-lg px-2">
-                  4 langkah sederhana yang terbukti efektif untuk mencapai tujuan besar
+                  4 langkah sederhana yang terbukti efektif untuk mencapai
+                  tujuan besar
                 </p>
               </div>
-              
+
               {/* Enhanced Steps - Mobile Optimized */}
               <div className="space-y-4 md:space-y-6 relative">
                 {/* Step 1: Goal */}
@@ -1863,25 +1894,31 @@ export default function CompanyOnboarding() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-3">
-                        <h4 className="text-lg md:text-xl font-bold text-white">GOAL / Tujuan</h4>
-                        <div className="px-2 py-1 md:px-3 md:py-1 bg-orange-500 text-white rounded-full text-xs font-bold">VISI BESAR</div>
+                        <h4 className="text-lg md:text-xl font-bold text-white">
+                          GOAL / Tujuan
+                        </h4>
+                        <div className="px-2 py-1 md:px-3 md:py-1 bg-orange-500 text-white rounded-full text-xs font-bold">
+                          VISI BESAR
+                        </div>
                       </div>
-                      <p className="text-gray-300 mb-2 md:mb-3 text-base md:text-lg">Apa yang ingin dicapai dalam 3-12 bulan ke depan</p>
+                      <p className="text-gray-300 mb-2 md:mb-3 text-base md:text-lg">
+                        Apa yang ingin dicapai dalam 3-12 bulan ke depan
+                      </p>
                       <div className="bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg md:rounded-xl p-2 md:p-3 border-l-4 border-orange-400 shadow-md">
                         <div className="flex items-center space-x-2 mb-2">
                           <Sparkles className="w-4 h-4 text-orange-500 flex-shrink-0" />
-                          <span className="text-sm font-bold text-orange-700">Contoh Real:</span>
+                          <span className="text-sm font-bold text-orange-700">
+                            Contoh Real: "Meningkatkan penjualan produk secara
+                            signifikan"
+                          </span>
                         </div>
-                        <p className="text-gray-800 font-medium text-sm md:text-base">
-                          "Meningkatkan penjualan produk secara signifikan"
-                        </p>
                       </div>
                     </div>
                   </div>
-                  
+
                   {/* Connecting line */}
-                  <div className="flex justify-center my-4 md:my-6">
-                    <div className="w-1 h-6 md:h-8 bg-gradient-to-b from-orange-400 to-blue-400 opacity-60"></div>
+                  <div className="flex justify-center my-2 md:my-3">
+                    <div className="w-1 h-3 md:h-4 bg-gradient-to-b from-orange-400 to-blue-400 opacity-60"></div>
                   </div>
                 </div>
 
@@ -1896,36 +1933,33 @@ export default function CompanyOnboarding() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-3">
-                        <h4 className="text-lg md:text-xl font-bold text-white">ANGKA TARGET</h4>
-                        <div className="px-2 py-1 md:px-3 md:py-1 bg-blue-500 text-white rounded-full text-xs font-bold">UKURAN</div>
+                        <h4 className="text-lg md:text-xl font-bold text-white">
+                          ANGKA TARGET
+                        </h4>
+                        <div className="px-2 py-1 md:px-3 md:py-1 bg-blue-500 text-white rounded-full text-xs font-bold">
+                          UKURAN
+                        </div>
                       </div>
-                      <p className="text-gray-300 mb-2 md:mb-3 text-base md:text-lg">Angka spesifik yang mengukur pencapaian tujuan</p>
+                      <p className="text-gray-300 mb-2 md:mb-3 text-base md:text-lg">
+                        Angka spesifik yang mengukur pencapaian tujuan
+                      </p>
                       <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg md:rounded-xl p-2 md:p-3 border-l-4 border-blue-400 shadow-md">
                         <div className="flex items-center space-x-2 mb-3">
                           <BarChart3 className="w-4 h-4 text-blue-500 flex-shrink-0" />
-                          <span className="text-sm font-bold text-blue-700">Target Konkret:</span>
-                        </div>
-                        <div className="space-y-2">
-                          <div className="flex items-start space-x-2">
-                            <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                            <span className="text-gray-800 text-sm md:text-base">Penjualan naik 50% dari bulan lalu</span>
-                          </div>
-                          <div className="flex items-start space-x-2">
-                            <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                            <span className="text-gray-800 text-sm md:text-base">Dapat 1000 pelanggan baru</span>
-                          </div>
-                          <div className="flex items-start space-x-2">
-                            <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                            <span className="text-gray-800 text-sm md:text-base">Rating produk mencapai 4.5/5</span>
-                          </div>
+                          <span className="text-sm font-bold text-blue-700">
+                            Target Konkret:
+                          </span>
+                          <span className="text-gray-800 text-sm md:text-base">
+                            Penjualan naik 50% dari bulan lalu
+                          </span>
                         </div>
                       </div>
                     </div>
                   </div>
-                  
+
                   {/* Connecting line */}
-                  <div className="flex justify-center my-4 md:my-6">
-                    <div className="w-1 h-6 md:h-8 bg-gradient-to-b from-blue-400 to-green-400 opacity-60"></div>
+                  <div className="flex justify-center my-2 md:my-3">
+                    <div className="w-1 h-3 md:h-4 bg-gradient-to-b from-blue-400 to-green-400 opacity-60"></div>
                   </div>
                 </div>
 
@@ -1940,36 +1974,38 @@ export default function CompanyOnboarding() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-3">
-                        <h4 className="text-lg md:text-xl font-bold text-white">INIISIATIF / Strategi</h4>
-                        <div className="px-2 py-1 md:px-3 md:py-1 bg-green-500 text-white rounded-full text-xs font-bold">PROGRAM</div>
+                        <h4 className="text-lg md:text-xl font-bold text-white">
+                          INIISIATIF / Strategi
+                        </h4>
+                        <div className="px-2 py-1 md:px-3 md:py-1 bg-green-500 text-white rounded-full text-xs font-bold">
+                          PROGRAM
+                        </div>
                       </div>
-                      <p className="text-gray-300 mb-2 md:mb-3 text-base md:text-lg">Program spesifik yang dilakukan untuk mencapai target</p>
+                      <p className="text-gray-300 mb-2 md:mb-3 text-base md:text-lg">
+                        Program spesifik yang dilakukan untuk mencapai target
+                      </p>
                       <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-lg md:rounded-xl p-2 md:p-3 border-l-4 border-green-400 shadow-md">
                         <div className="flex items-center space-x-2 mb-3">
                           <Lightbulb className="w-4 h-4 text-green-500 flex-shrink-0" />
-                          <span className="text-sm font-bold text-green-700">Rencana Strategis:</span>
+                          <span className="text-sm font-bold text-green-700">
+                            Rencana Strategis:
+                          </span>
                         </div>
                         <div className="space-y-2">
                           <div className="flex items-start space-x-2">
                             <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
-                            <span className="text-gray-800 text-sm md:text-base">Kampanye marketing di media sosial</span>
-                          </div>
-                          <div className="flex items-start space-x-2">
-                            <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
-                            <span className="text-gray-800 text-sm md:text-base">Program diskon untuk pelanggan baru</span>
-                          </div>
-                          <div className="flex items-start space-x-2">
-                            <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
-                            <span className="text-gray-800 text-sm md:text-base">Pelatihan tim customer service</span>
+                            <span className="text-gray-800 text-sm md:text-base">
+                              Kampanye marketing di media sosial
+                            </span>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                  
+
                   {/* Connecting line */}
-                  <div className="flex justify-center my-4 md:my-6">
-                    <div className="w-1 h-6 md:h-8 bg-gradient-to-b from-green-400 to-purple-400 opacity-60"></div>
+                  <div className="flex justify-center my-2 md:my-3">
+                    <div className="w-1 h-3 md:h-4 bg-gradient-to-b from-green-400 to-purple-400 opacity-60"></div>
                   </div>
                 </div>
 
@@ -1984,27 +2020,41 @@ export default function CompanyOnboarding() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-3">
-                        <h4 className="text-lg md:text-xl font-bold text-white">TASK / Tugas Harian</h4>
-                        <div className="px-2 py-1 md:px-3 md:py-1 bg-purple-500 text-white rounded-full text-xs font-bold">EKSEKUSI</div>
+                        <h4 className="text-lg md:text-xl font-bold text-white">
+                          TASK / Tugas Harian
+                        </h4>
+                        <div className="px-2 py-1 md:px-3 md:py-1 bg-purple-500 text-white rounded-full text-xs font-bold">
+                          EKSEKUSI
+                        </div>
                       </div>
-                      <p className="text-gray-300 mb-2 md:mb-3 text-base md:text-lg">Aktivitas konkret yang dikerjakan setiap hari</p>
+                      <p className="text-gray-300 mb-2 md:mb-3 text-base md:text-lg">
+                        Aktivitas konkret yang dikerjakan setiap hari
+                      </p>
                       <div className="bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg md:rounded-xl p-2 md:p-3 border-l-4 border-purple-400 shadow-md">
                         <div className="flex items-center space-x-2 mb-3">
                           <CheckCircle className="w-4 h-4 text-purple-500 flex-shrink-0" />
-                          <span className="text-sm font-bold text-purple-700">Action Items:</span>
+                          <span className="text-sm font-bold text-purple-700">
+                            Action Items:
+                          </span>
                         </div>
                         <div className="space-y-2">
                           <div className="flex items-start space-x-2">
                             <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
-                            <span className="text-gray-800 text-sm md:text-base">Membuat perencanaan kampanye marketing</span>
+                            <span className="text-gray-800 text-sm md:text-base">
+                              Membuat perencanaan kampanye marketing
+                            </span>
                           </div>
                           <div className="flex items-start space-x-2">
                             <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
-                            <span className="text-gray-800 text-sm md:text-base">Menelpon 10 calon pelanggan</span>
+                            <span className="text-gray-800 text-sm md:text-base">
+                              Menelpon 10 calon pelanggan
+                            </span>
                           </div>
                           <div className="flex items-start space-x-2">
                             <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
-                            <span className="text-gray-800 text-sm md:text-base">Update website dengan produk baru</span>
+                            <span className="text-gray-800 text-sm md:text-base">
+                              Update website dengan produk baru
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -2012,16 +2062,18 @@ export default function CompanyOnboarding() {
                   </div>
                 </div>
               </div>
-              
+
               {/* Mobile-Optimized Summary */}
               <div className="mt-6 md:mt-8 bg-gradient-to-r from-slate-700 to-gray-800 rounded-lg md:rounded-xl p-3 md:p-4 shadow-xl relative overflow-hidden border border-gray-600">
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10"></div>
                 <div className="relative">
                   <div className="flex items-center justify-center space-x-2 mb-3 md:mb-4">
                     <Zap className="w-4 h-4 md:w-5 md:h-5 text-white" />
-                    <h4 className="text-lg md:text-xl font-bold text-white">Formula Sukses :</h4>
+                    <h4 className="text-lg md:text-xl font-bold text-white">
+                      Formula Sukses :
+                    </h4>
                   </div>
-                  
+
                   {/* Mobile: Stack vertically, Desktop: Horizontal */}
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-center space-y-2 sm:space-y-0 sm:space-x-2 md:space-x-3 mb-3 md:mb-4">
                     <span className="px-3 py-2 md:px-4 md:py-2 bg-orange-500/80 backdrop-blur-sm text-white rounded-full font-bold text-xs md:text-sm shadow-lg text-center border border-orange-400/50">
@@ -2043,9 +2095,11 @@ export default function CompanyOnboarding() {
                       ✅ Eksekusi
                     </span>
                   </div>
-                  
+
                   <p className="text-white/90 text-center leading-relaxed text-sm md:text-base px-2">
-                    <strong>Kunci keberhasilan:</strong> Setiap tugas harian mendukung strategi → strategi mencapai target → target mewujudkan tujuan besar
+                    <strong>Kunci keberhasilan:</strong> Setiap tugas harian
+                    mendukung strategi → strategi mencapai target → target
+                    mewujudkan tujuan besar
                   </p>
                 </div>
               </div>
@@ -2053,16 +2107,19 @@ export default function CompanyOnboarding() {
 
             <div className="text-center">
               <p className="text-sm text-gray-600">
-                Selanjutnya, kita akan membuat goal berdasarkan fokus bisnis yang sudah Anda pilih: 
-                <span className="font-medium text-orange-600"> {onboardingData.teamFocus === "penjualan"
-                  ? "Tingkatkan Pendapatan"
-                  : onboardingData.teamFocus === "operasional"
-                    ? "Rapikan Operasional"
-                    : onboardingData.teamFocus === "customer_service"
-                      ? "Kembangkan Tim"
-                      : onboardingData.teamFocus === "marketing"
-                        ? "Ekspansi Bisnis"
-                        : ""}
+                Selanjutnya, kita akan membuat goal berdasarkan fokus bisnis
+                yang sudah Anda pilih:
+                <span className="font-medium text-orange-600">
+                  {" "}
+                  {onboardingData.teamFocus === "penjualan"
+                    ? "Tingkatkan Pendapatan"
+                    : onboardingData.teamFocus === "operasional"
+                      ? "Rapikan Operasional"
+                      : onboardingData.teamFocus === "customer_service"
+                        ? "Kembangkan Tim"
+                        : onboardingData.teamFocus === "marketing"
+                          ? "Ekspansi Bisnis"
+                          : ""}
                 </span>
               </p>
             </div>
@@ -2075,12 +2132,15 @@ export default function CompanyOnboarding() {
             {isLoadingTemplates ? (
               <div className="flex items-center justify-center p-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600"></div>
-                <span className="ml-3 text-gray-600">Memuat template goal...</span>
+                <span className="ml-3 text-gray-600">
+                  Memuat template goal...
+                </span>
               </div>
             ) : goalTemplates && goalTemplates.length > 0 ? (
               <div className="space-y-3">
                 <Label>
-                  Pilih goal template yang sesuai dengan fokus bisnis Anda ({onboardingData.teamFocus === "penjualan"
+                  Pilih goal template yang sesuai dengan fokus bisnis Anda (
+                  {onboardingData.teamFocus === "penjualan"
                     ? "Tingkatkan Pendapatan"
                     : onboardingData.teamFocus === "operasional"
                       ? "Rapikan Operasional"
@@ -2088,7 +2148,8 @@ export default function CompanyOnboarding() {
                         ? "Kembangkan Tim"
                         : onboardingData.teamFocus === "marketing"
                           ? "Ekspansi Bisnis"
-                          : ""}):
+                          : ""}
+                  ):
                 </Label>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   {goalTemplates.map((template: any, index: number) => (
@@ -2099,22 +2160,22 @@ export default function CompanyOnboarding() {
                         const startDate = new Date();
                         const endDate = new Date();
                         endDate.setMonth(startDate.getMonth() + 1);
-                        
+
                         // Track the selected template ID
                         setSelectedTemplateId(template.id);
-                        
+
                         // Clear edited data when switching templates
                         setEditedKeyResults({});
                         setEditedObjective(null);
-                        
-                        setOnboardingData({ 
-                          ...onboardingData, 
+
+                        setOnboardingData({
+                          ...onboardingData,
                           objective: template.title,
                           objectiveDescription: template.description, // Add description from template
                           // Set default 1-month cycle
                           cycleDuration: "1bulan",
-                          cycleStartDate: startDate.toISOString().split('T')[0],
-                          cycleEndDate: endDate.toISOString().split('T')[0]
+                          cycleStartDate: startDate.toISOString().split("T")[0],
+                          cycleEndDate: endDate.toISOString().split("T")[0],
                         });
                       }}
                       className={`p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] h-fit ${
@@ -2126,7 +2187,10 @@ export default function CompanyOnboarding() {
                       <div className="space-y-2">
                         <div className="flex items-start justify-between">
                           <h3 className="leading-relaxed font-semibold text-base flex-1">
-                            {selectedTemplateId === template.id && editedObjective ? editedObjective : template.title}
+                            {selectedTemplateId === template.id &&
+                            editedObjective
+                              ? editedObjective
+                              : template.title}
                           </h3>
                           {selectedTemplateId === template.id && (
                             <Button
@@ -2134,9 +2198,15 @@ export default function CompanyOnboarding() {
                               size="sm"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                const selectedTemplate = goalTemplates?.find(t => t.title === onboardingData.objective);
+                                const selectedTemplate = goalTemplates?.find(
+                                  (t) => t.title === onboardingData.objective,
+                                );
                                 setTempObjectiveTitle(onboardingData.objective);
-                                setTempObjectiveDescription(onboardingData.objectiveDescription || selectedTemplate?.description || '');
+                                setTempObjectiveDescription(
+                                  onboardingData.objectiveDescription ||
+                                    selectedTemplate?.description ||
+                                    "",
+                                );
                                 setEditObjectiveModal(true);
                               }}
                               className="ml-2 text-xs px-2 py-1 h-7 border-orange-300 text-orange-700 hover:bg-orange-50"
@@ -2146,119 +2216,164 @@ export default function CompanyOnboarding() {
                           )}
                         </div>
                         {(() => {
-                          const displayDescription = selectedTemplateId === template.id && onboardingData.objectiveDescription 
-                            ? onboardingData.objectiveDescription 
-                            : template.description;
-                          
+                          const displayDescription =
+                            selectedTemplateId === template.id &&
+                            onboardingData.objectiveDescription
+                              ? onboardingData.objectiveDescription
+                              : template.description;
+
                           // Debug logging
                           if (selectedTemplateId === template.id) {
-                            console.log('🔍 Debug template description:', {
+                            console.log("🔍 Debug template description:", {
                               templateId: template.id,
                               selectedTemplateId,
-                              objectiveDescription: onboardingData.objectiveDescription,
+                              objectiveDescription:
+                                onboardingData.objectiveDescription,
                               templateDescription: template.description,
-                              displayDescription
+                              displayDescription,
                             });
                           }
-                          
+
                           return displayDescription ? (
                             <p className="text-sm text-gray-600 leading-relaxed">
                               {displayDescription}
                             </p>
                           ) : null;
                         })()}
-                        
+
                         {/* Display Angka Target */}
-                        {template.keyResults && template.keyResults.length > 0 && (
-                          <div className="space-y-2">
-                            <div className="flex items-center justify-between">
-                              <p className="text-xs font-medium text-orange-600 uppercase tracking-wide">
-                                Angka Target:
-                              </p>
-                            </div>
-                            <div className="space-y-1">
-                              {template.keyResults.slice(0, 3).map((keyResult: any, krIndex: number) => {
-                                // Use edited data only if this template is selected and has edits, otherwise use original template data
-                                const displayKeyResult = (selectedTemplateId === template.id && editedKeyResults[krIndex]) ? editedKeyResults[krIndex] : keyResult;
-                                
-                                return (
-                                <div key={krIndex} className="flex items-center justify-between group">
-                                  <div className="flex items-center space-x-2 flex-1">
-                                    {(() => {
-                                      // Type-specific icons based on keyResultType
-                                      const getKeyResultIcon = (type: string) => {
-                                        switch (type) {
-                                          case 'increase_to':
-                                            return <TrendingUp className="w-3 h-3 text-green-600 flex-shrink-0" />;
-                                          case 'decrease_to':
-                                            return <TrendingDown className="w-3 h-3 text-red-600 flex-shrink-0" />;
-                                          case 'achieve_or_not':
-                                            return <TargetIcon className="w-3 h-3 text-blue-600 flex-shrink-0" />;
-                                          case 'should_stay_above':
-                                            return <Plus className="w-3 h-3 text-emerald-600 flex-shrink-0" />;
-                                          case 'should_stay_below':
-                                            return <Minus className="w-3 h-3 text-amber-600 flex-shrink-0" />;
-                                          default:
-                                            return <div className="w-1.5 h-1.5 bg-orange-400 rounded-full flex-shrink-0"></div>;
-                                        }
-                                      };
-                                      return getKeyResultIcon(displayKeyResult.keyResultType || 'default');
-                                    })()}
-                                    <span className="text-xs text-gray-600 flex-1">
-                                      {displayKeyResult.title}
-                                      {displayKeyResult.targetValue && displayKeyResult.unit && (
-                                        <span className="ml-1 px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded text-[10px] font-medium">
-                                          {displayKeyResult.targetValue} {displayKeyResult.unit}
-                                        </span>
-                                      )}
+                        {template.keyResults &&
+                          template.keyResults.length > 0 && (
+                            <div className="space-y-2">
+                              <div className="flex items-center justify-between">
+                                <p className="text-xs font-medium text-orange-600 uppercase tracking-wide">
+                                  Angka Target:
+                                </p>
+                              </div>
+                              <div className="space-y-1">
+                                {template.keyResults
+                                  .slice(0, 3)
+                                  .map((keyResult: any, krIndex: number) => {
+                                    // Use edited data only if this template is selected and has edits, otherwise use original template data
+                                    const displayKeyResult =
+                                      selectedTemplateId === template.id &&
+                                      editedKeyResults[krIndex]
+                                        ? editedKeyResults[krIndex]
+                                        : keyResult;
+
+                                    return (
+                                      <div
+                                        key={krIndex}
+                                        className="flex items-center justify-between group"
+                                      >
+                                        <div className="flex items-center space-x-2 flex-1">
+                                          {(() => {
+                                            // Type-specific icons based on keyResultType
+                                            const getKeyResultIcon = (
+                                              type: string,
+                                            ) => {
+                                              switch (type) {
+                                                case "increase_to":
+                                                  return (
+                                                    <TrendingUp className="w-3 h-3 text-green-600 flex-shrink-0" />
+                                                  );
+                                                case "decrease_to":
+                                                  return (
+                                                    <TrendingDown className="w-3 h-3 text-red-600 flex-shrink-0" />
+                                                  );
+                                                case "achieve_or_not":
+                                                  return (
+                                                    <TargetIcon className="w-3 h-3 text-blue-600 flex-shrink-0" />
+                                                  );
+                                                case "should_stay_above":
+                                                  return (
+                                                    <Plus className="w-3 h-3 text-emerald-600 flex-shrink-0" />
+                                                  );
+                                                case "should_stay_below":
+                                                  return (
+                                                    <Minus className="w-3 h-3 text-amber-600 flex-shrink-0" />
+                                                  );
+                                                default:
+                                                  return (
+                                                    <div className="w-1.5 h-1.5 bg-orange-400 rounded-full flex-shrink-0"></div>
+                                                  );
+                                              }
+                                            };
+                                            return getKeyResultIcon(
+                                              displayKeyResult.keyResultType ||
+                                                "default",
+                                            );
+                                          })()}
+                                          <span className="text-xs text-gray-600 flex-1">
+                                            {displayKeyResult.title}
+                                            {displayKeyResult.targetValue &&
+                                              displayKeyResult.unit && (
+                                                <span className="ml-1 px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded text-[10px] font-medium">
+                                                  {displayKeyResult.targetValue}{" "}
+                                                  {displayKeyResult.unit}
+                                                </span>
+                                              )}
+                                          </span>
+                                        </div>
+                                        {selectedTemplateId === template.id && (
+                                          <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              const originalText =
+                                                keyResult.targetValue &&
+                                                keyResult.unit
+                                                  ? `${keyResult.title} (Target: ${keyResult.targetValue} ${keyResult.unit})`
+                                                  : keyResult.title;
+                                              setTempKeyResultText(
+                                                originalText,
+                                              );
+                                              setEditIndividualKeyResultModal({
+                                                open: true,
+                                                index: krIndex,
+                                                keyResult: {
+                                                  ...keyResult,
+                                                  // Ensure we use the actual template data
+                                                  title: keyResult.title,
+                                                  description:
+                                                    keyResult.description || "",
+                                                  keyResultType:
+                                                    keyResult.keyResultType ||
+                                                    "increase_to",
+                                                  baseValue:
+                                                    keyResult.baseValue || "0",
+                                                  targetValue:
+                                                    keyResult.targetValue ||
+                                                    "0",
+                                                  currentValue:
+                                                    keyResult.currentValue ||
+                                                    "0",
+                                                  unit: keyResult.unit || "",
+                                                },
+                                                originalText: originalText,
+                                              });
+                                            }}
+                                            className="h-5 w-5 p-0 hover:bg-orange-50"
+                                          >
+                                            <Edit className="w-3 h-3 text-orange-600" />
+                                          </Button>
+                                        )}
+                                      </div>
+                                    );
+                                  })}
+                                {template.keyResults.length > 3 && (
+                                  <div className="flex items-center space-x-2">
+                                    <div className="w-1.5 h-1.5 bg-gray-300 rounded-full flex-shrink-0"></div>
+                                    <span className="text-xs text-gray-500">
+                                      +{template.keyResults.length - 3} angka
+                                      target lainnya
                                     </span>
                                   </div>
-                                  {selectedTemplateId === template.id && (
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        const originalText = keyResult.targetValue && keyResult.unit 
-                                          ? `${keyResult.title} (Target: ${keyResult.targetValue} ${keyResult.unit})`
-                                          : keyResult.title;
-                                        setTempKeyResultText(originalText);
-                                        setEditIndividualKeyResultModal({
-                                          open: true,
-                                          index: krIndex,
-                                          keyResult: {
-                                            ...keyResult,
-                                            // Ensure we use the actual template data
-                                            title: keyResult.title,
-                                            description: keyResult.description || '',
-                                            keyResultType: keyResult.keyResultType || 'increase_to',
-                                            baseValue: keyResult.baseValue || '0',
-                                            targetValue: keyResult.targetValue || '0',
-                                            currentValue: keyResult.currentValue || '0',
-                                            unit: keyResult.unit || '',
-                                          },
-                                          originalText: originalText
-                                        });
-                                      }}
-                                      className="h-5 w-5 p-0 hover:bg-orange-50"
-                                    >
-                                      <Edit className="w-3 h-3 text-orange-600" />
-                                    </Button>
-                                  )}
-                                </div>
-                                );
-                              })}
-                              {template.keyResults.length > 3 && (
-                                <div className="flex items-center space-x-2">
-                                  <div className="w-1.5 h-1.5 bg-gray-300 rounded-full flex-shrink-0"></div>
-                                  <span className="text-xs text-gray-500">
-                                    +{template.keyResults.length - 3} angka target lainnya
-                                  </span>
-                                </div>
-                              )}
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        )}
+                          )}
                       </div>
                     </div>
                   ))}
@@ -2281,39 +2396,40 @@ export default function CompanyOnboarding() {
                   </Label>
                 </div>
                 <p className="text-sm text-purple-700 mb-4">
-                  Pilih durasi waktu untuk mencapai goal "{onboardingData.objective}"
+                  Pilih durasi waktu untuk mencapai goal "
+                  {onboardingData.objective}"
                 </p>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                   {[
-                    { 
-                      value: "1bulan", 
-                      label: "1 Bulan", 
+                    {
+                      value: "1bulan",
+                      label: "1 Bulan",
                       description: "Sprint intensif jangka pendek",
                       icon: "🚀",
-                      color: "from-green-500 to-emerald-500"
+                      color: "from-green-500 to-emerald-500",
                     },
-                    { 
-                      value: "3bulan", 
-                      label: "3 Bulan", 
+                    {
+                      value: "3bulan",
+                      label: "3 Bulan",
                       description: "Kuartal strategis",
                       icon: "📈",
-                      color: "from-blue-500 to-cyan-500"
+                      color: "from-blue-500 to-cyan-500",
                     },
-                    { 
-                      value: "1tahun", 
-                      label: "1 Tahun", 
+                    {
+                      value: "1tahun",
+                      label: "1 Tahun",
                       description: "Rencana strategis tahunan",
                       icon: "🎯",
-                      color: "from-purple-500 to-violet-500"
-                    }
+                      color: "from-purple-500 to-violet-500",
+                    },
                   ].map((option) => (
                     <div
                       key={option.value}
                       onClick={() => {
                         const startDate = new Date();
                         const endDate = new Date();
-                        
+
                         if (option.value === "1bulan") {
                           endDate.setMonth(startDate.getMonth() + 1);
                         } else if (option.value === "3bulan") {
@@ -2321,12 +2437,12 @@ export default function CompanyOnboarding() {
                         } else if (option.value === "1tahun") {
                           endDate.setFullYear(startDate.getFullYear() + 1);
                         }
-                        
-                        setOnboardingData({ 
-                          ...onboardingData, 
+
+                        setOnboardingData({
+                          ...onboardingData,
                           cycleDuration: option.value,
-                          cycleStartDate: startDate.toISOString().split('T')[0],
-                          cycleEndDate: endDate.toISOString().split('T')[0]
+                          cycleStartDate: startDate.toISOString().split("T")[0],
+                          cycleEndDate: endDate.toISOString().split("T")[0],
                         });
                       }}
                       className={`p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
@@ -2336,71 +2452,94 @@ export default function CompanyOnboarding() {
                       }`}
                     >
                       <div className="text-center space-y-2">
-                        <div className={`w-12 h-12 mx-auto rounded-full bg-gradient-to-r ${option.color} flex items-center justify-center text-white text-xl shadow-lg`}>
+                        <div
+                          className={`w-12 h-12 mx-auto rounded-full bg-gradient-to-r ${option.color} flex items-center justify-center text-white text-xl shadow-lg`}
+                        >
                           {option.icon}
                         </div>
-                        <h4 className="font-semibold text-gray-800">{option.label}</h4>
-                        <p className="text-xs text-gray-600">{option.description}</p>
-                        {onboardingData.cycleDuration === option.value && onboardingData.cycleStartDate && onboardingData.cycleEndDate && (
-                          <div className="mt-2 space-y-2">
-                            <div className="p-2 bg-purple-50 rounded text-xs text-purple-700">
-                              <div className="font-medium">Periode:</div>
-                              <div>{new Date(onboardingData.cycleStartDate).toLocaleDateString('id-ID')} - {new Date(onboardingData.cycleEndDate).toLocaleDateString('id-ID')}</div>
+                        <h4 className="font-semibold text-gray-800">
+                          {option.label}
+                        </h4>
+                        <p className="text-xs text-gray-600">
+                          {option.description}
+                        </p>
+                        {onboardingData.cycleDuration === option.value &&
+                          onboardingData.cycleStartDate &&
+                          onboardingData.cycleEndDate && (
+                            <div className="mt-2 space-y-2">
+                              <div className="p-2 bg-purple-50 rounded text-xs text-purple-700">
+                                <div className="font-medium">Periode:</div>
+                                <div>
+                                  {new Date(
+                                    onboardingData.cycleStartDate,
+                                  ).toLocaleDateString("id-ID")}{" "}
+                                  -{" "}
+                                  {new Date(
+                                    onboardingData.cycleEndDate,
+                                  ).toLocaleDateString("id-ID")}
+                                </div>
+                              </div>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setEditCycleModal(true);
+                                }}
+                                className="h-6 w-full text-xs text-purple-600 hover:text-purple-700 hover:bg-purple-100 border border-purple-200"
+                              >
+                                <Edit className="w-3 h-3 mr-1" />
+                                Ubah Periode
+                              </Button>
                             </div>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setEditCycleModal(true);
-                              }}
-                              className="h-6 w-full text-xs text-purple-600 hover:text-purple-700 hover:bg-purple-100 border border-purple-200"
-                            >
-                              <Edit className="w-3 h-3 mr-1" />
-                              Ubah Periode
-                            </Button>
-                          </div>
-                        )}
+                          )}
                       </div>
                     </div>
                   ))}
                 </div>
 
-                
                 {/* Tips section when cycle is active */}
                 {onboardingData.cycleDuration && (
                   <div className="mt-2 p-3 bg-blue-50 rounded-lg border border-blue-200">
                     <div className="flex items-center space-x-2 mb-2">
                       <Edit className="w-4 h-4 text-blue-600" />
-                      <span className="text-sm font-medium text-blue-800">Tips Kustomisasi:</span>
+                      <span className="text-sm font-medium text-blue-800">
+                        Tips Kustomisasi:
+                      </span>
                     </div>
                     <p className="text-sm text-blue-700">
-                      Anda dapat menyesuaikan goal dan ukuran target dengan mengklik tombol <strong>"Edit Goal"</strong> dan <strong>ikon edit</strong> di samping setiap angka target untuk personalisasi yang lebih detail.
+                      Anda dapat menyesuaikan goal dan ukuran target dengan
+                      mengklik tombol <strong>"Edit Goal"</strong> dan{" "}
+                      <strong>ikon edit</strong> di samping setiap angka target
+                      untuk personalisasi yang lebih detail.
                     </p>
                   </div>
                 )}
-                
               </div>
             )}
-            
           </div>
         );
 
       case 5: // Pilihan Inisiatif Strategis
         // Get selected template based on objective from all templates (not just current focus area)
-        const selectedTemplate = allGoalTemplates?.find(template => template.title === onboardingData.objective);
-        
+        const selectedTemplate = allGoalTemplates?.find(
+          (template) => template.title === onboardingData.objective,
+        );
+
         // Debug logging
         console.log("🔍 Step 5 Debug:", {
           objective: onboardingData.objective,
           isLoadingAllTemplates,
           allTemplateCount: allGoalTemplates?.length || 0,
-          allTemplateTitles: allGoalTemplates?.map(t => t.title) || [],
-          selectedTemplate: selectedTemplate ? selectedTemplate.title : "NOT FOUND",
-          selectedTemplateInitiatives: selectedTemplate?.initiatives || "NO INITIATIVES",
+          allTemplateTitles: allGoalTemplates?.map((t) => t.title) || [],
+          selectedTemplate: selectedTemplate
+            ? selectedTemplate.title
+            : "NOT FOUND",
+          selectedTemplateInitiatives:
+            selectedTemplate?.initiatives || "NO INITIATIVES",
           selectedTemplateTasks: selectedTemplate?.tasks || "NO TASKS",
           currentStep: onboardingData.currentStep,
-          user: !!user
+          user: !!user,
         });
 
         // Additional debug for tasks
@@ -2408,22 +2547,24 @@ export default function CompanyOnboarding() {
           console.log("🔍 Tasks Debug:", {
             totalTasks: selectedTemplate.tasks.length,
             taskStructure: selectedTemplate.tasks,
-            initiativeIds: selectedTemplate.tasks.map((t: any) => t.initiativeId)
+            initiativeIds: selectedTemplate.tasks.map(
+              (t: any) => t.initiativeId,
+            ),
           });
         }
-        
+
         // Get initiatives from selected template
         const getTemplateInitiatives = () => {
           if (!selectedTemplate || !selectedTemplate.initiatives) {
             console.log("❌ No template or initiatives found:", {
               hasTemplate: !!selectedTemplate,
-              hasInitiatives: selectedTemplate?.initiatives?.length || 0
+              hasInitiatives: selectedTemplate?.initiatives?.length || 0,
             });
             return [];
           }
           return selectedTemplate.initiatives.map((initiative: any) => ({
             title: initiative.title,
-            description: initiative.description
+            description: initiative.description,
           }));
         };
 
@@ -2437,7 +2578,10 @@ export default function CompanyOnboarding() {
                 Pilih Inisiatif Strategis
               </h3>
               <p className="text-sm text-gray-600">
-                Pilih inisiatif yang paling sesuai untuk mencapai goal: <span className="font-medium text-indigo-600">"{onboardingData.objective}"</span>
+                Pilih inisiatif yang paling sesuai untuk mencapai goal:{" "}
+                <span className="font-medium text-indigo-600">
+                  "{onboardingData.objective}"
+                </span>
               </p>
             </div>
 
@@ -2452,13 +2596,17 @@ export default function CompanyOnboarding() {
                         : "border-gray-200 hover:border-indigo-300 hover:bg-gray-50"
                     }`}
                     onClick={() => {
-                      const newInitiatives = selectedInitiatives.includes(initiative.title)
-                        ? selectedInitiatives.filter(init => init !== initiative.title)
+                      const newInitiatives = selectedInitiatives.includes(
+                        initiative.title,
+                      )
+                        ? selectedInitiatives.filter(
+                            (init) => init !== initiative.title,
+                          )
                         : [...selectedInitiatives, initiative.title];
-                      
+
                       setOnboardingData({
                         ...onboardingData,
-                        initiatives: newInitiatives
+                        initiatives: newInitiatives,
                       });
                     }}
                   >
@@ -2475,48 +2623,65 @@ export default function CompanyOnboarding() {
                         <p className="text-sm text-gray-600 mb-3">
                           {initiative.description}
                         </p>
-                        
+
                         {/* Display tasks for this initiative */}
-                        {selectedTemplate?.tasks && selectedTemplate.tasks
-                          .filter((task: any) => task.initiativeId === index.toString())
-                          .length > 0 && (
-                          <div className="mt-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
-                            <p className="text-xs font-medium text-gray-700 flex items-center mb-2">
-                              <ListTodo className="w-3 h-3 mr-1" />
-                              Tugas yang terkait:
-                            </p>
-                            <div className="space-y-2">
-                              {selectedTemplate.tasks
-                                .filter((task: any) => task.initiativeId === index.toString())
-                                .map((task: any, taskIndex: number) => (
-                                  <div key={taskIndex} className="flex items-start space-x-2 text-xs">
-                                    <CheckCircle className="w-3 h-3 text-green-500 mt-0.5 flex-shrink-0" />
-                                    <div className="flex-1">
-                                      <div className="flex items-start justify-between">
-                                        <span className="text-gray-800 leading-relaxed font-medium">{task.title}</span>
-                                        {task.priority && (
-                                          <Badge variant="outline" className="text-xs ml-2 flex-shrink-0">
-                                            {task.priority === 'high' ? '🔴 Tinggi' : 
-                                             task.priority === 'medium' ? '🟡 Sedang' : 
-                                             '🟢 Rendah'}
-                                          </Badge>
+                        {selectedTemplate?.tasks &&
+                          selectedTemplate.tasks.filter(
+                            (task: any) =>
+                              task.initiativeId === index.toString(),
+                          ).length > 0 && (
+                            <div className="mt-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                              <p className="text-xs font-medium text-gray-700 flex items-center mb-2">
+                                <ListTodo className="w-3 h-3 mr-1" />
+                                Tugas yang terkait:
+                              </p>
+                              <div className="space-y-2">
+                                {selectedTemplate.tasks
+                                  .filter(
+                                    (task: any) =>
+                                      task.initiativeId === index.toString(),
+                                  )
+                                  .map((task: any, taskIndex: number) => (
+                                    <div
+                                      key={taskIndex}
+                                      className="flex items-start space-x-2 text-xs"
+                                    >
+                                      <CheckCircle className="w-3 h-3 text-green-500 mt-0.5 flex-shrink-0" />
+                                      <div className="flex-1">
+                                        <div className="flex items-start justify-between">
+                                          <span className="text-gray-800 leading-relaxed font-medium">
+                                            {task.title}
+                                          </span>
+                                          {task.priority && (
+                                            <Badge
+                                              variant="outline"
+                                              className="text-xs ml-2 flex-shrink-0"
+                                            >
+                                              {task.priority === "high"
+                                                ? "🔴 Tinggi"
+                                                : task.priority === "medium"
+                                                  ? "🟡 Sedang"
+                                                  : "🟢 Rendah"}
+                                            </Badge>
+                                          )}
+                                        </div>
+                                        {task.description && (
+                                          <p className="text-gray-600 mt-1 text-xs leading-relaxed">
+                                            {task.description}
+                                          </p>
+                                        )}
+                                        {task.dueDate && (
+                                          <div className="flex items-center mt-1 text-xs text-gray-500">
+                                            <Clock className="w-3 h-3 mr-1" />
+                                            Target: {task.dueDate}
+                                          </div>
                                         )}
                                       </div>
-                                      {task.description && (
-                                        <p className="text-gray-600 mt-1 text-xs leading-relaxed">{task.description}</p>
-                                      )}
-                                      {task.dueDate && (
-                                        <div className="flex items-center mt-1 text-xs text-gray-500">
-                                          <Clock className="w-3 h-3 mr-1" />
-                                          Target: {task.dueDate}
-                                        </div>
-                                      )}
                                     </div>
-                                  </div>
-                                ))}
+                                  ))}
+                              </div>
                             </div>
-                          </div>
-                        )}
+                          )}
                       </div>
                     </div>
                   </div>
@@ -2540,7 +2705,7 @@ export default function CompanyOnboarding() {
                 </p>
               </div>
             )}
-            
+
             {/* Skip option */}
             <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
               <div className="flex items-start space-x-3">
@@ -2550,7 +2715,8 @@ export default function CompanyOnboarding() {
                     Belum siap memilih inisiatif?
                   </h4>
                   <p className="text-sm text-blue-700 mb-3">
-                    Anda dapat melewati langkah ini dan menambahkan inisiatif strategis nanti melalui pengaturan goal.
+                    Anda dapat melewati langkah ini dan menambahkan inisiatif
+                    strategis nanti melalui pengaturan goal.
                   </p>
                   <Button
                     variant="outline"
@@ -2558,7 +2724,7 @@ export default function CompanyOnboarding() {
                     onClick={() => {
                       setOnboardingData({
                         ...onboardingData,
-                        initiatives: []
+                        initiatives: [],
                       });
                     }}
                     className="border-blue-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400"
@@ -2581,10 +2747,12 @@ export default function CompanyOnboarding() {
                 Pilih frekuensi update goal:
               </Label>
               <p className="text-sm text-gray-600">
-                Seberapa sering Anda ingin memperbarui progress goal? Setting ini akan menentukan ritme monitoring dan evaluasi pencapaian Anda.
+                Seberapa sering Anda ingin memperbarui progress goal? Setting
+                ini akan menentukan ritme monitoring dan evaluasi pencapaian
+                Anda.
               </p>
             </div>
-            
+
             <RadioGroup
               value={onboardingData.updateFrequency}
               onValueChange={(value) =>
@@ -2599,11 +2767,18 @@ export default function CompanyOnboarding() {
                     : "border-gray-200 bg-white hover:border-blue-300"
                 }`}
                 onClick={() =>
-                  setOnboardingData({ ...onboardingData, updateFrequency: "harian" })
+                  setOnboardingData({
+                    ...onboardingData,
+                    updateFrequency: "harian",
+                  })
                 }
               >
                 <div className="flex items-start space-x-4">
-                  <RadioGroupItem value="harian" id="freq-harian" className="mt-1" />
+                  <RadioGroupItem
+                    value="harian"
+                    id="freq-harian"
+                    className="mt-1"
+                  />
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-2">
                       <Clock className="w-5 h-5 text-red-600" />
@@ -2615,10 +2790,12 @@ export default function CompanyOnboarding() {
                       </Label>
                     </div>
                     <p className="text-sm text-gray-600 mb-2">
-                      Pembaruan progress setiap hari untuk monitoring ketat dan progress yang cepat.
+                      Pembaruan progress setiap hari untuk monitoring ketat dan
+                      progress yang cepat.
                     </p>
                     <div className="text-xs text-gray-500">
-                      <strong>Cocok untuk:</strong> Goal dengan target jangka pendek, perlu monitoring ketat, atau dalam fase kritis
+                      <strong>Cocok untuk:</strong> Goal dengan target jangka
+                      pendek, perlu monitoring ketat, atau dalam fase kritis
                     </div>
                   </div>
                 </div>
@@ -2631,11 +2808,18 @@ export default function CompanyOnboarding() {
                     : "border-gray-200 bg-white hover:border-blue-300"
                 }`}
                 onClick={() =>
-                  setOnboardingData({ ...onboardingData, updateFrequency: "mingguan" })
+                  setOnboardingData({
+                    ...onboardingData,
+                    updateFrequency: "mingguan",
+                  })
                 }
               >
                 <div className="flex items-start space-x-4">
-                  <RadioGroupItem value="mingguan" id="freq-mingguan" className="mt-1" />
+                  <RadioGroupItem
+                    value="mingguan"
+                    id="freq-mingguan"
+                    className="mt-1"
+                  />
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-2">
                       <Calendar className="w-5 h-5 text-yellow-600" />
@@ -2647,10 +2831,12 @@ export default function CompanyOnboarding() {
                       </Label>
                     </div>
                     <p className="text-sm text-gray-600 mb-2">
-                      Pembaruan progress setiap minggu untuk keseimbangan antara monitoring dan fokus eksekusi.
+                      Pembaruan progress setiap minggu untuk keseimbangan antara
+                      monitoring dan fokus eksekusi.
                     </p>
                     <div className="text-xs text-gray-500">
-                      <strong>Cocok untuk:</strong> Goal menengah, tim yang sudah terbiasa, atau fokus strategis reguler
+                      <strong>Cocok untuk:</strong> Goal menengah, tim yang
+                      sudah terbiasa, atau fokus strategis reguler
                     </div>
                   </div>
                 </div>
@@ -2663,11 +2849,18 @@ export default function CompanyOnboarding() {
                     : "border-gray-200 bg-white hover:border-blue-300"
                 }`}
                 onClick={() =>
-                  setOnboardingData({ ...onboardingData, updateFrequency: "bulanan" })
+                  setOnboardingData({
+                    ...onboardingData,
+                    updateFrequency: "bulanan",
+                  })
                 }
               >
                 <div className="flex items-start space-x-4">
-                  <RadioGroupItem value="bulanan" id="freq-bulanan" className="mt-1" />
+                  <RadioGroupItem
+                    value="bulanan"
+                    id="freq-bulanan"
+                    className="mt-1"
+                  />
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-2">
                       <TrendingUp className="w-5 h-5 text-green-600" />
@@ -2679,10 +2872,12 @@ export default function CompanyOnboarding() {
                       </Label>
                     </div>
                     <p className="text-sm text-gray-600 mb-2">
-                      Pembaruan progress setiap bulan untuk goal jangka panjang dan evaluasi strategis.
+                      Pembaruan progress setiap bulan untuk goal jangka panjang
+                      dan evaluasi strategis.
                     </p>
                     <div className="text-xs text-gray-500">
-                      <strong>Cocok untuk:</strong> Goal strategis jangka panjang, eksekutif level, atau review berkala
+                      <strong>Cocok untuk:</strong> Goal strategis jangka
+                      panjang, eksekutif level, atau review berkala
                     </div>
                   </div>
                 </div>
@@ -2694,7 +2889,10 @@ export default function CompanyOnboarding() {
                 <div className="flex items-start space-x-2">
                   <Info className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
                   <div className="text-sm text-blue-700">
-                    <strong>Pilihan Anda:</strong> Update {onboardingData.updateFrequency} akan menentukan frekuensi reminder dan monitoring progress goal Anda. Anda dapat mengubah setting ini kapan saja di pengaturan goal.
+                    <strong>Pilihan Anda:</strong> Update{" "}
+                    {onboardingData.updateFrequency} akan menentukan frekuensi
+                    reminder dan monitoring progress goal Anda. Anda dapat
+                    mengubah setting ini kapan saja di pengaturan goal.
                   </div>
                 </div>
               </div>
@@ -3362,7 +3560,9 @@ export default function CompanyOnboarding() {
                           >
                             <Checkbox
                               id={`initiative-${groupIndex}-${initIndex}`}
-                              checked={selectedInitiativesFiltered.includes(initiative)}
+                              checked={selectedInitiativesFiltered.includes(
+                                initiative,
+                              )}
                               onCheckedChange={(checked) => {
                                 let newInitiatives = [
                                   ...onboardingData.initiatives,
@@ -3398,7 +3598,8 @@ export default function CompanyOnboarding() {
             {selectedInitiativesFiltered.length > 0 && (
               <div className="p-4 bg-green-50 rounded-lg border border-green-200">
                 <h4 className="font-semibold text-green-800 mb-3">
-                  🎯 Inisiatif yang Dipilih ({selectedInitiativesFiltered.length})
+                  🎯 Inisiatif yang Dipilih (
+                  {selectedInitiativesFiltered.length})
                 </h4>
                 <div className="space-y-2">
                   {Object.entries(initiativesByKeyResult).map(
@@ -3436,7 +3637,8 @@ export default function CompanyOnboarding() {
                 </div>
                 <p className="text-sm text-green-700 mt-3">
                   <strong>
-                    Total: {selectedInitiativesFiltered.length} inisiatif terpilih
+                    Total: {selectedInitiativesFiltered.length} inisiatif
+                    terpilih
                   </strong>
                 </p>
               </div>
@@ -4194,17 +4396,21 @@ export default function CompanyOnboarding() {
                                     <span className="text-sm font-semibold text-green-800">
                                       Angka Target {krIndex + 1}
                                     </span>
-                                    <p className="text-sm text-gray-700">{kr}</p>
+                                    <p className="text-sm text-gray-700">
+                                      {kr}
+                                    </p>
                                   </div>
                                 </div>
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  onClick={() => setEditKeyResultModal({ 
-                                    open: true, 
-                                    index: krIndex, 
-                                    keyResult: kr 
-                                  })}
+                                  onClick={() =>
+                                    setEditKeyResultModal({
+                                      open: true,
+                                      index: krIndex,
+                                      keyResult: kr,
+                                    })
+                                  }
                                   className="h-8 w-8 p-0 hover:bg-green-50 ml-2"
                                 >
                                   <Edit className="w-4 h-4 text-green-600" />
@@ -4496,13 +4702,18 @@ export default function CompanyOnboarding() {
 
   // Get virtual assistant message based on current step
   const getVirtualAssistantMessage = () => {
-    const companyName = onboardingData.companyName || (user as any)?.organization?.name || "perusahaan Anda";
+    const companyName =
+      onboardingData.companyName ||
+      (user as any)?.organization?.name ||
+      "perusahaan Anda";
     const selectedFocus = onboardingData.teamFocus;
     const selectedObjective = onboardingData.objective;
-    const hasKeyResults = onboardingData.keyResults && onboardingData.keyResults.length > 0;
-    const hasInitiatives = onboardingData.initiatives && onboardingData.initiatives.length > 0;
+    const hasKeyResults =
+      onboardingData.keyResults && onboardingData.keyResults.length > 0;
+    const hasInitiatives =
+      onboardingData.initiatives && onboardingData.initiatives.length > 0;
     const hasTasks = onboardingData.tasks && onboardingData.tasks.length > 0;
-    
+
     // Step 0: Welcome screen
     if (onboardingData.currentStep === 0) {
       return "Halo! Saya Orby, asisten virtual yang akan membantu menyusun goal yang tepat dan terukur. Mari mulai dengan mengenal profil perusahaan Anda terlebih dahulu.";
@@ -4512,36 +4723,36 @@ export default function CompanyOnboarding() {
     const stepMessages: Record<number, string> = {
       // Step 1: Company Profile Introduction - Explain what this step is about
       1: `Halaman ini menampilkan profil perusahaan ${companyName} yang sudah Anda isi sebelumnya. Anda dapat melihat dan mengedit informasi seperti nama perusahaan, alamat, provinsi, kota, jenis industri, ukuran perusahaan, posisi, dan sumber referral. Data ini akan digunakan untuk rekomendasi goal yang sesuai dengan profil bisnis Anda.`,
-      
-      // Step 2: Business Focus Selection - Explain what this step is about  
+
+      // Step 2: Business Focus Selection - Explain what this step is about
       2: `Halaman ini untuk memilih fokus utama bisnis ${companyName}. Ada 5 area bisnis yang bisa dipilih: Marketing, Sales, Operasional, Customer Service, dan Pengembangan Produk. Setiap area memiliki template goal yang berbeda dan sesuai dengan kebutuhan bisnis. Pilih satu area yang paling berdampak dan mendesak untuk ditingkatkan.`,
-      
+
       // Step 3: Hierarchy Concept - Explain the goal hierarchy structure
       3: `Halaman ini menjelaskan konsep hirarki dalam sistem OKR untuk ${companyName}. Struktur hirarki terdiri dari: Goal (tujuan utama) → Target (Key Results/angka yang terukur) → Inisiatif (langkah strategis) → Task (tugas konkret). Memahami hirarki ini penting agar eksekusi lebih terarah dan terstruktur.`,
-      
+
       // Step 4: Objective Creation - Explain what this step is about
-      4: selectedFocus 
+      4: selectedFocus
         ? `Halaman ini untuk membuat tujuan utama berdasarkan fokus ${selectedFocus} yang sudah dipilih. Anda akan merumuskan goal yang spesifik dan terukur untuk ${companyName}. Goal ini akan menjadi arah utama yang ingin dicapai dalam periode tertentu. Sistem akan memberikan rekomendasi goal yang sesuai dengan profil perusahaan.`
         : "Halaman ini untuk membuat tujuan utama berdasarkan fokus bisnis yang sudah dipilih. Anda akan merumuskan goal yang spesifik dan terukur untuk perusahaan. Goal ini akan menjadi arah utama yang ingin dicapai dalam periode tertentu.",
-      
+
       // Step 5: Key Results Definition - Explain what this step is about
       5: selectedObjective
         ? `Halaman ini untuk menentukan Key Results dari tujuan "${selectedObjective}". Key Results adalah metrik konkret yang mengukur keberhasilan goal Anda. Setiap Key Result memiliki angka target yang spesifik dan terukur untuk ${companyName}. Sistem memberikan rekomendasi target berdasarkan fokus bisnis yang dipilih.`
         : "Halaman ini untuk menentukan Key Results dari tujuan yang sudah dibuat. Key Results adalah metrik konkret yang mengukur keberhasilan goal Anda. Setiap Key Result memiliki angka target yang spesifik dan terukur.",
-      
+
       // Step 6: Initiatives Selection - Explain what this step is about
       6: selectedObjective
         ? `Halaman ini untuk memilih inisiatif strategis yang akan membantu mencapai "${selectedObjective}". Inisiatif adalah langkah-langkah besar atau proyek yang akan dilakukan untuk mencapai target ${selectedFocus} di ${companyName}. Anda bisa memilih beberapa inisiatif yang paling efektif dari rekomendasi sistem.`
         : "Halaman ini untuk memilih inisiatif strategis yang akan membantu mencapai tujuan yang sudah ditetapkan. Inisiatif adalah langkah-langkah besar atau proyek yang akan dilakukan untuk mencapai target bisnis. Anda bisa memilih beberapa inisiatif yang paling efektif.",
-      
+
       // Step 7: Tasks Breakdown - Explain what this step is about
       7: hasInitiatives
         ? `Halaman ini untuk membuat tugas-tugas konkret dari inisiatif yang sudah dipilih. Setiap inisiatif akan dipecah menjadi action items yang dapat dikerjakan tim ${companyName}. Tugas-tugas ini akan memiliki deadline dan person in charge yang jelas.`
         : "Halaman ini untuk membuat tugas-tugas konkret dari inisiatif yang sudah dipilih. Setiap inisiatif akan dipecah menjadi action items yang dapat dikerjakan tim. Tugas-tugas ini akan memiliki deadline dan person in charge yang jelas.",
-      
+
       // Step 8: Progress Cadence - Explain what this step is about
       8: `Halaman ini untuk mengatur ritme check-in progress untuk ${companyName}. Anda akan menentukan seberapa sering tim melaporkan kemajuan (harian, mingguan, bulanan) dan waktu reminder otomatis. Setting ini penting untuk menjaga momentum dan accountability tim.`,
-      
+
       // Step 9: Summary Review - Explain what this step is about
       9: `Halaman ini menampilkan ringkasan lengkap setup OKR yang sudah dibuat untuk ${companyName}. Anda bisa melihat semua goal, key results, inisiatif, tugas, dan setting reminder yang telah dikonfigurasi. Ini adalah review terakhir sebelum sistem mulai berjalan dan klik "Mulai Tur" untuk melihat dashboard.`,
     };
@@ -4581,7 +4792,6 @@ export default function CompanyOnboarding() {
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="text-center mb-6">
-
             {/* Welcome Screen Visual - Only show on step 0 */}
             {onboardingData.currentStep === 0 && (
               <div className="mt-8 mb-6">
@@ -4777,7 +4987,7 @@ export default function CompanyOnboarding() {
                     className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 transition-all duration-300 transform hover:scale-105 hover:shadow-lg disabled:hover:scale-100 disabled:hover:shadow-none disabled:opacity-70 min-w-[140px] relative overflow-hidden"
                   >
                     <div className="flex items-center justify-center gap-2">
-                      {(completeOnboardingMutation.isPending || isRedirecting) ? (
+                      {completeOnboardingMutation.isPending || isRedirecting ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
                       ) : (
                         <PlayCircle className="w-4 h-4" />
@@ -4786,12 +4996,13 @@ export default function CompanyOnboarding() {
                         {completeOnboardingMutation.isPending
                           ? "Menyimpan..."
                           : isRedirecting
-                          ? "Menuju Dashboard..."
-                          : "Mulai Tur"}
+                            ? "Menuju Dashboard..."
+                            : "Mulai Tur"}
                       </span>
                     </div>
                     {/* Animated background overlay during loading */}
-                    {(completeOnboardingMutation.isPending || isRedirecting) && (
+                    {(completeOnboardingMutation.isPending ||
+                      isRedirecting) && (
                       <div className="absolute inset-0 bg-gradient-to-r from-orange-700 to-orange-600 animate-pulse" />
                     )}
                   </Button>
@@ -4823,21 +5034,28 @@ export default function CompanyOnboarding() {
               <span>Edit Goal & Angka Target</span>
             </DialogTitle>
             <DialogDescription>
-              Sesuaikan goal dan angka target sesuai kebutuhan spesifik perusahaan Anda
+              Sesuaikan goal dan angka target sesuai kebutuhan spesifik
+              perusahaan Anda
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-6">
             {/* Edit Goal Section */}
             <div className="space-y-3">
-              <Label htmlFor="modal-objective" className="text-sm font-medium text-gray-800">
+              <Label
+                htmlFor="modal-objective"
+                className="text-sm font-medium text-gray-800"
+              >
                 Edit Goal:
               </Label>
               <Textarea
                 id="modal-objective"
                 value={onboardingData.objective}
                 onChange={(e) =>
-                  setOnboardingData({ ...onboardingData, objective: e.target.value })
+                  setOnboardingData({
+                    ...onboardingData,
+                    objective: e.target.value,
+                  })
                 }
                 placeholder="Sesuaikan goal sesuai kebutuhan perusahaan Anda..."
                 className="min-h-[80px] text-sm leading-relaxed"
@@ -4846,35 +5064,42 @@ export default function CompanyOnboarding() {
 
             {/* Edit Angka Target Section */}
             {(() => {
-              const selectedTemplate = goalTemplates?.find((t: any) => t.title === onboardingData.objective);
-              if (!selectedTemplate || !selectedTemplate.keyResults || selectedTemplate.keyResults.length === 0) {
+              const selectedTemplate = goalTemplates?.find(
+                (t: any) => t.title === onboardingData.objective,
+              );
+              if (
+                !selectedTemplate ||
+                !selectedTemplate.keyResults ||
+                selectedTemplate.keyResults.length === 0
+              ) {
                 return null;
               }
 
               // Initialize structured key results from template if not already set
-              const currentKeyResults = onboardingData.keyResults.length > 0 
-                ? onboardingData.keyResults.map((kr: any) => {
-                    if (typeof kr === 'string') {
-                      // Convert old string format to new object format
-                      return {
-                        title: kr,
-                        keyResultType: 'increase_to',
-                        targetValue: '',
-                        currentValue: '0',
-                        baseValue: '0',
-                        unit: 'number'
-                      };
-                    }
-                    return kr;
-                  })
-                : selectedTemplate.keyResults.map((kr: any) => ({
-                    title: kr.title || '',
-                    keyResultType: kr.keyResultType || 'increase_to',
-                    targetValue: kr.targetValue || '',
-                    currentValue: kr.currentValue || '0',
-                    baseValue: kr.baseValue || '0',
-                    unit: kr.unit || 'number'
-                  }));
+              const currentKeyResults =
+                onboardingData.keyResults.length > 0
+                  ? onboardingData.keyResults.map((kr: any) => {
+                      if (typeof kr === "string") {
+                        // Convert old string format to new object format
+                        return {
+                          title: kr,
+                          keyResultType: "increase_to",
+                          targetValue: "",
+                          currentValue: "0",
+                          baseValue: "0",
+                          unit: "number",
+                        };
+                      }
+                      return kr;
+                    })
+                  : selectedTemplate.keyResults.map((kr: any) => ({
+                      title: kr.title || "",
+                      keyResultType: kr.keyResultType || "increase_to",
+                      targetValue: kr.targetValue || "",
+                      currentValue: kr.currentValue || "0",
+                      baseValue: kr.baseValue || "0",
+                      unit: kr.unit || "number",
+                    }));
 
               return (
                 <div className="space-y-4">
@@ -4882,143 +5107,76 @@ export default function CompanyOnboarding() {
                     <Target className="w-4 h-4 text-blue-500" />
                     Edit Angka Target:
                   </Label>
-                  
+
                   <div className="border border-blue-200 rounded-lg overflow-hidden">
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead className="bg-blue-50 border-b border-blue-200">
                           <tr>
-                            <th className="text-left p-3 font-medium text-gray-700 min-w-[200px]">Judul Angka Target</th>
-                            <th className="text-left p-3 font-medium text-gray-700 min-w-[140px]">Tipe</th>
-                            <th className="text-left p-3 font-medium text-gray-700 w-20">Awal</th>
-                            <th className="text-left p-3 font-medium text-gray-700 w-20">Saat Ini</th>
-                            <th className="text-left p-3 font-medium text-gray-700 w-20">Target</th>
-                            <th className="text-left p-3 font-medium text-gray-700 min-w-[120px]">Satuan</th>
+                            <th className="text-left p-3 font-medium text-gray-700 min-w-[200px]">
+                              Judul Angka Target
+                            </th>
+                            <th className="text-left p-3 font-medium text-gray-700 min-w-[140px]">
+                              Tipe
+                            </th>
+                            <th className="text-left p-3 font-medium text-gray-700 w-20">
+                              Awal
+                            </th>
+                            <th className="text-left p-3 font-medium text-gray-700 w-20">
+                              Saat Ini
+                            </th>
+                            <th className="text-left p-3 font-medium text-gray-700 w-20">
+                              Target
+                            </th>
+                            <th className="text-left p-3 font-medium text-gray-700 min-w-[120px]">
+                              Satuan
+                            </th>
                           </tr>
                         </thead>
                         <tbody>
-                          {currentKeyResults.map((keyResult: any, index: number) => (
-                            <tr key={index} className="border-b border-gray-200 hover:bg-gray-50">
-                              {/* Title */}
-                              <td className="p-3">
-                                <Input
-                                  value={keyResult.title}
-                                  onChange={(e) => {
-                                    const updatedKeyResults = [...currentKeyResults];
-                                    updatedKeyResults[index] = { ...updatedKeyResults[index], title: e.target.value };
-                                    setOnboardingData({ 
-                                      ...onboardingData, 
-                                      keyResults: updatedKeyResults 
-                                    });
-                                  }}
-                                  placeholder="Masukkan judul..."
-                                  className="text-xs border-gray-300 focus:border-blue-400"
-                                />
-                              </td>
-                              
-                              {/* Type */}
-                              <td className="p-3">
-                                <Select
-                                  value={keyResult.keyResultType}
-                                  onValueChange={(value) => {
-                                    const updatedKeyResults = [...currentKeyResults];
-                                    updatedKeyResults[index] = { ...updatedKeyResults[index], keyResultType: value };
-                                    setOnboardingData({ 
-                                      ...onboardingData, 
-                                      keyResults: updatedKeyResults 
-                                    });
-                                  }}
-                                >
-                                  <SelectTrigger className="text-xs h-8">
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="increase_to">Tingkatkan</SelectItem>
-                                    <SelectItem value="decrease_to">Turunkan</SelectItem>
-                                    <SelectItem value="achieve_or_not">Capai/Tidak</SelectItem>
-                                    <SelectItem value="should_stay_above">Tetap &gt;</SelectItem>
-                                    <SelectItem value="should_stay_below">Tetap &lt;</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                              </td>
-
-                              {/* Base Value */}
-                              <td className="p-3">
-                                {keyResult.keyResultType !== 'achieve_or_not' ? (
+                          {currentKeyResults.map(
+                            (keyResult: any, index: number) => (
+                              <tr
+                                key={index}
+                                className="border-b border-gray-200 hover:bg-gray-50"
+                              >
+                                {/* Title */}
+                                <td className="p-3">
                                   <Input
-                                    type="number"
-                                    value={keyResult.baseValue}
+                                    value={keyResult.title}
                                     onChange={(e) => {
-                                      const updatedKeyResults = [...currentKeyResults];
-                                      updatedKeyResults[index] = { ...updatedKeyResults[index], baseValue: e.target.value };
-                                      setOnboardingData({ 
-                                        ...onboardingData, 
-                                        keyResults: updatedKeyResults 
+                                      const updatedKeyResults = [
+                                        ...currentKeyResults,
+                                      ];
+                                      updatedKeyResults[index] = {
+                                        ...updatedKeyResults[index],
+                                        title: e.target.value,
+                                      };
+                                      setOnboardingData({
+                                        ...onboardingData,
+                                        keyResults: updatedKeyResults,
                                       });
                                     }}
-                                    placeholder="0"
-                                    className="text-xs h-8 border-gray-300"
+                                    placeholder="Masukkan judul..."
+                                    className="text-xs border-gray-300 focus:border-blue-400"
                                   />
-                                ) : (
-                                  <span className="text-gray-400 text-xs">-</span>
-                                )}
-                              </td>
+                                </td>
 
-                              {/* Current Value */}
-                              <td className="p-3">
-                                {keyResult.keyResultType !== 'achieve_or_not' ? (
-                                  <Input
-                                    type="number"
-                                    value={keyResult.currentValue}
-                                    onChange={(e) => {
-                                      const updatedKeyResults = [...currentKeyResults];
-                                      updatedKeyResults[index] = { ...updatedKeyResults[index], currentValue: e.target.value };
-                                      setOnboardingData({ 
-                                        ...onboardingData, 
-                                        keyResults: updatedKeyResults 
-                                      });
-                                    }}
-                                    placeholder="0"
-                                    className="text-xs h-8 border-gray-300"
-                                  />
-                                ) : (
-                                  <span className="text-gray-400 text-xs">-</span>
-                                )}
-                              </td>
-
-                              {/* Target Value */}
-                              <td className="p-3">
-                                {keyResult.keyResultType !== 'achieve_or_not' ? (
-                                  <Input
-                                    type="number"
-                                    value={keyResult.targetValue}
-                                    onChange={(e) => {
-                                      const updatedKeyResults = [...currentKeyResults];
-                                      updatedKeyResults[index] = { ...updatedKeyResults[index], targetValue: e.target.value };
-                                      setOnboardingData({ 
-                                        ...onboardingData, 
-                                        keyResults: updatedKeyResults 
-                                      });
-                                    }}
-                                    placeholder="100"
-                                    className="text-xs h-8 border-gray-300"
-                                  />
-                                ) : (
-                                  <span className="text-gray-400 text-xs">-</span>
-                                )}
-                              </td>
-
-                              {/* Unit */}
-                              <td className="p-3">
-                                {keyResult.keyResultType !== 'achieve_or_not' ? (
+                                {/* Type */}
+                                <td className="p-3">
                                   <Select
-                                    value={keyResult.unit}
+                                    value={keyResult.keyResultType}
                                     onValueChange={(value) => {
-                                      const updatedKeyResults = [...currentKeyResults];
-                                      updatedKeyResults[index] = { ...updatedKeyResults[index], unit: value };
-                                      setOnboardingData({ 
-                                        ...onboardingData, 
-                                        keyResults: updatedKeyResults 
+                                      const updatedKeyResults = [
+                                        ...currentKeyResults,
+                                      ];
+                                      updatedKeyResults[index] = {
+                                        ...updatedKeyResults[index],
+                                        keyResultType: value,
+                                      };
+                                      setOnboardingData({
+                                        ...onboardingData,
+                                        keyResults: updatedKeyResults,
                                       });
                                     }}
                                   >
@@ -5026,24 +5184,167 @@ export default function CompanyOnboarding() {
                                       <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
-                                      <SelectItem value="number">Angka</SelectItem>
-                                      <SelectItem value="percentage">%</SelectItem>
-                                      <SelectItem value="currency">Rp</SelectItem>
+                                      <SelectItem value="increase_to">
+                                        Tingkatkan
+                                      </SelectItem>
+                                      <SelectItem value="decrease_to">
+                                        Turunkan
+                                      </SelectItem>
+                                      <SelectItem value="achieve_or_not">
+                                        Capai/Tidak
+                                      </SelectItem>
+                                      <SelectItem value="should_stay_above">
+                                        Tetap &gt;
+                                      </SelectItem>
+                                      <SelectItem value="should_stay_below">
+                                        Tetap &lt;
+                                      </SelectItem>
                                     </SelectContent>
                                   </Select>
-                                ) : (
-                                  <span className="text-gray-400 text-xs">-</span>
-                                )}
-                              </td>
-                            </tr>
-                          ))}
+                                </td>
+
+                                {/* Base Value */}
+                                <td className="p-3">
+                                  {keyResult.keyResultType !==
+                                  "achieve_or_not" ? (
+                                    <Input
+                                      type="number"
+                                      value={keyResult.baseValue}
+                                      onChange={(e) => {
+                                        const updatedKeyResults = [
+                                          ...currentKeyResults,
+                                        ];
+                                        updatedKeyResults[index] = {
+                                          ...updatedKeyResults[index],
+                                          baseValue: e.target.value,
+                                        };
+                                        setOnboardingData({
+                                          ...onboardingData,
+                                          keyResults: updatedKeyResults,
+                                        });
+                                      }}
+                                      placeholder="0"
+                                      className="text-xs h-8 border-gray-300"
+                                    />
+                                  ) : (
+                                    <span className="text-gray-400 text-xs">
+                                      -
+                                    </span>
+                                  )}
+                                </td>
+
+                                {/* Current Value */}
+                                <td className="p-3">
+                                  {keyResult.keyResultType !==
+                                  "achieve_or_not" ? (
+                                    <Input
+                                      type="number"
+                                      value={keyResult.currentValue}
+                                      onChange={(e) => {
+                                        const updatedKeyResults = [
+                                          ...currentKeyResults,
+                                        ];
+                                        updatedKeyResults[index] = {
+                                          ...updatedKeyResults[index],
+                                          currentValue: e.target.value,
+                                        };
+                                        setOnboardingData({
+                                          ...onboardingData,
+                                          keyResults: updatedKeyResults,
+                                        });
+                                      }}
+                                      placeholder="0"
+                                      className="text-xs h-8 border-gray-300"
+                                    />
+                                  ) : (
+                                    <span className="text-gray-400 text-xs">
+                                      -
+                                    </span>
+                                  )}
+                                </td>
+
+                                {/* Target Value */}
+                                <td className="p-3">
+                                  {keyResult.keyResultType !==
+                                  "achieve_or_not" ? (
+                                    <Input
+                                      type="number"
+                                      value={keyResult.targetValue}
+                                      onChange={(e) => {
+                                        const updatedKeyResults = [
+                                          ...currentKeyResults,
+                                        ];
+                                        updatedKeyResults[index] = {
+                                          ...updatedKeyResults[index],
+                                          targetValue: e.target.value,
+                                        };
+                                        setOnboardingData({
+                                          ...onboardingData,
+                                          keyResults: updatedKeyResults,
+                                        });
+                                      }}
+                                      placeholder="100"
+                                      className="text-xs h-8 border-gray-300"
+                                    />
+                                  ) : (
+                                    <span className="text-gray-400 text-xs">
+                                      -
+                                    </span>
+                                  )}
+                                </td>
+
+                                {/* Unit */}
+                                <td className="p-3">
+                                  {keyResult.keyResultType !==
+                                  "achieve_or_not" ? (
+                                    <Select
+                                      value={keyResult.unit}
+                                      onValueChange={(value) => {
+                                        const updatedKeyResults = [
+                                          ...currentKeyResults,
+                                        ];
+                                        updatedKeyResults[index] = {
+                                          ...updatedKeyResults[index],
+                                          unit: value,
+                                        };
+                                        setOnboardingData({
+                                          ...onboardingData,
+                                          keyResults: updatedKeyResults,
+                                        });
+                                      }}
+                                    >
+                                      <SelectTrigger className="text-xs h-8">
+                                        <SelectValue />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="number">
+                                          Angka
+                                        </SelectItem>
+                                        <SelectItem value="percentage">
+                                          %
+                                        </SelectItem>
+                                        <SelectItem value="currency">
+                                          Rp
+                                        </SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  ) : (
+                                    <span className="text-gray-400 text-xs">
+                                      -
+                                    </span>
+                                  )}
+                                </td>
+                              </tr>
+                            ),
+                          )}
                         </tbody>
                       </table>
                     </div>
                   </div>
-                  
+
                   <p className="text-xs text-blue-600 bg-blue-50 p-3 rounded-lg">
-                    💡 <strong>Tips:</strong> Format tabel memudahkan editing multiple angka target dengan struktur database lengkap
+                    💡 <strong>Tips:</strong> Format tabel memudahkan editing
+                    multiple angka target dengan struktur database lengkap
                   </p>
                 </div>
               );
@@ -5051,10 +5352,7 @@ export default function CompanyOnboarding() {
           </div>
 
           <DialogFooter className="space-x-2">
-            <Button
-              variant="outline"
-              onClick={() => setShowEditModal(false)}
-            >
+            <Button variant="outline" onClick={() => setShowEditModal(false)}>
               Batal
             </Button>
             <Button
@@ -5062,7 +5360,8 @@ export default function CompanyOnboarding() {
                 setShowEditModal(false);
                 toast({
                   title: "Perubahan Disimpan",
-                  description: "Goal dan angka target telah berhasil diperbarui",
+                  description:
+                    "Goal dan angka target telah berhasil diperbarui",
                   variant: "default",
                 });
               }}
@@ -5088,14 +5387,20 @@ export default function CompanyOnboarding() {
           </DialogHeader>
 
           <div className="space-y-4">
-            <Label htmlFor="goal-edit" className="text-sm font-medium text-blue-800">
+            <Label
+              htmlFor="goal-edit"
+              className="text-sm font-medium text-blue-800"
+            >
               Goal Utama:
             </Label>
             <Textarea
               id="goal-edit"
               value={onboardingData.objective}
               onChange={(e) =>
-                setOnboardingData({ ...onboardingData, objective: e.target.value })
+                setOnboardingData({
+                  ...onboardingData,
+                  objective: e.target.value,
+                })
               }
               placeholder="Masukkan goal utama perusahaan Anda..."
               className="min-h-[100px] text-sm leading-relaxed bg-white border-blue-200 focus:border-blue-400 focus:ring-blue-400"
@@ -5121,9 +5426,12 @@ export default function CompanyOnboarding() {
       </Dialog>
 
       {/* Edit Angka Target Modal */}
-      <Dialog open={editKeyResultModal.open} onOpenChange={(open) => 
-        setEditKeyResultModal({ open, index: -1, keyResult: null })
-      }>
+      <Dialog
+        open={editKeyResultModal.open}
+        onOpenChange={(open) =>
+          setEditKeyResultModal({ open, index: -1, keyResult: null })
+        }
+      >
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle className="flex items-center space-x-2">
@@ -5136,42 +5444,61 @@ export default function CompanyOnboarding() {
           </DialogHeader>
 
           <div className="space-y-4">
-            <Label htmlFor="kr-edit" className="text-sm font-medium text-green-800">
+            <Label
+              htmlFor="kr-edit"
+              className="text-sm font-medium text-green-800"
+            >
               Angka Target:
             </Label>
             <Textarea
               id="kr-edit"
-              value={editKeyResultModal.keyResult || ''}
+              value={editKeyResultModal.keyResult || ""}
               onChange={(e) => {
                 // Update the key result in onboardingData
                 const newKeyResults = [...onboardingData.keyResults];
                 newKeyResults[editKeyResultModal.index] = e.target.value;
-                setOnboardingData({ ...onboardingData, keyResults: newKeyResults });
-                
+                setOnboardingData({
+                  ...onboardingData,
+                  keyResults: newKeyResults,
+                });
+
                 // Update modal state
                 setEditKeyResultModal({
                   ...editKeyResultModal,
-                  keyResult: e.target.value
+                  keyResult: e.target.value,
                 });
               }}
               placeholder="Masukkan angka target yang spesifik dan terukur..."
               className="min-h-[100px] text-sm leading-relaxed bg-white border-green-200 focus:border-green-400 focus:ring-green-400"
             />
             <p className="text-xs text-green-600">
-              💡 Tip: Pastikan target bersifat SMART (Specific, Measurable, Achievable, Relevant, Time-bound)
+              💡 Tip: Pastikan target bersifat SMART (Specific, Measurable,
+              Achievable, Relevant, Time-bound)
             </p>
           </div>
 
           <div className="flex justify-end space-x-3 pt-4">
             <Button
               variant="outline"
-              onClick={() => setEditKeyResultModal({ open: false, index: -1, keyResult: null })}
+              onClick={() =>
+                setEditKeyResultModal({
+                  open: false,
+                  index: -1,
+                  keyResult: null,
+                })
+              }
               className="border-gray-300 text-gray-700 hover:bg-gray-50"
             >
               Batal
             </Button>
             <Button
-              onClick={() => setEditKeyResultModal({ open: false, index: -1, keyResult: null })}
+              onClick={() =>
+                setEditKeyResultModal({
+                  open: false,
+                  index: -1,
+                  keyResult: null,
+                })
+              }
               className="bg-green-600 hover:bg-green-700 text-white"
             >
               Simpan Perubahan
@@ -5195,7 +5522,10 @@ export default function CompanyOnboarding() {
 
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="objective-title" className="text-sm font-medium text-orange-800">
+              <Label
+                htmlFor="objective-title"
+                className="text-sm font-medium text-orange-800"
+              >
                 Nama Goal:
               </Label>
               <Input
@@ -5206,9 +5536,12 @@ export default function CompanyOnboarding() {
                 className="text-sm bg-white border-orange-200 focus:border-orange-400 focus:ring-orange-400"
               />
             </div>
-            
+
             <div className="space-y-2">
-              <Label htmlFor="objective-description" className="text-sm font-medium text-orange-800">
+              <Label
+                htmlFor="objective-description"
+                className="text-sm font-medium text-orange-800"
+              >
                 Deskripsi Goal:
               </Label>
               <Textarea
@@ -5231,44 +5564,48 @@ export default function CompanyOnboarding() {
             </Button>
             <Button
               onClick={async () => {
-                console.log('🔍 Saving objective data:', {
+                console.log("🔍 Saving objective data:", {
                   tempObjectiveTitle,
                   tempObjectiveDescription,
-                  currentOnboardingData: onboardingData
+                  currentOnboardingData: onboardingData,
                 });
-                
-                const updatedData = { 
-                  ...onboardingData, 
+
+                const updatedData = {
+                  ...onboardingData,
                   objective: tempObjectiveTitle,
-                  objectiveDescription: tempObjectiveDescription
+                  objectiveDescription: tempObjectiveDescription,
                 };
-                
+
                 // Update local state
                 setOnboardingData(updatedData);
                 setEditedObjective(tempObjectiveTitle);
-                
+
                 // Save to backend
                 try {
-                  const response = await fetch('/api/onboarding/progress', {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(updatedData)
+                  const response = await fetch("/api/onboarding/progress", {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(updatedData),
                   });
-                  
+
                   if (!response.ok) {
-                    throw new Error('Failed to save');
+                    throw new Error("Failed to save");
                   }
-                  
-                  console.log('✅ Objective description saved to backend');
+
+                  console.log("✅ Objective description saved to backend");
                 } catch (error) {
-                  console.error('❌ Error saving objective description:', error);
+                  console.error(
+                    "❌ Error saving objective description:",
+                    error,
+                  );
                 }
-                
+
                 setEditObjectiveModal(false);
                 toast({
                   title: "Goal Berhasil Diperbarui",
-                  description: "Nama dan deskripsi goal telah diperbarui sesuai kebutuhan Anda.",
-                  variant: "default"
+                  description:
+                    "Nama dan deskripsi goal telah diperbarui sesuai kebutuhan Anda.",
+                  variant: "default",
                 });
               }}
               className="bg-orange-600 hover:bg-orange-700 text-white"
@@ -5282,25 +5619,36 @@ export default function CompanyOnboarding() {
       {/* Individual Key Result Edit Modal - Using Comprehensive Form */}
       <KeyResultModal
         open={editIndividualKeyResultModal.open}
-        onOpenChange={(open) => 
-          setEditIndividualKeyResultModal({ open, index: -1, keyResult: null, originalText: '' })
+        onOpenChange={(open) =>
+          setEditIndividualKeyResultModal({
+            open,
+            index: -1,
+            keyResult: null,
+            originalText: "",
+          })
         }
         onSubmit={(keyResultData) => {
           // Convert the comprehensive key result data back to simple text for onboarding
-          const formattedText = keyResultData.targetValue && keyResultData.unit && keyResultData.keyResultType !== 'achieve_or_not'
-            ? `${keyResultData.title} (Target: ${keyResultData.targetValue} ${keyResultData.unit})`
-            : keyResultData.title;
-          
+          const formattedText =
+            keyResultData.targetValue &&
+            keyResultData.unit &&
+            keyResultData.keyResultType !== "achieve_or_not"
+              ? `${keyResultData.title} (Target: ${keyResultData.targetValue} ${keyResultData.unit})`
+              : keyResultData.title;
+
           // Update the specific key result in onboardingData
           const newKeyResults = [...onboardingData.keyResults];
-          if (editIndividualKeyResultModal.index >= 0 && editIndividualKeyResultModal.index < newKeyResults.length) {
+          if (
+            editIndividualKeyResultModal.index >= 0 &&
+            editIndividualKeyResultModal.index < newKeyResults.length
+          ) {
             newKeyResults[editIndividualKeyResultModal.index] = formattedText;
             setOnboardingData({ ...onboardingData, keyResults: newKeyResults });
           }
-          
+
           // Store the edited key result data for display override
           if (editIndividualKeyResultModal.index >= 0) {
-            setEditedKeyResults(prev => ({
+            setEditedKeyResults((prev) => ({
               ...prev,
               [editIndividualKeyResultModal.index]: {
                 title: keyResultData.title,
@@ -5310,28 +5658,43 @@ export default function CompanyOnboarding() {
                 targetValue: keyResultData.targetValue,
                 currentValue: keyResultData.currentValue,
                 unit: keyResultData.unit,
-              }
+              },
             }));
           }
-          
-          setEditIndividualKeyResultModal({ open: false, index: -1, keyResult: null, originalText: '' });
+
+          setEditIndividualKeyResultModal({
+            open: false,
+            index: -1,
+            keyResult: null,
+            originalText: "",
+          });
           toast({
             title: "Key Result Berhasil Diperbarui",
             description: "Key result telah diperbarui dengan form lengkap.",
-            variant: "default"
+            variant: "default",
           });
         }}
-        editingKeyResult={editIndividualKeyResultModal.keyResult ? {
-          title: editIndividualKeyResultModal.keyResult.title || '',
-          description: editIndividualKeyResultModal.keyResult.description || '',
-          keyResultType: editIndividualKeyResultModal.keyResult.keyResultType || 'increase_to',
-          baseValue: editIndividualKeyResultModal.keyResult.baseValue || '0',
-          targetValue: editIndividualKeyResultModal.keyResult.targetValue || '0',
-          currentValue: editIndividualKeyResultModal.keyResult.currentValue || '0',
-          unit: editIndividualKeyResultModal.keyResult.unit || '',
-          status: 'in_progress',
-          assignedTo: (user as any)?.id || '',
-        } : undefined}
+        editingKeyResult={
+          editIndividualKeyResultModal.keyResult
+            ? {
+                title: editIndividualKeyResultModal.keyResult.title || "",
+                description:
+                  editIndividualKeyResultModal.keyResult.description || "",
+                keyResultType:
+                  editIndividualKeyResultModal.keyResult.keyResultType ||
+                  "increase_to",
+                baseValue:
+                  editIndividualKeyResultModal.keyResult.baseValue || "0",
+                targetValue:
+                  editIndividualKeyResultModal.keyResult.targetValue || "0",
+                currentValue:
+                  editIndividualKeyResultModal.keyResult.currentValue || "0",
+                unit: editIndividualKeyResultModal.keyResult.unit || "",
+                status: "in_progress",
+                assignedTo: (user as any)?.id || "",
+              }
+            : undefined
+        }
         isEditing={editIndividualKeyResultModal.open}
         users={(users as any) || []}
       />
