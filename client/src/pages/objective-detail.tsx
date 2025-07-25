@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 import {
   ArrowLeft,
   Edit,
@@ -434,7 +434,7 @@ export default function GoalDetail() {
   const [tourStep, setTourStep] = useState<number>(0);
   const [showTour, setShowTour] = useState(false);
   const [tourForceUpdate, setTourForceUpdate] = useState(0);
-  const [activeTab, setActiveTab] = useState("tasks");
+  
 
 
   // Check for highlight parameter in URL
@@ -2135,168 +2135,146 @@ export default function GoalDetail() {
         </div>
       </div>
 
-      {/* Tabs Section */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="flex w-full h-auto p-0 bg-transparent gap-0 rounded-none mb-4 sm:mb-6 relative tour-tabs">
-          {/* Tab 1 - Tugas */}
-          <TabsTrigger
-            value="tasks"
-            className="relative bg-gray-100 border border-gray-300 px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-medium text-gray-700 hover:bg-gray-50 data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=active]:border-purple-600 flex items-center gap-2 sm:gap-3 justify-start flex-1"
-            style={{
-              clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%)",
-              zIndex: 1,
-            }}
-          >
-            <span className="bg-white text-purple-600 rounded-full w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center text-xs sm:text-sm font-bold shrink-0">
-              1
-            </span>
-            <span className="hidden sm:inline">Tugas ({tugas.length})</span>
-            <span className="sm:hidden">Tugas ({tugas.length})</span>
-          </TabsTrigger>
-        </TabsList>
-
-
-
-
-
-        {/* Tugas Tab */}
-        <TabsContent value="tasks" className="space-y-6 tour-tasks">
+      {/* Tasks Section */}
+      <div className="bg-white p-4 sm:p-6 rounded-lg border border-gray-200 shadow-sm tour-tasks">
           {/* Header with Description */}
-          <div className="bg-gradient-to-r from-purple-50 to-violet-50 p-4 md:p-6 rounded-lg border border-purple-200">
-            <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-4 space-y-3 md:space-y-0">
-              <div className="flex-1">
-                <h3 className="text-lg md:text-xl font-semibold text-purple-900 mb-2 flex items-center gap-2">
-                  <CheckSquare className="w-5 h-5 md:w-6 md:h-6 text-purple-600" />
-                  Tugas & Aktivitas
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <button 
-                        type="button" 
-                        className="inline-flex items-center justify-center ml-1"
-                      >
-                        <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                      </button>
-                    </PopoverTrigger>
-                    <PopoverContent side="right" className="max-w-sm">
-                      <div className="space-y-2">
-                        <h4 className="font-medium text-sm">Tugas & Aktivitas</h4>
-                        <p className="text-sm text-gray-600">
-                          Tugas adalah aktivitas operasional harian yang mendukung pelaksanaan inisiatif strategis. 
-                          Setiap tugas memiliki:
-                        </p>
-                        <ul className="text-sm text-gray-600 space-y-1 list-disc pl-4">
-                          <li>Deskripsi yang jelas dan actionable</li>
-                          <li>PIC (Person In Charge) yang bertanggung jawab</li>
-                          <li>Deadline untuk penyelesaian</li>
-                          <li>Tingkat prioritas (rendah, sedang, tinggi, kritis)</li>
-                          <li>Status tracking (belum mulai, berjalan, selesai, dibatalkan)</li>
-                        </ul>
-                        <p className="text-sm text-gray-600 mt-2">
-                          <strong>Contoh:</strong> Membuat konten sosial media untuk kampanye produk baru
-                        </p>
-                      </div>
-                    </PopoverContent>
-                  </Popover>
+        <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-4 space-y-3 md:space-y-0">
+          <div className="flex-1">
+            <h3 className="text-lg md:text-xl font-semibold text-purple-900 mb-2 flex items-center gap-2">
+              <CheckSquare className="w-5 h-5 md:w-6 md:h-6 text-purple-600 shrink-0" />
+              Tugas & Aktivitas
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button 
+                    type="button" 
+                    className="inline-flex items-center justify-center ml-1"
+                  >
+                    <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent side="right" className="max-w-sm">
+                  <div className="space-y-2">
+                    <h4 className="font-medium text-sm">Tugas & Aktivitas</h4>
+                    <p className="text-sm text-gray-600">
+                      Tugas adalah aktivitas operasional harian yang mendukung pelaksanaan inisiatif strategis. 
+                      Setiap tugas memiliki:
+                    </p>
+                    <ul className="text-sm text-gray-600 space-y-1 list-disc pl-4">
+                      <li>Deskripsi yang jelas dan actionable</li>
+                      <li>PIC (Person In Charge) yang bertanggung jawab</li>
+                      <li>Deadline untuk penyelesaian</li>
+                      <li>Tingkat prioritas (rendah, sedang, tinggi, kritis)</li>
+                      <li>Status tracking (belum mulai, berjalan, selesai, dibatalkan)</li>
+                    </ul>
+                    <p className="text-sm text-gray-600 mt-2">
+                      <strong>Contoh:</strong> Membuat konten sosial media untuk kampanye produk baru
+                    </p>
+                  </div>
+                </PopoverContent>
+              </Popover>
+            </h3>
+            <p className="text-purple-700 text-sm leading-relaxed">
+              Tugas adalah aktivitas operasional yang mendukung pelaksanaan
+              inisiatif. Setiap tugas memiliki PIC, deadline, dan tingkat
+              prioritas untuk memastikan eksekusi yang efektif.
+            </p>
+          </div>
+          <Button
+            onClick={() => setShowTaskModal(true)}
+            className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white w-full md:w-auto md:ml-4 shrink-0"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            <span className="sm:hidden">Tambah</span>
+            <span className="hidden sm:inline">Tambah Task</span>
+          </Button>
+        </div>
+
+        {/* Quick Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4 mt-4">
+          <div className="bg-white p-3 md:p-4 rounded-lg border border-purple-100">
+            <div className="flex items-center gap-2 mb-1">
+              <CheckCircle2 className="w-4 h-4 text-green-600" />
+              <span className="text-xs md:text-sm font-medium text-gray-700">
+                Selesai
+              </span>
+            </div>
+            <div className="text-xl md:text-2xl font-bold text-green-600">
+              {tugas.filter((t) => t.status === "completed").length}
+            </div>
+          </div>
+
+          <div className="bg-white p-3 md:p-4 rounded-lg border border-purple-100">
+            <div className="flex items-center gap-2 mb-1">
+              <Clock className="w-4 h-4 text-blue-600" />
+              <span className="text-xs md:text-sm font-medium text-gray-700">
+                Berlangsung
+              </span>
+            </div>
+            <div className="text-xl md:text-2xl font-bold text-blue-600">
+              {tugas.filter((t) => t.status === "in_progress").length}
+            </div>
+          </div>
+
+          <div className="bg-white p-3 md:p-4 rounded-lg border border-purple-100">
+            <div className="flex items-center gap-2 mb-1">
+              <AlertTriangle className="w-4 h-4 text-red-600" />
+              <span className="text-xs md:text-sm font-medium text-gray-700">
+                Terlambat
+              </span>
+            </div>
+            <div className="text-xl md:text-2xl font-bold text-red-600">
+              {
+                tugas.filter(
+                  (t) =>
+                    t.dueDate &&
+                    new Date(t.dueDate) < new Date() &&
+                    t.status !== "completed",
+                ).length
+              }
+            </div>
+          </div>
+
+          <div className="bg-white p-3 md:p-4 rounded-lg border border-purple-100">
+            <div className="flex items-center gap-2 mb-1">
+              <TrendingUp className="w-4 h-4 text-orange-600" />
+              <span className="text-xs md:text-sm font-medium text-gray-700">
+                Prioritas Tinggi
+              </span>
+            </div>
+            <div className="text-xl md:text-2xl font-bold text-orange-600">
+              {tugas.filter((t) => t.priority === "high").length}
+            </div>
+          </div>
+
+          <div className="bg-white p-3 md:p-4 rounded-lg border border-purple-100 md:col-span-1 col-span-2">
+            <div className="flex items-center gap-2 mb-1">
+              <UserIcon className="w-4 h-4 text-indigo-600" />
+              <span className="text-xs md:text-sm font-medium text-gray-700">
+                Ditugaskan
+              </span>
+            </div>
+            <div className="text-xl md:text-2xl font-bold text-indigo-600">
+              {tugas.filter((t) => t.assignedTo).length}
+            </div>
+          </div>
+        </div>
+
+        {/* Tugas List */}
+        <div className="mt-6 space-y-4">
+            {/* Tugas List */}
+          <div className="mt-6 space-y-4">
+              {tugas.length === 0 ? (
+              <div className="border-2 border-dashed border-purple-200 bg-purple-50/50 rounded-lg p-8 text-center">
+                <CheckSquare className="w-12 h-12 mx-auto mb-4 text-purple-400" />
+                <h3 className="text-lg font-medium text-purple-900 mb-2">
+                  Belum ada tugas
                 </h3>
-                <p className="text-purple-700 text-sm leading-relaxed hidden md:block">
-                  Tugas adalah aktivitas operasional yang mendukung pelaksanaan
-                  inisiatif. Setiap tugas memiliki PIC, deadline, dan tingkat
-                  prioritas untuk memastikan eksekusi yang efektif.
+                <p className="text-purple-700 mb-4">
+                  Tugas akan muncul ketika inisiatif dibuat dan dijabarkan ke
+                  aktivitas operasional.
                 </p>
               </div>
-              <Button
-                onClick={() => setShowTaskModal(true)}
-                className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white shadow-lg hover:shadow-xl transition-all duration-200 w-full md:w-auto"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Tambah Task
-              </Button>
-            </div>
-
-            {/* Quick Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4 mt-4">
-              <div className="bg-white p-3 md:p-4 rounded-lg border border-purple-100">
-                <div className="flex items-center gap-2 mb-1">
-                  <CheckCircle2 className="w-4 h-4 text-green-600" />
-                  <span className="text-xs md:text-sm font-medium text-gray-700">
-                    Selesai
-                  </span>
-                </div>
-                <div className="text-xl md:text-2xl font-bold text-green-600">
-                  {tugas.filter((t) => t.status === "completed").length}
-                </div>
-              </div>
-
-              <div className="bg-white p-3 md:p-4 rounded-lg border border-purple-100">
-                <div className="flex items-center gap-2 mb-1">
-                  <Clock className="w-4 h-4 text-blue-600" />
-                  <span className="text-xs md:text-sm font-medium text-gray-700">
-                    Berlangsung
-                  </span>
-                </div>
-                <div className="text-xl md:text-2xl font-bold text-blue-600">
-                  {tugas.filter((t) => t.status === "in_progress").length}
-                </div>
-              </div>
-
-              <div className="bg-white p-3 md:p-4 rounded-lg border border-purple-100">
-                <div className="flex items-center gap-2 mb-1">
-                  <AlertTriangle className="w-4 h-4 text-red-600" />
-                  <span className="text-xs md:text-sm font-medium text-gray-700">
-                    Terlambat
-                  </span>
-                </div>
-                <div className="text-xl md:text-2xl font-bold text-red-600">
-                  {
-                    tugas.filter(
-                      (t) =>
-                        t.dueDate &&
-                        new Date(t.dueDate) < new Date() &&
-                        t.status !== "completed",
-                    ).length
-                  }
-                </div>
-              </div>
-
-              <div className="bg-white p-3 md:p-4 rounded-lg border border-purple-100">
-                <div className="flex items-center gap-2 mb-1">
-                  <TrendingUp className="w-4 h-4 text-orange-600" />
-                  <span className="text-xs md:text-sm font-medium text-gray-700">
-                    Prioritas Tinggi
-                  </span>
-                </div>
-                <div className="text-xl md:text-2xl font-bold text-orange-600">
-                  {tugas.filter((t) => t.priority === "high").length}
-                </div>
-              </div>
-
-              <div className="bg-white p-3 md:p-4 rounded-lg border border-purple-100 md:col-span-1 col-span-2">
-                <div className="flex items-center gap-2 mb-1">
-                  <UserIcon className="w-4 h-4 text-indigo-600" />
-                  <span className="text-xs md:text-sm font-medium text-gray-700">
-                    Ditugaskan
-                  </span>
-                </div>
-                <div className="text-xl md:text-2xl font-bold text-indigo-600">
-                  {tugas.filter((t) => t.assignedTo).length}
-                </div>
-              </div>
-            </div>
-
-            {/* Tugas List */}
-            <div className="mt-6 space-y-4">
-              {tugas.length === 0 ? (
-                <div className="border-2 border-dashed border-purple-200 bg-purple-50/50 rounded-lg p-8 text-center">
-                  <CheckSquare className="w-12 h-12 mx-auto mb-4 text-purple-400" />
-                  <h3 className="text-lg font-medium text-purple-900 mb-2">
-                    Belum ada tugas
-                  </h3>
-                  <p className="text-purple-700 mb-4">
-                    Tugas akan muncul ketika inisiatif dibuat dan dijabarkan ke
-                    aktivitas operasional.
-                  </p>
-                </div>
-              ) : (
+            ) : (
                 <Card>
                   <CardContent className="p-0">
                     {/* Desktop Table View */}
@@ -2662,12 +2640,10 @@ export default function GoalDetail() {
                       ))}
                     </div>
                   </CardContent>
-                </Card>
-              )}
-            </div>
+              </Card>
+            )}
           </div>
-        </TabsContent>
-      </Tabs>
+        </div>
       {/* Modals */}
       {checkInModal.keyResult && (
         <CheckInModal
@@ -2731,8 +2707,7 @@ export default function GoalDetail() {
           queryClient.invalidateQueries({ queryKey: ['/api/objectives'] });
           queryClient.invalidateQueries({ queryKey: ['/api/okrs'] });
           
-          // Switch to initiatives tab after successful creation/update
-          setActiveTab("initiatives");
+          
         }}
         keyResultId=""
         objectiveId={id}
