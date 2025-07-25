@@ -430,7 +430,13 @@ function InitiativesCard({ initiatives, onAddInitiative, onEditInitiative, onDel
 }
 
 // Tasks Card Component
-function TasksCard({ tasks, onAddTask, initiatives }: { tasks: any[], onAddTask: () => void, initiatives: any[] }) {
+function TasksCard({ tasks, onAddTask, initiatives, onEditTask, onDeleteTask }: { 
+  tasks: any[], 
+  onAddTask: () => void, 
+  initiatives: any[],
+  onEditTask: (task: any, index: number) => void,
+  onDeleteTask: (index: number) => void 
+}) {
   return (
     <Card>
       <CardHeader>
@@ -458,13 +464,47 @@ function TasksCard({ tasks, onAddTask, initiatives }: { tasks: any[], onAddTask:
               return (
                 <div key={index} className="border rounded-lg p-4">
                   <div className="flex items-start justify-between mb-2">
-                    <h4 className="font-medium">{task.title}</h4>
-                    {relatedInitiative && (
-                      <Badge variant="outline" className="text-xs">
-                        <Lightbulb className="h-3 w-3 mr-1" />
-                        {relatedInitiative.title}
-                      </Badge>
-                    )}
+                    <div className="flex items-center gap-2">
+                      <h4 className="font-medium">{task.title}</h4>
+                      {relatedInitiative && (
+                        <Badge variant="outline" className="text-xs">
+                          <Lightbulb className="h-3 w-3 mr-1" />
+                          {relatedInitiative.title}
+                        </Badge>
+                      )}
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => onEditTask(task, index)}
+                            className="h-8 w-8 p-0"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Edit tugas</p>
+                        </TooltipContent>
+                      </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => onDeleteTask(index)}
+                            className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Hapus tugas</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
                   </div>
                   {task.description && (
                     <p className="text-sm text-gray-600">{task.description}</p>
@@ -509,6 +549,13 @@ export default function TemplateDetailPage() {
   const [initiativeEditIndex, setInitiativeEditIndex] = useState<number>(-1);
   const [deleteInitiativeDialogOpen, setDeleteInitiativeDialogOpen] = useState(false);
   const [initiativeToDelete, setInitiativeToDelete] = useState<number>(-1);
+  
+  // Modal states for editing/deleting tasks
+  const [isEditTaskModalOpen, setIsEditTaskModalOpen] = useState(false);
+  const [taskToEdit, setTaskToEdit] = useState<any>(null);
+  const [taskEditIndex, setTaskEditIndex] = useState<number>(-1);
+  const [deleteTaskDialogOpen, setDeleteTaskDialogOpen] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState<number>(-1);
   
   const [newTask, setNewTask] = useState({
     title: "",
@@ -736,6 +783,47 @@ export default function TemplateDetailPage() {
     });
   };
 
+  // Handlers for editing/deleting tasks
+  const handleEditTask = (task: any, index: number) => {
+    setTaskToEdit(task);
+    setTaskEditIndex(index);
+    setIsEditTaskModalOpen(true);
+  };
+
+  const handleSaveEditTask = () => {
+    if (!template || taskEditIndex === -1) return;
+    
+    const updatedTasks = [...(template?.tasks || [])];
+    updatedTasks[taskEditIndex] = taskToEdit;
+    
+    updateMutation.mutate({ tasks: updatedTasks });
+    
+    setIsEditTaskModalOpen(false);
+    setTaskToEdit(null);
+    setTaskEditIndex(-1);
+  };
+
+  const handleDeleteTask = (index: number) => {
+    setTaskToDelete(index);
+    setDeleteTaskDialogOpen(true);
+  };
+
+  const confirmDeleteTask = () => {
+    if (!template || taskToDelete === -1) return;
+    
+    const updatedTasks = template.tasks.filter((_, index) => index !== taskToDelete);
+    updateMutation.mutate({ tasks: updatedTasks });
+    
+    setDeleteTaskDialogOpen(false);
+    setTaskToDelete(-1);
+    
+    toast({
+      title: "Tugas Dihapus",
+      description: "Tugas berhasil dihapus dari template",
+      variant: "default"
+    });
+  };
+
   if (isLoading) {
     return (
       <div className="container max-w-7xl mx-auto space-y-6 p-6">
@@ -863,6 +951,8 @@ export default function TemplateDetailPage() {
               tasks={template?.tasks} 
               onAddTask={() => setIsAddTaskModalOpen(true)}
               initiatives={template?.initiatives || []}
+              onEditTask={handleEditTask}
+              onDeleteTask={handleDeleteTask}
             />
           </TabsContent>
         </Tabs>
@@ -1090,6 +1180,105 @@ export default function TemplateDetailPage() {
               <AlertDialogCancel>Batal</AlertDialogCancel>
               <AlertDialogAction
                 onClick={confirmDeleteInitiative}
+                className="bg-red-600 hover:bg-red-700"
+                disabled={updateMutation.isPending}
+              >
+                {updateMutation.isPending ? "Menghapus..." : "Hapus"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        {/* Edit Task Modal */}
+        <Dialog open={isEditTaskModalOpen} onOpenChange={setIsEditTaskModalOpen}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Edit Tugas</DialogTitle>
+              <DialogDescription>
+                Ubah informasi tugas ini
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="edit-task-title">Judul Tugas</Label>
+                <Input
+                  id="edit-task-title"
+                  value={taskToEdit?.title || ""}
+                  onChange={(e) => setTaskToEdit({ ...taskToEdit, title: e.target.value })}
+                  placeholder="Masukkan judul tugas..."
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="edit-task-description">Deskripsi</Label>
+                <Textarea
+                  id="edit-task-description"
+                  value={taskToEdit?.description || ""}
+                  onChange={(e) => setTaskToEdit({ ...taskToEdit, description: e.target.value })}
+                  placeholder="Masukkan deskripsi tugas..."
+                  rows={4}
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="edit-task-initiative">Inisiatif Terkait</Label>
+                <Select 
+                  value={taskToEdit?.initiativeId || ""} 
+                  onValueChange={(value) => setTaskToEdit({ ...taskToEdit, initiativeId: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Pilih inisiatif..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {template?.initiatives && template.initiatives.length > 0 ? (
+                      template.initiatives.map((initiative: any, index: number) => (
+                        <SelectItem key={index} value={index.toString()}>
+                          {initiative.title}
+                        </SelectItem>
+                      ))
+                    ) : (
+                      <SelectItem value="no-initiatives" disabled>
+                        Belum ada inisiatif tersedia
+                      </SelectItem>
+                    )}
+                  </SelectContent>
+                </Select>
+                <p className="text-sm text-gray-500 mt-1">
+                  Pilih inisiatif yang akan didukung oleh tugas ini
+                </p>
+              </div>
+            </div>
+            
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsEditTaskModalOpen(false)}>
+                Batal
+              </Button>
+              <Button 
+                onClick={handleSaveEditTask}
+                disabled={!taskToEdit?.title || updateMutation.isPending}
+                className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600"
+              >
+                {updateMutation.isPending ? "Menyimpan..." : "Simpan Perubahan"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Delete Task Confirmation Dialog */}
+        <AlertDialog open={deleteTaskDialogOpen} onOpenChange={setDeleteTaskDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Hapus Tugas</AlertDialogTitle>
+              <AlertDialogDescription>
+                Apakah Anda yakin ingin menghapus tugas ini dari template? 
+                Tindakan ini tidak dapat dibatalkan.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Batal</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={confirmDeleteTask}
                 className="bg-red-600 hover:bg-red-700"
                 disabled={updateMutation.isPending}
               >
