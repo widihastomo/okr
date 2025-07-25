@@ -851,6 +851,13 @@ export default function DailyFocusPage() {
   
   // Initiative creation modal state
   const [isInitiativeModalOpen, setIsInitiativeModalOpen] = useState(false);
+  
+  // Tab state
+  const [activeTab, setActiveTab] = useState('daily-focus');
+  
+  // Modal states for company details and welcome screen
+  const [showCompanyDetailsModal, setShowCompanyDetailsModal] = useState(false);
+  const [showWelcomeScreen, setShowWelcomeScreen] = useState(false);
 
 
 
@@ -944,6 +951,92 @@ export default function DailyFocusPage() {
       queryKey: ["/api/trial/achievements"],
       enabled: !!userId,
     });
+
+  // Organization data query
+  const { data: organizationData, isLoading: isOrgDataLoading } = useQuery({
+    queryKey: ['/api/auth/me'],
+    enabled: !!user,
+  });
+
+  // Current user data query
+  const { data: currentUserData, isLoading: isUserDataLoading } = useQuery({
+    queryKey: ['/api/auth/me'],
+    enabled: !!user,
+  });
+
+  // Update selectedUserId when userId changes
+  useEffect(() => {
+    if (userId && selectedUserId === "all") {
+      setSelectedUserId("all");
+    }
+  }, [userId, selectedUserId]);
+
+  // Company details and welcome screen logic
+  useEffect(() => {
+    if (!currentUserData || isUserDataLoading || !organizationData || isOrgDataLoading) {
+      return;
+    }
+
+    const companyDetailsCompleted = localStorage.getItem("company-details-completed");
+    const onboardingCompleted = localStorage.getItem("onboarding-completed");
+    const welcomeShown = localStorage.getItem("welcome-screen-shown");
+    const tourStarted = localStorage.getItem("tour-started");
+    const tourCompleted = localStorage.getItem("tour-completed");
+    
+    console.log("🔍 Company details check:", { companyDetailsCompleted, onboardingCompleted, welcomeShown, tourStarted, tourCompleted });
+    console.log("🔍 Current user data:", currentUserData);
+    console.log("🔍 Is loading:", isUserDataLoading);
+    
+    // Check if organization has complete company details from database
+    let hasCompleteCompanyDetails = false;
+    if (organizationData?.organization) {
+      const org = organizationData.organization;
+      hasCompleteCompanyDetails = !!(org.companyAddress && org.province && org.city);
+      console.log("🏢 Database company details check:", { 
+        companyAddress: org.companyAddress, 
+        province: org.province, 
+        city: org.city,
+        hasCompleteCompanyDetails
+      });
+    }
+    
+    // Company details modal HIDDEN per user request
+    // Only show modal if we have loaded organization data and company details are incomplete
+    if (false && organizationData && !isOrgDataLoading && !hasCompleteCompanyDetails) {
+      console.log("📝 Showing company details modal - missing required fields");
+      setShowCompanyDetailsModal(true);
+      return;
+    }
+    
+    // For users with complete company details, ensure modal is hidden
+    if (hasCompleteCompanyDetails) {
+      console.log("✅ Company details are complete - hiding modal");
+      setShowCompanyDetailsModal(false);
+      
+      // Update localStorage to reflect completion
+      if (companyDetailsCompleted !== "true") {
+        localStorage.setItem("company-details-completed", "true");
+      }
+      
+      // Show welcome screen if user hasn't seen it AND hasn't started/completed tour
+      if (welcomeShown !== "true" && tourStarted !== "true" && tourCompleted !== "true") {
+        console.log("✅ Triggering welcome screen display");
+        setShowWelcomeScreen(true);
+      }
+    }
+
+    // Listen for manual welcome screen trigger
+    const handleShowWelcomeScreen = () => {
+      console.log("🎉 Manual welcome screen triggered");
+      setShowWelcomeScreen(true);
+    };
+
+    window.addEventListener('showWelcomeScreen', handleShowWelcomeScreen);
+    
+    return () => {
+      window.removeEventListener('showWelcomeScreen', handleShowWelcomeScreen);
+    };
+  }, [currentUserData, isUserDataLoading, organizationData, isOrgDataLoading]);
 
   // Custom hook to get comment count for a specific task
   const useTaskCommentCount = (taskId: string) => {
@@ -1350,22 +1443,6 @@ export default function DailyFocusPage() {
     return initiatives.filter((init: any) => init.keyResultId === keyResultId)
       .length;
   };
-
-  // Check for company details and welcome screen for new users
-  const [showCompanyDetailsModal, setShowCompanyDetailsModal] = useState(false);
-  const [showWelcomeScreen, setShowWelcomeScreen] = useState(false);
-  
-  // Fetch current user data to check company details completion
-  const { data: currentUserData, isLoading: isUserDataLoading } = useQuery({
-    queryKey: ['/api/auth/me'],
-    enabled: !!userId,
-  });
-  
-  // Fetch organization data to check company details completion
-  const { data: organizationData, isLoading: isOrgDataLoading } = useQuery({
-    queryKey: ['/api/my-organization-with-role'],
-    enabled: !!userId,
-  });
   
   useEffect(() => {
     // Check localStorage flags
@@ -1932,34 +2009,43 @@ export default function DailyFocusPage() {
       
       
       {/* Main Content Tabs */}
-      <Tabs defaultValue="daily-focus" className="w-full">
+      <div className="w-full">
         <div className="flex items-center justify-between border-b border-gray-200">
-          <TabsList className="flex space-x-8 bg-transparent p-0 h-auto">
-            <TabsTrigger
-              value="daily-focus"
-              className="pb-2 px-1 border-b-2 font-medium text-sm data-[state=active]:border-orange-500 data-[state=active]:text-orange-600 data-[state=inactive]:border-transparent data-[state=inactive]:text-gray-500 hover:text-gray-700 hover:border-gray-300 bg-transparent"
+          <div className="flex space-x-8">
+            <button
+              onClick={() => setActiveTab("daily-focus")}
+              className={`pb-2 px-1 border-b-2 font-medium text-sm ${
+                activeTab === "daily-focus"
+                  ? "border-orange-500 text-orange-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              }`}
               data-tour="daily-focus-tab"
             >
               <div className="flex items-center space-x-2">
                 <LayoutDashboard className="w-4 h-4" />
                 <span>Daily Focus</span>
               </div>
-            </TabsTrigger>
-            <TabsTrigger
-              value="timeline"
-              className="pb-2 px-1 border-b-2 font-medium text-sm data-[state=active]:border-orange-500 data-[state=active]:text-orange-600 data-[state=inactive]:border-transparent data-[state=inactive]:text-gray-500 hover:text-gray-700 hover:border-gray-300 bg-transparent"
+            </button>
+            <button
+              onClick={() => setActiveTab("timeline")}
+              className={`pb-2 px-1 border-b-2 font-medium text-sm ${
+                activeTab === "timeline"
+                  ? "border-orange-500 text-orange-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              }`}
               data-tour="timeline-tab"
             >
               <div className="flex items-center space-x-2">
                 <Activity className="w-4 h-4" />
                 <span>Timeline</span>
               </div>
-            </TabsTrigger>
-          </TabsList>
+            </button>
+          </div>
         </div>
 
         {/* Daily Focus Tab Content */}
-        <TabsContent value="daily-focus" className="space-y-6">
+        {activeTab === "daily-focus" && (
+        <div className="space-y-6 mt-6">
           {/* Goal Section */}
           <Card className="border-blue-200 bg-blue-50" data-tour="goal-terkait-aktivitas">
             <CardHeader>
@@ -2126,30 +2212,16 @@ export default function DailyFocusPage() {
             formatDate={formatDate}
           />
           {/* End Daily Focus Tab Content */}
-        </TabsContent>
+        </div>
+        )}
 
         {/* Timeline Tab Content */}
-        <TabsContent value="timeline" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <MessageSquare className="h-5 w-5" />
-                Timeline Feed
-              </CardTitle>
-              <CardDescription>
-                Activity feed dari update harian dan progress tim
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8 text-gray-500">
-                <MessageSquare className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>Timeline feed sedang dalam perbaikan</p>
-                <p className="text-sm">Fitur ini akan segera kembali normal</p>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+        {activeTab === "timeline" && (
+        <div className="space-y-6 mt-6">
+          <TimelineFeedComponent />
+        </div>
+        )}
+      </div>
       {/* Modals */}
       {selectedKeyResult && (
         <CheckInModal
