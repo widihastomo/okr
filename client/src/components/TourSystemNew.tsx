@@ -105,7 +105,6 @@ const TOUR_STEPS: TourStep[] = [
     position: "right",
     category: "feature",
     targetPath: "/goals",
-    requiresClick: true,
   },
 
   {
@@ -149,7 +148,6 @@ const TOUR_STEPS: TourStep[] = [
     position: "right",
     category: "feature",
     targetPath: "/tasks",
-    requiresClick: true,
   },
   {
     id: "tasks-list-view",
@@ -201,7 +199,6 @@ const TOUR_STEPS: TourStep[] = [
     position: "right",
     category: "feature",
     targetPath: "/timeline",
-    requiresClick: true,
   },
   {
     id: "timeline-daily-checkin",
@@ -234,7 +231,6 @@ const TOUR_STEPS: TourStep[] = [
     position: "right",
     category: "feature",
     targetPath: "/cycles",
-    requiresClick: true,
   },
   {
     id: "cycles-content",

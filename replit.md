@@ -452,6 +452,13 @@ The system now includes a comprehensive dummy data generation feature that creat
 
 ## Changelog
 ```
+- July 25, 2025. **CLICK-FREE TOUR STEPS COMPLETED** - Successfully removed requiresClick property from tour steps 5, 9, 14, 17 for smoother navigation:
+  * ENHANCED: Step 5 (Goals) now shows tooltip without requiring user click
+  * ENHANCED: Step 9 (Tasks) now shows tooltip without requiring user click  
+  * ENHANCED: Step 14 (Timeline) now shows tooltip without requiring user click
+  * ENHANCED: Step 17 (Cycles) now shows tooltip without requiring user click
+  * IMPROVED: Tour flow now provides automatic guidance without mandatory user interactions
+  * RESULT: Smoother tour experience with reduced friction and better user flow
 - July 25, 2025. **TOUR STEPS 5-10 REMOVAL COMPLETED** - Successfully removed tour steps 5 through 10 to streamline user experience:
   * REMOVED: update-harian-instan (Update Harian Instan button explanation)
   * REMOVED: overview-cards (Overview Cards explanation)
