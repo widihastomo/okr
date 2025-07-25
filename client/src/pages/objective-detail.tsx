@@ -1817,7 +1817,8 @@ export default function GoalDetail() {
           ) : (
             <Card>
               <CardContent className="p-0">
-                <div className="overflow-x-auto">
+                {/* Desktop Table View */}
+                <div className="hidden md:block overflow-x-auto">
                   <table className="w-full">
                     <thead className="bg-gray-50 border-b">
                       <tr>
@@ -2081,6 +2082,226 @@ export default function GoalDetail() {
                       })}
                     </tbody>
                   </table>
+                </div>
+
+                {/* Mobile Card View */}
+                <div className="md:hidden space-y-3 p-4">
+                  {inisiatif
+                    .sort((a, b) => {
+                      const scoreA = parseFloat(a.priorityScore || "0");
+                      const scoreB = parseFloat(b.priorityScore || "0");
+                      return scoreB - scoreA; // Sort by priority score descending
+                    })
+                    .map((initiative) => {
+                    const rawScore = initiative.priorityScore;
+                    const score = parseFloat(rawScore || "0");
+                    
+                    let color: string;
+                    let label: string;
+                    
+                    if (score >= 4.0) {
+                      color = "bg-red-100 text-red-800";
+                      label = "Kritis";
+                    } else if (score >= 3.0) {
+                      color = "bg-orange-100 text-orange-800";
+                      label = "Tinggi";
+                    } else if (score >= 2.0) {
+                      color = "bg-yellow-100 text-yellow-800";
+                      label = "Sedang";
+                    } else {
+                      color = "bg-green-100 text-green-800";
+                      label = "Rendah";
+                    }
+
+                    return (
+                      <div key={initiative.id} className="bg-white rounded-lg border border-gray-200 p-4 space-y-3">
+                        {/* Title and Status Row */}
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <Link href={`/initiatives/${initiative.id}`}>
+                              <h4 className="font-medium text-gray-900 hover:text-blue-600 cursor-pointer truncate">
+                                {initiative.title}
+                              </h4>
+                            </Link>
+                            {initiative.keyResultId && (
+                              <div className="flex items-center gap-1 mt-1">
+                                <Target className="w-3 h-3 text-blue-600" />
+                                <span className="text-xs text-blue-600 font-medium truncate">
+                                  {goal?.keyResults?.find((kr: any) => kr.id === initiative.keyResultId)?.title || 'Unknown'}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2 flex-shrink-0">
+                            {(() => {
+                              const status = initiative.status || "draft";
+                              const getStatusInfo = (status: string) => {
+                                const statusMap = {
+                                  'draft': {
+                                    label: 'Draft',
+                                    bgColor: 'bg-gray-100',
+                                    textColor: 'text-gray-800',
+                                  },
+                                  'sedang_berjalan': {
+                                    label: 'Berjalan',
+                                    bgColor: 'bg-blue-100',
+                                    textColor: 'text-blue-800',
+                                  },
+                                  'selesai': {
+                                    label: 'Selesai',
+                                    bgColor: 'bg-green-100',
+                                    textColor: 'text-green-800',
+                                  },
+                                  'dibatalkan': {
+                                    label: 'Batal',
+                                    bgColor: 'bg-red-100',
+                                    textColor: 'text-red-800',
+                                  }
+                                };
+                                return statusMap[status as keyof typeof statusMap] || statusMap['draft'];
+                              };
+                              
+                              const statusInfo = getStatusInfo(status);
+                              
+                              return (
+                                <Badge className={`${statusInfo.bgColor} ${statusInfo.textColor} text-xs`}>
+                                  {statusInfo.label}
+                                </Badge>
+                              );
+                            })()}
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8 p-0"
+                                >
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem
+                                  onClick={() => window.location.href = `/initiatives/${initiative.id}`}
+                                >
+                                  <Eye className="mr-2 h-4 w-4" />
+                                  Lihat Detail
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    setEditingInitiative(initiative);
+                                    setShowInitiativeFormModal(true);
+                                  }}
+                                >
+                                  <Edit className="mr-2 h-4 w-4" />
+                                  Ubah
+                                </DropdownMenuItem>
+                                <DropdownMenuItem 
+                                  className="text-red-600"
+                                  onClick={() => setDeletingInitiative(initiative)}
+                                >
+                                  <Trash2 className="mr-2 h-4 w-4" />
+                                  Hapus
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                        </div>
+
+                        {/* Priority and Progress Row */}
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-500">Prioritas:</span>
+                            <Badge className={`${color} text-xs`}>
+                              {label}
+                            </Badge>
+                            <span className="text-xs text-gray-400">
+                              {score.toFixed(1)}/5.0
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-16 bg-gray-200 rounded-full h-2">
+                              <div
+                                className={`h-2 rounded-full ${(() => {
+                                  const progress = initiative.progressPercentage || 0;
+                                  if (progress >= 100) return "bg-green-600";
+                                  if (progress >= 80) return "bg-green-500";
+                                  if (progress >= 60) return "bg-orange-500";
+                                  return "bg-red-500";
+                                })()}`}
+                                style={{
+                                  width: `${initiative.progressPercentage || 0}%`,
+                                }}
+                              ></div>
+                            </div>
+                            <span className="text-xs font-medium text-gray-900">
+                              {initiative.progressPercentage || 0}%
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Dates and PIC Row */}
+                        <div className="flex items-center justify-between gap-4 text-xs">
+                          <div className="space-y-1">
+                            {initiative.startDate && (
+                              <div className="text-gray-500">
+                                Mulai: {new Date(initiative.startDate).toLocaleDateString("id-ID", {
+                                  day: "numeric",
+                                  month: "short",
+                                })}
+                              </div>
+                            )}
+                            {initiative.dueDate ? (
+                              <div
+                                className={`${
+                                  new Date(initiative.dueDate) < new Date()
+                                    ? "text-red-600 font-medium"
+                                    : "text-gray-900"
+                                }`}
+                              >
+                                Selesai: {new Date(initiative.dueDate).toLocaleDateString("id-ID", {
+                                  day: "numeric",
+                                  month: "short",
+                                })}
+                              </div>
+                            ) : (
+                              <div className="text-gray-400">
+                                Selesai: -
+                              </div>
+                            )}
+                          </div>
+                          <div className="text-right">
+                            {initiative.picId ? (
+                              <div className="flex items-center gap-2">
+                                <Avatar className="w-6 h-6">
+                                  <AvatarImage 
+                                    src={getUserProfileImage(initiative.picId)} 
+                                    alt={getUserName(initiative.picId)}
+                                  />
+                                  <AvatarFallback className="bg-blue-500 text-white text-xs font-medium">
+                                    {getUserInitials(initiative.picId)}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <span className="text-xs text-gray-900 truncate max-w-20">
+                                  {getUserName(initiative.picId)}
+                                </span>
+                              </div>
+                            ) : (
+                              <span className="text-gray-400 text-xs">
+                                Tidak ditugaskan
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Budget if exists */}
+                        {initiative.budget && (
+                          <div className="text-xs text-gray-500 pt-1 border-t border-gray-100">
+                            Budget: Rp {parseFloat(initiative.budget).toLocaleString("id-ID")}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </CardContent>
             </Card>

@@ -452,6 +452,14 @@ The system now includes a comprehensive dummy data generation feature that creat
 
 ## Changelog
 ```
+- July 25, 2025. **MOBILE-RESPONSIVE INISIATIF TABLE OPTIMIZATION COMPLETED** - Successfully implemented responsive design for Inisiatif section with mobile-optimized card layout:
+  * CREATED: Desktop table view (hidden md:block) preserving existing full table functionality with all columns
+  * IMPLEMENTED: Mobile card view (md:hidden) with compact card-based layout optimized for small screens
+  * ENHANCED: Mobile cards display initiative title, status badge, priority with score, progress bar, dates, and PIC in organized rows
+  * OPTIMIZED: Compact mobile design with truncated text, smaller avatars (w-6 h-6), and efficient space usage
+  * MAINTAINED: All functionality including dropdown menus, navigation links, and action buttons in both views
+  * RESPONSIVE: Automatic switching between table view (desktop) and card view (mobile) using Tailwind breakpoints
+  * RESULT: Fully responsive Inisiatif section providing optimal user experience across all device sizes
 - July 25, 2025. **COORDINATED BUTTON COLORS WITH SECTION THEMES COMPLETED** - Successfully aligned all add buttons with their respective section background colors:
   * UPDATED: "Tambah Angka Target" buttons changed from orange to blue outline (border-blue-600 text-blue-600 hover:bg-blue-100)
   * UPDATED: "Tambah Inisiatif" buttons changed from orange to green outline (border-green-600 text-green-600 hover:bg-green-100)
