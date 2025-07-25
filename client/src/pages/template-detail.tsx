@@ -347,7 +347,12 @@ function KeyResultsCard({
 }
 
 // Initiatives Card Component
-function InitiativesCard({ initiatives, onAddInitiative }: { initiatives: any[], onAddInitiative: () => void }) {
+function InitiativesCard({ initiatives, onAddInitiative, onEditInitiative, onDeleteInitiative }: { 
+  initiatives: any[], 
+  onAddInitiative: () => void, 
+  onEditInitiative: (initiative: any, index: number) => void,
+  onDeleteInitiative: (index: number) => void 
+}) {
   return (
     <Card>
       <CardHeader>
@@ -372,7 +377,41 @@ function InitiativesCard({ initiatives, onAddInitiative }: { initiatives: any[],
           <div className="space-y-4">
             {initiatives.map((initiative: any, index: number) => (
               <div key={index} className="border rounded-lg p-4">
-                <h4 className="font-medium mb-2">{initiative.title}</h4>
+                <div className="flex items-start justify-between mb-2">
+                  <h4 className="font-medium">{initiative.title}</h4>
+                  <div className="flex items-center space-x-2">
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => onEditInitiative(initiative, index)}
+                          className="h-8 w-8 p-0"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Edit inisiatif</p>
+                      </TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => onDeleteInitiative(index)}
+                          className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Hapus inisiatif</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                </div>
                 {initiative.description && (
                   <p className="text-sm text-gray-600">{initiative.description}</p>
                 )}
@@ -463,6 +502,13 @@ export default function TemplateDetailPage() {
   const [keyResultEditIndex, setKeyResultEditIndex] = useState<number>(-1);
   const [deleteKeyResultDialogOpen, setDeleteKeyResultDialogOpen] = useState(false);
   const [keyResultToDelete, setKeyResultToDelete] = useState<number>(-1);
+  
+  // Modal states for editing/deleting initiatives
+  const [isEditInitiativeModalOpen, setIsEditInitiativeModalOpen] = useState(false);
+  const [initiativeToEdit, setInitiativeToEdit] = useState<any>(null);
+  const [initiativeEditIndex, setInitiativeEditIndex] = useState<number>(-1);
+  const [deleteInitiativeDialogOpen, setDeleteInitiativeDialogOpen] = useState(false);
+  const [initiativeToDelete, setInitiativeToDelete] = useState<number>(-1);
   
   const [newTask, setNewTask] = useState({
     title: "",
@@ -649,6 +695,47 @@ export default function TemplateDetailPage() {
     });
   };
 
+  // Handlers for editing/deleting initiatives
+  const handleEditInitiative = (initiative: any, index: number) => {
+    setInitiativeToEdit(initiative);
+    setInitiativeEditIndex(index);
+    setIsEditInitiativeModalOpen(true);
+  };
+
+  const handleSaveEditInitiative = () => {
+    if (!template || initiativeEditIndex === -1) return;
+    
+    const updatedInitiatives = [...(template?.initiatives || [])];
+    updatedInitiatives[initiativeEditIndex] = initiativeToEdit;
+    
+    updateMutation.mutate({ initiatives: updatedInitiatives });
+    
+    setIsEditInitiativeModalOpen(false);
+    setInitiativeToEdit(null);
+    setInitiativeEditIndex(-1);
+  };
+
+  const handleDeleteInitiative = (index: number) => {
+    setInitiativeToDelete(index);
+    setDeleteInitiativeDialogOpen(true);
+  };
+
+  const confirmDeleteInitiative = () => {
+    if (!template || initiativeToDelete === -1) return;
+    
+    const updatedInitiatives = template.initiatives.filter((_, index) => index !== initiativeToDelete);
+    updateMutation.mutate({ initiatives: updatedInitiatives });
+    
+    setDeleteInitiativeDialogOpen(false);
+    setInitiativeToDelete(-1);
+    
+    toast({
+      title: "Inisiatif Dihapus",
+      description: "Inisiatif berhasil dihapus dari template",
+      variant: "default"
+    });
+  };
+
   if (isLoading) {
     return (
       <div className="container max-w-7xl mx-auto space-y-6 p-6">
@@ -766,6 +853,8 @@ export default function TemplateDetailPage() {
             <InitiativesCard 
               initiatives={template?.initiatives} 
               onAddInitiative={() => setIsAddInitiativeModalOpen(true)}
+              onEditInitiative={handleEditInitiative}
+              onDeleteInitiative={handleDeleteInitiative}
             />
           </TabsContent>
 
@@ -930,6 +1019,77 @@ export default function TemplateDetailPage() {
               <AlertDialogCancel>Batal</AlertDialogCancel>
               <AlertDialogAction
                 onClick={confirmDeleteKeyResult}
+                className="bg-red-600 hover:bg-red-700"
+                disabled={updateMutation.isPending}
+              >
+                {updateMutation.isPending ? "Menghapus..." : "Hapus"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        {/* Edit Initiative Modal */}
+        <Dialog open={isEditInitiativeModalOpen} onOpenChange={setIsEditInitiativeModalOpen}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Edit Inisiatif</DialogTitle>
+              <DialogDescription>
+                Ubah informasi inisiatif ini
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="edit-init-title">Judul Inisiatif</Label>
+                <Input
+                  id="edit-init-title"
+                  value={initiativeToEdit?.title || ""}
+                  onChange={(e) => setInitiativeToEdit({ ...initiativeToEdit, title: e.target.value })}
+                  placeholder="Masukkan judul inisiatif..."
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="edit-init-description">Deskripsi</Label>
+                <Textarea
+                  id="edit-init-description"
+                  value={initiativeToEdit?.description || ""}
+                  onChange={(e) => setInitiativeToEdit({ ...initiativeToEdit, description: e.target.value })}
+                  placeholder="Masukkan deskripsi inisiatif..."
+                  rows={4}
+                />
+              </div>
+            </div>
+            
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsEditInitiativeModalOpen(false)}>
+                Batal
+              </Button>
+              <Button 
+                onClick={handleSaveEditInitiative}
+                disabled={!initiativeToEdit?.title || updateMutation.isPending}
+                className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600"
+              >
+                {updateMutation.isPending ? "Menyimpan..." : "Simpan Perubahan"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Delete Initiative Confirmation Dialog */}
+        <AlertDialog open={deleteInitiativeDialogOpen} onOpenChange={setDeleteInitiativeDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Hapus Inisiatif</AlertDialogTitle>
+              <AlertDialogDescription>
+                Apakah Anda yakin ingin menghapus inisiatif ini dari template? 
+                Tindakan ini tidak dapat dibatalkan.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Batal</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={confirmDeleteInitiative}
                 className="bg-red-600 hover:bg-red-700"
                 disabled={updateMutation.isPending}
               >
