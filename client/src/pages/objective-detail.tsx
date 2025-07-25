@@ -1805,7 +1805,6 @@ export default function GoalDetail() {
           )}
         </div>
       </div>
-
       {/* Inisiatif Summary Card */}
       <div className="bg-white p-4 sm:p-6 rounded-lg border border-gray-200 shadow-sm mb-6">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 gap-3 sm:gap-4">
@@ -1843,11 +1842,7 @@ export default function GoalDetail() {
                 </PopoverContent>
               </Popover>
             </h3>
-            <p className="text-green-700 text-sm leading-relaxed">
-              Inisiatif adalah langkah-langkah strategis untuk mencapai ukuran
-              keberhasilan. Setiap inisiatif memiliki timeline, budget, dan
-              PIC yang bertanggung jawab untuk eksekusi.
-            </p>
+            <p className="text-green-700 text-sm leading-relaxed">Inisiatif adalah langkah-langkah strategis untuk mencapai ukuran keberhasilan.</p>
           </div>
           <Button
             onClick={() => setShowInitiativeFormModal(true)}
@@ -2218,7 +2213,6 @@ export default function GoalDetail() {
           )}
         </div>
       </div>
-
       {/* Tabs Section */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="flex w-full h-auto p-0 bg-transparent gap-0 rounded-none mb-4 sm:mb-6 relative tour-tabs">
