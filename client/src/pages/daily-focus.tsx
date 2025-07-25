@@ -51,6 +51,10 @@ import {
   Info,
   HelpCircle,
   ArrowRight,
+  Heart,
+  Share2,
+  Send,
+  Smile,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -299,6 +303,376 @@ function MissionCard({
         )}
       </Card>
     </div>
+  );
+}
+
+// Timeline Feed Component
+function TimelineFeedComponent() {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+
+  // Timeline states
+  const [timelineFilter, setTimelineFilter] = useState('all');
+  const [userFilter, setUserFilter] = useState('all');
+  const [expandedDetails, setExpandedDetails] = useState<Record<string, boolean>>({});
+  const [showComments, setShowComments] = useState<Record<string, boolean>>({});
+  const [commentTexts, setCommentTexts] = useState<Record<string, string>>({});
+
+  // Helper function for thousand separator formatting
+  const formatWithThousandSeparator = (value: string | number) => {
+    if (!value && value !== 0) return '';
+    const numValue = typeof value === 'string' ? parseFloat(value) : value;
+    if (isNaN(numValue)) return value.toString();
+    return numValue.toLocaleString('id-ID');
+  };
+
+  // Get timeline data
+  const { data: timelineData = [], isLoading: timelineLoading } = useQuery({
+    queryKey: ['/api/timeline'],
+    enabled: !!user,
+  });
+
+  // Get users for filter
+  const { data: users = [] } = useQuery({
+    queryKey: ['/api/users'],
+    enabled: !!user,
+  });
+
+  // Add comment mutation
+  const addCommentMutation = useMutation({
+    mutationFn: async ({ timelineId, content }: { timelineId: string; content: string }) => {
+      return apiRequest('POST', `/api/timeline/${timelineId}/comments`, { content });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/timeline'] });
+    },
+  });
+
+  // Filter timeline data
+  const filteredTimeline = (timelineData as any[]).filter((item: any) => {
+    if (timelineFilter !== 'all' && item.type !== timelineFilter) return false;
+    if (userFilter !== 'all' && item.userId !== userFilter) return false;
+    return true;
+  });
+
+  const handleAddComment = (timelineId: string, content: string) => {
+    addCommentMutation.mutate({ timelineId, content });
+    setCommentTexts(prev => ({ ...prev, [timelineId]: '' }));
+  };
+
+  const toggleExpanded = (id: string) => {
+    setExpandedDetails(prev => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  const toggleComments = (id: string) => {
+    setShowComments(prev => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  if (timelineLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Timeline Feed</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="flex space-x-3">
+                <Skeleton className="h-10 w-10 rounded-full" />
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-4 w-1/2" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <MessageSquare className="h-5 w-5" />
+          Timeline Feed
+        </CardTitle>
+        <CardDescription>
+          Activity feed dari update harian dan progress tim
+        </CardDescription>
+        
+        {/* Filters */}
+        <div className="flex flex-col sm:flex-row gap-2 pt-4">
+          <Select value={timelineFilter} onValueChange={setTimelineFilter}>
+            <SelectTrigger className="w-full sm:w-40">
+              <SelectValue placeholder="Semua Aktivitas" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Semua Aktivitas</SelectItem>
+              <SelectItem value="daily_update">Update Harian</SelectItem>
+              <SelectItem value="check_in">Check-in Target</SelectItem>
+            </SelectContent>
+          </Select>
+          
+          <Select value={userFilter} onValueChange={setUserFilter}>
+            <SelectTrigger className="w-full sm:w-40">
+              <SelectValue placeholder="Semua User" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Semua User</SelectItem>
+              {(users as any[]).map((u: any) => (
+                <SelectItem key={u.id} value={u.id}>
+                  {u.name || u.email}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </CardHeader>
+      
+      <CardContent>
+        {filteredTimeline.length === 0 ? (
+          <div className="text-center py-8">
+            <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              Belum Ada Aktivitas
+            </h3>
+            <p className="text-sm text-gray-600 mb-4 max-w-md mx-auto">
+              Timeline akan menampilkan update harian dan progress dari tim setelah ada aktivitas.
+            </p>
+            <Button
+              className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600"
+              onClick={() => window.location.href = '/timeline'}
+            >
+              <ExternalLink className="w-4 h-4 mr-2" />
+              Buka Halaman Timeline Lengkap
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {filteredTimeline.slice(0, 5).map((item: any) => (
+              <div key={item.id} className="border border-gray-200 rounded-lg bg-white">
+                {/* Timeline Card Header */}
+                <div className="p-4">
+                  <div className="flex items-start space-x-3">
+                    <Avatar className="w-10 h-10">
+                      <AvatarImage src={item.user?.profileImageUrl} />
+                      <AvatarFallback>
+                        {(item.user?.name || item.user?.email || 'U').charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="font-semibold text-gray-900">
+                            {item.user?.name || item.user?.email}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {new Date(item.createdAt).toLocaleDateString('id-ID', {
+                              day: 'numeric',
+                              month: 'long',
+                              year: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </div>
+                        </div>
+                        
+                        <Badge variant={item.type === 'check_in' ? 'default' : 'secondary'}>
+                          {item.type === 'check_in' ? 'Check-in Target' : 'Update Harian'}
+                        </Badge>
+                      </div>
+                      
+                      {/* Content Summary */}
+                      <div className="mt-3">
+                        {item.summary && (
+                          <p className="text-gray-700 mb-3">{item.summary}</p>
+                        )}
+                        
+                        {/* Progress Information for Check-ins */}
+                        {item.type === 'check_in' && item.keyResultTitle && (
+                          <div className="bg-blue-50 rounded-lg p-3 mb-3">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-sm font-medium text-blue-800">
+                                {item.keyResultTitle}
+                              </span>
+                              <span className="text-sm font-bold text-blue-900">
+                                {formatWithThousandSeparator(item.checkInValue || '')} {item.keyResultUnit || ''}
+                              </span>
+                            </div>
+                            
+                            {item.checkInNotes && (
+                              <div className="mt-2">
+                                <div className="text-xs font-medium text-blue-800 mb-1">Catatan:</div>
+                                <div className="text-xs text-blue-700 italic">"{item.checkInNotes}"</div>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                        
+                        {/* Update Details */}
+                        {(item.tasksUpdated > 0 || item.keyResultsUpdated > 0) && (
+                          <div className="flex flex-wrap gap-2 mb-3">
+                            {item.tasksUpdated > 0 && (
+                              <Badge variant="outline" className="text-green-700 border-green-200">
+                                {item.tasksUpdated} task diupdate
+                              </Badge>
+                            )}
+                            {item.keyResultsUpdated > 0 && (
+                              <Badge variant="outline" className="text-blue-700 border-blue-200">
+                                {item.keyResultsUpdated} target diupdate
+                              </Badge>
+                            )}
+                          </div>
+                        )}
+                        
+                        {/* Expand Details Button */}
+                        {(item.tasksSummary || item.keyResultsSummary || item.whatWorkedWell || item.challenges) && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => toggleExpanded(item.id)}
+                            className="text-blue-600 hover:text-blue-700 p-0 h-auto"
+                          >
+                            {expandedDetails[item.id] ? (
+                              <>
+                                <ChevronDown className="w-4 h-4 mr-1" />
+                                Sembunyikan Detail
+                              </>
+                            ) : (
+                              <>
+                                <ChevronRight className="w-4 h-4 mr-1" />
+                                Lihat Detail
+                              </>
+                            )}
+                          </Button>
+                        )}
+                        
+                        {/* Expanded Details */}
+                        {expandedDetails[item.id] && (
+                          <div className="mt-4 space-y-3 p-3 bg-gray-50 rounded-lg">
+                            {item.tasksSummary && (
+                              <div>
+                                <div className="text-sm font-medium text-gray-800 mb-1">Tasks:</div>
+                                <div className="text-sm text-gray-700">{item.tasksSummary}</div>
+                              </div>
+                            )}
+                            
+                            {item.keyResultsSummary && (
+                              <div>
+                                <div className="text-sm font-medium text-gray-800 mb-1">Angka Target:</div>
+                                <div className="text-sm text-gray-700">{item.keyResultsSummary}</div>
+                              </div>
+                            )}
+                            
+                            {item.whatWorkedWell && (
+                              <div>
+                                <div className="text-sm font-medium text-green-800 mb-1">Yang Berjalan Baik:</div>
+                                <div className="text-sm text-gray-700">{item.whatWorkedWell}</div>
+                              </div>
+                            )}
+                            
+                            {item.challenges && (
+                              <div>
+                                <div className="text-sm font-medium text-red-800 mb-1">Tantangan:</div>
+                                <div className="text-sm text-gray-700">{item.challenges}</div>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Social Engagement */}
+                <div className="border-t border-gray-100">
+                  <div className="px-4 py-2 flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-gray-500 hover:text-red-500"
+                      >
+                        <Heart className="w-4 h-4 mr-1" />
+                        <span className="text-xs">Suka</span>
+                      </Button>
+                      
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => toggleComments(item.id)}
+                        className="text-gray-500 hover:text-blue-500"
+                      >
+                        <MessageSquare className="w-4 h-4 mr-1" />
+                        <span className="text-xs">Komentar</span>
+                      </Button>
+                    </div>
+                  </div>
+                  
+                  {/* Comments Section */}
+                  {showComments[item.id] && (
+                    <div className="px-4 pb-3 border-t border-gray-50">
+                      <div className="mt-3 space-y-2">
+                        {/* Add Comment */}
+                        <div className="flex space-x-2">
+                          <Avatar className="w-6 h-6">
+                            <AvatarImage src={(user as any)?.profileImageUrl} />
+                            <AvatarFallback>
+                              {((user as any)?.name || (user as any)?.email || 'U').charAt(0).toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
+                          
+                          <div className="flex-1 flex space-x-2">
+                            <input
+                              type="text"
+                              placeholder="Tulis komentar..."
+                              value={commentTexts[item.id] || ''}
+                              onChange={(e) => setCommentTexts(prev => ({ ...prev, [item.id]: e.target.value }))}
+                              onKeyPress={(e) => {
+                                if (e.key === 'Enter' && commentTexts[item.id]?.trim()) {
+                                  handleAddComment(item.id, commentTexts[item.id]);
+                                }
+                              }}
+                              className="flex-1 text-sm px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                            <Button
+                              size="sm"
+                              onClick={() => {
+                                if (commentTexts[item.id]?.trim()) {
+                                  handleAddComment(item.id, commentTexts[item.id]);
+                                }
+                              }}
+                              disabled={!commentTexts[item.id]?.trim() || addCommentMutation.isPending}
+                            >
+                              <Send className="w-3 h-3" />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+            
+            {filteredTimeline.length > 5 && (
+              <div className="text-center py-4">
+                <Button
+                  variant="outline"
+                  onClick={() => window.location.href = '/timeline'}
+                >
+                  <ExternalLink className="w-4 h-4 mr-2" />
+                  Lihat Semua di Timeline Lengkap
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }
 
@@ -3753,32 +4127,7 @@ export default function DailyFocusPage() {
 
         {/* Timeline Tab Content */}
         <TabsContent value="timeline" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Timeline Feed</CardTitle>
-              <CardDescription>
-                Activity feed dari halaman timeline - update harian dan progress tim
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8">
-                <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  Timeline Feed
-                </h3>
-                <p className="text-sm text-gray-600 mb-4 max-w-md mx-auto">
-                  Menampilkan aktivitas terbaru dari halaman timeline seperti update harian, progress key results, dan aktivitas tim.
-                </p>
-                <Button
-                  className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600"
-                  onClick={() => window.location.href = '/timeline'}
-                >
-                  <ExternalLink className="w-4 h-4 mr-2" />
-                  Buka Halaman Timeline
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          <TimelineFeedComponent />
         </TabsContent>
       </Tabs>
       {/* Modals */}
