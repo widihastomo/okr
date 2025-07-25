@@ -1728,7 +1728,7 @@ export default function DailyFocusPage() {
             </p>
           </div>
 
-          {/* User Filter and Daily Check-in - desktop */}
+          {/* User Filter, Daily Check-in, and Tour Button - desktop */}
           <div className="flex items-center gap-3 relative z-10">
             <div className="hidden sm:flex items-center gap-2 text-sm text-gray-500">
               <Calendar className="h-4 w-4" />
@@ -1761,6 +1761,9 @@ export default function DailyFocusPage() {
             </div>
             <div data-tour="update-harian-instan">
               <DailyUpdateSimple />
+            </div>
+            <div className="hidden sm:block">
+              <TourStartButton variant="outline" size="sm" />
             </div>
           </div>
         </div>
@@ -1803,11 +1806,6 @@ export default function DailyFocusPage() {
           <div className="flex items-center gap-2 justify-end">
             <TourStartButton variant="outline" size="sm" />
           </div>
-        </div>
-
-        {/* Desktop Action buttons */}
-        <div className="hidden sm:flex items-center justify-end">
-          <TourStartButton variant="outline" size="sm" />
         </div>
       </div>
       {/* Filter Indicator - Only show when viewing another user's data */}
