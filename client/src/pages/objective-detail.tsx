@@ -1479,15 +1479,17 @@ export default function GoalDetail() {
                           </div>
                         </div>
                       </div>
-                      
-                      {/* Progress information moved to the front */}
-                      <div className="text-xs text-gray-600 font-medium mb-2 bg-blue-50 px-2 py-1 rounded">
+                      <p className="text-sm text-gray-600 mb-2">
+                        {kr.description}
+                      </p>
+
+                      <div className="text-xs text-gray-500">
                         {(() => {
                           // Handle achieve_or_not type
                           if (kr.keyResultType === "achieve_or_not") {
                             return progress >= 100
-                              ? "Progress saat ini: Tercapai"
-                              : "Progress saat ini: Belum tercapai";
+                              ? "Status: Tercapai"
+                              : "Status: Belum tercapai";
                           }
 
                           // Handle should_stay types
@@ -1505,7 +1507,7 @@ export default function GoalDetail() {
                                   : "";
                             const unitSuffix = kr.unit === "%" ? "%" : "";
 
-                            return `Progress saat ini: ${unitDisplay}${currentVal.toLocaleString("id-ID")}${unitSuffix} | Threshold: ${unitDisplay}${targetVal.toLocaleString("id-ID")}${unitSuffix}`;
+                            return `Saat ini: ${unitDisplay}${currentVal.toLocaleString("id-ID")}${unitSuffix} | Threshold: ${unitDisplay}${targetVal.toLocaleString("id-ID")}${unitSuffix}`;
                           }
 
                           // Handle increase_to and decrease_to types
@@ -1517,30 +1519,24 @@ export default function GoalDetail() {
 
                           if (kr.keyResultType === "decrease_to") {
                             if (kr.unit === "Rp") {
-                              return `Progress saat ini: Rp ${baseVal.toLocaleString("id-ID")} → Rp ${targetVal.toLocaleString("id-ID")} (capaian: Rp ${currentVal.toLocaleString("id-ID")})`;
+                              return `Rp ${baseVal.toLocaleString("id-ID")} → Rp ${targetVal.toLocaleString("id-ID")} (capaian: Rp ${currentVal.toLocaleString("id-ID")})`;
                             } else if (kr.unit === "%") {
-                              return `Progress saat ini: ${baseVal.toLocaleString("id-ID")}% → ${targetVal.toLocaleString("id-ID")}% (capaian: ${currentVal.toLocaleString("id-ID")}%)`;
+                              return `${baseVal.toLocaleString("id-ID")}% → ${targetVal.toLocaleString("id-ID")}% (capaian: ${currentVal.toLocaleString("id-ID")}%)`;
                             } else {
-                              return `Progress saat ini: ${baseVal.toLocaleString("id-ID")} → ${targetVal.toLocaleString("id-ID")} ${kr.unit || ""} (capaian: ${currentVal.toLocaleString("id-ID")})`;
+                              return `${baseVal.toLocaleString("id-ID")} → ${targetVal.toLocaleString("id-ID")} ${kr.unit || ""} (capaian: ${currentVal.toLocaleString("id-ID")})`;
                             }
                           } else {
                             // increase_to type
                             if (kr.unit === "Rp") {
-                              return `Progress saat ini: Rp ${baseVal.toLocaleString("id-ID")} → Rp ${targetVal.toLocaleString("id-ID")} (capaian: Rp ${currentVal.toLocaleString("id-ID")})`;
+                              return `Rp ${baseVal.toLocaleString("id-ID")} → Rp ${targetVal.toLocaleString("id-ID")} (capaian: Rp ${currentVal.toLocaleString("id-ID")})`;
                             } else if (kr.unit === "%") {
-                              return `Progress saat ini: ${baseVal.toLocaleString("id-ID")}% → ${targetVal.toLocaleString("id-ID")}% (capaian: ${currentVal.toLocaleString("id-ID")}%)`;
+                              return `${baseVal.toLocaleString("id-ID")}% → ${targetVal.toLocaleString("id-ID")}% (capaian: ${currentVal.toLocaleString("id-ID")}%)`;
                             } else {
-                              return `Progress saat ini: ${baseVal.toLocaleString("id-ID")} → ${targetVal.toLocaleString("id-ID")} ${kr.unit || ""} (capaian: ${currentVal.toLocaleString("id-ID")})`;
+                              return `${baseVal.toLocaleString("id-ID")} → ${targetVal.toLocaleString("id-ID")} ${kr.unit || ""} (capaian: ${currentVal.toLocaleString("id-ID")})`;
                             }
                           }
                         })()}
                       </div>
-
-                      <p className="text-sm text-gray-600 mb-2">
-                        {kr.description}
-                      </p>
-
-
                     </div>
 
                     {/* Action Buttons - Top Right */}
