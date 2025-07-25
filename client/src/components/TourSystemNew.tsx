@@ -179,29 +179,7 @@ const TOUR_STEPS: TourStep[] = [
     position: "bottom",
     category: "feature",
   },
-  {
-    id: "analytics-tabs",
-    title: "Analytics Tabs - Tab Navigation",
-    description:
-      "Navigasi tab Analytics terdiri dari 4 bagian utama: Overview (dashboard umum), Team Performance (performa tim), User Performance (performa individu), dan Initiatives & Tasks (analisis proyek). Gunakan tab ini untuk melihat berbagai perspektif analytics sesuai kebutuhan analisis Anda.",
-    icon: Activity,
-    selector: '[data-tour="analytics-tabs"]',
-    position: "bottom",
-    category: "feature",
-  },
 
-  {
-    id: "users",
-    title: "Kelola Pengguna - Tim Management",
-    description:
-      "Undang anggota tim baru, kelola peran dan permissions, serta atur akses pengguna ke berbagai fitur. Sistem role-based access control memastikan setiap anggota tim memiliki akses yang tepat sesuai dengan tanggung jawab mereka dalam organisasi.",
-    icon: Users,
-    selector: '[data-tour="users"]',
-    position: "right",
-    category: "navigation",
-    targetPath: "/client-users",
-    requiresClick: true,
-  },
   {
     id: "users-tab",
     title: "Tab Pengguna",
@@ -212,28 +190,7 @@ const TOUR_STEPS: TourStep[] = [
     position: "bottom",
     category: "feature",
   },
-  {
-    id: "teams-tab",
-    title: "Tab Tim",
-    description:
-      "Tab Tim memungkinkan Anda mengelola struktur tim dalam organisasi. Anda dapat membuat tim baru, mengatur anggota tim, menetapkan team leader, dan mengonfigurasi peran setiap anggota dalam tim.",
-    icon: Users,
-    selector: '[data-tour="teams-tab"]',
-    position: "bottom",
-    category: "feature",
-  },
-  {
-    id: "settings",
-    title: "Pengaturan - Konfigurasi Sistem",
-    description:
-      "Kelola preferensi organisasi, konfigurasi billing dan subscription, pengaturan security, dan customization sistem. Area ini memberikan kontrol penuh terhadap bagaimana platform OKR bekerja sesuai dengan kebutuhan spesifik organisasi Anda.",
-    icon: Settings,
-    selector: '[data-tour="settings"]',
-    position: "right",
-    category: "navigation",
-    targetPath: "/organization-settings",
-    requiresClick: true,
-  },
+
   {
     id: "settings-content",
     title: "Pengaturan - Organisasi",
@@ -244,18 +201,7 @@ const TOUR_STEPS: TourStep[] = [
     position: "top",
     category: "feature",
   },
-  {
-    id: "help",
-    title: "Help Center - Bantuan & Dukungan",
-    description:
-      "Help Center menyediakan dokumentasi lengkap, FAQ, tutorial video, dan kontak support untuk membantu Anda memaksimalkan penggunaan platform OKR. Anda juga dapat restart tour sistem melalui halaman ini kapan saja.",
-    icon: HelpCircle,
-    selector: '[data-tour="help"]',
-    position: "left",
-    category: "navigation",
-    targetPath: "/help",
-    requiresClick: true,
-  },
+
   {
     id: "help-content",
     title: "Help Center - Pusat Bantuan",
