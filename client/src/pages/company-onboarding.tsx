@@ -1408,8 +1408,11 @@ export default function CompanyOnboarding() {
       // Set onboarding completed flag
       localStorage.setItem("onboarding-completed", "true");
 
-      // Show welcome modal instead of immediately starting tour
-      setShowWelcomeModal(true);
+      // Navigate directly to dashboard
+      setIsRedirecting(true);
+      setTimeout(() => {
+        navigate("/");
+      }, 1000);
     } catch (error) {
       console.error("Failed to complete onboarding:", error);
     }
@@ -3036,7 +3039,7 @@ export default function CompanyOnboarding() {
                         ? "Menyimpan..."
                         : isRedirecting
                           ? "Menuju Dashboard..."
-                          : "Mulai Tur"}
+                          : "Selesai"}
                     </span>
                   </div>
                   {/* Animated background overlay during loading */}
