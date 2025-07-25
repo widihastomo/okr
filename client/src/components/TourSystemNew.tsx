@@ -168,7 +168,6 @@ const TOUR_STEPS: TourStep[] = [
     position: "bottom",
     category: "navigation",
     targetPath: "/analytics",
-    requiresClick: true,
   },
   {
     id: "analytics-filters",
