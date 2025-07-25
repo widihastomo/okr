@@ -452,6 +452,13 @@ The system now includes a comprehensive dummy data generation feature that creat
 
 ## Changelog
 ```
+- July 25, 2025. **CLIENT TEMPLATE UI SIMPLIFICATION COMPLETED** - Successfully removed initiatives and tasks display from template cards per user feedback:
+  * REMOVED: Initiatives section display from template cards for cleaner interface
+  * REMOVED: Tasks section display from template cards to focus on essential content
+  * CLEANED: Unused icon imports (Users, CheckCircle) from ClientTemplates.tsx component
+  * SIMPLIFIED: Template cards now only show title, description, badges, and key results
+  * MAINTAINED: Full template usage functionality with cycle selection modal
+  * RESULT: Cleaner, more focused template browsing experience highlighting core goal structure
 - July 25, 2025. **TEMPLATE GOALS MENU FOR CLIENTS COMPLETED** - Successfully added Template Goals menu to regular client sidebar navigation:
   * ADDED: "Template Goals" menu item to regular user sidebar (not system owner only)
   * POSITIONED: Template menu after Analytics in client navigation for logical flow

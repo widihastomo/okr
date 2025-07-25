@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Filter, FileText, Target, TrendingUp, TrendingDown, Plus, Minus, Users, Calendar, CheckCircle } from "lucide-react";
+import { Filter, FileText, Target, TrendingUp, TrendingDown, Plus, Minus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -315,49 +315,7 @@ export default function ClientTemplates() {
                   </div>
                 )}
 
-                {/* Initiatives */}
-                {template.initiatives && template.initiatives.length > 0 && (
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                      <Users className="w-4 h-4" />
-                      Inisiatif ({template.initiatives.length})
-                    </h4>
-                    <div className="space-y-1">
-                      {template.initiatives.slice(0, 2).map((initiative, index) => (
-                        <div key={index} className="text-sm text-gray-600 line-clamp-1">
-                          • {initiative.title}
-                        </div>
-                      ))}
-                      {template.initiatives.length > 2 && (
-                        <div className="text-xs text-gray-500">
-                          +{template.initiatives.length - 2} inisiatif lainnya
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
 
-                {/* Tasks */}
-                {template.tasks && template.tasks.length > 0 && (
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4" />
-                      Tugas ({template.tasks.length})
-                    </h4>
-                    <div className="space-y-1">
-                      {template.tasks.slice(0, 2).map((task, index) => (
-                        <div key={index} className="text-sm text-gray-600 line-clamp-1">
-                          • {task.title}
-                        </div>
-                      ))}
-                      {template.tasks.length > 2 && (
-                        <div className="text-xs text-gray-500">
-                          +{template.tasks.length - 2} tugas lainnya
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
 
                 {/* Use Template Button */}
                 <div className="pt-3 border-t">
