@@ -187,6 +187,12 @@ export default function Sidebar({
       tourId: "cycles",
     },
     {
+      label: "Template Goals",
+      icon: FileText,
+      path: "/goal-templates",
+      active: location === "/goal-templates",
+    },
+    {
       label: "Pencapaian",
       icon: Trophy,
       path: "/achievements",
@@ -199,12 +205,6 @@ export default function Sidebar({
       path: "/analytics",
       active: location === "/analytics",
       tourId: "analytics",
-    },
-    {
-      label: "Template Goals",
-      icon: FileText,
-      path: "/goal-templates",
-      active: location === "/goal-templates",
     },
   ];
 
