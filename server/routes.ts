@@ -1731,6 +1731,124 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Use goal template to create objectives
+  app.post("/api/goal-templates/:id/use", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      const templateId = req.params.id;
+      
+      if (!currentUser.organizationId) {
+        return res.status(400).json({ message: "User not associated with an organization" });
+      }
+
+      const { cycleId } = req.body;
+      if (!cycleId) {
+        return res.status(400).json({ message: "Cycle ID is required" });
+      }
+
+      // Get the goal template
+      const template = await storage.getGoalTemplate(templateId);
+      if (!template) {
+        return res.status(404).json({ message: "Template not found" });
+      }
+
+      // Check template access permissions
+      if (!currentUser.isSystemOwner && template.organizationId && template.organizationId !== currentUser.organizationId) {
+        return res.status(403).json({ message: "Access denied to this template" });
+      }
+
+      // Verify cycle exists and belongs to user's organization
+      const cycle = await storage.getCycle(cycleId);
+      if (!cycle) {
+        return res.status(404).json({ message: "Cycle not found" });
+      }
+      if (cycle.organizationId !== currentUser.organizationId) {
+        return res.status(403).json({ message: "Access denied to this cycle" });
+      }
+
+      // Create objective from template
+      const objectiveData = {
+        title: template.title,
+        description: template.description,
+        cycleId: cycleId,
+        owner: "team",
+        ownerType: "team" as const,
+        ownerId: currentUser.id,
+        teamId: null,
+        status: "in_progress" as const,
+        organizationId: currentUser.organizationId,
+        createdBy: currentUser.id,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+
+      const objective = await storage.createObjective(objectiveData);
+      
+      // Create key results from template
+      const keyResults = [];
+      if (template.keyResults && Array.isArray(template.keyResults)) {
+        for (const krTemplate of template.keyResults as any[]) {
+          const keyResultData = {
+            objectiveId: objective.id,
+            title: krTemplate.title,
+            description: krTemplate.description || null,
+            currentValue: "0",
+            targetValue: krTemplate.targetValue || krTemplate.target?.toString() || "100",
+            baseValue: krTemplate.baseValue || krTemplate.baseline?.toString() || "0",
+            unit: krTemplate.unit || "%",
+            keyResultType: krTemplate.keyResultType || "increase_to" as const,
+            status: "in_progress" as const,
+            assignedTo: currentUser.id,
+            organizationId: currentUser.organizationId,
+            createdBy: currentUser.id,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          };
+          
+          const keyResult = await storage.createKeyResult(keyResultData);
+          keyResults.push(keyResult);
+        }
+      }
+
+      // Create initiatives from template if available
+      const initiatives = [];
+      if (template.initiatives && Array.isArray(template.initiatives)) {
+        for (const initTemplate of template.initiatives as any[]) {
+          const initiativeData = {
+            title: initTemplate.title,
+            description: initTemplate.description || null,
+            objectiveId: objective.id,
+            picId: currentUser.id,
+            status: "active" as const,
+            priority: "medium" as const,
+            startDate: new Date(),
+            endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
+            organizationId: currentUser.organizationId,
+            createdBy: currentUser.id,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          };
+          
+          const initiative = await storage.createInitiative(initiativeData);
+          initiatives.push(initiative);
+        }
+      }
+
+      const result = {
+        objective,
+        keyResults,
+        initiatives,
+        overallProgress: 0
+      };
+
+      console.log(`✅ Created objective from template: ${template.title}`);
+      res.status(201).json(result);
+    } catch (error) {
+      console.error("Error using goal template:", error);
+      res.status(500).json({ message: "Failed to create objective from template" });
+    }
+  });
+
   // Objectives endpoints
   app.get("/api/objectives", requireAuth, async (req, res) => {
     try {

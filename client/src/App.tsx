@@ -74,6 +74,7 @@ import TestToast from "@/pages/test-toast";
 import UpgradePackage from "@/pages/upgrade-package";
 import TemplateManagement from "@/pages/template-management";
 import TemplateDetail from "@/pages/template-detail";
+import ClientTemplates from "@/components/ClientTemplates";
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -313,7 +314,7 @@ function Router() {
               />
               <Route
                 path="/goal-templates"
-                component={TemplateManagement}
+                component={ClientTemplates}
               />
               <Route
                 path="/template/:id"
