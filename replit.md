@@ -452,6 +452,12 @@ The system now includes a comprehensive dummy data generation feature that creat
 
 ## Changelog
 ```
+- July 25, 2025. **INITIATIVE CARDS 2-COLUMN LAYOUT COMPLETED** - Successfully implemented responsive 2-column grid layout for initiative selection:
+  * ENHANCED: Changed initiative cards from single column (space-y-4) to responsive 2-column grid (grid-cols-1 md:grid-cols-2 gap-4)
+  * OPTIMIZED: Added h-fit class to ensure cards adjust height based on content for better visual balance
+  * IMPROVED: Better space utilization on desktop screens while maintaining mobile-first responsive design
+  * MAINTAINED: All existing functionality including task display, priority badges, and selection interaction
+  * RESULT: More efficient screen space usage with professional 2-column layout for initiative selection cards
 - July 25, 2025. **INITIATIVE TASKS DISPLAY SYSTEM COMPLETED** - Successfully implemented tasks display for each initiative in company onboarding step 5:
   * FIXED: Database query issue where getAllGoalTemplates() only searched organization-specific templates, missing system-wide templates (null organizationId)
   * ENHANCED: Modified getAllGoalTemplates() method to return both organization-specific AND system-wide templates using SQL OR condition

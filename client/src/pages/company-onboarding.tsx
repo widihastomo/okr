@@ -2432,11 +2432,11 @@ export default function CompanyOnboarding() {
             </div>
 
             {availableInitiatives.length > 0 ? (
-              <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {availableInitiatives.map((initiative: any, index: number) => (
                   <div
                     key={index}
-                    className={`p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ${
+                    className={`p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 h-fit ${
                       selectedInitiatives.includes(initiative.title)
                         ? "border-indigo-500 bg-indigo-50"
                         : "border-gray-200 hover:border-indigo-300 hover:bg-gray-50"
