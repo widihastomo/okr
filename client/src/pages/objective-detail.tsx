@@ -52,6 +52,7 @@ import {
   Sparkles,
   HelpCircle,
   Check,
+  Minus,
 } from "lucide-react";
 import { Link } from "wouter";
 import { CheckInModal } from "@/components/check-in-modal";
@@ -127,13 +128,13 @@ import ObjectiveOverviewCard from "@/components/objective-overview-card";
 import ObjectiveTimeline from "@/components/objective-timeline";
 import ActivityLogCard from "@/components/activity-log-card";
 import type {
-  GoalWithKeyResults,
+  OKRWithKeyResults,
   KeyResult,
   Initiative,
   Task,
   Cycle,
   Team,
-  User as UserType,
+  User,
 } from "@shared/schema";
 import {
   calculateIdealProgress,
@@ -452,7 +453,7 @@ export default function GoalDetail() {
   }, [location]);
 
   // Fetch goal data
-  const { data: goal, isLoading } = useQuery<GoalWithKeyResults>({
+  const { data: goal, isLoading } = useQuery<OKRWithKeyResults>({
     queryKey: [`/api/objectives/${id}`],
     enabled: !!id,
   });
@@ -642,6 +643,12 @@ export default function GoalDetail() {
 
   const handleCreateKeyResult = (data: any) => {
     // Ensure unit has a valid default value and proper type conversion
+    // Handle assignedTo field: if "unassigned", use goal owner ID or null
+    let assignedToValue = data.assignedTo;
+    if (assignedToValue === "unassigned") {
+      assignedToValue = userOwner?.id || null;
+    }
+    
     const processedData = {
       title: data.title,
       description: data.description,
@@ -650,7 +657,7 @@ export default function GoalDetail() {
       targetValue: data.targetValue,
       currentValue: data.currentValue,
       unit: data.unit || "number",
-      assignedTo: data.assignedTo,
+      assignedTo: assignedToValue,
       objectiveId: goal?.id || ""
     };
     createKeyResultMutation.mutate(processedData);

@@ -173,11 +173,18 @@ export default function EditKeyResultModal({
     mutationFn: async (data: EditKeyResultFormData) => {
       if (!keyResult) throw new Error("Key result not found");
       
+      // Handle assignedTo field: if "unassigned", use goal owner ID or null
+      let assignedToValue = data.assignedTo;
+      if (assignedToValue === "unassigned") {
+        assignedToValue = goalOwner?.id || null;
+      }
+      
       const response = await apiRequest(
         "PATCH",
         `/api/key-results/${keyResult.id}`,
         {
           ...data,
+          assignedTo: assignedToValue,
           baseValue: data.baseValue || null,
           unit: data.unit || null,
           description: data.description || null,
