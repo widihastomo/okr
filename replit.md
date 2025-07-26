@@ -340,6 +340,13 @@ PORT=5001 npm run dev
 - **INVOICE PROTECTION**: Both reset types explicitly preserve invoice history and billing data for financial record integrity
 
 ## Recently Fixed Issues
+- **USER MENTION FEATURE IMPLEMENTED** (July 26, 2025): Added @username mention functionality to comment system
+  * **Enhancement:** Users can now type @ followed by username to mention team members in comments
+  * **UI Components:** Added mention dropdown with user search, avatar display, and selection interface
+  * **Smart Detection:** Real-time @ trigger detection with cursor position tracking and filtered user suggestions
+  * **Interactive Selection:** Click to select users from dropdown, automatically inserts @username into comment text
+  * **User Experience:** Placeholder text updated to "Tulis komentar... (gunakan @ untuk mention)" with escape key support
+  * **Result:** Complete mention system enabling targeted communication and user notification in timeline comments
 - **COMMENT TIME SORTING IMPLEMENTED** (July 26, 2025): Comments now display in chronological order from oldest to newest
   * **Enhancement:** Added time-based sorting to comment display using `sort()` with `createdAt` timestamps
   * **Implementation:** Comments sorted by `new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()` for ascending chronological order

@@ -400,6 +400,11 @@ function TimelineFeedComponent() {
   const [commentsData, setCommentsData] = useState<{[key: string]: any[]}>({});
   const [commentsLoading, setCommentsLoading] = useState<{[key: string]: boolean}>({});
   const [showEmojiPicker, setShowEmojiPicker] = useState<{[key: string]: boolean}>({});
+  
+  // State for user mention functionality
+  const [showMentionDropdown, setShowMentionDropdown] = useState<{[key: string]: boolean}>({});
+  const [mentionSearch, setMentionSearch] = useState<{[key: string]: string}>({});
+  const [mentionPosition, setMentionPosition] = useState<{[key: string]: number}>({});
 
   // Fetch all comments for timeline items - API already returns grouped format
   const { data: allCommentsData = {} } = useQuery({
@@ -508,7 +513,54 @@ function TimelineFeedComponent() {
     setShowEmojiPicker(prev => ({ ...prev, [timelineId]: false }));
   };
 
-  // Close emoji picker when clicking outside
+  // Handle mention functionality
+  const handleMentionTrigger = (timelineItemId: string, inputValue: string, cursorPosition: number) => {
+    const lastAtIndex = inputValue.lastIndexOf('@', cursorPosition - 1);
+    
+    if (lastAtIndex !== -1 && (lastAtIndex === 0 || inputValue[lastAtIndex - 1] === ' ')) {
+      const searchTerm = inputValue.substring(lastAtIndex + 1, cursorPosition);
+      const spaceIndex = searchTerm.indexOf(' ');
+      
+      if (spaceIndex === -1) {
+        setMentionSearch(prev => ({ ...prev, [timelineItemId]: searchTerm }));
+        setMentionPosition(prev => ({ ...prev, [timelineItemId]: lastAtIndex }));
+        setShowMentionDropdown(prev => ({ ...prev, [timelineItemId]: true }));
+        return;
+      }
+    }
+    
+    setShowMentionDropdown(prev => ({ ...prev, [timelineItemId]: false }));
+  };
+
+  // Get filtered users for mention
+  const getFilteredUsersForMention = (timelineItemId: string) => {
+    const search = mentionSearch[timelineItemId] || '';
+    return (users as any[])
+      .filter((user: any) => user.isActive === true)
+      .filter((user: any) => {
+        const name = user.name || user.email || '';
+        return name.toLowerCase().includes(search.toLowerCase());
+      })
+      .slice(0, 5); // Limit to 5 results
+  };
+
+  // Handle mention selection
+  const handleMentionSelect = (timelineItemId: string, selectedUser: any) => {
+    const currentText = commentTexts[timelineItemId] || '';
+    const position = mentionPosition[timelineItemId] || 0;
+    const searchLength = mentionSearch[timelineItemId]?.length || 0;
+    const userName = selectedUser.name || selectedUser.email;
+    
+    const beforeMention = currentText.substring(0, position);
+    const afterMention = currentText.substring(position + 1 + searchLength);
+    const newText = `${beforeMention}@${userName} ${afterMention}`;
+    
+    setCommentTexts(prev => ({ ...prev, [timelineItemId]: newText }));
+    setShowMentionDropdown(prev => ({ ...prev, [timelineItemId]: false }));
+    setMentionSearch(prev => ({ ...prev, [timelineItemId]: '' }));
+  };
+
+  // Close emoji picker and mention dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
@@ -516,6 +568,10 @@ function TimelineFeedComponent() {
       if (!target.closest('.emoji-picker-container') && !target.closest('.emoji-button')) {
         console.log('🎭 Closing emoji picker due to outside click');
         setShowEmojiPicker({});
+      }
+      // Don't close if clicking on mention dropdown
+      if (!target.closest('.mention-dropdown-container')) {
+        setShowMentionDropdown({});
       }
     };
 
@@ -1043,12 +1099,27 @@ function TimelineFeedComponent() {
                             <div className="flex-1 relative">
                               <input
                                 type="text"
-                                placeholder="Tulis komentar..."
+                                placeholder="Tulis komentar... (gunakan @ untuk mention)"
                                 value={commentTexts[item.id] || ''}
-                                onChange={(e) => setCommentTexts(prev => ({ ...prev, [item.id]: e.target.value }))}
+                                onChange={(e) => {
+                                  const value = e.target.value;
+                                  setCommentTexts(prev => ({ ...prev, [item.id]: value }));
+                                  
+                                  // Use a small timeout to get accurate cursor position after onChange
+                                  setTimeout(() => {
+                                    const cursorPosition = e.target.selectionStart || 0;
+                                    handleMentionTrigger(item.id, value, cursorPosition);
+                                  }, 0);
+                                }}
                                 onKeyPress={(e) => {
                                   if (e.key === 'Enter' && commentTexts[item.id]?.trim()) {
                                     handleAddComment(item.id, commentTexts[item.id]);
+                                  }
+                                }}
+                                onKeyDown={(e) => {
+                                  // Handle escape key to close mention dropdown
+                                  if (e.key === 'Escape') {
+                                    setShowMentionDropdown(prev => ({ ...prev, [item.id]: false }));
                                   }
                                 }}
                                 className="w-full text-sm px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -1094,6 +1165,40 @@ function TimelineFeedComponent() {
                                   </button>
                                 ))}
                               </div>
+                            </div>
+                          )}
+
+                          {/* User Mention Dropdown - Positioned to appear above */}
+                          {showMentionDropdown[item.id] && (
+                            <div className="absolute bottom-full left-0 mb-2 z-50 mention-dropdown-container bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                              <div className="text-xs text-gray-500 p-2 font-medium">Mention User:</div>
+                              {getFilteredUsersForMention(item.id).length > 0 ? (
+                                <div className="space-y-1">
+                                  {getFilteredUsersForMention(item.id).map((user: any) => (
+                                    <button
+                                      key={user.id}
+                                      onClick={() => handleMentionSelect(item.id, user)}
+                                      className="w-full flex items-center space-x-2 px-3 py-2 hover:bg-gray-100 transition-colors"
+                                    >
+                                      <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-green-500 rounded-full flex items-center justify-center text-white font-semibold text-xs flex-shrink-0">
+                                        {(user.name || user.email || 'U').charAt(0).toUpperCase()}
+                                      </div>
+                                      <div className="flex-1 text-left">
+                                        <div className="text-sm font-medium text-gray-900">
+                                          {user.name || user.email}
+                                        </div>
+                                        {user.name && (
+                                          <div className="text-xs text-gray-500">{user.email}</div>
+                                        )}
+                                      </div>
+                                    </button>
+                                  ))}
+                                </div>
+                              ) : (
+                                <div className="p-3 text-xs text-gray-500 italic">
+                                  Tidak ada user ditemukan
+                                </div>
+                              )}
                             </div>
                           )}
                         </div>
