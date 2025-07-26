@@ -609,6 +609,21 @@ function TimelineFeedComponent() {
     setShowEmojiPicker(prev => ({ ...prev, [timelineId]: false }));
   };
 
+  // Add emoji to edit comment text
+  const addEmojiToEditComment = (emoji: string) => {
+    setEditCommentText(prev => (prev || '') + emoji);
+    setShowEmojiPicker(prev => {
+      // Close the edit emoji picker by clearing all edit-related keys
+      const newState = { ...prev };
+      Object.keys(newState).forEach(key => {
+        if (key.startsWith('edit-')) {
+          newState[key] = false;
+        }
+      });
+      return newState;
+    });
+  };
+
   // Handle mention functionality
   const handleMentionTrigger = (timelineItemId: string, inputValue: string, cursorPosition: number) => {
     const lastAtIndex = inputValue.lastIndexOf('@', cursorPosition - 1);
@@ -1257,13 +1272,45 @@ function TimelineFeedComponent() {
                                   {/* Show edit form if editing this comment */}
                                   {editingComment === comment.id ? (
                                     <div className="space-y-2">
-                                      <textarea
-                                        value={editCommentText}
-                                        onChange={(e) => setEditCommentText(e.target.value)}
-                                        className="w-full p-2 text-sm border border-gray-300 rounded resize-none focus:outline-none focus:ring-2 focus:ring-orange-500"
-                                        rows={2}
-                                        placeholder="Edit komentar..."
-                                      />
+                                      <div className="relative">
+                                        <textarea
+                                          value={editCommentText}
+                                          onChange={(e) => setEditCommentText(e.target.value)}
+                                          className="w-full p-2 pr-10 text-sm border border-gray-300 rounded resize-none focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                          rows={2}
+                                          placeholder="Edit komentar..."
+                                        />
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            toggleEmojiPicker(`edit-${comment.id}`);
+                                          }}
+                                          className="emoji-button absolute right-1 top-1 p-1 h-6 w-6"
+                                        >
+                                          <Smile className="w-3 h-3 text-gray-500" />
+                                        </Button>
+                                        
+                                        {/* Emoji Picker for Edit Form - Positioned to appear above */}
+                                        {showEmojiPicker[`edit-${comment.id}`] && (
+                                          <div className="absolute bottom-full right-0 mb-2 z-50 emoji-picker-container bg-white border border-gray-200 rounded-lg p-3 shadow-lg">
+                                            <div className="text-xs text-gray-500 mb-2 font-medium">Pilih Emoticon:</div>
+                                            <div className="grid grid-cols-8 gap-1">
+                                              {emoticons.map((emoji, index) => (
+                                                <button
+                                                  key={index}
+                                                  onClick={() => addEmojiToEditComment(emoji)}
+                                                  className="w-6 h-6 flex items-center justify-center hover:bg-gray-100 rounded text-sm transition-colors"
+                                                  title={emoji}
+                                                >
+                                                  {emoji}
+                                                </button>
+                                              ))}
+                                            </div>
+                                          </div>
+                                        )}
+                                      </div>
                                       <div className="flex items-center gap-2">
                                         <button
                                           onClick={saveEditedComment}
