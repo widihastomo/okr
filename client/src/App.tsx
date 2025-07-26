@@ -36,7 +36,6 @@ import AchievementsPage from "@/pages/achievements";
 
 import DailyFocusPage from "@/pages/daily-focus";
 import TasksPage from "@/pages/tasks";
-import TimelinePage from "@/pages/timeline";
 import HelpPage from "@/pages/help";
 
 import OrganizationSettings from "@/pages/organization-settings";
@@ -244,7 +243,6 @@ const Router = () => {
               <Route path="/" component={DailyFocusPage} />
               <Route path="/daily-focus" component={DailyFocusPage} />
               <Route path="/tasks" component={TasksPage} />
-              <Route path="/timeline" component={TimelinePage} />
               <Route path="/goals" component={Dashboard} />
               <Route path="/home" component={Home} />
               <Route path="/profile" component={Profile} />
