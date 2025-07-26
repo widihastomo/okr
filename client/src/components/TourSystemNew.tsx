@@ -302,7 +302,9 @@ export default function TourSystem() {
     cleanupHighlights();
     
     // Show completion modal with celebration
+    console.log("🎉 Setting completion modal to true");
     setShowCompletionModal(true);
+    console.log("✅ Completion modal state set to true");
   };
 
   console.log("TourSystemNew state:", { isActive, currentStep, totalSteps });
@@ -996,7 +998,10 @@ export default function TourSystem() {
       {/* Tour Completion Modal */}
       <TourCompletionModal
         isOpen={showCompletionModal}
-        onClose={() => setShowCompletionModal(false)}
+        onClose={() => {
+          console.log("🚪 Closing completion modal");
+          setShowCompletionModal(false);
+        }}
         isSkipped={false}
       />
     </>
