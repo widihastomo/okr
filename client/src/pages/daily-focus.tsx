@@ -2065,8 +2065,9 @@ export default function DailyFocusPage() {
                 </div>
                 {relatedObjectives.length > 0 && (
                   <Button
+                    variant="outline"
                     size="sm"
-                    className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 w-full sm:w-auto flex-shrink-0"
+                    className="border-orange-600 text-orange-600 hover:bg-orange-50 w-full sm:w-auto flex-shrink-0"
                     onClick={handleOpenGoalModal}
                   >
                     <Plus className="w-4 h-4 mr-2" />
@@ -2182,7 +2183,8 @@ export default function DailyFocusPage() {
                     mencapai target yang jelas
                   </p>
                   <Button
-                    className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 w-full sm:w-auto"
+                    variant="outline"
+                    className="border-orange-600 text-orange-600 hover:bg-orange-50 w-full sm:w-auto"
                     onClick={handleOpenGoalModal}
                   >
                     <Plus className="w-4 h-4 mr-2" />
