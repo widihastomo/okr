@@ -2264,7 +2264,10 @@ export default function DailyFocusPage() {
             <AlertDialogCancel onClick={() => setIsDeleteDialogOpen(false)}>
               Batal
             </AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDeleteTask}>
+            <AlertDialogAction 
+              onClick={confirmDeleteTask}
+              className="bg-orange-600 hover:bg-orange-700 text-white"
+            >
               Hapus
             </AlertDialogAction>
           </AlertDialogFooter>
