@@ -561,8 +561,8 @@ export function DailyFocusCards({
                   .filter((initiative) => {
                     if (!userFilter || userFilter === 'all') return true;
                     return (
-                      initiative.assignedToUser?.toString() === userFilter ||
-                      initiative.ownerId?.toString() === userFilter
+                      initiative.picId?.toString() === userFilter ||
+                      initiative.createdBy?.toString() === userFilter
                     );
                   })
                   .map((initiative) => {
@@ -583,6 +583,8 @@ export function DailyFocusCards({
                                 className={`text-xs px-2 py-1 rounded-full font-medium shrink-0 ${
                                   initiative.status === 'not_started'
                                     ? 'bg-gray-100 text-gray-700'
+                                    : initiative.status === 'draft'
+                                    ? 'bg-yellow-100 text-yellow-700'
                                     : initiative.status === 'in_progress'
                                     ? 'bg-blue-100 text-blue-700'
                                     : initiative.status === 'completed'
@@ -592,6 +594,8 @@ export function DailyFocusCards({
                               >
                                 {initiative.status === 'not_started'
                                   ? 'Belum Mulai'
+                                  : initiative.status === 'draft'
+                                  ? 'Draft'
                                   : initiative.status === 'in_progress'
                                   ? 'Berlangsung'
                                   : initiative.status === 'completed'
@@ -607,8 +611,8 @@ export function DailyFocusCards({
                             
                             {/* Due Date and Progress - Mobile: Stack, Desktop: Inline */}
                             <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-4 text-xs text-gray-500">
-                              <span>Due: {formatDate(new Date(initiative.endDate))}</span>
-                              <span>Progress: {Math.round(initiative.progress)}%</span>
+                              <span>Due: {formatDate(new Date(initiative.dueDate))}</span>
+                              <span>Progress: {Math.round(initiative.progressPercentage || 0)}%</span>
                             </div>
                           </div>
                           
