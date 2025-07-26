@@ -324,7 +324,6 @@ function TimelineFeedComponent() {
   const [expandedDetails, setExpandedDetails] = useState<Record<string, boolean>>({});
   const [showComments, setShowComments] = useState<Record<string, boolean>>({});
   const [commentTexts, setCommentTexts] = useState<Record<string, string>>({});
-  const [reactions, setReactions] = useState<Record<string, {liked: boolean, likeCount: number}>>({});
 
   // Helper function for thousand separator formatting
   const formatWithThousandSeparator = (value: string | number) => {
@@ -402,6 +401,12 @@ function TimelineFeedComponent() {
   const [commentsData, setCommentsData] = useState<{[key: string]: any[]}>({});
   const [commentsLoading, setCommentsLoading] = useState<{[key: string]: boolean}>({});
   const [showEmojiPicker, setShowEmojiPicker] = useState<{[key: string]: boolean}>({});
+
+  // Get timeline reactions data
+  const { data: timelineReactions = {} } = useQuery({
+    queryKey: ['/api/timeline/reactions'],
+    enabled: !!user,
+  });
   
   // State for user mention functionality
   const [showMentionDropdown, setShowMentionDropdown] = useState<{[key: string]: boolean}>({});
@@ -560,6 +565,22 @@ function TimelineFeedComponent() {
         description: error.message,
         variant: "destructive",
       });
+    }
+  });
+
+  // Like/reaction mutations
+  const reactionMutation = useMutation({
+    mutationFn: async ({ timelineId, emoji }: { timelineId: string; emoji: string }) => {
+      const response = await apiRequest('POST', `/api/timeline/${timelineId}/reactions`, { emoji });
+      return response.json();
+    },
+    onSuccess: () => {
+      // Invalidate reactions query to refetch updated data
+      queryClient.invalidateQueries({ queryKey: ['/api/timeline/reactions'] });
+      console.log('✅ Reaction updated successfully');
+    },
+    onError: (error) => {
+      console.error('❌ Error updating reaction:', error);
     }
   });
 
@@ -804,16 +825,8 @@ function TimelineFeedComponent() {
 
   // Handle reaction toggle
   const handleReactionToggle = (itemId: string) => {
-    setReactions(prev => {
-      const current = prev[itemId] || { liked: false, likeCount: 0 };
-      return {
-        ...prev,
-        [itemId]: {
-          liked: !current.liked,
-          likeCount: current.liked ? current.likeCount - 1 : current.likeCount + 1
-        }
-      };
-    });
+    // Use the 👍 emoji for likes (same as the Heart button represents)
+    reactionMutation.mutate({ timelineId: itemId, emoji: '👍' });
   };
 
   if (timelineLoading) {
@@ -1229,16 +1242,17 @@ function TimelineFeedComponent() {
                         variant="ghost"
                         size="sm"
                         onClick={() => handleReactionToggle(item.id)}
+                        disabled={reactionMutation.isPending}
                         className={`px-2 py-1 transition-colors ${
-                          reactions[item.id]?.liked 
+                          (timelineReactions[item.id] as any)?.['👍'] > 0
                             ? 'text-red-500 hover:text-red-600' 
                             : 'text-gray-500 hover:text-red-500'
                         }`}
                       >
-                        <Heart className={`w-4 h-4 mr-1 ${reactions[item.id]?.liked ? 'fill-current' : ''}`} />
+                        <Heart className={`w-4 h-4 mr-1 ${(timelineReactions[item.id] as any)?.['👍'] > 0 ? 'fill-current' : ''}`} />
                         <span className="text-xs">
-                          {reactions[item.id]?.liked ? 'Disukai' : 'Suka'}
-                          {reactions[item.id]?.likeCount > 0 && ` (${reactions[item.id].likeCount})`}
+                          {(timelineReactions[item.id] as any)?.['👍'] > 0 ? 'Disukai' : 'Suka'}
+                          {(timelineReactions[item.id] as any)?.['👍'] > 0 && ` (${(timelineReactions[item.id] as any)['👍']})`}
                         </span>
                       </Button>
                       
