@@ -5727,6 +5727,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = req.user as User;
 
       console.log("🔍 Edit comment debug:", { commentId, content, userId: user.id });
+      console.log("🔍 Request received for comment editing");
 
       if (!content || !content.trim()) {
         return res.status(400).json({ message: "Comment content is required" });

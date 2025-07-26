@@ -502,8 +502,22 @@ function TimelineFeedComponent() {
       
       console.log('✅ Comment updated successfully:', updatedComment);
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('❌ Error updating comment:', error);
+      console.error('❌ Error details:', {
+        message: error?.message,
+        status: error?.status,
+        statusText: error?.statusText,
+        response: error?.response,
+        stack: error?.stack
+      });
+      
+      // Show error toast
+      toast({
+        title: "Gagal mengedit komentar",
+        description: error?.message || "Terjadi kesalahan saat mengedit komentar",
+        variant: "destructive",
+      });
     }
   });
 
