@@ -349,7 +349,7 @@ export function DailyFocusCards({
                     {activeKeyResults
                       .filter((kr) => {
                         if (!userFilter || userFilter === 'all') return true;
-                        return kr.assignedTo === parseInt(userFilter);
+                        return kr.assignedTo === userFilter;
                       })
                       .map((keyResult) => {
                         const progress = keyResult.keyResultType === 'achieve_or_not' 
@@ -452,8 +452,8 @@ export function DailyFocusCards({
                   .filter((initiative) => {
                     if (!userFilter || userFilter === 'all') return true;
                     return (
-                      initiative.assignedToUser === parseInt(userFilter) ||
-                      initiative.ownerId === parseInt(userFilter)
+                      initiative.assignedToUser === userFilter ||
+                      initiative.ownerId === userFilter
                     );
                   })
                   .map((initiative) => {
