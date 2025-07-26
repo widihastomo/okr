@@ -244,14 +244,9 @@ function MissionCard({ missions, className }: MissionCardProps) {
   
   // Auto-expand when missions are not completed
   const shouldAutoExpand = completedMissions < totalMissions;
-  const [isExpanded, setIsExpanded] = useState(shouldAutoExpand);
+  const [isExpanded, setIsExpanded] = useState(false);
   
-  // Update expansion state when mission completion status changes
-  useEffect(() => {
-    if (shouldAutoExpand && !isExpanded) {
-      setIsExpanded(true);
-    }
-  }, [shouldAutoExpand, isExpanded]);
+  // Keep collapsed by default - no auto-expansion
   
   return (
     <div className={className}>

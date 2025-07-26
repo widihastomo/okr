@@ -452,6 +452,12 @@ The system now includes a comprehensive dummy data generation feature that creat
 
 ## Changelog
 ```
+- July 25, 2025. **MISSION CARD DEFAULT COLLAPSE COMPLETED** - Successfully set Mission Card to default collapsed state per user preference:
+  * CHANGED: Mission Card initial state from expanded (auto-expand based on incomplete missions) to collapsed (useState(false))
+  * REMOVED: Auto-expansion logic that automatically opened card when missions were incomplete
+  * ENHANCED: Users now see compact mission progress summary by default with manual expand option
+  * MAINTAINED: All functionality including mission progress tracking, completion status, and interactive expand/collapse
+  * RESULT: Cleaner interface with Mission Card collapsed by default, following user's interface simplification preference
 - July 25, 2025. **COMPACT MOBILE VIEW OPTIMIZATION COMPLETED** - Successfully created ultra-compact mobile interface for Inisiatif section with enhanced space efficiency:
   * OPTIMIZED: Quick Stats changed from single column to 2x2 grid on mobile with smaller padding, icons, and compact text
   * STREAMLINED: Stats labels shortened ("Total Budget" → "Budget", "Rata-rata Progress" → "Progress", "Berlangsung" → "Berjalan")
