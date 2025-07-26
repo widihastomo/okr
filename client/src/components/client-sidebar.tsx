@@ -45,7 +45,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import TimelineIconDefault from "@/components/ui/timeline-icon";
+
 
 interface SidebarProps {
   isOpen: boolean;
@@ -171,13 +171,6 @@ export default function Sidebar({
       path: "/tasks",
       active: location === "/tasks",
       tourId: "tasks",
-    },
-    {
-      label: "Timeline",
-      icon: TimelineIconDefault,
-      path: "/timeline",
-      active: location === "/timeline",
-      tourId: "timeline",
     },
     {
       label: "Siklus",

@@ -452,6 +452,15 @@ The system now includes a comprehensive dummy data generation feature that creat
 
 ## Changelog
 ```
+- July 26, 2025. **TIMELINE PAGE AND MENU COMPLETELY REMOVED** - Successfully removed timeline page and menu item from application per user request:
+  * REMOVED: Timeline route (/timeline) from App.tsx routing configuration
+  * REMOVED: TimelinePage import reference and component dependency
+  * REMOVED: Timeline menu item from client sidebar navigation (regularUserMenuItems array)
+  * REMOVED: TimelineIconDefault import from client-sidebar.tsx
+  * REMOVED: Timeline tour step from TourSystemNew component tour configuration
+  * UPDATED: Tour system reduced from 14 to 13 total steps after timeline removal
+  * ARCHITECTURAL: Timeline functionality now exclusively available through Dashboard Timeline tab
+  * RESULT: Clean application structure without redundant timeline page while preserving timeline features within Dashboard
 - July 26, 2025. **GOAL BUTTON OUTLINE STYLE APPLIED** - Successfully converted "Tambah Goal" and "Buat Goal Pertama" buttons to outline variant:
   * CHANGED: Both buttons from gradient style to outline variant with border-orange-600 text-orange-600 styling
   * UPDATED: Hover effect to hover:bg-orange-50 for consistent user experience

@@ -123,18 +123,6 @@ const TOUR_STEPS: TourStep[] = [
   },
 
   {
-    id: "timeline",
-    title: "Timeline - Riwayat Progress",
-    description:
-      "Visualisasi kronologis dari semua aktivitas dan progress yang telah dicapai. Lihat check-in, pencapaian milestone, dan perkembangan key results dalam format timeline yang mudah dipahami. Fitur ini memberikan gambaran historis yang komprehensif tentang perjalanan organisasi.",
-    icon: Clock,
-    selector: '[data-tour="timeline"]',
-    position: "right",
-    category: "feature",
-    targetPath: "/timeline",
-  },
-
-  {
     id: "cycles",
     title: "Siklus - Periode Waktu",
     description:
