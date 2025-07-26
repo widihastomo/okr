@@ -452,6 +452,11 @@ The system now includes a comprehensive dummy data generation feature that creat
 
 ## Changelog
 ```
+- July 26, 2025. **TASK BUTTON OUTLINE STYLE APPLIED** - Successfully converted "Tambah Task" button to outline variant per user request:
+  * CHANGED: Button variant from gradient style (bg-gradient-to-r from-orange-600 to-orange-500) to outline style
+  * UPDATED: Styling to border-orange-600 text-orange-600 hover:bg-orange-50 for consistent outline design
+  * MAINTAINED: All existing functionality while updating visual style to match user preference
+  * RESULT: Clean outline button styling consistent with other outline buttons throughout the application
 - July 26, 2025. **CARD HEIGHT CONSTRAINTS UPDATED** - Successfully updated height constraints to 500px for both Task and Key Result cards:
   * UPDATED: Changed from min-h-[400px] max-h-[600px] to min-h-[500px] max-h-[500px] for fixed height consistency
   * ENHANCED: Both Task Prioritas and Update Progress cards now have uniform 500px height
