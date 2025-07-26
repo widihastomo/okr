@@ -688,27 +688,27 @@ export default function OrganizationSettings() {
         }`} data-tour="org-settings">
           {(user as any)?.role !== "member" && (
             <>
-              <TabsTrigger value="general" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 p-2 sm:p-3">
-                <Building2 className="h-4 w-4" />
+              <TabsTrigger value="general" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 p-2 sm:p-3 text-sm">
+                <Building2 className="w-4 h-4" />
                 <span className="text-xs sm:text-sm">Umum</span>
               </TabsTrigger>
-              <TabsTrigger value="subscription" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 p-2 sm:p-3">
-                <CreditCard className="h-4 w-4" />
+              <TabsTrigger value="subscription" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 p-2 sm:p-3 text-sm">
+                <CreditCard className="w-4 h-4" />
                 <span className="text-xs sm:text-sm">Langganan</span>
               </TabsTrigger>
-              <TabsTrigger value="roles" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 p-2 sm:p-3">
-                <Shield className="h-4 w-4" />
+              <TabsTrigger value="roles" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 p-2 sm:p-3 text-sm">
+                <Shield className="w-4 h-4" />
                 <span className="text-xs sm:text-sm">Roles</span>
               </TabsTrigger>
             </>
           )}
-          <TabsTrigger value="notifications" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 p-2 sm:p-3">
-            <Bell className="h-4 w-4" />
+          <TabsTrigger value="notifications" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 p-2 sm:p-3 text-sm">
+            <Bell className="w-4 h-4" />
             <span className="text-xs sm:text-sm">Notifikasi</span>
           </TabsTrigger>
           {(user as any)?.role !== "member" && (
-            <TabsTrigger value="settings" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 p-2 sm:p-3">
-              <Settings className="h-4 w-4" />
+            <TabsTrigger value="settings" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 p-2 sm:p-3 text-sm">
+              <Settings className="w-4 h-4" />
               <span className="text-xs sm:text-sm">Lanjutan</span>
             </TabsTrigger>
           )}
