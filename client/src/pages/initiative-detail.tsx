@@ -1809,7 +1809,7 @@ export default function InitiativeDetailPage() {
             <CardContent className="pt-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Success Metrics Section */}
-                <div className="lg:border-r lg:border-gray-200 lg:pr-6">
+                <div>
                   <Card className="border-orange-200 bg-orange-50/30">
                     <CardContent className="p-4">
                       <div className="space-y-3">
@@ -1969,7 +1969,7 @@ export default function InitiativeDetailPage() {
                 </div>
 
                 {/* Deliverables Section */}
-                <div className="lg:pl-6">
+                <div>
                   <Card className="border-green-200 bg-green-50/30">
                     <CardContent className="p-4">
                       <div className="space-y-3">
