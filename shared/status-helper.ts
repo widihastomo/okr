@@ -33,7 +33,7 @@ export function getProgressStatus(progressPercentage: number, idealProgress: num
 }
 
 /**
- * Calculate dynamic status for key result based on current progress and timeline
+ * Calculate dynamic status for key result based on current progress and timeline (STRICT VERSION)
  */
 export function calculateKeyResultStatus(
   currentProgress: number,
@@ -41,20 +41,26 @@ export function calculateKeyResultStatus(
   cycleEndDate: Date
 ): { status: 'on_track' | 'at_risk' | 'off_track'; statusText: string } {
   const idealProgress = calculateIdealProgress(cycleStartDate, cycleEndDate);
-  const progressStatus = getProgressStatus(currentProgress, idealProgress);
   
-  // Map to simplified status system used in UI
-  switch (progressStatus) {
-    case 'completed':
-    case 'ahead':
-    case 'on_track':
-      return { status: 'on_track', statusText: 'On Track' };
-    case 'at_risk':
-      return { status: 'at_risk', statusText: 'At Risk' };
-    case 'behind':
-    default:
-      return { status: 'off_track', statusText: 'Off Track' };
+  // STRICT logic: if below ideal target, immediately becomes at risk
+  if (currentProgress >= 100) {
+    return { status: 'on_track', statusText: 'On Track' };
   }
+  
+  if (currentProgress >= idealProgress) {
+    return { status: 'on_track', statusText: 'On Track' };
+  }
+  
+  const gap = idealProgress - currentProgress;
+  
+  // Strict thresholds based on how far behind ideal target
+  // At Risk: 0-15% below ideal target
+  // Off Track: >15% below ideal target
+  if (gap <= 15) {
+    return { status: 'at_risk', statusText: 'At Risk' };
+  }
+  
+  return { status: 'off_track', statusText: 'Off Track' };
 }
 
 /**

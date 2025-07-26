@@ -452,6 +452,12 @@ The system now includes a comprehensive dummy data generation feature that creat
 
 ## Changelog
 ```
+- July 26, 2025. **STRICT STATUS CALCULATION SYSTEM COMPLETED** - Successfully implemented strict key result status calculation based on ideal timeline targets:
+  * ENHANCED: Strict status logic where any progress below ideal target immediately becomes "At Risk"
+  * DEFINED: Clear status thresholds - On Track (≥ideal target), At Risk (0-15% below ideal), Off Track (>15% below ideal)
+  * ALIGNED: Status calculation directly compares current progress vs timeline-based ideal progress percentage
+  * REMOVED: Previous lenient gap tolerance system that allowed underperformance to still show "On Track"
+  * RESULT: Key result status badges now accurately reflect performance against timeline expectations with zero tolerance for falling behind schedule
 - July 26, 2025. **THOUSAND SEPARATOR AND RUPIAH FORMATTING COMPLETED** - Successfully implemented proper number formatting for key result values in Daily Focus cards:
   * ADDED: formatValue() function with thousand separator support using formatNumberWithSeparator utility
   * ENHANCED: Rupiah currency formatting using Intl.NumberFormat with 'id-ID' locale and IDR currency
