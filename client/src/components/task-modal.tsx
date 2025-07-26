@@ -52,7 +52,8 @@ import {
 
 interface TaskModalProps {
   open: boolean;
-  onClose: () => void;
+  onOpenChange?: (open: boolean) => void;
+  onClose?: () => void;
   task?: any;
   initiativeId?: string;
   objectiveId?: string;
@@ -76,12 +77,16 @@ const getStatusLabel = (status: string) => {
 
 export default function TaskModal({
   open,
+  onOpenChange,
   onClose,
   task,
   initiativeId,
   objectiveId,
   isAdding,
 }: TaskModalProps) {
+  // Auto-detect if this is adding mode when isAdding prop is not provided
+  const isAddingMode = isAdding !== undefined ? isAdding : !task;
+  
   const { toast } = useToast();
   const { user } = useAuth();
 
@@ -128,8 +133,12 @@ export default function TaskModal({
     setStartDatePopoverOpen(false);
     setDueDatePopoverOpen(false);
 
-    // Call parent close handler
-    onClose();
+    // Call appropriate close handler
+    if (onOpenChange) {
+      onOpenChange(false);
+    } else if (onClose) {
+      onClose();
+    }
   };
 
   // Helper function to get status display with visual indicator
@@ -197,7 +206,7 @@ export default function TaskModal({
     : [];
 
   useEffect(() => {
-    if (task && !isAdding) {
+    if (task && !isAddingMode) {
       setFormData({
         title: task.title || "",
         description: task.description || "",
@@ -220,7 +229,7 @@ export default function TaskModal({
         initiativeId: initiativeId || "",
       });
     }
-  }, [task, isAdding, initiativeId, user]);
+  }, [task, isAddingMode, initiativeId, user]);
 
   const createMutation = useMutation({
     mutationFn: async (data: any) => {
@@ -448,7 +457,7 @@ export default function TaskModal({
           : formData.initiativeId || initiativeId,
     };
 
-    if (isAdding) {
+    if (isAddingMode) {
       createMutation.mutate(submitData);
     } else {
       updateMutation.mutate(submitData);
@@ -486,10 +495,10 @@ export default function TaskModal({
       <DialogContent className="w-[90vw] max-w-[90vw] sm:max-w-xl lg:max-w-2xl max-h-[80vh] overflow-y-auto p-3 sm:p-4 mx-auto">
         <DialogHeader>
           <DialogTitle>
-            {isAdding ? "Tambah Task Baru" : "Edit Task"}
+            {isAddingMode ? "Tambah Task Baru" : "Edit Task"}
           </DialogTitle>
           <DialogDescription className="text-left">
-            {isAdding
+            {isAddingMode
               ? initiativeId 
                 ? "Buat task baru untuk initiative ini"
                 : "Buat task baru untuk project Anda"
@@ -1097,11 +1106,11 @@ export default function TaskModal({
             }
             className="w-full sm:w-auto px-6 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white order-1 sm:order-2"
           >
-            {isAdding ? "Tambah Task" : "Update Task"}
+            {isAddingMode ? "Tambah Task" : "Update Task"}
           </Button>
           <Button
             variant="outline"
-            onClick={onClose}
+            onClick={handleClose}
             className="w-full sm:w-auto px-6 order-2 sm:order-1"
           >
             Batal
