@@ -3429,9 +3429,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createTimelineComment(comment: InsertTimelineComment): Promise<TimelineComment> {
+    const { mentionedUsers, ...commentData } = comment;
     const [newComment] = await db
       .insert(timelineComments)
-      .values(comment)
+      .values(commentData)
       .returning();
     return newComment;
   }
