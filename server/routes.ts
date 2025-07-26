@@ -5726,6 +5726,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { content } = req.body;
       const user = req.user as User;
 
+      console.log("🔍 Edit comment debug:", { commentId, content, userId: user.id });
+
       if (!content || !content.trim()) {
         return res.status(400).json({ message: "Comment content is required" });
       }
@@ -5733,12 +5735,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get existing comment to check ownership
       const existingComment = await storage.getTimelineCommentById(commentId);
       
+      console.log("🔍 Existing comment:", existingComment);
+      
       if (!existingComment) {
         return res.status(404).json({ message: "Comment not found" });
       }
 
       // Check if user owns the comment
-      if (existingComment.createdBy !== user.id && existingComment.userId !== user.id) {
+      console.log("🔍 Ownership check:", { 
+        commentCreatedBy: existingComment.createdBy, 
+        userId: user.id, 
+        match: existingComment.createdBy === user.id 
+      });
+      
+      if (existingComment.createdBy !== user.id) {
         return res.status(403).json({ message: "Unauthorized to edit this comment" });
       }
 
