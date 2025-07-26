@@ -463,8 +463,54 @@ The system now includes a comprehensive dummy data generation feature that creat
   - Open `clear-onboarding-browser.html` in browser - Clear localStorage data
 * **RESULT**: User can start completely fresh onboarding process from beginning
 
+## Frontend API Configuration System
+
+### **ENVIRONMENT-BASED API ENDPOINT DETECTION COMPLETED** - Successfully implemented comprehensive frontend build system with automatic API endpoint configuration:
+
+#### **System Components**
+- **`client/src/lib/api-config.ts`** - Core API configuration utility with environment detection
+- **`client/src/lib/queryClient.ts`** - Enhanced API client with automatic endpoint resolution
+- **`build-env-aware.js`** - Environment-aware build script with debugging and validation
+- **`FRONTEND-API-CONFIG.md`** - Complete documentation and troubleshooting guide
+
+#### **Configuration Strategy**
+- **VITE_API_URL Priority** (highest): Uses exact URL for all API calls (Replit, custom domains)
+- **Development Mode**: Uses relative URLs with Vite proxy for local development
+- **Production Fallback**: Uses current page origin for same-origin deployments
+
+#### **Enhanced Build Features**
+- **Environment Validation**: Validates configuration before build
+- **Build Info Generation**: Creates `dist/public/build-info.json` with deployment metadata
+- **Custom HTML**: Environment-aware HTML with configuration display
+- **Debug Logging**: Comprehensive API configuration logging in browser console
+
+#### **Build Commands**
+- `npm run build` - Standard Vite build with environment detection
+- `node build-env-aware.js` - Enhanced build with debugging and validation
+
+#### **Usage Examples**
+- **Replit**: `VITE_API_URL=https://your-repl-name.replit.app`
+- **Custom Domain**: `VITE_API_URL=https://api.yourdomain.com`
+- **Same-Origin**: Leave `VITE_API_URL` empty
+- **Development**: Leave `VITE_API_URL` empty (Vite proxy handles API)
+
+#### **Implementation Results**
+- ✅ **Automatic API Detection**: Frontend automatically configures endpoints based on environment
+- ✅ **Debug Visibility**: Console logging shows exact API configuration and strategy used
+- ✅ **Build Validation**: Enhanced build script validates environment and creates deployment metadata
+- ✅ **Backward Compatibility**: Existing deployments continue working without changes
+- ✅ **Documentation**: Complete guide for configuration, troubleshooting, and deployment scenarios
+
 ## Changelog
 ```
+- July 26, 2025. **FRONTEND API CONFIGURATION SYSTEM COMPLETED** - Successfully implemented comprehensive environment-based API endpoint detection:
+  * CREATED: api-config.ts utility for centralized API configuration management with debugging capabilities
+  * ENHANCED: queryClient.ts with environment variable detection, fallback mechanisms, and comprehensive logging
+  * BUILT: build-env-aware.js script for environment-aware frontend builds with proper .env integration
+  * IMPLEMENTED: 3-tier detection strategy (VITE_API_URL → development proxy → current origin) with automatic fallback
+  * VALIDATED: System automatically detects and uses VITE_API_URL from environment for API endpoint configuration
+  * DOCUMENTED: Complete configuration guide with deployment examples and troubleshooting instructions
+  * RESULT: Frontend now automatically configures API endpoints based on environment with comprehensive debugging support
 - July 26, 2025. **ONBOARDING DATA RESET FUNCTIONALITY COMPLETED** - Successfully created comprehensive system to clear user onboarding data:
   * CREATED: reset-user-onboarding.js script to clear database records (tour status, onboarding progress)
   * CREATED: clear-onboarding-browser.html tool to clear all localStorage onboarding-related data  
