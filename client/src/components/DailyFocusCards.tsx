@@ -565,7 +565,7 @@ export function DailyFocusCards({
         <div className="flex-1">
           <Card data-tour="update-progress-tab" className="min-h-[500px] max-h-[500px] flex flex-col">
             <CardHeader>
-              <CardTitle>Update Progress Angka Target ({activeKeyResults.length})</CardTitle>
+              <CardTitle className="font-semibold tracking-tight text-[18px]">Update Progress Angka Target ({activeKeyResults.length})</CardTitle>
               <CardDescription>
                 Lakukan check-in pada angka target (termasuk yang sudah 100%)
               </CardDescription>
