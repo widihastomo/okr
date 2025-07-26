@@ -387,9 +387,23 @@ export function DailyFocusCards({
                                   </Badge>
                                 </div>
                                 <div className="w-full space-y-1">
-                                  <Progress value={Math.min(Math.max(progress, 0), 100)} className="h-2" />
+                                  <div className="relative">
+                                    <Progress value={Math.min(Math.max(progress, 0), 100)} className="h-3" />
+                                    {/* Ideal target marker at 70% */}
+                                    <div 
+                                      className="absolute top-0 h-3 w-0.5 bg-orange-500 rounded-full" 
+                                      style={{ left: '70%' }}
+                                      title="Target Ideal: 70%"
+                                    />
+                                    <div 
+                                      className="absolute -top-1 w-2 h-2 bg-orange-500 rounded-full border border-white" 
+                                      style={{ left: 'calc(70% - 4px)' }}
+                                      title="Target Ideal: 70%"
+                                    />
+                                  </div>
                                   <div className="flex justify-between text-xs text-gray-500">
                                     <span>{Math.round(progress)}%</span>
+                                    <span className="text-orange-600 font-medium">Target: 70%</span>
                                     <span>{keyResult.currentValue} / {keyResult.targetValue} {keyResult.unit}</span>
                                   </div>
                                 </div>
