@@ -1616,12 +1616,10 @@ export default function InitiativeDetailPage() {
         />
       )}
 
-      {/* Main Content Grid */}
-      <div className="flex flex-col lg:grid lg:grid-cols-3 gap-6 mb-6">
-        {/* Main Content */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Overview Card */}
-          <Card className="border-gray-200 shadow-sm">
+      {/* Overview and History Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        {/* Overview Card */}
+        <Card className="border-gray-200 shadow-sm lg:col-span-2">
             <CardHeader className="pb-4">
               <div className="flex items-start justify-between">
                 <h1 className="text-2xl font-bold text-gray-900">
@@ -1798,10 +1796,16 @@ export default function InitiativeDetailPage() {
 
               </div>
             </CardContent>
-          </Card>
+        </Card>
 
-          {/* Metrik Keberhasilan & Deliverables Card - Combined */}
-          <Card className="border-gray-200 shadow-sm lg:col-span-2">
+        {/* Initiative History Card */}
+        <InitiativeHistory initiativeId={id!} />
+      </div>
+
+      {/* Main Content Section */}
+      <div className="space-y-6">
+        {/* Metrik Keberhasilan & Deliverables Card - Combined */}
+        <Card className="border-gray-200 shadow-sm">
             <CardHeader className="pb-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -2518,13 +2522,6 @@ export default function InitiativeDetailPage() {
             }
           />
         </div>
-
-        {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Initiative History */}
-          <InitiativeHistory initiativeId={id!} />
-        </div>
-      </div>
 
       {/* Add Deliverable Modal */}
       <Dialog open={isAddDeliverableModalOpen} onOpenChange={setIsAddDeliverableModalOpen}>
