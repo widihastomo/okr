@@ -314,6 +314,7 @@ function MissionCard({
 function TimelineFeedComponent() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   // Timeline states
   const [timelineFilter, setTimelineFilter] = useState('all');
@@ -510,9 +511,13 @@ function TimelineFeedComponent() {
   const deleteCommentMutation = useMutation({
     mutationFn: async (commentId: string) => {
       const response = await apiRequest('DELETE', `/api/timeline/comments/${commentId}`);
+      // Don't try to parse JSON for 204 No Content responses
+      if (response.status === 204) {
+        return { success: true, commentId };
+      }
       return response.json();
     },
-    onSuccess: (_, commentId) => {
+    onSuccess: (data, commentId) => {
       // Remove comment from local data
       setCommentsData(prev => {
         const newData = { ...prev };
@@ -526,10 +531,21 @@ function TimelineFeedComponent() {
       queryClient.invalidateQueries({ queryKey: ['/api/timeline'] });
       queryClient.invalidateQueries({ queryKey: ['/api/timeline/comments'] });
       
+      // Show success toast
+      toast({
+        title: "Komentar berhasil dihapus",
+        variant: "success",
+      });
+      
       console.log('✅ Comment deleted successfully');
     },
     onError: (error) => {
       console.error('❌ Error deleting comment:', error);
+      toast({
+        title: "Gagal menghapus komentar",
+        description: error.message,
+        variant: "destructive",
+      });
     }
   });
 
