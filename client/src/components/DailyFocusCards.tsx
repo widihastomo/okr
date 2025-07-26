@@ -399,8 +399,6 @@ export function DailyFocusCards({
                                 <span className="text-xs text-red-600">
                                   Due: {formatDate(new Date(task.dueDate))}
                                 </span>
-                              </div>
-                              <div className="flex items-center gap-1">
                                 <Avatar className="h-4 w-4">
                                   <AvatarImage src={users.find((u: any) => u.id === task.assignedTo)?.profileImageUrl} />
                                   <AvatarFallback className="bg-blue-100 text-blue-600 text-xs font-medium">
@@ -455,8 +453,6 @@ export function DailyFocusCards({
                                 <span className="text-xs text-blue-600">
                                   Due: {formatDate(new Date(task.dueDate))}
                                 </span>
-                              </div>
-                              <div className="flex items-center gap-1">
                                 <Avatar className="h-4 w-4">
                                   <AvatarImage src={users.find((u: any) => u.id === task.assignedTo)?.profileImageUrl} />
                                   <AvatarFallback className="bg-blue-100 text-blue-600 text-xs font-medium">
@@ -511,8 +507,6 @@ export function DailyFocusCards({
                                 <span className="text-xs text-green-600">
                                   Due: {formatDate(new Date(task.dueDate))}
                                 </span>
-                              </div>
-                              <div className="flex items-center gap-1">
                                 <Avatar className="h-4 w-4">
                                   <AvatarImage src={users.find((u: any) => u.id === task.assignedTo)?.profileImageUrl} />
                                   <AvatarFallback className="bg-blue-100 text-blue-600 text-xs font-medium">
