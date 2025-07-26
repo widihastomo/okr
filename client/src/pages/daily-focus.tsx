@@ -423,6 +423,7 @@ function TimelineFeedComponent() {
   const toggleEmojiPicker = (timelineId: string) => {
     console.log('🎭 Toggling emoji picker for:', timelineId);
     console.log('🎭 Current state:', showEmojiPicker);
+    
     setShowEmojiPicker(prev => {
       const newState = { ...prev, [timelineId]: !prev[timelineId] };
       console.log('🎭 New state:', newState);
@@ -443,7 +444,9 @@ function TimelineFeedComponent() {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
-      if (!target.closest('.emoji-picker-container')) {
+      // Don't close if clicking on emoji picker container or emoji button
+      if (!target.closest('.emoji-picker-container') && !target.closest('.emoji-button')) {
+        console.log('🎭 Closing emoji picker due to outside click');
         setShowEmojiPicker({});
       }
     };
@@ -951,11 +954,12 @@ function TimelineFeedComponent() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => {
+                                onClick={(e) => {
+                                  e.stopPropagation();
                                   console.log('🎭 Emoji button clicked for item:', item.id);
                                   toggleEmojiPicker(item.id);
                                 }}
-                                className="absolute right-1 top-1/2 transform -translate-y-1/2 p-1 h-6 w-6"
+                                className="emoji-button absolute right-1 top-1/2 transform -translate-y-1/2 p-1 h-6 w-6"
                               >
                                 <Smile className="w-3 h-3 text-gray-500" />
                               </Button>
