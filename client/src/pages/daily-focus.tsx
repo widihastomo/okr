@@ -647,11 +647,27 @@ function TimelineFeedComponent() {
     }
   };
 
+  // State for delete confirmation modal
+  const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false);
+  const [commentToDelete, setCommentToDelete] = useState<string | null>(null);
+
   const handleDeleteComment = (commentId: string) => {
-    if (window.confirm('Apakah Anda yakin ingin menghapus komentar ini?')) {
-      deleteCommentMutation.mutate(commentId);
-    }
+    setCommentToDelete(commentId);
+    setShowDeleteConfirmModal(true);
     setShowCommentMenu({});
+  };
+
+  const confirmDeleteComment = () => {
+    if (commentToDelete) {
+      deleteCommentMutation.mutate(commentToDelete);
+    }
+    setShowDeleteConfirmModal(false);
+    setCommentToDelete(null);
+  };
+
+  const cancelDeleteComment = () => {
+    setShowDeleteConfirmModal(false);
+    setCommentToDelete(null);
   };
 
   // Close emoji picker, mention dropdown, and comment menu when clicking outside
@@ -1490,6 +1506,38 @@ function TimelineFeedComponent() {
           </div>
         </div>
       </CardContent>
+
+      {/* Delete Comment Confirmation Modal */}
+      {showDeleteConfirmModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-sm mx-4">
+            <div className="flex items-center mb-4">
+              <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-3">
+                <Trash2 className="w-5 h-5 text-red-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Hapus Komentar</h3>
+                <p className="text-sm text-gray-600">Apakah Anda yakin ingin menghapus komentar ini?</p>
+              </div>
+            </div>
+            <div className="flex space-x-3 justify-end">
+              <button
+                onClick={cancelDeleteComment}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+              >
+                Batal
+              </button>
+              <button
+                onClick={confirmDeleteComment}
+                disabled={deleteCommentMutation.isPending}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-md transition-colors disabled:opacity-50"
+              >
+                {deleteCommentMutation.isPending ? 'Menghapus...' : 'Hapus'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </Card>
   );
 }
