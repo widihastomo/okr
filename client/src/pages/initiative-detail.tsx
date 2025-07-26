@@ -244,7 +244,7 @@ function MissionCard({
   const shouldAutoExpand =
     (!successMetrics || successMetrics.length === 0) &&
     (!tasks || tasks.length === 0);
-  const [isExpanded, setIsExpanded] = useState(shouldAutoExpand);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   return (
     <div className={className}>
