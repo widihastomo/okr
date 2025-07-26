@@ -367,12 +367,28 @@ function TimelineFeedComponent() {
     enabled: !!user,
   });
 
-  // Get comments for each timeline item
-  const useTimelineComments = (timelineItemId: string) => {
-    return useQuery({
-      queryKey: ['/api/timeline', timelineItemId, 'comments'],
-      enabled: !!timelineItemId && showComments[timelineItemId],
-    });
+  // State to track comments for each timeline item
+  const [commentsData, setCommentsData] = useState<{[key: string]: any[]}>({});
+  const [commentsLoading, setCommentsLoading] = useState<{[key: string]: boolean}>({});
+
+  // Function to fetch comments for a timeline item
+  const fetchCommentsForItem = async (timelineItemId: string) => {
+    if (commentsLoading[timelineItemId] || commentsData[timelineItemId]) return;
+    
+    setCommentsLoading(prev => ({ ...prev, [timelineItemId]: true }));
+    try {
+      const response = await fetch(`/api/timeline/${timelineItemId}/comments`, {
+        credentials: 'include',
+      });
+      if (response.ok) {
+        const comments = await response.json();
+        setCommentsData(prev => ({ ...prev, [timelineItemId]: comments }));
+      }
+    } catch (error) {
+      console.error('Error fetching comments:', error);
+    } finally {
+      setCommentsLoading(prev => ({ ...prev, [timelineItemId]: false }));
+    }
   };
 
   // Add comment mutation
@@ -382,7 +398,8 @@ function TimelineFeedComponent() {
     },
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['/api/timeline'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/timeline', variables.timelineId, 'comments'] });
+      // Refresh comments data
+      fetchCommentsForItem(variables.timelineId);
     },
   });
 
@@ -403,7 +420,14 @@ function TimelineFeedComponent() {
   };
 
   const toggleComments = (id: string) => {
-    setShowComments(prev => ({ ...prev, [id]: !prev[id] }));
+    setShowComments(prev => {
+      const newValue = !prev[id];
+      // Fetch comments when opening for the first time
+      if (newValue && !commentsData[id]) {
+        fetchCommentsForItem(id);
+      }
+      return { ...prev, [id]: newValue };
+    });
   };
 
   // Handle reaction toggle
@@ -823,10 +847,7 @@ function TimelineFeedComponent() {
                         <MessageSquare className="w-4 h-4 mr-1" />
                         <span className="text-xs">
                           Komentar
-                          {(() => {
-                            const { data: comments = [] } = useTimelineComments(item.id);
-                            return comments.length > 0 ? ` (${comments.length})` : '';
-                          })()}
+                          {commentsData[item.id]?.length > 0 ? ` (${commentsData[item.id].length})` : ''}
                         </span>
                       </Button>
                     </div>
@@ -836,46 +857,38 @@ function TimelineFeedComponent() {
                   {showComments[item.id] && (
                     <div className="mt-3 pt-3 border-t border-gray-50">
                       {/* Existing Comments */}
-                      {(() => {
-                        const { data: comments = [], isLoading: commentsLoading } = useTimelineComments(item.id);
-                        
-                        return (
-                          <>
-                            {comments.length > 0 && (
-                              <div className="space-y-3 mb-3">
-                                {comments.map((comment: any) => (
-                                  <div key={comment.id} className="flex space-x-2">
-                                    <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-green-500 rounded-full flex items-center justify-center text-white font-semibold text-xs flex-shrink-0">
-                                      {(comment.userName || comment.userEmail || 'U').charAt(0).toUpperCase()}
-                                    </div>
-                                    <div className="flex-1">
-                                      <div className="bg-gray-50 rounded-lg px-3 py-2">
-                                        <div className="flex items-center justify-between mb-1">
-                                          <span className="text-xs font-medium text-gray-900">
-                                            {comment.userName || comment.userEmail}
-                                          </span>
-                                          <span className="text-xs text-gray-500">
-                                            {getTimeAgo(comment.createdAt)}
-                                          </span>
-                                        </div>
-                                        <div className="text-sm text-gray-700">
-                                          {comment.content}
-                                        </div>
-                                      </div>
-                                    </div>
+                      {commentsData[item.id]?.length > 0 && (
+                        <div className="space-y-3 mb-3">
+                          {commentsData[item.id].map((comment: any) => (
+                            <div key={comment.id} className="flex space-x-2">
+                              <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-green-500 rounded-full flex items-center justify-center text-white font-semibold text-xs flex-shrink-0">
+                                {(comment.userName || comment.userEmail || 'U').charAt(0).toUpperCase()}
+                              </div>
+                              <div className="flex-1">
+                                <div className="bg-gray-50 rounded-lg px-3 py-2">
+                                  <div className="flex items-center justify-between mb-1">
+                                    <span className="text-xs font-medium text-gray-900">
+                                      {comment.userName || comment.userEmail}
+                                    </span>
+                                    <span className="text-xs text-gray-500">
+                                      {getTimeAgo(comment.createdAt)}
+                                    </span>
                                   </div>
-                                ))}
+                                  <div className="text-sm text-gray-700">
+                                    {comment.content}
+                                  </div>
+                                </div>
                               </div>
-                            )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
 
-                            {commentsLoading && (
-                              <div className="text-center py-2">
-                                <div className="text-xs text-gray-500">Memuat komentar...</div>
-                              </div>
-                            )}
-                          </>
-                        );
-                      })()}
+                      {commentsLoading[item.id] && (
+                        <div className="text-center py-2">
+                          <div className="text-xs text-gray-500">Memuat komentar...</div>
+                        </div>
+                      )}
 
                       {/* Add New Comment */}
                       <div className="flex space-x-2">
