@@ -3,7 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Plus, Eye, Edit, Trash2, Target, CheckCircle, Clock, Calendar, Lightbulb, TrendingUp, BarChart3 } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Plus, Eye, Edit, Trash2, Target, CheckCircle, Clock, Calendar, Lightbulb, TrendingUp, BarChart3, User } from "lucide-react";
 import { Link } from "wouter";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { formatNumberWithSeparator } from "@/lib/number-utils";
@@ -49,6 +51,12 @@ interface Cycle {
   endDate: string;
 }
 
+interface User {
+  id: string;
+  name: string;
+  email: string;
+}
+
 interface DailyFocusCardsProps {
   // Task props
   overdueTasks: Task[];
@@ -73,6 +81,9 @@ interface DailyFocusCardsProps {
   // Cycle data for timeline calculation
   cycles: Cycle[];
   
+  // Users data
+  users: User[];
+  
   // Common
   userFilter: string;
   formatDate: (date: Date) => string;
@@ -94,9 +105,28 @@ export function DailyFocusCards({
   isLoadingInitiatives,
   onUpdateMetrics,
   cycles,
+  users,
   userFilter,
   formatDate
 }: DailyFocusCardsProps) {
+
+  // Helper function to get user name
+  const getUserName = (userId: string | null | undefined): string => {
+    if (!userId || !users) return "Pengguna";
+    const user = users.find((u: any) => u.id === userId);
+    
+    // Use consolidated name field
+    if (user?.name && user.name.trim() !== "") {
+      return user.name.trim();
+    }
+    
+    // Fallback to email username
+    if (user?.email) {
+      return user.email.split('@')[0];
+    }
+    
+    return "Pengguna";
+  };
 
   // Format value with thousand separator and rupiah formatting
   const formatValue = (value: number, unit: string) => {
@@ -543,20 +573,236 @@ export function DailyFocusCards({
             Monitor dan perbarui progress inisiatif yang sedang berjalan
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="p-0">
           {isLoadingInitiatives ? (
-            <div className="space-y-4">
-              {Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="p-3 bg-white border border-gray-200 rounded-lg">
-                  <Skeleton className="h-4 w-full mb-2" />
-                  <Skeleton className="h-3 w-2/3 mb-2" />
-                  <Skeleton className="h-3 w-1/3" />
-                </div>
+            <div className="space-y-3 p-4">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="h-12 bg-gray-200 rounded animate-pulse"></div>
               ))}
             </div>
           ) : activeInitiatives.length > 0 ? (
             <>
-              <div className="space-y-4">
+              {/* Desktop Table View */}
+              <div className="hidden md:block overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-gray-50 border-b">
+                      <TableHead className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Inisiatif
+                      </TableHead>
+                      <TableHead className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Status
+                      </TableHead>
+                      <TableHead className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Prioritas
+                      </TableHead>
+                      <TableHead className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Progress
+                      </TableHead>
+                      <TableHead className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Tenggat
+                      </TableHead>
+                      <TableHead className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        PIC
+                      </TableHead>
+                      <TableHead className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Aksi
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody className="bg-white divide-y divide-gray-200">
+                    {activeInitiatives
+                      .filter((initiative) => {
+                        if (!userFilter || userFilter === 'all') return true;
+                        return (
+                          initiative.picId?.toString() === userFilter ||
+                          initiative.createdBy?.toString() === userFilter
+                        );
+                      })
+                      .sort((a, b) => {
+                        const scoreA = parseFloat(a.priorityScore || "0");
+                        const scoreB = parseFloat(b.priorityScore || "0");
+                        return scoreB - scoreA; // Sort by priority score descending
+                      })
+                      .map((initiative) => {
+                        const rawScore = initiative.priorityScore;
+                        const score = parseFloat(rawScore || "0");
+                        
+                        let color: string;
+                        let label: string;
+                        
+                        if (score >= 4.0) {
+                          color = "bg-red-100 text-red-800";
+                          label = "Kritis";
+                        } else if (score >= 3.0) {
+                          color = "bg-orange-100 text-orange-800";
+                          label = "Tinggi";
+                        } else if (score >= 2.0) {
+                          color = "bg-yellow-100 text-yellow-800";
+                          label = "Sedang";
+                        } else {
+                          color = "bg-green-100 text-green-800";
+                          label = "Rendah";
+                        }
+
+                        return (
+                          <TableRow
+                            key={initiative.id}
+                            className="hover:bg-gray-50"
+                          >
+                            <TableCell className="px-4 py-4">
+                              <div>
+                                <Link href={`/initiatives/${initiative.id}`}>
+                                  <div className="font-medium text-gray-900 hover:text-blue-600 cursor-pointer">
+                                    {initiative.title}
+                                  </div>
+                                </Link>
+                                
+                                {initiative.keyResultId && (
+                                  <div className="flex items-center gap-1 mt-1">
+                                    <TooltipProvider>
+                                      <Tooltip>
+                                        <TooltipTrigger>
+                                          <Target className="w-3 h-3 text-blue-600" />
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                          <p>Angka Target</p>
+                                        </TooltipContent>
+                                      </Tooltip>
+                                    </TooltipProvider>
+                                    <span className="text-xs text-blue-600 font-medium">
+                                      {initiative.keyResultId}
+                                    </span>
+                                  </div>
+                                )}
+                                {initiative.budget && (
+                                  <div className="text-sm text-gray-500 mt-1">
+                                    Budget: Rp{" "}
+                                    {parseFloat(
+                                      initiative.budget,
+                                    ).toLocaleString("id-ID")}
+                                  </div>
+                                )}
+                              </div>
+                            </TableCell>
+                            <TableCell className="px-4 py-4">
+                              {(() => {
+                                const status = initiative.status || "draft";
+                                const getStatusInfo = (status: string) => {
+                                  const statusMap = {
+                                    'draft': {
+                                      label: 'Draft',
+                                      bgColor: 'bg-yellow-100',
+                                      textColor: 'text-yellow-800',
+                                    },
+                                    'not_started': {
+                                      label: 'Belum Mulai',
+                                      bgColor: 'bg-gray-100',
+                                      textColor: 'text-gray-800',
+                                    },
+                                    'in_progress': {
+                                      label: 'Berlangsung',
+                                      bgColor: 'bg-blue-100',
+                                      textColor: 'text-blue-800',
+                                    },
+                                    'completed': {
+                                      label: 'Selesai',
+                                      bgColor: 'bg-green-100',
+                                      textColor: 'text-green-800',
+                                    },
+                                    'cancelled': {
+                                      label: 'Dibatalkan',
+                                      bgColor: 'bg-red-100',
+                                      textColor: 'text-red-800',
+                                    }
+                                  };
+                                  return statusMap[status] || statusMap['draft'];
+                                };
+
+                                const statusInfo = getStatusInfo(status);
+                                return (
+                                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusInfo.bgColor} ${statusInfo.textColor}`}>
+                                    {statusInfo.label}
+                                  </span>
+                                );
+                              })()}
+                            </TableCell>
+                            <TableCell className="px-4 py-4">
+                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${color}`}>
+                                {label} ({score.toFixed(1)})
+                              </span>
+                            </TableCell>
+                            <TableCell className="px-4 py-4">
+                              <div className="w-full">
+                                <div className="flex items-center justify-between text-sm mb-1">
+                                  <span className="text-gray-600">{Math.round(initiative.progressPercentage || 0)}%</span>
+                                </div>
+                                <Progress 
+                                  value={initiative.progressPercentage || 0} 
+                                  className="h-2"
+                                />
+                              </div>
+                            </TableCell>
+                            <TableCell className="px-4 py-4">
+                              <div className="text-sm">
+                                <div 
+                                  className={
+                                    new Date(initiative.dueDate) < new Date()
+                                      ? "text-red-600 font-medium"
+                                      : "text-gray-900"
+                                  }
+                                >
+                                  {new Date(initiative.dueDate).toLocaleDateString("id-ID")}
+                                </div>
+                              </div>
+                            </TableCell>
+                            <TableCell className="px-4 py-4">
+                              <div className="flex items-center space-x-2">
+                                <User className="w-4 h-4 text-gray-400" />
+                                <span className="text-sm text-gray-600">
+                                  {getUserName(initiative.picId || initiative.createdBy)}
+                                </span>
+                              </div>
+                            </TableCell>
+                            <TableCell className="px-4 py-4">
+                              <div className="flex items-center space-x-2">
+                                {initiative.status === 'completed' ? (
+                                  <Button
+                                    disabled
+                                    size="sm"
+                                    className="bg-gray-300 text-gray-500 cursor-not-allowed"
+                                  >
+                                    Selesai
+                                  </Button>
+                                ) : (
+                                  <Button
+                                    onClick={() => onUpdateMetrics(initiative)}
+                                    size="sm"
+                                    className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
+                                  >
+                                    Update
+                                  </Button>
+                                )}
+                                <Link href={`/initiatives/${initiative.id}`}>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    title="Lihat Detail"
+                                  >
+                                    <Eye className="h-4 w-4" />
+                                  </Button>
+                                </Link>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                  </TableBody>
+                </Table>
+              </div>
+
+              {/* Mobile Card View */}
+              <div className="md:hidden space-y-4 p-4">
                 {activeInitiatives
                   .filter((initiative) => {
                     if (!userFilter || userFilter === 'all') return true;
@@ -565,86 +811,129 @@ export function DailyFocusCards({
                       initiative.createdBy?.toString() === userFilter
                     );
                   })
+                  .sort((a, b) => {
+                    const scoreA = parseFloat(a.priorityScore || "0");
+                    const scoreB = parseFloat(b.priorityScore || "0");
+                    return scoreB - scoreA;
+                  })
                   .map((initiative) => {
+                    const rawScore = initiative.priorityScore;
+                    const score = parseFloat(rawScore || "0");
+                    
+                    let color: string;
+                    let label: string;
+                    
+                    if (score >= 4.0) {
+                      color = "bg-red-100 text-red-800";
+                      label = "Kritis";
+                    } else if (score >= 3.0) {
+                      color = "bg-orange-100 text-orange-800";
+                      label = "Tinggi";
+                    } else if (score >= 2.0) {
+                      color = "bg-yellow-100 text-yellow-800";
+                      label = "Sedang";
+                    } else {
+                      color = "bg-green-100 text-green-800";
+                      label = "Rendah";
+                    }
+
                     return (
                       <div
                         key={initiative.id}
-                        className="p-2 md:p-3 bg-white border border-gray-200 rounded-lg space-y-2 md:space-y-3"
+                        className="p-3 bg-white border border-gray-200 rounded-lg space-y-3"
                       >
-                        {/* Mobile: Vertical Stack Layout, Desktop: Horizontal */}
-                        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-2 md:gap-3">
-                          <div className="flex-1 min-w-0 space-y-1 md:space-y-2">
-                            {/* Title and Status Badge */}
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <h3 className="text-xs md:text-sm font-medium text-gray-900 truncate">
+                        {/* Title and Status Badge */}
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex-1 min-w-0">
+                            <Link href={`/initiatives/${initiative.id}`}>
+                              <h3 className="text-sm font-medium text-gray-900 hover:text-blue-600 cursor-pointer line-clamp-2">
                                 {initiative.title}
                               </h3>
-                              <span
-                                className={`text-xs px-2 py-1 rounded-full font-medium shrink-0 ${
-                                  initiative.status === 'not_started'
-                                    ? 'bg-gray-100 text-gray-700'
-                                    : initiative.status === 'draft'
-                                    ? 'bg-yellow-100 text-yellow-700'
-                                    : initiative.status === 'in_progress'
-                                    ? 'bg-blue-100 text-blue-700'
-                                    : initiative.status === 'completed'
-                                    ? 'bg-green-100 text-green-700'
-                                    : 'bg-red-100 text-red-700'
-                                }`}
-                              >
-                                {initiative.status === 'not_started'
-                                  ? 'Belum Mulai'
-                                  : initiative.status === 'draft'
-                                  ? 'Draft'
-                                  : initiative.status === 'in_progress'
-                                  ? 'Berlangsung'
-                                  : initiative.status === 'completed'
-                                  ? 'Selesai'
-                                  : 'Dibatalkan'}
-                              </span>
-                            </div>
-                            
-                            {/* Description */}
-                            <p className="text-xs text-gray-600 line-clamp-2">
-                              {initiative.description}
-                            </p>
-                            
-                            {/* Due Date and Progress - Mobile: Stack, Desktop: Inline */}
-                            <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-4 text-xs text-gray-500">
-                              <span>Due: {formatDate(new Date(initiative.dueDate))}</span>
-                              <span>Progress: {Math.round(initiative.progressPercentage || 0)}%</span>
-                            </div>
-                          </div>
-                          
-                          {/* Action Buttons - Mobile: Full width stack, Desktop: Right side */}
-                          <div className="flex flex-col md:flex-row items-stretch md:items-center gap-1 md:gap-1 w-full md:w-auto md:shrink-0">
-                            {initiative.status === 'completed' ? (
-                              <Button
-                                disabled
-                                className="bg-gray-300 text-gray-500 cursor-not-allowed px-3 md:px-4 py-1.5 md:py-2 rounded-md text-xs md:text-sm font-medium"
-                              >
-                                Selesai
-                              </Button>
-                            ) : (
-                              <Button
-                                onClick={() => onUpdateMetrics(initiative)}
-                                className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-md text-xs md:text-sm font-medium"
-                              >
-                                Update Metrics
-                              </Button>
-                            )}
-                            <Link href={`/initiatives/${initiative.id}`} className="w-full md:w-auto">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                title="Lihat Detail"
-                                className="w-full md:w-auto px-3 py-1.5 text-xs"
-                              >
-                                <Eye className="h-3 w-3 md:h-4 md:w-4" />
-                                <span className="ml-1 md:hidden">Detail</span>
-                              </Button>
                             </Link>
                           </div>
+                          <span
+                            className={`text-xs px-2 py-1 rounded-full font-medium shrink-0 ${
+                              initiative.status === 'not_started'
+                                ? 'bg-gray-100 text-gray-700'
+                                : initiative.status === 'draft'
+                                ? 'bg-yellow-100 text-yellow-700'
+                                : initiative.status === 'in_progress'
+                                ? 'bg-blue-100 text-blue-700'
+                                : initiative.status === 'completed'
+                                ? 'bg-green-100 text-green-700'
+                                : 'bg-red-100 text-red-700'
+                            }`}
+                          >
+                            {initiative.status === 'not_started'
+                              ? 'Belum Mulai'
+                              : initiative.status === 'draft'
+                              ? 'Draft'
+                              : initiative.status === 'in_progress'
+                              ? 'Berlangsung'
+                              : initiative.status === 'completed'
+                              ? 'Selesai'
+                              : 'Dibatalkan'}
+                          </span>
+                        </div>
+                        
+                        {/* Priority and Progress Row */}
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between gap-2">
+                            <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${color}`}>
+                              {label} ({score.toFixed(1)})
+                            </span>
+                            <span className="text-xs text-gray-500">
+                              {Math.round(initiative.progressPercentage || 0)}%
+                            </span>
+                          </div>
+                          <Progress 
+                            value={initiative.progressPercentage || 0} 
+                            className="h-1.5"
+                          />
+                        </div>
+                        
+                        {/* Due Date and PIC */}
+                        <div className="flex items-center justify-between text-xs text-gray-500">
+                          <span className={
+                            new Date(initiative.dueDate) < new Date()
+                              ? "text-red-600 font-medium"
+                              : ""
+                          }>
+                            Due: {new Date(initiative.dueDate).toLocaleDateString("id-ID")}
+                          </span>
+                          <span>
+                            PIC: {getUserName(initiative.picId || initiative.createdBy)}
+                          </span>
+                        </div>
+                        
+                        {/* Action Buttons */}
+                        <div className="flex gap-2">
+                          {initiative.status === 'completed' ? (
+                            <Button
+                              disabled
+                              size="sm"
+                              className="flex-1 bg-gray-300 text-gray-500 cursor-not-allowed"
+                            >
+                              Selesai
+                            </Button>
+                          ) : (
+                            <Button
+                              onClick={() => onUpdateMetrics(initiative)}
+                              size="sm"
+                              className="flex-1 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
+                            >
+                              Update Metrics
+                            </Button>
+                          )}
+                          <Link href={`/initiatives/${initiative.id}`}>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              title="Lihat Detail"
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                          </Link>
                         </div>
                       </div>
                     );

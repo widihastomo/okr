@@ -2209,6 +2209,7 @@ export default function DailyFocusPage() {
             isLoadingInitiatives={isLoadingInitiatives}
             onUpdateMetrics={handleUpdateMetrics}
             cycles={cycles}
+            users={users}
             userFilter={selectedUserId}
             formatDate={formatDate}
           />
