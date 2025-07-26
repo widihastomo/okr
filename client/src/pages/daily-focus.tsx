@@ -329,6 +329,31 @@ function TimelineFeedComponent() {
     return numValue.toLocaleString('id-ID');
   };
 
+  // Helper function for human-readable time difference
+  const getTimeAgo = (date: string | Date) => {
+    const now = new Date();
+    const updateTime = new Date(date);
+    const diffInMs = now.getTime() - updateTime.getTime();
+    const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
+    const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
+    const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+
+    if (diffInMinutes < 1) {
+      return 'Baru saja';
+    } else if (diffInMinutes < 60) {
+      return `${diffInMinutes} menit yang lalu`;
+    } else if (diffInHours < 24) {
+      return `${diffInHours} jam yang lalu`;
+    } else if (diffInDays < 7) {
+      return `${diffInDays} hari yang lalu`;
+    } else {
+      return updateTime.toLocaleDateString('id-ID', {
+        day: 'numeric',
+        month: 'short'
+      });
+    }
+  };
+
   // Get timeline data
   const { data: timelineData = [], isLoading: timelineLoading } = useQuery({
     queryKey: ['/api/timeline'],
@@ -893,12 +918,7 @@ function TimelineFeedComponent() {
                         {userInfo.lastUpdate ? (
                           <div className="mt-1">
                             <div className="text-xs text-gray-500">
-                              {new Date(userInfo.lastUpdate.updateDate || userInfo.lastUpdate.createdAt).toLocaleDateString('id-ID', {
-                                day: 'numeric',
-                                month: 'short',
-                                hour: '2-digit',
-                                minute: '2-digit'
-                              })}
+                              {getTimeAgo(userInfo.lastUpdate.updateDate || userInfo.lastUpdate.createdAt)}
                             </div>
                             <div className="text-xs text-gray-600 mt-1">
                               {userInfo.lastUpdate.type === 'check_in' ? (
