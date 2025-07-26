@@ -424,18 +424,20 @@ export function DailyFocusCards({
                         return (
                           <div
                             key={keyResult.id}
-                            className="p-3 bg-white border border-gray-200 rounded-lg space-y-3"
+                            className="p-2 md:p-3 bg-white border border-gray-200 rounded-lg space-y-2 md:space-y-3"
                           >
-                            <div className="flex items-start justify-between gap-3">
-                              <div className="flex-1 min-w-0 space-y-2">
-                                <div className="flex items-center gap-2">
+                            {/* Mobile: Vertical Stack Layout, Desktop: Horizontal */}
+                            <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-2 md:gap-3">
+                              <div className="flex-1 min-w-0 space-y-1 md:space-y-2">
+                                {/* Title and Badge Row */}
+                                <div className="flex items-center gap-2 flex-wrap">
                                   <Link href={`/key-results/${keyResult.id}`}>
-                                    <h3 className="text-sm font-medium text-gray-900 truncate hover:text-blue-600 cursor-pointer transition-colors">
+                                    <h3 className="text-xs md:text-sm font-medium text-gray-900 truncate hover:text-blue-600 cursor-pointer transition-colors">
                                       {keyResult.title}
                                     </h3>
                                   </Link>
                                   <Badge
-                                    className={`text-xs ${
+                                    className={`text-xs shrink-0 ${
                                       dynamicStatus.status === 'on_track'
                                         ? 'bg-green-100 text-green-700'
                                         : dynamicStatus.status === 'at_risk'
@@ -446,9 +448,11 @@ export function DailyFocusCards({
                                     {dynamicStatus.statusText}
                                   </Badge>
                                 </div>
+                                
+                                {/* Progress Bar */}
                                 <div className="w-full space-y-1">
                                   <div className="relative">
-                                    <Progress value={Math.min(Math.max(progress, 0), 100)} className="h-3" />
+                                    <Progress value={Math.min(Math.max(progress, 0), 100)} className="h-2 md:h-3" />
                                     {/* Ideal target marker based on timeline */}
                                     {(() => {
                                       const idealProgress = currentCycle ? (() => {
@@ -462,30 +466,34 @@ export function DailyFocusCards({
                                       return (
                                         <>
                                           <div 
-                                            className="absolute top-0 h-3 w-0.5 bg-orange-500 rounded-full" 
+                                            className="absolute top-0 h-2 md:h-3 w-0.5 bg-orange-500 rounded-full" 
                                             style={{ left: `${idealProgress}%` }}
                                             title={`Target Ideal: ${idealProgress}%`}
                                           />
                                           <div 
-                                            className="absolute -top-1 w-2 h-2 bg-orange-500 rounded-full border border-white" 
-                                            style={{ left: `calc(${idealProgress}% - 4px)` }}
+                                            className="absolute -top-0.5 md:-top-1 w-1.5 h-1.5 md:w-2 md:h-2 bg-orange-500 rounded-full border border-white" 
+                                            style={{ left: `calc(${idealProgress}% - 3px)` }}
                                             title={`Target Ideal: ${idealProgress}%`}
                                           />
                                         </>
                                       );
                                     })()}
                                   </div>
-                                  <div className="flex justify-between text-xs text-gray-500">
-                                    <span>{Math.round(progress)}%</span>
-                                    <span className="text-orange-600 font-medium">Target: {currentCycle ? (() => {
-                                      const cycleStart = new Date(currentCycle.startDate);
-                                      const cycleEnd = new Date(currentCycle.endDate);
-                                      const now = new Date();
-                                      const totalDuration = cycleEnd.getTime() - cycleStart.getTime();
-                                      const timePassed = Math.max(0, now.getTime() - cycleStart.getTime());
-                                      return Math.round(Math.min(100, Math.max(0, (timePassed / totalDuration) * 100)));
-                                    })() : 70}%</span>
-                                    <span>
+                                  
+                                  {/* Progress Info - Mobile: 2 rows, Desktop: 1 row */}
+                                  <div className="flex flex-col md:flex-row md:justify-between text-xs text-gray-500 gap-1 md:gap-0">
+                                    <div className="flex justify-between md:justify-start md:gap-4">
+                                      <span>{Math.round(progress)}%</span>
+                                      <span className="text-orange-600 font-medium">Target: {currentCycle ? (() => {
+                                        const cycleStart = new Date(currentCycle.startDate);
+                                        const cycleEnd = new Date(currentCycle.endDate);
+                                        const now = new Date();
+                                        const totalDuration = cycleEnd.getTime() - cycleStart.getTime();
+                                        const timePassed = Math.max(0, now.getTime() - cycleStart.getTime());
+                                        return Math.round(Math.min(100, Math.max(0, (timePassed / totalDuration) * 100)));
+                                      })() : 70}%</span>
+                                    </div>
+                                    <span className="text-center md:text-right">
                                       {(() => {
                                         const isRupiah = keyResult.unit?.toLowerCase() === "rp" || keyResult.unit?.toLowerCase() === "rupiah" || keyResult.unit?.toLowerCase() === "idr";
                                         const currentFormatted = formatValue(keyResult.currentValue, keyResult.unit);
@@ -495,15 +503,16 @@ export function DailyFocusCards({
                                     </span>
                                   </div>
                                 </div>
-
                               </div>
-                              <div className="flex items-center gap-1 shrink-0">
+                              
+                              {/* Check-in Button - Mobile: Full width at bottom, Desktop: Right side */}
+                              <div className="flex items-center gap-1 shrink-0 w-full md:w-auto">
                                 <Button
                                   onClick={() => onOpenCheckInModal(keyResult)}
-                                  className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white px-4 py-2 rounded-md text-sm font-medium flex items-center gap-2"
+                                  className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-md text-xs md:text-sm font-medium flex items-center justify-center gap-1 md:gap-2 w-full md:w-auto"
                                 >
-                                  <TrendingUp className="h-4 w-4" />
-                                  Check-in
+                                  <TrendingUp className="h-3 w-3 md:h-4 md:w-4" />
+                                  <span className="md:inline">Check-in</span>
                                 </Button>
                               </div>
                             </div>
@@ -560,16 +569,18 @@ export function DailyFocusCards({
                     return (
                       <div
                         key={initiative.id}
-                        className="p-3 bg-white border border-gray-200 rounded-lg space-y-3"
+                        className="p-2 md:p-3 bg-white border border-gray-200 rounded-lg space-y-2 md:space-y-3"
                       >
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="flex-1 min-w-0 space-y-2">
-                            <div className="flex items-center gap-2">
-                              <h3 className="text-sm font-medium text-gray-900 truncate">
+                        {/* Mobile: Vertical Stack Layout, Desktop: Horizontal */}
+                        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-2 md:gap-3">
+                          <div className="flex-1 min-w-0 space-y-1 md:space-y-2">
+                            {/* Title and Status Badge */}
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <h3 className="text-xs md:text-sm font-medium text-gray-900 truncate">
                                 {initiative.title}
                               </h3>
                               <span
-                                className={`text-xs px-2 py-1 rounded-full font-medium ${
+                                className={`text-xs px-2 py-1 rounded-full font-medium shrink-0 ${
                                   initiative.status === 'not_started'
                                     ? 'bg-gray-100 text-gray-700'
                                     : initiative.status === 'in_progress'
@@ -588,39 +599,45 @@ export function DailyFocusCards({
                                   : 'Dibatalkan'}
                               </span>
                             </div>
-                            <p className="text-xs text-gray-600">
+                            
+                            {/* Description */}
+                            <p className="text-xs text-gray-600 line-clamp-2">
                               {initiative.description}
                             </p>
-                            <div className="flex items-center gap-4 text-xs text-gray-500">
+                            
+                            {/* Due Date and Progress - Mobile: Stack, Desktop: Inline */}
+                            <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-4 text-xs text-gray-500">
                               <span>Due: {formatDate(new Date(initiative.endDate))}</span>
-                              <span>
-                                Progress: {Math.round(initiative.progress)}%
-                              </span>
+                              <span>Progress: {Math.round(initiative.progress)}%</span>
                             </div>
                           </div>
-                          <div className="flex items-center gap-1 shrink-0">
+                          
+                          {/* Action Buttons - Mobile: Full width stack, Desktop: Right side */}
+                          <div className="flex flex-col md:flex-row items-stretch md:items-center gap-1 md:gap-1 w-full md:w-auto md:shrink-0">
                             {initiative.status === 'completed' ? (
                               <Button
                                 disabled
-                                className="bg-gray-300 text-gray-500 cursor-not-allowed px-4 py-2 rounded-md text-sm font-medium flex-1 mr-2"
+                                className="bg-gray-300 text-gray-500 cursor-not-allowed px-3 md:px-4 py-1.5 md:py-2 rounded-md text-xs md:text-sm font-medium"
                               >
                                 Selesai
                               </Button>
                             ) : (
                               <Button
                                 onClick={() => onUpdateMetrics(initiative)}
-                                className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white px-4 py-2 rounded-md text-sm font-medium flex-1 mr-2"
+                                className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-md text-xs md:text-sm font-medium"
                               >
                                 Update Metrics
                               </Button>
                             )}
-                            <Link href={`/initiatives/${initiative.id}`}>
+                            <Link href={`/initiatives/${initiative.id}`} className="w-full md:w-auto">
                               <Button
                                 variant="outline"
                                 size="sm"
                                 title="Lihat Detail"
+                                className="w-full md:w-auto px-3 py-1.5 text-xs"
                               >
-                                <Eye className="h-4 w-4" />
+                                <Eye className="h-3 w-3 md:h-4 md:w-4" />
+                                <span className="ml-1 md:hidden">Detail</span>
                               </Button>
                             </Link>
                           </div>
