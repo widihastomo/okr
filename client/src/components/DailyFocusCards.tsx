@@ -502,7 +502,7 @@ export function DailyFocusCards({
                                   onClick={() => onOpenCheckInModal(keyResult)}
                                   className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white px-4 py-2 rounded-md text-sm font-medium flex items-center gap-2"
                                 >
-                                  <BarChart3 className="h-4 w-4" />
+                                  <TrendingUp className="h-4 w-4" />
                                   Check-in
                                 </Button>
                               </div>
