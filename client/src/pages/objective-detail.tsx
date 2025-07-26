@@ -1716,19 +1716,22 @@ export default function GoalDetail() {
             </h3>
             <p className="text-green-700 text-sm leading-relaxed">Inisiatif adalah langkah-langkah strategis untuk mencapai ukuran keberhasilan.</p>
           </div>
-          <Button
-            variant="outline"
-            onClick={() => setShowInitiativeFormModal(true)}
-            className="border-green-600 text-green-600 hover:bg-green-100 w-full sm:w-auto sm:ml-4 shrink-0"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            <span className="sm:hidden">Tambah</span>
-            <span className="hidden sm:inline">Tambah Inisiatif</span>
-          </Button>
+          {inisiatif.length > 0 && (
+            <Button
+              variant="outline"
+              onClick={() => setShowInitiativeFormModal(true)}
+              className="border-green-600 text-green-600 hover:bg-green-100 w-full sm:w-auto sm:ml-4 shrink-0"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              <span className="sm:hidden">Tambah</span>
+              <span className="hidden sm:inline">Tambah Inisiatif</span>
+            </Button>
+          )}
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mt-4">
+        {inisiatif.length > 0 && (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mt-4">
           <div className="bg-white p-3 md:p-4 rounded-lg border border-green-100">
             <div className="flex items-center gap-1 md:gap-2 mb-1">
               <CheckCircle2 className="w-3 h-3 md:w-4 md:h-4 text-green-600" />
@@ -1788,6 +1791,7 @@ export default function GoalDetail() {
             </div>
           </div>
         </div>
+        )}
 
         {/* Inisiatif List */}
         <div className="mt-6 space-y-4">

@@ -452,6 +452,12 @@ The system now includes a comprehensive dummy data generation feature that creat
 
 ## Changelog
 ```
+- July 25, 2025. **INISIATIF SECTION UI CLEANUP COMPLETED** - Successfully implemented conditional visibility for Inisiatif section elements:
+  * HIDDEN: "Tambah Inisiatif" button when no initiatives exist (inisiatif.length === 0)
+  * HIDDEN: Quick Stats grid when no initiatives exist to avoid displaying zero/empty statistics
+  * MAINTAINED: "Tambah Inisiatif Pertama" button in empty state for initial creation
+  * STYLED: Button consistency with outline green variant matching existing "Tambah Inisiatif" style
+  * RESULT: Clean Inisiatif section that shows relevant UI elements only when initiatives exist
 - July 25, 2025. **MISSION CARD DEFAULT COLLAPSE COMPLETED** - Successfully set Mission Card to default collapsed state per user preference:
   * CHANGED: Mission Card initial state from expanded (auto-expand based on incomplete missions) to collapsed (useState(false))
   * REMOVED: Auto-expansion logic that automatically opened card when missions were incomplete
