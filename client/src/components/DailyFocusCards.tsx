@@ -7,6 +7,7 @@ import { Plus, Eye, Edit, Trash2, Target, CheckCircle, Clock, Calendar, Lightbul
 import { Link } from "wouter";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { formatNumberWithSeparator } from "@/lib/number-utils";
+import { calculateKeyResultStatus } from "@shared/status-helper";
 
 interface Task {
   id: number;
@@ -409,6 +410,16 @@ export function DailyFocusCards({
                           : keyResult.keyResultType === 'decrease_to'
                           ? Math.max(0, Math.min(100, ((keyResult.currentValue - keyResult.targetValue) / (keyResult.currentValue - keyResult.targetValue)) * 100))
                           : Math.max(0, Math.min(100, (keyResult.currentValue / keyResult.targetValue) * 100));
+                        
+                        // Calculate dynamic status based on progress vs timeline
+                        const currentCycle = cycles && cycles.length > 0 ? cycles[0] : null;
+                        const dynamicStatus = currentCycle 
+                          ? calculateKeyResultStatus(
+                              progress,
+                              new Date(currentCycle.startDate),
+                              new Date(currentCycle.endDate)
+                            )
+                          : { status: keyResult.status || 'on_track', statusText: 'On Track' };
 
                         return (
                           <div
@@ -425,18 +436,14 @@ export function DailyFocusCards({
                                   </Link>
                                   <Badge
                                     className={`text-xs ${
-                                      keyResult.status === 'on_track'
+                                      dynamicStatus.status === 'on_track'
                                         ? 'bg-green-100 text-green-700'
-                                        : keyResult.status === 'at_risk'
+                                        : dynamicStatus.status === 'at_risk'
                                         ? 'bg-yellow-100 text-yellow-700'
                                         : 'bg-red-100 text-red-700'
                                     }`}
                                   >
-                                    {keyResult.status === 'on_track'
-                                      ? 'On Track'
-                                      : keyResult.status === 'at_risk'
-                                      ? 'At Risk'
-                                      : 'Off Track'}
+                                    {dynamicStatus.statusText}
                                   </Badge>
                                 </div>
                                 <div className="w-full space-y-1">
@@ -444,7 +451,14 @@ export function DailyFocusCards({
                                     <Progress value={Math.min(Math.max(progress, 0), 100)} className="h-3" />
                                     {/* Ideal target marker based on timeline */}
                                     {(() => {
-                                      const idealProgress = calculateIdealProgress(keyResult);
+                                      const idealProgress = currentCycle ? (() => {
+                                        const cycleStart = new Date(currentCycle.startDate);
+                                        const cycleEnd = new Date(currentCycle.endDate);
+                                        const now = new Date();
+                                        const totalDuration = cycleEnd.getTime() - cycleStart.getTime();
+                                        const timePassed = Math.max(0, now.getTime() - cycleStart.getTime());
+                                        return Math.round(Math.min(100, Math.max(0, (timePassed / totalDuration) * 100)));
+                                      })() : 70; // Fallback to 70% if no cycle data
                                       return (
                                         <>
                                           <div 
@@ -463,7 +477,14 @@ export function DailyFocusCards({
                                   </div>
                                   <div className="flex justify-between text-xs text-gray-500">
                                     <span>{Math.round(progress)}%</span>
-                                    <span className="text-orange-600 font-medium">Target: {calculateIdealProgress(keyResult)}%</span>
+                                    <span className="text-orange-600 font-medium">Target: {currentCycle ? (() => {
+                                      const cycleStart = new Date(currentCycle.startDate);
+                                      const cycleEnd = new Date(currentCycle.endDate);
+                                      const now = new Date();
+                                      const totalDuration = cycleEnd.getTime() - cycleStart.getTime();
+                                      const timePassed = Math.max(0, now.getTime() - cycleStart.getTime());
+                                      return Math.round(Math.min(100, Math.max(0, (timePassed / totalDuration) * 100)));
+                                    })() : 70}%</span>
                                     <span>
                                       {(() => {
                                         const isRupiah = keyResult.unit?.toLowerCase() === "rp" || keyResult.unit?.toLowerCase() === "rupiah" || keyResult.unit?.toLowerCase() === "idr";
