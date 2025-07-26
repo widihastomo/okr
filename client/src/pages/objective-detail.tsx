@@ -1802,8 +1802,9 @@ export default function GoalDetail() {
                 telah ditetapkan
               </p>
               <Button
+                variant="outline"
                 onClick={() => setShowInitiativeFormModal(true)}
-                className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
+                className="border-green-600 text-green-600 hover:bg-green-100"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Tambah Inisiatif Pertama
