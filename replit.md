@@ -452,6 +452,12 @@ The system now includes a comprehensive dummy data generation feature that creat
 
 ## Changelog
 ```
+- July 26, 2025. **MOBILE TOUR SIDEBAR EXPANSION BUG FIXED** - Successfully resolved mobile tour step navigation issue where sidebar wasn't expanding properly:
+  * FIXED: Updated isMenuStep function to remove obsolete "timeline" reference and include correct current menu step IDs
+  * ENHANCED: Modified nextStep function to properly handle mobile sidebar expansion before proceeding to menu steps
+  * IMPROVED: Enhanced expandSidebarForMobile function with better logging and state detection for debugging
+  * RESOLVED: Tour step 3 to 4 transition now properly expands sidebar on mobile devices as intended
+  * RESULT: Mobile tour navigation now works seamlessly with proper sidebar expansion for menu-based tour steps
 - July 26, 2025. **TIMELINE PAGE AND MENU COMPLETELY REMOVED** - Successfully removed timeline page and menu item from application per user request:
   * REMOVED: Timeline route (/timeline) from App.tsx routing configuration
   * REMOVED: TimelinePage import reference and component dependency

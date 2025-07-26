@@ -246,7 +246,18 @@ export default function TourSystem() {
     cleanupHighlights();
 
     if (currentStep < totalSteps - 1) {
-      setCurrentStep(currentStep + 1);
+      const nextStepIndex = currentStep + 1;
+      const nextStepData = TOUR_STEPS[nextStepIndex];
+      
+      // Handle mobile sidebar expansion for menu items
+      if (isMobile() && isMenuStep(nextStepData.id)) {
+        console.log(`Mobile: Expanding sidebar for menu step ${nextStepData.id}`);
+        expandSidebarForMobile().then(() => {
+          setCurrentStep(nextStepIndex);
+        });
+      } else {
+        setCurrentStep(nextStepIndex);
+      }
     } else {
       completeTour();
     }
@@ -450,15 +461,16 @@ export default function TourSystem() {
   // Function to check if the current step is a menu item
   const isMenuStep = (stepId: string) => {
     const menuSteps = [
-      "daily-focus",
+      "dashboard",
       "goals", 
       "tasks",
-      "timeline",
       "cycles",
+      "template-goals",
       "achievements",
       "analytics",
       "users",
-      "settings"
+      "settings",
+      "help"
     ];
     return menuSteps.includes(stepId);
   };
@@ -466,16 +478,25 @@ export default function TourSystem() {
   // Function to expand sidebar on mobile for menu items
   const expandSidebarForMobile = () => {
     if (isMobile()) {
+      console.log("Mobile detected - attempting to expand sidebar");
       // Find the hamburger menu button and click it to expand sidebar
-      const hamburgerButton = document.querySelector('[data-tour="hamburger-menu"]');
+      const hamburgerButton = document.querySelector('[data-tour="hamburger-menu"]') as HTMLElement;
       if (hamburgerButton) {
-        // Only click if sidebar is not already open
+        // Check if sidebar is already open by looking for specific mobile classes
         const sidebar = document.querySelector('[data-sidebar="sidebar"]');
-        if (!sidebar || !sidebar.classList.contains('translate-x-0')) {
-          (hamburgerButton as HTMLElement).click();
+        const isSidebarOpen = sidebar?.classList.contains('translate-x-0') || 
+                             sidebar?.getAttribute('data-state') === 'open';
+        
+        if (!isSidebarOpen) {
+          console.log("Sidebar closed - clicking hamburger to expand");
+          hamburgerButton.click();
           // Return promise to wait for sidebar animation
-          return new Promise(resolve => setTimeout(resolve, 300));
+          return new Promise(resolve => setTimeout(resolve, 400));
+        } else {
+          console.log("Sidebar already open");
         }
+      } else {
+        console.log("Hamburger button not found");
       }
     }
     return Promise.resolve();
