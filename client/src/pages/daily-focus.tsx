@@ -58,6 +58,7 @@ import {
   Activity,
   Save,
   X,
+  Reply,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -418,6 +419,10 @@ function TimelineFeedComponent() {
   const [editingComment, setEditingComment] = useState<string | null>(null);
   const [editCommentText, setEditCommentText] = useState<string>('');
 
+  // State for reply functionality
+  const [replyingToComment, setReplyingToComment] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState<string>('');
+
   // Fetch all comments for timeline items - API already returns grouped format
   const { data: allCommentsData = {} } = useQuery({
     queryKey: ['/api/timeline/comments'],
@@ -607,6 +612,43 @@ function TimelineFeedComponent() {
   const handleAddComment = (timelineId: string, content: string) => {
     addCommentMutation.mutate({ timelineId, content });
     setCommentTexts(prev => ({ ...prev, [timelineId]: '' }));
+  };
+
+  // Handle reply to comment
+  const handleReplyToComment = (commentId: string, content: string, timelineId: string) => {
+    // Find the comment to get its timeline ID
+    let targetTimelineId = timelineId;
+    
+    // If we don't have the timeline ID, find it from the comments data
+    if (!targetTimelineId) {
+      for (const [tId, comments] of Object.entries(commentsData)) {
+        if (comments.some((c: any) => c.id === commentId)) {
+          targetTimelineId = tId;
+          break;
+        }
+      }
+    }
+    
+    if (!targetTimelineId) {
+      console.error('Could not find timeline ID for comment reply');
+      return;
+    }
+    
+    addCommentMutation.mutate({ 
+      timelineId: targetTimelineId,
+      content: content,
+      parentId: commentId // Add parent comment ID for replies
+    });
+    setReplyText('');
+    setReplyingToComment(null);
+  };
+
+  // Start replying to a comment
+  const startReplyingToComment = (commentId: string) => {
+    setReplyingToComment(commentId);
+    setReplyText('');
+    // Close any open comment menus
+    setShowCommentMenu({});
   };
 
   // Toggle emoji picker
@@ -1313,6 +1355,13 @@ function TimelineFeedComponent() {
                                           {showCommentMenu[`${item.id}-${comment.id}`] && (
                                             <div className="absolute bottom-full right-0 mb-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 min-w-[120px] comment-menu-container">
                                               <button
+                                                onClick={() => startReplyingToComment(comment.id)}
+                                                className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                                              >
+                                                <Reply className="h-3 w-3" />
+                                                Balas
+                                              </button>
+                                              <button
                                                 onClick={() => startEditingComment(comment)}
                                                 className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
                                               >
@@ -1444,6 +1493,55 @@ function TimelineFeedComponent() {
                                     </div>
                                   )}
                                 </div>
+                                
+                                {/* Reply Form - Show if replying to this comment */}
+                                {replyingToComment === comment.id && (
+                                  <div className="mt-3 pl-4 border-l-2 border-gray-200">
+                                    <div className="flex space-x-2">
+                                      <div className="w-5 h-5 bg-gradient-to-br from-blue-500 to-green-500 rounded-full flex items-center justify-center text-white font-semibold text-xs flex-shrink-0">
+                                        {((user as any)?.name || (user as any)?.email || 'U').charAt(0).toUpperCase()}
+                                      </div>
+                                      <div className="flex-1 space-y-2">
+                                        <div className="flex space-x-2">
+                                          <input
+                                            type="text"
+                                            placeholder="Tulis balasan..."
+                                            value={replyText}
+                                            onChange={(e) => setReplyText(e.target.value)}
+                                            onKeyPress={(e) => {
+                                              if (e.key === 'Enter' && replyText.trim()) {
+                                                handleReplyToComment(comment.id, replyText, item.id);
+                                              }
+                                            }}
+                                            className="flex-1 text-sm px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            autoFocus
+                                          />
+                                          <Button
+                                            size="sm"
+                                            onClick={() => {
+                                              if (replyText.trim()) {
+                                                handleReplyToComment(comment.id, replyText, item.id);
+                                              }
+                                            }}
+                                            disabled={!replyText.trim() || addCommentMutation.isPending}
+                                          >
+                                            <Send className="w-3 h-3" />
+                                          </Button>
+                                          <Button
+                                            size="sm"
+                                            variant="outline"
+                                            onClick={() => {
+                                              setReplyingToComment(null);
+                                              setReplyText('');
+                                            }}
+                                          >
+                                            Batal
+                                          </Button>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
                               </div>
                             </div>
                           ))}

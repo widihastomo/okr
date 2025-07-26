@@ -1074,6 +1074,7 @@ export const timelineComments = pgTable("timeline_comments", {
   timelineItemId: text("timeline_item_id").notNull(), // References timeline item ID (can be check-in or daily update)
   organizationId: uuid("organization_id").notNull().references(() => organizations.id),
   content: text("content").notNull(),
+  parentId: uuid("parent_id"), // For nested replies - references another comment
   createdBy: uuid("created_by").notNull().references(() => users.id),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -1099,7 +1100,7 @@ export const timelineLikes = pgTable("timeline_likes", {
 });
 
 // Timeline Comments Relations
-export const timelineCommentsRelations = relations(timelineComments, ({ one }) => ({
+export const timelineCommentsRelations = relations(timelineComments, ({ one, many }) => ({
   creator: one(users, {
     fields: [timelineComments.createdBy],
     references: [users.id],
@@ -1107,6 +1108,14 @@ export const timelineCommentsRelations = relations(timelineComments, ({ one }) =
   organization: one(organizations, {
     fields: [timelineComments.organizationId],
     references: [organizations.id],
+  }),
+  parent: one(timelineComments, {
+    fields: [timelineComments.parentId],
+    references: [timelineComments.id],
+    relationName: "parentChild"
+  }),
+  replies: many(timelineComments, {
+    relationName: "parentChild"
   }),
 }));
 

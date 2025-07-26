@@ -3866,7 +3866,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const user = req.user as User;
       const { timelineId } = req.params;
-      const { content, mentionedUsers = [] } = req.body;
+      const { content, mentionedUsers = [], parentId } = req.body;
 
       if (!user?.organizationId || !user?.id) {
         return res.status(401).json({ message: "User not authenticated" });
@@ -3876,12 +3876,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Comment content is required" });
       }
 
-      const comment = await storage.createTimelineComment({
+      const commentData: any = {
         timelineItemId: timelineId,
         createdBy: user.id,
         organizationId: user.organizationId,
         content: content.trim()
-      });
+      };
+
+      // Add parentId if this is a reply
+      if (parentId) {
+        commentData.parentId = parentId;
+      }
+
+      const comment = await storage.createTimelineComment(commentData);
 
       // Add user data to comment response for immediate UI display
       const commentWithUser = {
