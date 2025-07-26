@@ -317,6 +317,8 @@ function TimelineFeedComponent() {
   // Timeline states
   const [timelineFilter, setTimelineFilter] = useState('all');
   const [userFilter, setUserFilter] = useState('all');
+  const [teamFilter, setTeamFilter] = useState('all');
+  const [dateFilter, setDateFilter] = useState('this_week');
   const [expandedDetails, setExpandedDetails] = useState<Record<string, boolean>>({});
   const [showComments, setShowComments] = useState<Record<string, boolean>>({});
   const [commentTexts, setCommentTexts] = useState<Record<string, string>>({});
@@ -355,6 +357,27 @@ function TimelineFeedComponent() {
     }
   };
 
+  // Helper function to check if date is within filter range
+  const isDateInRange = (itemDate: string | Date, filter: string) => {
+    const now = new Date();
+    const itemDateTime = new Date(itemDate);
+    const diffInMs = now.getTime() - itemDateTime.getTime();
+    const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+
+    switch (filter) {
+      case 'today':
+        return diffInDays === 0;
+      case 'this_week':
+        return diffInDays <= 7;
+      case 'this_month':
+        return diffInDays <= 30;
+      case 'all':
+        return true;
+      default:
+        return true;
+    }
+  };
+
   // Get timeline data
   const { data: timelineData = [], isLoading: timelineLoading } = useQuery({
     queryKey: ['/api/timeline'],
@@ -364,6 +387,12 @@ function TimelineFeedComponent() {
   // Get users for filter
   const { data: users = [] } = useQuery({
     queryKey: ['/api/users'],
+    enabled: !!user,
+  });
+
+  // Get teams for filter
+  const { data: teams = [] } = useQuery({
+    queryKey: ['/api/teams'],
     enabled: !!user,
   });
 
@@ -409,8 +438,21 @@ function TimelineFeedComponent() {
 
   // Filter timeline data
   const filteredTimeline = (timelineData as any[]).filter((item: any) => {
+    // Activity type filter
     if (timelineFilter !== 'all' && item.type !== timelineFilter) return false;
+    
+    // User filter
     if (userFilter !== 'all' && item.userId !== userFilter) return false;
+    
+    // Team filter (check if user belongs to selected team)
+    if (teamFilter !== 'all') {
+      const itemUser = (users as any[]).find((u: any) => u.id === item.userId);
+      if (!itemUser || !itemUser.teamId || itemUser.teamId !== teamFilter) return false;
+    }
+    
+    // Date filter
+    if (!isDateInRange(item.updateDate || item.createdAt, dateFilter)) return false;
+    
     return true;
   });
 
@@ -553,6 +595,38 @@ function TimelineFeedComponent() {
                         {u.name || u.email}
                       </SelectItem>
                     ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Filter Tim</label>
+                <Select value={teamFilter} onValueChange={setTeamFilter}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Semua Tim" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Semua Tim</SelectItem>
+                    {(teams as any[]).map((team: any) => (
+                      <SelectItem key={team.id} value={team.id}>
+                        {team.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Filter Tanggal</label>
+                <Select value={dateFilter} onValueChange={setDateFilter}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Minggu Ini" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="today">Hari Ini</SelectItem>
+                    <SelectItem value="this_week">Minggu Ini</SelectItem>
+                    <SelectItem value="this_month">Bulan Ini</SelectItem>
+                    <SelectItem value="all">Semua Waktu</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
