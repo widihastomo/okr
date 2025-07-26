@@ -40,6 +40,13 @@ interface Initiative {
   ownerId?: number;
 }
 
+interface Cycle {
+  id: string;
+  name: string;
+  startDate: string;
+  endDate: string;
+}
+
 interface DailyFocusCardsProps {
   // Task props
   overdueTasks: Task[];
@@ -61,6 +68,9 @@ interface DailyFocusCardsProps {
   isLoadingInitiatives: boolean;
   onUpdateMetrics: (initiative: Initiative) => void;
   
+  // Cycle data for timeline calculation
+  cycles: Cycle[];
+  
   // Common
   userFilter: string;
   formatDate: (date: Date) => string;
@@ -81,9 +91,28 @@ export function DailyFocusCards({
   activeInitiatives,
   isLoadingInitiatives,
   onUpdateMetrics,
+  cycles,
   userFilter,
   formatDate
 }: DailyFocusCardsProps) {
+
+  // Calculate ideal progress based on timeline (same as objective detail page)
+  const calculateIdealProgress = (keyResult: KeyResult) => {
+    // Find the cycle for this key result's objective
+    if (!cycles || cycles.length === 0) return 70; // Fallback to 70% if no cycle data
+    const cycle = cycles[0]; // Get the first active cycle
+    if (!cycle) return 70; // Fallback to 70% if no cycle data
+    
+    const cycleStart = new Date(cycle.startDate);
+    const cycleEnd = new Date(cycle.endDate);
+    const now = new Date();
+
+    const totalDuration = cycleEnd.getTime() - cycleStart.getTime();
+    const timePassed = Math.max(0, now.getTime() - cycleStart.getTime());
+    const idealProgress = Math.min(100, Math.max(0, (timePassed / totalDuration) * 100));
+    
+    return Math.round(idealProgress);
+  };
 
   const renderTaskPriorityBadge = (priority: string) => {
     const colors = {
@@ -391,21 +420,28 @@ export function DailyFocusCards({
                                 <div className="w-full space-y-1">
                                   <div className="relative">
                                     <Progress value={Math.min(Math.max(progress, 0), 100)} className="h-3" />
-                                    {/* Ideal target marker at 70% */}
-                                    <div 
-                                      className="absolute top-0 h-3 w-0.5 bg-orange-500 rounded-full" 
-                                      style={{ left: '70%' }}
-                                      title="Target Ideal: 70%"
-                                    />
-                                    <div 
-                                      className="absolute -top-1 w-2 h-2 bg-orange-500 rounded-full border border-white" 
-                                      style={{ left: 'calc(70% - 4px)' }}
-                                      title="Target Ideal: 70%"
-                                    />
+                                    {/* Ideal target marker based on timeline */}
+                                    {(() => {
+                                      const idealProgress = calculateIdealProgress(keyResult);
+                                      return (
+                                        <>
+                                          <div 
+                                            className="absolute top-0 h-3 w-0.5 bg-orange-500 rounded-full" 
+                                            style={{ left: `${idealProgress}%` }}
+                                            title={`Target Ideal: ${idealProgress}%`}
+                                          />
+                                          <div 
+                                            className="absolute -top-1 w-2 h-2 bg-orange-500 rounded-full border border-white" 
+                                            style={{ left: `calc(${idealProgress}% - 4px)` }}
+                                            title={`Target Ideal: ${idealProgress}%`}
+                                          />
+                                        </>
+                                      );
+                                    })()}
                                   </div>
                                   <div className="flex justify-between text-xs text-gray-500">
                                     <span>{Math.round(progress)}%</span>
-                                    <span className="text-orange-600 font-medium">Target: 70%</span>
+                                    <span className="text-orange-600 font-medium">Target: {calculateIdealProgress(keyResult)}%</span>
                                     <span>{keyResult.currentValue} / {keyResult.targetValue} {keyResult.unit}</span>
                                   </div>
                                 </div>
