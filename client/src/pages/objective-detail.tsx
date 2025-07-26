@@ -2294,6 +2294,14 @@ export default function GoalDetail() {
                 Tugas akan muncul ketika inisiatif dibuat dan dijabarkan ke
                 aktivitas operasional.
               </p>
+              <Button
+                variant="outline"
+                onClick={() => setShowTaskModal(true)}
+                className="border-purple-600 text-purple-600 hover:bg-purple-100"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Tambah Task Pertama
+              </Button>
             </div>
           ) : (
             <Card>
