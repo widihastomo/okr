@@ -370,6 +370,10 @@ function TimelineFeedComponent() {
   // State to track comments for each timeline item
   const [commentsData, setCommentsData] = useState<{[key: string]: any[]}>({});
   const [commentsLoading, setCommentsLoading] = useState<{[key: string]: boolean}>({});
+  const [showEmojiPicker, setShowEmojiPicker] = useState<{[key: string]: boolean}>({});
+
+  // Emoticons for picker
+  const emoticons = ['😊', '😄', '😆', '😍', '🥰', '😂', '🤣', '😭', '😢', '😓', '😤', '😡', '🤔', '😴', '🤯', '🥳', '🎉', '👍', '👎', '❤️', '💯', '🔥', '✨', '⚡', '💪', '🙌', '👏', '🎯', '✅', '❌', '⭐'];
 
   // Function to fetch comments for a timeline item
   const fetchCommentsForItem = async (timelineItemId: string) => {
@@ -414,6 +418,33 @@ function TimelineFeedComponent() {
     addCommentMutation.mutate({ timelineId, content });
     setCommentTexts(prev => ({ ...prev, [timelineId]: '' }));
   };
+
+  // Toggle emoji picker
+  const toggleEmojiPicker = (timelineId: string) => {
+    setShowEmojiPicker(prev => ({ ...prev, [timelineId]: !prev[timelineId] }));
+  };
+
+  // Add emoji to comment text
+  const addEmojiToComment = (timelineId: string, emoji: string) => {
+    setCommentTexts(prev => ({
+      ...prev,
+      [timelineId]: (prev[timelineId] || '') + emoji
+    }));
+    setShowEmojiPicker(prev => ({ ...prev, [timelineId]: false }));
+  };
+
+  // Close emoji picker when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest('.emoji-picker-container')) {
+        setShowEmojiPicker({});
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
 
   const toggleExpanded = (id: string) => {
     setExpandedDetails(prev => ({ ...prev, [id]: !prev[id] }));
@@ -896,30 +927,61 @@ function TimelineFeedComponent() {
                           {((user as any)?.name || (user as any)?.email || 'U').charAt(0).toUpperCase()}
                         </div>
                         
-                        <div className="flex-1 flex space-x-2">
-                          <input
-                            type="text"
-                            placeholder="Tulis komentar..."
-                            value={commentTexts[item.id] || ''}
-                            onChange={(e) => setCommentTexts(prev => ({ ...prev, [item.id]: e.target.value }))}
-                            onKeyPress={(e) => {
-                              if (e.key === 'Enter' && commentTexts[item.id]?.trim()) {
-                                handleAddComment(item.id, commentTexts[item.id]);
-                              }
-                            }}
-                            className="flex-1 text-sm px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          />
-                          <Button
-                            size="sm"
-                            onClick={() => {
-                              if (commentTexts[item.id]?.trim()) {
-                                handleAddComment(item.id, commentTexts[item.id]);
-                              }
-                            }}
-                            disabled={!commentTexts[item.id]?.trim() || addCommentMutation.isPending}
-                          >
-                            <Send className="w-3 h-3" />
-                          </Button>
+                        <div className="flex-1 space-y-2">
+                          <div className="flex space-x-2">
+                            <div className="flex-1 relative">
+                              <input
+                                type="text"
+                                placeholder="Tulis komentar..."
+                                value={commentTexts[item.id] || ''}
+                                onChange={(e) => setCommentTexts(prev => ({ ...prev, [item.id]: e.target.value }))}
+                                onKeyPress={(e) => {
+                                  if (e.key === 'Enter' && commentTexts[item.id]?.trim()) {
+                                    handleAddComment(item.id, commentTexts[item.id]);
+                                  }
+                                }}
+                                className="w-full text-sm px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              />
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => toggleEmojiPicker(item.id)}
+                                className="absolute right-1 top-1/2 transform -translate-y-1/2 p-1 h-6 w-6"
+                              >
+                                <Smile className="w-3 h-3 text-gray-500" />
+                              </Button>
+                            </div>
+                            <Button
+                              size="sm"
+                              onClick={() => {
+                                if (commentTexts[item.id]?.trim()) {
+                                  handleAddComment(item.id, commentTexts[item.id]);
+                                }
+                              }}
+                              disabled={!commentTexts[item.id]?.trim() || addCommentMutation.isPending}
+                            >
+                              <Send className="w-3 h-3" />
+                            </Button>
+                          </div>
+                          
+                          {/* Emoji Picker */}
+                          {showEmojiPicker[item.id] && (
+                            <div className="emoji-picker-container bg-white border border-gray-200 rounded-lg p-3 shadow-lg">
+                              <div className="text-xs text-gray-500 mb-2 font-medium">Pilih Emoticon:</div>
+                              <div className="grid grid-cols-8 gap-1">
+                                {emoticons.map((emoji, index) => (
+                                  <button
+                                    key={index}
+                                    onClick={() => addEmojiToComment(item.id, emoji)}
+                                    className="w-6 h-6 flex items-center justify-center hover:bg-gray-100 rounded text-sm transition-colors"
+                                    title={emoji}
+                                  >
+                                    {emoji}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
