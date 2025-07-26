@@ -450,8 +450,27 @@ The system now includes a comprehensive dummy data generation feature that creat
 * **CREDENTIALS**: System owner account (admin@refokus.com / RefokusAdmin2025!) dengan 19 application settings, 4 subscription plans, dan 8 goal templates
 * **BENEFIT**: Development server startup lebih cepat tanpa delay auto-seeder, database setup lengkap hanya ketika diperlukan
 
+## User Onboarding Reset Functionality
+
+### **ONBOARDING RESET SYSTEM IMPLEMENTED** - Complete system for clearing user onboarding data and starting fresh:
+* **CREATED**: `reset-user-onboarding.js` - Script to reset database onboarding data for specific user
+* **CREATED**: `clear-onboarding-browser.html` - Browser tool to clear localStorage onboarding data  
+* **DATABASE RESET**: Clears user tour completion status, onboarding progress records
+* **BROWSER RESET**: Removes all localStorage keys related to onboarding and tour completion
+* **COMPREHENSIVE**: Resets both server-side database records and client-side browser storage
+* **USAGE**: 
+  - `npx tsx reset-user-onboarding.js` - Reset database records for current user
+  - Open `clear-onboarding-browser.html` in browser - Clear localStorage data
+* **RESULT**: User can start completely fresh onboarding process from beginning
+
 ## Changelog
 ```
+- July 26, 2025. **ONBOARDING DATA RESET FUNCTIONALITY COMPLETED** - Successfully created comprehensive system to clear user onboarding data:
+  * CREATED: reset-user-onboarding.js script to clear database records (tour status, onboarding progress)
+  * CREATED: clear-onboarding-browser.html tool to clear all localStorage onboarding-related data  
+  * IMPLEMENTED: Complete reset of user tour completion status and onboarding progress records
+  * VERIFIED: Successfully reset current user's onboarding data - user can now start fresh onboarding process
+  * RESULT: User can completely restart onboarding flow from beginning with clean database and browser state
 - July 26, 2025. **DIRECT DASHBOARD NAVIGATION AFTER ONBOARDING COMPLETED** - Successfully implemented direct navigation to dashboard after onboarding completion per user request:
   * CHANGED: Onboarding completion flow now navigates directly to "/" using wouter navigation instead of showing completion modal
   * REMOVED: TourCompletionModal component and related state from company onboarding completion flow
