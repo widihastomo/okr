@@ -3881,7 +3881,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         createdBy: user.id,
         organizationId: user.organizationId,
         content: content.trim()
-        // Note: mentionedUsers will be added once database schema is updated
       });
 
       res.status(201).json(comment);

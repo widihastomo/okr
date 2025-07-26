@@ -339,6 +339,14 @@ PORT=5001 npm run dev
 - **ENHANCED USER INTERFACE**: Professional dual reset interface with color-coded options and detailed explanations of preserved vs deleted data
 - **INVOICE PROTECTION**: Both reset types explicitly preserve invoice history and billing data for financial record integrity
 
+## Recently Fixed Issues
+- **CRITICAL COMMENT BUG COMPLETELY FIXED** (July 26, 2025): Timeline comments not being saved bug resolved
+  * **Root Cause:** Schema mismatch between shared/schema.ts and actual database structure - mentionedUsers field existed in schema but not in database
+  * **Solution:** Removed mentionedUsers field from timelineComments schema definition and API payload
+  * **Fixed Files:** server/routes.ts (line 3879) and shared/schema.ts (line 1077)
+  * **Testing:** Verified comment creation and retrieval working with multiple test comments
+  * **Result:** Timeline comment system now fully functional with user data inclusion
+
 ## Current Issues  
 - **PERSISTENT DROPDOWN ISSUE**: Daily instant update task status dropdowns consistently fail to register clicks or onChange events despite multiple debugging approaches including native HTML select, custom buttons, visual debugging, and state management fixes. Root cause appears to be a deeper React/DOM interaction issue that requires alternative UI pattern.
 - **WORKAROUND IMPLEMENTED**: Created 4-button selection interface (Belum/Jalan/Selesai/Batal) to replace dropdown for task status changes

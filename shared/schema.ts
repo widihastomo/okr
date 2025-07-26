@@ -1074,7 +1074,6 @@ export const timelineComments = pgTable("timeline_comments", {
   timelineItemId: text("timeline_item_id").notNull(), // References timeline item ID (can be check-in or daily update)
   organizationId: uuid("organization_id").notNull().references(() => organizations.id),
   content: text("content").notNull(),
-  mentionedUsers: text("mentioned_users").array().default([]), // Array of user IDs mentioned in comment
   createdBy: uuid("created_by").notNull().references(() => users.id),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
