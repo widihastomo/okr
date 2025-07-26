@@ -6,6 +6,7 @@ import { Progress } from "@/components/ui/progress";
 import { Plus, Eye, Edit, Trash2, Target, CheckCircle, Clock, Calendar, Lightbulb, TrendingUp } from "lucide-react";
 import { Link } from "wouter";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { formatNumberWithSeparator } from "@/lib/number-utils";
 
 interface Task {
   id: number;
@@ -95,6 +96,27 @@ export function DailyFocusCards({
   userFilter,
   formatDate
 }: DailyFocusCardsProps) {
+
+  // Format value with thousand separator and rupiah formatting
+  const formatValue = (value: number, unit: string) => {
+    if (!value && value !== 0) return "0";
+    
+    // Check if unit is rupiah/currency
+    const isRupiah = unit?.toLowerCase() === "rp" || unit?.toLowerCase() === "rupiah" || unit?.toLowerCase() === "idr";
+    
+    if (isRupiah) {
+      // Format as currency with Rp prefix
+      return new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }).format(value);
+    } else {
+      // Format with thousand separator
+      return formatNumberWithSeparator(value.toString());
+    }
+  };
 
   // Calculate ideal progress based on timeline (same as objective detail page)
   const calculateIdealProgress = (keyResult: KeyResult) => {
@@ -379,7 +401,7 @@ export function DailyFocusCards({
                     {activeKeyResults
                       .filter((kr) => {
                         if (!userFilter || userFilter === 'all') return true;
-                        return kr.assignedTo === userFilter;
+                        return kr.assignedTo?.toString() === userFilter;
                       })
                       .map((keyResult) => {
                         const progress = keyResult.keyResultType === 'achieve_or_not' 
@@ -442,7 +464,14 @@ export function DailyFocusCards({
                                   <div className="flex justify-between text-xs text-gray-500">
                                     <span>{Math.round(progress)}%</span>
                                     <span className="text-orange-600 font-medium">Target: {calculateIdealProgress(keyResult)}%</span>
-                                    <span>{keyResult.currentValue} / {keyResult.targetValue} {keyResult.unit}</span>
+                                    <span>
+                                      {(() => {
+                                        const isRupiah = keyResult.unit?.toLowerCase() === "rp" || keyResult.unit?.toLowerCase() === "rupiah" || keyResult.unit?.toLowerCase() === "idr";
+                                        const currentFormatted = formatValue(keyResult.currentValue, keyResult.unit);
+                                        const targetFormatted = formatValue(keyResult.targetValue, keyResult.unit);
+                                        return isRupiah ? `${currentFormatted} / ${targetFormatted}` : `${currentFormatted} / ${targetFormatted} ${keyResult.unit}`;
+                                      })()}
+                                    </span>
                                   </div>
                                 </div>
 
@@ -501,8 +530,8 @@ export function DailyFocusCards({
                   .filter((initiative) => {
                     if (!userFilter || userFilter === 'all') return true;
                     return (
-                      initiative.assignedToUser === userFilter ||
-                      initiative.ownerId === userFilter
+                      initiative.assignedToUser?.toString() === userFilter ||
+                      initiative.ownerId?.toString() === userFilter
                     );
                   })
                   .map((initiative) => {

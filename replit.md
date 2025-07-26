@@ -452,6 +452,19 @@ The system now includes a comprehensive dummy data generation feature that creat
 
 ## Changelog
 ```
+- July 26, 2025. **THOUSAND SEPARATOR AND RUPIAH FORMATTING COMPLETED** - Successfully implemented proper number formatting for key result values in Daily Focus cards:
+  * ADDED: formatValue() function with thousand separator support using formatNumberWithSeparator utility
+  * ENHANCED: Rupiah currency formatting using Intl.NumberFormat with 'id-ID' locale and IDR currency
+  * INTEGRATED: Smart unit detection for rupiah (rp, rupiah, idr) to apply appropriate formatting
+  * CONDITIONAL: Display logic that removes duplicate unit labels when using currency formatting
+  * FIXED: TypeScript errors by properly converting number types to string for user filter comparisons
+  * RESULT: Key result values now display with proper thousand separators (1.000.000) and rupiah format (Rp 1.000.000) matching existing application standards
+- July 26, 2025. **TIMELINE-BASED IDEAL TARGET CALCULATION COMPLETED** - Successfully implemented dynamic ideal progress markers:
+  * ADDED: cycle data integration to DailyFocusCards component for timeline-based calculations
+  * REPLACED: hardcoded 70% markers with dynamic calculateIdealProgress() function
+  * ALIGNED: calculation logic matches objective detail page for consistency across application
+  * ENHANCED: orange target markers now show actual timeline progress based on cycle start/end dates
+  * RESULT: Daily Focus progress bars display accurate ideal targets that adapt to cycle timeline instead of fixed percentages
 - July 26, 2025. **KEY RESULT REDIRECT FUNCTIONALITY COMPLETED** - Successfully added navigation to detailed key result view:
   * ADDED: Link wrapper around key result title enabling click navigation to detail page (/key-results/{id})
   * ENHANCED: Title styling with hover effects (hover:text-blue-600) and cursor pointer for better UX
