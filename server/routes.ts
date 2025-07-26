@@ -5719,6 +5719,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
 
 
+  // Edit timeline comment
+  app.patch("/api/timeline/comments/:commentId", requireAuth, async (req, res) => {
+    try {
+      const { commentId } = req.params;
+      const { content } = req.body;
+      const user = req.user as User;
+
+      if (!content || !content.trim()) {
+        return res.status(400).json({ message: "Comment content is required" });
+      }
+
+      // Get existing comment to check ownership
+      const existingComment = await storage.getTimelineCommentById(commentId);
+      
+      if (!existingComment) {
+        return res.status(404).json({ message: "Comment not found" });
+      }
+
+      // Check if user owns the comment
+      if (existingComment.createdBy !== user.id && existingComment.userId !== user.id) {
+        return res.status(403).json({ message: "Unauthorized to edit this comment" });
+      }
+
+      const updatedComment = await storage.updateTimelineComment(commentId, {
+        content: content.trim(),
+        isEdited: true,
+        editedAt: new Date(),
+        updatedAt: new Date()
+      });
+
+      if (!updatedComment) {
+        return res.status(404).json({ message: "Comment not found" });
+      }
+
+      // Add user data to response
+      const commentWithUser = {
+        ...updatedComment,
+        userName: user.name,
+        userEmail: user.email
+      };
+
+      res.json(commentWithUser);
+    } catch (error) {
+      console.error("Error updating timeline comment:", error);
+      res.status(500).json({ message: "Failed to update comment" });
+    }
+  });
+
   app.delete("/api/timeline/comments/:commentId", requireAuth, async (req, res) => {
     try {
       const { commentId } = req.params;

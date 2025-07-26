@@ -287,6 +287,7 @@ export interface IStorage {
 
   // Timeline Interactions
   getTimelineComments(timelineItemId: string): Promise<TimelineComment[]>;
+  getTimelineCommentById(id: string): Promise<TimelineComment | undefined>;
   createTimelineComment(comment: InsertTimelineComment): Promise<TimelineComment>;
   updateTimelineComment(id: string, comment: Partial<InsertTimelineComment>): Promise<TimelineComment | undefined>;
   deleteTimelineComment(id: string): Promise<boolean>;
@@ -3434,6 +3435,14 @@ export class DatabaseStorage implements IStorage {
       .values(comment)
       .returning();
     return newComment;
+  }
+
+  async getTimelineCommentById(id: string): Promise<TimelineComment | undefined> {
+    const [comment] = await db
+      .select()
+      .from(timelineComments)
+      .where(eq(timelineComments.id, id));
+    return comment || undefined;
   }
 
   async updateTimelineComment(id: string, comment: Partial<InsertTimelineComment>): Promise<TimelineComment | undefined> {
