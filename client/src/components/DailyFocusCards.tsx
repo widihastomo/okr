@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import { Plus, Eye, Edit, Trash2, Target, CheckCircle, Clock, Calendar, Lightbulb, TrendingUp } from "lucide-react";
 import { Link } from "wouter";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -385,18 +386,14 @@ export function DailyFocusCards({
                                       : 'Off Track'}
                                   </Badge>
                                 </div>
-                                <p className="text-xs text-gray-600">
-                                  {keyResult.description}
-                                </p>
-                                <div className="flex items-center gap-4 text-xs text-gray-500">
-                                  <span>
-                                    Current: {keyResult.currentValue} {keyResult.unit}
-                                  </span>
-                                  <span>
-                                    Target: {keyResult.targetValue} {keyResult.unit}
-                                  </span>
-                                  <span>Progress: {Math.round(progress)}%</span>
+                                <div className="w-full space-y-1">
+                                  <Progress value={Math.min(Math.max(progress, 0), 100)} className="h-2" />
+                                  <div className="flex justify-between text-xs text-gray-500">
+                                    <span>{Math.round(progress)}%</span>
+                                    <span>{keyResult.currentValue} / {keyResult.targetValue} {keyResult.unit}</span>
+                                  </div>
                                 </div>
+
                               </div>
                               <div className="flex items-center gap-1 shrink-0">
                                 <Button
