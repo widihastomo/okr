@@ -39,7 +39,6 @@ import {
   Plus,
   ChevronsUpDown,
   Rocket,
-
   CheckCircle2,
   UserPlus,
   Users,
@@ -57,6 +56,8 @@ import {
   Smile,
   Sun,
   Activity,
+  Save,
+  X,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -406,6 +407,11 @@ function TimelineFeedComponent() {
   const [mentionSearch, setMentionSearch] = useState<{[key: string]: string}>({});
   const [mentionPosition, setMentionPosition] = useState<{[key: string]: number}>({});
 
+  // State for comment editing and dropdown menus
+  const [showCommentMenu, setShowCommentMenu] = useState<{[key: string]: boolean}>({});
+  const [editingComment, setEditingComment] = useState<string | null>(null);
+  const [editCommentText, setEditCommentText] = useState<string>('');
+
   // Fetch all comments for timeline items - API already returns grouped format
   const { data: allCommentsData = {} } = useQuery({
     queryKey: ['/api/timeline/comments'],
@@ -464,6 +470,66 @@ function TimelineFeedComponent() {
     },
     onError: (error) => {
       console.error('❌ Error adding comment:', error);
+    }
+  });
+
+  // Edit comment mutation
+  const editCommentMutation = useMutation({
+    mutationFn: async ({ commentId, content }: { commentId: string; content: string }) => {
+      const response = await apiRequest('PATCH', `/api/timeline/comments/${commentId}`, { content });
+      return response.json();
+    },
+    onSuccess: (updatedComment) => {
+      // Update local comments data
+      setCommentsData(prev => {
+        const newData = { ...prev };
+        Object.keys(newData).forEach(timelineId => {
+          newData[timelineId] = newData[timelineId].map(comment => 
+            comment.id === updatedComment.id ? updatedComment : comment
+          );
+        });
+        return newData;
+      });
+      
+      // Clear editing state
+      setEditingComment(null);
+      setEditCommentText('');
+      
+      // Invalidate queries to ensure sync
+      queryClient.invalidateQueries({ queryKey: ['/api/timeline'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/timeline/comments'] });
+      
+      console.log('✅ Comment updated successfully:', updatedComment);
+    },
+    onError: (error) => {
+      console.error('❌ Error updating comment:', error);
+    }
+  });
+
+  // Delete comment mutation
+  const deleteCommentMutation = useMutation({
+    mutationFn: async (commentId: string) => {
+      const response = await apiRequest('DELETE', `/api/timeline/comments/${commentId}`);
+      return response.json();
+    },
+    onSuccess: (_, commentId) => {
+      // Remove comment from local data
+      setCommentsData(prev => {
+        const newData = { ...prev };
+        Object.keys(newData).forEach(timelineId => {
+          newData[timelineId] = newData[timelineId].filter(comment => comment.id !== commentId);
+        });
+        return newData;
+      });
+      
+      // Invalidate queries to ensure sync
+      queryClient.invalidateQueries({ queryKey: ['/api/timeline'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/timeline/comments'] });
+      
+      console.log('✅ Comment deleted successfully');
+    },
+    onError: (error) => {
+      console.error('❌ Error deleting comment:', error);
     }
   });
 
@@ -560,7 +626,35 @@ function TimelineFeedComponent() {
     setMentionSearch(prev => ({ ...prev, [timelineItemId]: '' }));
   };
 
-  // Close emoji picker and mention dropdown when clicking outside
+  // Helper functions for comment management
+  const startEditingComment = (comment: any) => {
+    setEditingComment(comment.id);
+    setEditCommentText(comment.content);
+    setShowCommentMenu({});
+  };
+
+  const cancelEditingComment = () => {
+    setEditingComment(null);
+    setEditCommentText('');
+  };
+
+  const saveEditedComment = () => {
+    if (editingComment && editCommentText.trim()) {
+      editCommentMutation.mutate({ 
+        commentId: editingComment, 
+        content: editCommentText.trim() 
+      });
+    }
+  };
+
+  const handleDeleteComment = (commentId: string) => {
+    if (window.confirm('Apakah Anda yakin ingin menghapus komentar ini?')) {
+      deleteCommentMutation.mutate(commentId);
+    }
+    setShowCommentMenu({});
+  };
+
+  // Close emoji picker, mention dropdown, and comment menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
@@ -572,6 +666,10 @@ function TimelineFeedComponent() {
       // Don't close if clicking on mention dropdown
       if (!target.closest('.mention-dropdown-container')) {
         setShowMentionDropdown({});
+      }
+      // Don't close if clicking on comment menu
+      if (!target.closest('.comment-menu-container') && !target.closest('.comment-menu-button')) {
+        setShowCommentMenu({});
       }
     };
 
@@ -1068,13 +1166,78 @@ function TimelineFeedComponent() {
                                     <span className="text-xs font-medium text-gray-900">
                                       {comment.userName || comment.userEmail}
                                     </span>
-                                    <span className="text-xs text-gray-500">
-                                      {getTimeAgo(comment.createdAt)}
-                                    </span>
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-xs text-gray-500">
+                                        {getTimeAgo(comment.createdAt)}
+                                      </span>
+                                      {/* 3-dot menu - only show for comment creator */}
+                                      {comment.userId === user?.id && (
+                                        <div className="relative">
+                                          <button
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              setShowCommentMenu(prev => ({
+                                                ...prev,
+                                                [`${item.id}-${comment.id}`]: !prev[`${item.id}-${comment.id}`]
+                                              }));
+                                            }}
+                                            className="p-1 hover:bg-gray-200 rounded-full transition-colors"
+                                          >
+                                            <MoreVertical className="h-3 w-3 text-gray-400" />
+                                          </button>
+                                          
+                                          {showCommentMenu[`${item.id}-${comment.id}`] && (
+                                            <div className="absolute top-full right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 min-w-[120px]">
+                                              <button
+                                                onClick={() => handleEditComment(comment)}
+                                                className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                                              >
+                                                <Edit className="h-3 w-3" />
+                                                Edit
+                                              </button>
+                                              <button
+                                                onClick={() => handleDeleteComment(comment.id, item.id)}
+                                                className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                                              >
+                                                <Trash2 className="h-3 w-3" />
+                                                Hapus
+                                              </button>
+                                            </div>
+                                          )}
+                                        </div>
+                                      )}
+                                    </div>
                                   </div>
-                                  <div className="text-sm text-gray-700">
-                                    {comment.content}
-                                  </div>
+                                  {/* Show edit form if editing this comment */}
+                                  {editingComment === comment.id ? (
+                                    <div className="space-y-2">
+                                      <textarea
+                                        value={editCommentText}
+                                        onChange={(e) => setEditCommentText(e.target.value)}
+                                        className="w-full p-2 text-sm border border-gray-300 rounded resize-none focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                        rows={2}
+                                        placeholder="Edit komentar..."
+                                      />
+                                      <div className="flex items-center gap-2">
+                                        <button
+                                          onClick={() => handleSaveEditComment(comment.id, item.id)}
+                                          className="px-3 py-1 bg-orange-600 text-white text-xs rounded hover:bg-orange-700"
+                                        >
+                                          Simpan
+                                        </button>
+                                        <button
+                                          onClick={handleCancelEditComment}
+                                          className="px-3 py-1 bg-gray-300 text-gray-700 text-xs rounded hover:bg-gray-400"
+                                        >
+                                          Batal
+                                        </button>
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <div className="text-sm text-gray-700">
+                                      {comment.content}
+                                    </div>
+                                  )}
                                 </div>
                               </div>
                             </div>
