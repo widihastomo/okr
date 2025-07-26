@@ -1806,62 +1806,7 @@ export default function InitiativeDetailPage() {
       <div className="space-y-6">
         {/* Metrik Keberhasilan & Deliverables Card - Combined */}
         <Card className="border-gray-200 shadow-sm">
-            <CardHeader className="pb-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Target className="h-5 w-5 text-orange-500" />
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    Metrik Keberhasilan & Deliverables
-                  </h3>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <button
-                        type="button"
-                        className="inline-flex items-center justify-center ml-1"
-                      >
-                        <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                      </button>
-                    </PopoverTrigger>
-                    <PopoverContent side="right" className="max-w-sm">
-                      <div className="space-y-2">
-                        <h4 className="font-medium text-sm">
-                          Metrik Keberhasilan
-                        </h4>
-                        <p className="text-sm text-gray-600">
-                          Metrik keberhasilan adalah indikator kuantitatif
-                          yang digunakan untuk mengukur pencapaian inisiatif
-                          ini. Dengan menetapkan target yang jelas dan
-                          melacak progress secara berkala, Anda dapat:
-                        </p>
-                        <ul className="text-sm text-gray-600 space-y-1 list-disc pl-4">
-                          <li>
-                            Memantau kemajuan inisiatif secara objektif
-                          </li>
-                          <li>
-                            Mengevaluasi efektivitas strategi yang
-                            dijalankan
-                          </li>
-                          <li>
-                            Mengidentifikasi area yang perlu diperbaiki
-                          </li>
-                          <li>
-                            Memberikan bukti konkret pencapaian kepada
-                            stakeholder
-                          </li>
-                        </ul>
-                        <p className="text-sm text-gray-600 mt-2">
-                          <strong>Contoh:</strong> "Meningkatkan penjualan
-                          bulanan menjadi 100 unit", "Mencapai tingkat
-                          kepuasan pelanggan 85%"
-                        </p>
-                      </div>
-                    </PopoverContent>
-                  </Popover>
-                </div>
-
-              </div>
-            </CardHeader>
-            <CardContent className="pt-0">
+            <CardContent className="pt-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Success Metrics Section */}
                 <div className="lg:border-r lg:border-gray-200 lg:pr-6">
