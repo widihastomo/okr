@@ -55,7 +55,7 @@ import {
   Share2,
   Send,
   Smile,
-  LayoutDashboard,
+  Sun,
   Activity,
 } from "lucide-react";
 import {
@@ -2022,7 +2022,7 @@ export default function DailyFocusPage() {
               data-tour="daily-focus-tab"
             >
               <div className="flex items-center space-x-2">
-                <LayoutDashboard className="w-5 h-5" />
+                <Sun className="w-5 h-5" />
                 <span>Daily Focus</span>
               </div>
             </button>
