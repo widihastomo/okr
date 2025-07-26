@@ -307,10 +307,9 @@ export default function TourSystem() {
 
   console.log("TourSystemNew state:", { isActive, currentStep, totalSteps });
 
-  // Check user tour completion status and show welcome screen if needed
+  // Check onboarding completion status and show welcome screen when onboarding is completed
   useEffect(() => {
-    console.log("🔍 Company details check:", {
-      companyDetailsCompleted: localStorage.getItem("company-details-completed"),
+    console.log("🔍 Onboarding status check:", {
       onboardingCompleted: localStorage.getItem("onboarding-completed"),
       welcomeShown: localStorage.getItem("welcome-screen-shown"),
       tourStarted: localStorage.getItem("tour-started"),
@@ -321,12 +320,21 @@ export default function TourSystem() {
     console.log("🔍 Is loading:", isLoading);
     
     if (!isLoading && user) {
-      // Check if user hasn't completed the tour
-      if (!(user as any).tourCompleted) {
-        console.log("🔍 User hasn't completed tour, showing welcome screen");
+      // Check if onboarding was just completed but welcome screen hasn't been shown yet
+      const onboardingCompleted = localStorage.getItem("onboarding-completed") === "true";
+      const welcomeShown = localStorage.getItem("welcome-screen-shown") === "true";
+      const tourCompleted = (user as any).tourCompleted;
+      
+      if (onboardingCompleted && !welcomeShown && !tourCompleted) {
+        console.log("🔍 Onboarding completed, welcome screen not shown yet, and tour not completed - showing welcome screen");
         setShowWelcomeScreen(true);
+        localStorage.setItem("welcome-screen-shown", "true");
       } else {
-        console.log("🔍 User has completed tour, not showing welcome screen");
+        console.log("🔍 Not showing welcome screen:", {
+          onboardingCompleted,
+          welcomeShown,
+          tourCompleted
+        });
       }
     }
   }, [user, isLoading]);

@@ -10,6 +10,7 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -181,6 +182,9 @@ export default function WelcomeScreen({
             <Sparkles className="h-6 w-6 text-orange-500" />
             Selamat Datang di Refokus
           </DialogTitle>
+          <DialogDescription>
+            Panduan interaktif untuk memulai perjalanan produktivitas Anda
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6">
