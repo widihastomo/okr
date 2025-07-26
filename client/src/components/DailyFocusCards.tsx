@@ -6,11 +6,14 @@ import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Plus, Eye, Edit, Trash2, Target, CheckCircle, Clock, Calendar, Lightbulb, TrendingUp, BarChart3, User } from "lucide-react";
+import { Plus, Eye, Edit, Trash2, Target, CheckCircle, Clock, Calendar, Lightbulb, TrendingUp, BarChart3, User, ChevronDown, Check, MoreVertical } from "lucide-react";
 import { Link } from "wouter";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { formatNumberWithSeparator } from "@/lib/number-utils";
 import { calculateKeyResultStatus } from "@shared/status-helper";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 interface Task {
   id: number;
@@ -213,41 +216,129 @@ export function DailyFocusCards({
     );
   };
 
-  const renderTaskStatusButtons = (task: Task) => (
-    <div className="flex gap-1">
-      <Button
-        size="sm"
-        variant={task.status === 'not_started' ? 'default' : 'outline'}
-        onClick={() => onToggleTaskStatus(task.id, 'not_started')}
-        className="text-xs px-2 py-1"
-      >
-        Belum
-      </Button>
-      <Button
-        size="sm"
-        variant={task.status === 'in_progress' ? 'default' : 'outline'}
-        onClick={() => onToggleTaskStatus(task.id, 'in_progress')}
-        className="text-xs px-2 py-1"
-      >
-        Jalan
-      </Button>
-      <Button
-        size="sm"
-        variant={task.status === 'completed' ? 'default' : 'outline'}
-        onClick={() => onToggleTaskStatus(task.id, 'completed')}
-        className="text-xs px-2 py-1"
-      >
-        Selesai
-      </Button>
-      <Button
-        size="sm"
-        variant={task.status === 'cancelled' ? 'default' : 'outline'}
-        onClick={() => onToggleTaskStatus(task.id, 'cancelled')}
-        className="text-xs px-2 py-1"
-      >
-        Batal
-      </Button>
-    </div>
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+  
+  // Helper functions for task status
+  const getTaskStatusLabel = (status: string) => {
+    switch (status) {
+      case "not_started":
+        return "Belum Mulai";
+      case "in_progress":
+        return "Sedang Berjalan";
+      case "completed":
+        return "Selesai";
+      case "cancelled":
+        return "Dibatalkan";
+      default:
+        return "Tidak Diketahui";
+    }
+  };
+
+  const getTaskStatusColor = (status: string) => {
+    switch (status) {
+      case "not_started":
+        return "bg-gray-100 text-gray-800 border-gray-200";
+      case "in_progress":
+        return "bg-blue-100 text-blue-800 border-blue-200";
+      case "completed":
+        return "bg-green-100 text-green-800 border-green-200";
+      case "cancelled":
+        return "bg-red-100 text-red-800 border-red-200";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200";
+    }
+  };
+
+  // Task status update mutation
+  const updateTaskStatusMutation = useMutation({
+    mutationFn: async ({
+      taskId,
+      status,
+    }: {
+      taskId: string;
+      status: string;
+    }) => {
+      return await apiRequest("PATCH", `/api/tasks/${taskId}`, { status });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
+      toast({
+        title: "Status task berhasil diperbarui",
+        description: "Status task berhasil diperbarui",
+        variant: "default",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Gagal memperbarui status",
+        description: error.message || "Terjadi kesalahan saat memperbarui status task",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleStatusUpdate = (taskId: string, newStatus: string) => {
+    updateTaskStatusMutation.mutate({ taskId, status: newStatus });
+  };
+
+  const renderTaskStatusDropdown = (task: Task) => (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          className={`${getTaskStatusColor(task.status)} text-xs px-2 py-1 cursor-pointer hover:opacity-80 flex items-center gap-1 rounded-full border font-medium`}
+        >
+          {getTaskStatusLabel(task.status)}
+          <ChevronDown className="h-3 w-3" />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem
+          onClick={() => handleStatusUpdate(task.id.toString(), "not_started")}
+          className="cursor-pointer"
+        >
+          <div className="flex items-center gap-2">
+            {task.status === "not_started" && (
+              <Check className="h-3 w-3" />
+            )}
+            <span>Belum Mulai</span>
+          </div>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => handleStatusUpdate(task.id.toString(), "in_progress")}
+          className="cursor-pointer"
+        >
+          <div className="flex items-center gap-2">
+            {task.status === "in_progress" && (
+              <Check className="h-3 w-3" />
+            )}
+            <span>Sedang Berjalan</span>
+          </div>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => handleStatusUpdate(task.id.toString(), "completed")}
+          className="cursor-pointer"
+        >
+          <div className="flex items-center gap-2">
+            {task.status === "completed" && (
+              <Check className="h-3 w-3" />
+            )}
+            <span>Selesai</span>
+          </div>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => handleStatusUpdate(task.id.toString(), "cancelled")}
+          className="cursor-pointer"
+        >
+          <div className="flex items-center gap-2">
+            {task.status === "cancelled" && (
+              <Check className="h-3 w-3" />
+            )}
+            <span>Dibatalkan</span>
+          </div>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 
   return (
@@ -299,36 +390,38 @@ export function DailyFocusCards({
                         Terlambat ({overdueTasks.length})
                       </h4>
                       {overdueTasks.map((task) => (
-                        <div key={task.id} className="p-3 bg-red-50 border border-red-200 rounded-lg mb-2">
-                          <div className="flex items-start justify-between gap-3">
+                        <div key={task.id} className="p-2 bg-red-50 border border-red-200 rounded-lg mb-2">
+                          <div className="flex items-start justify-between gap-2">
                             <div className="flex-1 min-w-0">
                               <h3 className="text-sm font-medium text-gray-900 truncate">{task.title}</h3>
-                              <p className="text-xs text-gray-600 mb-2">{task.description}</p>
-                              <div className="flex items-center gap-2 mb-2">
+                              <p className="text-xs text-gray-600 mb-1">{task.description}</p>
+                              <div className="flex items-center gap-2 mb-1">
                                 {renderTaskPriorityBadge(task.priority)}
                                 <span className="text-xs text-red-600">
                                   Due: {formatDate(new Date(task.dueDate))}
                                 </span>
                               </div>
-                              {renderTaskStatusButtons(task)}
                             </div>
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="sm">
-                                  <Edit className="w-4 h-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent>
-                                <DropdownMenuItem onClick={() => onEditTask(task)}>
-                                  <Edit className="w-3 h-3 mr-2" />
-                                  Edit
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => onDeleteTask(task)}>
-                                  <Trash2 className="w-3 h-3 mr-2" />
-                                  Hapus
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
+                            <div className="flex items-center gap-1">
+                              {renderTaskStatusDropdown(task)}
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                                    <MoreVertical className="w-3 h-3" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent>
+                                  <DropdownMenuItem onClick={() => onEditTask(task)}>
+                                    <Edit className="w-3 h-3 mr-2" />
+                                    Edit
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => onDeleteTask(task)}>
+                                    <Trash2 className="w-3 h-3 mr-2" />
+                                    Hapus
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </div>
                           </div>
                         </div>
                       ))}
@@ -343,36 +436,38 @@ export function DailyFocusCards({
                         Hari Ini ({todayTasks.length})
                       </h4>
                       {todayTasks.map((task) => (
-                        <div key={task.id} className="p-3 bg-blue-50 border border-blue-200 rounded-lg mb-2">
-                          <div className="flex items-start justify-between gap-3">
+                        <div key={task.id} className="p-2 bg-blue-50 border border-blue-200 rounded-lg mb-2">
+                          <div className="flex items-start justify-between gap-2">
                             <div className="flex-1 min-w-0">
                               <h3 className="text-sm font-medium text-gray-900 truncate">{task.title}</h3>
-                              <p className="text-xs text-gray-600 mb-2">{task.description}</p>
-                              <div className="flex items-center gap-2 mb-2">
+                              <p className="text-xs text-gray-600 mb-1">{task.description}</p>
+                              <div className="flex items-center gap-2 mb-1">
                                 {renderTaskPriorityBadge(task.priority)}
                                 <span className="text-xs text-blue-600">
                                   Due: {formatDate(new Date(task.dueDate))}
                                 </span>
                               </div>
-                              {renderTaskStatusButtons(task)}
                             </div>
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="sm">
-                                  <Edit className="w-4 h-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent>
-                                <DropdownMenuItem onClick={() => onEditTask(task)}>
-                                  <Edit className="w-3 h-3 mr-2" />
-                                  Edit
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => onDeleteTask(task)}>
-                                  <Trash2 className="w-3 h-3 mr-2" />
-                                  Hapus
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
+                            <div className="flex items-center gap-1">
+                              {renderTaskStatusDropdown(task)}
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                                    <MoreVertical className="w-3 h-3" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent>
+                                  <DropdownMenuItem onClick={() => onEditTask(task)}>
+                                    <Edit className="w-3 h-3 mr-2" />
+                                    Edit
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => onDeleteTask(task)}>
+                                    <Trash2 className="w-3 h-3 mr-2" />
+                                    Hapus
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </div>
                           </div>
                         </div>
                       ))}
@@ -387,36 +482,38 @@ export function DailyFocusCards({
                         Besok ({tomorrowTasks.length})
                       </h4>
                       {tomorrowTasks.map((task) => (
-                        <div key={task.id} className="p-3 bg-green-50 border border-green-200 rounded-lg mb-2">
-                          <div className="flex items-start justify-between gap-3">
+                        <div key={task.id} className="p-2 bg-green-50 border border-green-200 rounded-lg mb-2">
+                          <div className="flex items-start justify-between gap-2">
                             <div className="flex-1 min-w-0">
                               <h3 className="text-sm font-medium text-gray-900 truncate">{task.title}</h3>
-                              <p className="text-xs text-gray-600 mb-2">{task.description}</p>
-                              <div className="flex items-center gap-2 mb-2">
+                              <p className="text-xs text-gray-600 mb-1">{task.description}</p>
+                              <div className="flex items-center gap-2 mb-1">
                                 {renderTaskPriorityBadge(task.priority)}
                                 <span className="text-xs text-green-600">
                                   Due: {formatDate(new Date(task.dueDate))}
                                 </span>
                               </div>
-                              {renderTaskStatusButtons(task)}
                             </div>
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="sm">
-                                  <Edit className="w-4 h-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent>
-                                <DropdownMenuItem onClick={() => onEditTask(task)}>
-                                  <Edit className="w-3 h-3 mr-2" />
-                                  Edit
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => onDeleteTask(task)}>
-                                  <Trash2 className="w-3 h-3 mr-2" />
-                                  Hapus
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
+                            <div className="flex items-center gap-1">
+                              {renderTaskStatusDropdown(task)}
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                                    <MoreVertical className="w-3 h-3" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent>
+                                  <DropdownMenuItem onClick={() => onEditTask(task)}>
+                                    <Edit className="w-3 h-3 mr-2" />
+                                    Edit
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => onDeleteTask(task)}>
+                                    <Trash2 className="w-3 h-3 mr-2" />
+                                    Hapus
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </div>
                           </div>
                         </div>
                       ))}
