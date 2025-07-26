@@ -421,7 +421,13 @@ function TimelineFeedComponent() {
 
   // Toggle emoji picker
   const toggleEmojiPicker = (timelineId: string) => {
-    setShowEmojiPicker(prev => ({ ...prev, [timelineId]: !prev[timelineId] }));
+    console.log('🎭 Toggling emoji picker for:', timelineId);
+    console.log('🎭 Current state:', showEmojiPicker);
+    setShowEmojiPicker(prev => {
+      const newState = { ...prev, [timelineId]: !prev[timelineId] };
+      console.log('🎭 New state:', newState);
+      return newState;
+    });
   };
 
   // Add emoji to comment text
@@ -945,7 +951,10 @@ function TimelineFeedComponent() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => toggleEmojiPicker(item.id)}
+                                onClick={() => {
+                                  console.log('🎭 Emoji button clicked for item:', item.id);
+                                  toggleEmojiPicker(item.id);
+                                }}
                                 className="absolute right-1 top-1/2 transform -translate-y-1/2 p-1 h-6 w-6"
                               >
                                 <Smile className="w-3 h-3 text-gray-500" />
@@ -965,23 +974,27 @@ function TimelineFeedComponent() {
                           </div>
                           
                           {/* Emoji Picker */}
-                          {showEmojiPicker[item.id] && (
-                            <div className="emoji-picker-container bg-white border border-gray-200 rounded-lg p-3 shadow-lg">
-                              <div className="text-xs text-gray-500 mb-2 font-medium">Pilih Emoticon:</div>
-                              <div className="grid grid-cols-8 gap-1">
-                                {emoticons.map((emoji, index) => (
-                                  <button
-                                    key={index}
-                                    onClick={() => addEmojiToComment(item.id, emoji)}
-                                    className="w-6 h-6 flex items-center justify-center hover:bg-gray-100 rounded text-sm transition-colors"
-                                    title={emoji}
-                                  >
-                                    {emoji}
-                                  </button>
-                                ))}
+                          {(() => {
+                            const shouldShow = showEmojiPicker[item.id];
+                            console.log(`🎭 Should show emoji picker for ${item.id}:`, shouldShow);
+                            return shouldShow && (
+                              <div className="emoji-picker-container bg-white border border-gray-200 rounded-lg p-3 shadow-lg">
+                                <div className="text-xs text-gray-500 mb-2 font-medium">Pilih Emoticon:</div>
+                                <div className="grid grid-cols-8 gap-1">
+                                  {emoticons.map((emoji, index) => (
+                                    <button
+                                      key={index}
+                                      onClick={() => addEmojiToComment(item.id, emoji)}
+                                      className="w-6 h-6 flex items-center justify-center hover:bg-gray-100 rounded text-sm transition-colors"
+                                      title={emoji}
+                                    >
+                                      {emoji}
+                                    </button>
+                                  ))}
+                                </div>
                               </div>
-                            </div>
-                          )}
+                            );
+                          })()}
                         </div>
                       </div>
                     </div>
