@@ -723,7 +723,7 @@ export function DailyFocusCards({
       {/* Kelola Inisiatif Card */}
       <Card data-tour="kelola-inisiatif-tab">
         <CardHeader>
-          <CardTitle>Kelola Inisiatif ({activeInitiatives.length})</CardTitle>
+          <CardTitle className="font-semibold tracking-tight text-[18px]">Kelola Inisiatif ({activeInitiatives.length})</CardTitle>
           <CardDescription>
             Monitor dan perbarui progress inisiatif yang sedang berjalan
           </CardDescription>
