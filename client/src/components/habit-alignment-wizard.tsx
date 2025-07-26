@@ -398,16 +398,16 @@ export default function HabitAlignmentWizard({ trigger }: HabitAlignmentWizardPr
 
           <Tabs value={currentStep.toString()} className={`w-full ${currentStep === 1 && !isOneClickMode ? 'hidden' : ''}`}>
             <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="1" disabled={currentStep < 1} className="text-sm">
-                <Target className="w-4 h-4 mr-2" />
+              <TabsTrigger value="1" disabled={currentStep < 1} className="text-base px-4 py-3">
+                <Target className="w-5 h-5 mr-2" />
                 Pilih Goals
               </TabsTrigger>
-              <TabsTrigger value="2" disabled={currentStep < 2} className="text-sm">
-                <Timer className="w-4 h-4 mr-2" />
+              <TabsTrigger value="2" disabled={currentStep < 2} className="text-base px-4 py-3">
+                <Timer className="w-5 h-5 mr-2" />
                 Preferensi
               </TabsTrigger>
-              <TabsTrigger value="3" disabled={currentStep < 3} className="text-sm">
-                <Lightbulb className="w-4 h-4 mr-2" />
+              <TabsTrigger value="3" disabled={currentStep < 3} className="text-base px-4 py-3">
+                <Lightbulb className="w-5 h-5 mr-2" />
                 Rekomendasi
               </TabsTrigger>
             </TabsList>

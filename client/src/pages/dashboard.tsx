@@ -685,7 +685,7 @@ export default function Dashboard() {
           <div className="flex space-x-8">
             <button
               onClick={() => setActiveTab("list")}
-              className={`pb-2 px-1 border-b-2 font-medium text-sm ${
+              className={`pb-3 px-4 border-b-2 font-medium text-base ${
                 activeTab === "list"
                   ? "border-orange-500 text-orange-600"
                   : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
@@ -693,13 +693,13 @@ export default function Dashboard() {
               data-tour="goals-list-view"
             >
               <div className="flex items-center space-x-2">
-                <List className="w-4 h-4" />
+                <List className="w-5 h-5" />
                 <span>List View</span>
               </div>
             </button>
             <button
               onClick={() => setActiveTab("hierarchy")}
-              className={`pb-2 px-1 border-b-2 font-medium text-sm ${
+              className={`pb-3 px-4 border-b-2 font-medium text-base ${
                 activeTab === "hierarchy"
                   ? "border-orange-500 text-orange-600"
                   : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
@@ -707,7 +707,7 @@ export default function Dashboard() {
               data-tour="goals-hierarchy-view"
             >
               <div className="flex items-center space-x-2">
-                <Network className="w-4 h-4" />
+                <Network className="w-5 h-5" />
                 <span>Hierarchy View</span>
               </div>
             </button>
