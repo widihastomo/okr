@@ -367,9 +367,11 @@ export function DailyFocusCards({
                             <div className="flex items-start justify-between gap-3">
                               <div className="flex-1 min-w-0 space-y-2">
                                 <div className="flex items-center gap-2">
-                                  <h3 className="text-sm font-medium text-gray-900 truncate">
-                                    {keyResult.title}
-                                  </h3>
+                                  <Link href={`/key-results/${keyResult.id}`}>
+                                    <h3 className="text-sm font-medium text-gray-900 truncate hover:text-blue-600 cursor-pointer transition-colors">
+                                      {keyResult.title}
+                                    </h3>
+                                  </Link>
                                   <Badge
                                     className={`text-xs ${
                                       keyResult.status === 'on_track'
