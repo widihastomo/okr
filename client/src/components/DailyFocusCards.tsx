@@ -347,7 +347,7 @@ export function DailyFocusCards({
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Task Prioritas Card */}
         <div className="flex-1">
-          <Card data-tour="task-prioritas" className="min-h-[400px] max-h-[600px] flex flex-col">
+          <Card data-tour="task-prioritas" className="min-h-[500px] max-h-[500px] flex flex-col">
             <CardHeader>
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div className="flex-1 min-w-0">
@@ -562,7 +562,7 @@ export function DailyFocusCards({
 
         {/* Update Progress Card */}
         <div className="flex-1">
-          <Card data-tour="update-progress-tab" className="min-h-[400px] max-h-[600px] flex flex-col">
+          <Card data-tour="update-progress-tab" className="min-h-[500px] max-h-[500px] flex flex-col">
             <CardHeader>
               <CardTitle>Update Progress Angka Target ({activeKeyResults.length})</CardTitle>
               <CardDescription>
