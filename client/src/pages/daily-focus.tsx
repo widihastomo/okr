@@ -1652,17 +1652,17 @@ export default function DailyFocusPage() {
 
   const activeInitiatives = filteredInitiatives.filter((init: any) => {
     // Include draft and running initiatives
-    if (init.status === "sedang_berjalan" || init.status === "draft") {
+    if (init.status === "sedang_berjalan" || init.status === "draft" || init.status === "in_progress" || init.status === "not_started") {
       return true;
     }
     
     // Include cancelled initiatives - they can be reopened
-    if (init.status === "dibatalkan") {
+    if (init.status === "dibatalkan" || init.status === "cancelled") {
       return true;
     }
     
     // Include completed initiatives if they are still within today's timeline
-    if (init.status === "selesai") {
+    if (init.status === "selesai" || init.status === "completed") {
       const dueDate = init.dueDate ? init.dueDate.split("T")[0] : null;
       const startDate = init.startDate ? init.startDate.split("T")[0] : null;
       
