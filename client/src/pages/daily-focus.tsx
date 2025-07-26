@@ -427,13 +427,26 @@ function TimelineFeedComponent() {
   // Add comment mutation
   const addCommentMutation = useMutation({
     mutationFn: async ({ timelineId, content }: { timelineId: string; content: string }) => {
-      return apiRequest('POST', `/api/timeline/${timelineId}/comments`, { content });
+      const response = await apiRequest('POST', `/api/timeline/${timelineId}/comments`, { content });
+      return response.json();
     },
-    onSuccess: (data, variables) => {
+    onSuccess: (newComment, variables) => {
+      // Immediately update local comments data with new comment
+      setCommentsData(prev => ({
+        ...prev,
+        [variables.timelineId]: [...(prev[variables.timelineId] || []), newComment]
+      }));
+      
+      // Invalidate timeline and comments queries to ensure sync
       queryClient.invalidateQueries({ queryKey: ['/api/timeline'] });
-      // Refresh comments data
-      fetchCommentsForItem(variables.timelineId);
+      queryClient.invalidateQueries({ queryKey: [`/api/timeline/${variables.timelineId}/comments`] });
+      
+      // Show success feedback
+      console.log('✅ Comment added successfully:', newComment);
     },
+    onError: (error) => {
+      console.error('❌ Error adding comment:', error);
+    }
   });
 
   // Filter timeline data
