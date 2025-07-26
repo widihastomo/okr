@@ -452,7 +452,7 @@ function TimelineFeedComponent() {
           </div>
 
           {/* Main Content Area */}
-          <div className="flex-1 lg:overflow-y-auto">
+          <div className="flex-1 lg:overflow-y-auto border-r border-gray-200">
             <div className="p-4 max-w-2xl mx-auto">
               {filteredTimeline.length === 0 ? (
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 text-center py-8 md:py-12 px-4">
@@ -820,9 +820,115 @@ function TimelineFeedComponent() {
             )}
           </div>
         )}
+            </div>
+          </div>
+
+          {/* Right Sidebar - User Activity (Desktop) */}
+          <div className="hidden lg:block lg:w-64 lg:flex-shrink-0">
+            <div className="p-4 space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Tim Activity</label>
+                <div className="text-xs text-gray-500">
+                  Update terbaru dari anggota tim
+                </div>
+              </div>
+              
+              <div className="space-y-3">
+                {(() => {
+                  // Create user activity summary from timeline data
+                  const userActivity = (users as any[]).map((user: any) => {
+                    const userTimeline = (timeline || []).filter((item: any) => 
+                      item.userId === user.id
+                    );
+                    
+                    const lastUpdate = userTimeline.length > 0 
+                      ? userTimeline.sort((a: any, b: any) => 
+                          new Date(b.updateDate || b.createdAt).getTime() - 
+                          new Date(a.updateDate || a.createdAt).getTime()
+                        )[0]
+                      : null;
+                    
+                    return {
+                      ...user,
+                      lastUpdate,
+                      updateCount: userTimeline.length
+                    };
+                  }).sort((a: any, b: any) => {
+                    // Sort by last update date (most recent first)
+                    if (!a.lastUpdate && !b.lastUpdate) return 0;
+                    if (!a.lastUpdate) return 1;
+                    if (!b.lastUpdate) return -1;
+                    return new Date(b.lastUpdate.updateDate || b.lastUpdate.createdAt).getTime() - 
+                           new Date(a.lastUpdate.updateDate || a.lastUpdate.createdAt).getTime();
+                  });
+
+                  return userActivity.map((userInfo: any) => (
+                    <div key={userInfo.id} className="flex items-start space-x-3 p-2 rounded-lg hover:bg-gray-50">
+                      <div className="flex-shrink-0">
+                        {userInfo.profileImageUrl ? (
+                          <img 
+                            src={userInfo.profileImageUrl} 
+                            alt={userInfo.name || userInfo.email}
+                            className="w-8 h-8 rounded-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-green-500 rounded-full flex items-center justify-center text-white font-semibold text-xs">
+                            {(userInfo.name || userInfo.email || 'U').charAt(0).toUpperCase()}
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-sm font-medium text-gray-900 truncate">
+                            {userInfo.name || userInfo.email}
+                          </h3>
+                          {userInfo.updateCount > 0 && (
+                            <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                              {userInfo.updateCount}
+                            </span>
+                          )}
+                        </div>
+                        
+                        {userInfo.lastUpdate ? (
+                          <div className="mt-1">
+                            <div className="text-xs text-gray-500">
+                              {new Date(userInfo.lastUpdate.updateDate || userInfo.lastUpdate.createdAt).toLocaleDateString('id-ID', {
+                                day: 'numeric',
+                                month: 'short',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}
+                            </div>
+                            <div className="text-xs text-gray-600 mt-1">
+                              {userInfo.lastUpdate.type === 'check_in' ? (
+                                <span className="flex items-center gap-1">
+                                  <div className="w-1.5 h-1.5 bg-purple-500 rounded-full"></div>
+                                  Check-in target
+                                </span>
+                              ) : (
+                                <span className="flex items-center gap-1">
+                                  <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
+                                  Update harian
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="mt-1">
+                            <div className="text-xs text-gray-400 italic">
+                              Belum ada update
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ));
+                })()}
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
       </CardContent>
     </Card>
   );
