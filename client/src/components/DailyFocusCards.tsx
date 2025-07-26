@@ -400,6 +400,17 @@ export function DailyFocusCards({
                                   Due: {formatDate(new Date(task.dueDate))}
                                 </span>
                               </div>
+                              <div className="flex items-center gap-1">
+                                <Avatar className="h-4 w-4">
+                                  <AvatarImage src={users.find((u: any) => u.id === task.assignedTo)?.profileImageUrl} />
+                                  <AvatarFallback className="bg-blue-100 text-blue-600 text-xs font-medium">
+                                    {getUserInitials(task.assignedTo?.toString())}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <span className="text-xs text-gray-600">
+                                  {getUserName(task.assignedTo?.toString())}
+                                </span>
+                              </div>
                             </div>
                             <div className="flex items-center gap-1">
                               {renderTaskStatusDropdown(task)}
@@ -445,6 +456,17 @@ export function DailyFocusCards({
                                   Due: {formatDate(new Date(task.dueDate))}
                                 </span>
                               </div>
+                              <div className="flex items-center gap-1">
+                                <Avatar className="h-4 w-4">
+                                  <AvatarImage src={users.find((u: any) => u.id === task.assignedTo)?.profileImageUrl} />
+                                  <AvatarFallback className="bg-blue-100 text-blue-600 text-xs font-medium">
+                                    {getUserInitials(task.assignedTo?.toString())}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <span className="text-xs text-gray-600">
+                                  {getUserName(task.assignedTo?.toString())}
+                                </span>
+                              </div>
                             </div>
                             <div className="flex items-center gap-1">
                               {renderTaskStatusDropdown(task)}
@@ -488,6 +510,17 @@ export function DailyFocusCards({
                                 {renderTaskPriorityBadge(task.priority)}
                                 <span className="text-xs text-green-600">
                                   Due: {formatDate(new Date(task.dueDate))}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <Avatar className="h-4 w-4">
+                                  <AvatarImage src={users.find((u: any) => u.id === task.assignedTo)?.profileImageUrl} />
+                                  <AvatarFallback className="bg-blue-100 text-blue-600 text-xs font-medium">
+                                    {getUserInitials(task.assignedTo?.toString())}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <span className="text-xs text-gray-600">
+                                  {getUserName(task.assignedTo?.toString())}
                                 </span>
                               </div>
                             </div>

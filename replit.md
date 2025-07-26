@@ -452,6 +452,19 @@ The system now includes a comprehensive dummy data generation feature that creat
 
 ## Changelog
 ```
+- July 26, 2025. **TASK PIC INFO INTEGRATION COMPLETED** - Successfully added PIC (person in charge) information to all task cards:
+  * ADDED: Avatar and name display for task assignee using existing getUserName() and getUserInitials() functions
+  * INTEGRATED: Small 4x4 avatar with blue background fallback showing user initials
+  * DISPLAYED: User name in gray text below priority and due date information
+  * APPLIED: Consistent PIC info across overdue, today, and tomorrow task sections
+  * ENHANCED: Task cards now show complete task ownership information for better accountability
+  * RESULT: Users can quickly identify who is responsible for each task without opening task details
+- July 26, 2025. **TIMEZONE CONVERSION BUG FIXED** - Successfully resolved date input issue where date 26 became date 25:
+  * IDENTIFIED: Root cause was .toISOString().split("T")[0] converting to UTC timezone causing date shift
+  * CREATED: formatDateForAPI() helper function that formats dates without timezone conversion
+  * REPLACED: UTC conversion with local timezone formatting using getFullYear(), getMonth(), getDate()
+  * FIXED: Date input now preserves user-selected date without timezone-related changes
+  * RESULT: Task creation with date 26 now correctly saves as date 26 instead of shifting to date 25
 - July 26, 2025. **TASK DISPLAY COMPACT OPTIMIZATION COMPLETED** - Successfully implemented ultra-compact task display with dropdown status and description removal:
   * REPLACED: Task status buttons with dropdown status similar to initiative detail page
   * REMOVED: Task description display from all task cards (overdue, today, tomorrow) for maximum space efficiency
