@@ -1172,7 +1172,7 @@ function TimelineFeedComponent() {
                                       </span>
                                       {/* 3-dot menu - only show for comment creator */}
                                       {comment.userId === user?.id && (
-                                        <div className="relative">
+                                        <div className="relative comment-menu-container">
                                           <button
                                             onClick={(e) => {
                                               e.stopPropagation();
@@ -1181,15 +1181,15 @@ function TimelineFeedComponent() {
                                                 [`${item.id}-${comment.id}`]: !prev[`${item.id}-${comment.id}`]
                                               }));
                                             }}
-                                            className="p-1 hover:bg-gray-200 rounded-full transition-colors"
+                                            className="p-1 hover:bg-gray-200 rounded-full transition-colors comment-menu-button"
                                           >
                                             <MoreVertical className="h-3 w-3 text-gray-400" />
                                           </button>
                                           
                                           {showCommentMenu[`${item.id}-${comment.id}`] && (
-                                            <div className="absolute top-full right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 min-w-[120px]">
+                                            <div className="absolute bottom-full right-0 mb-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 min-w-[120px] comment-menu-container">
                                               <button
-                                                onClick={() => handleEditComment(comment)}
+                                                onClick={() => startEditingComment(comment)}
                                                 className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
                                               >
                                                 <Edit className="h-3 w-3" />
@@ -1220,13 +1220,13 @@ function TimelineFeedComponent() {
                                       />
                                       <div className="flex items-center gap-2">
                                         <button
-                                          onClick={() => handleSaveEditComment(comment.id, item.id)}
+                                          onClick={saveEditedComment}
                                           className="px-3 py-1 bg-orange-600 text-white text-xs rounded hover:bg-orange-700"
                                         >
                                           Simpan
                                         </button>
                                         <button
-                                          onClick={handleCancelEditComment}
+                                          onClick={cancelEditingComment}
                                           className="px-3 py-1 bg-gray-300 text-gray-700 text-xs rounded hover:bg-gray-400"
                                         >
                                           Batal
