@@ -3883,7 +3883,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         content: content.trim()
       });
 
-      res.status(201).json(comment);
+      // Add user data to comment response for immediate UI display
+      const commentWithUser = {
+        ...comment,
+        userName: user.name,
+        userEmail: user.email
+      };
+
+      res.status(201).json(commentWithUser);
     } catch (error) {
       console.error("Error creating timeline comment:", error);
       res.status(500).json({ message: "Failed to create comment" });
