@@ -1866,52 +1866,34 @@ export default function InitiativeDetailPage() {
                 {/* Success Metrics Section */}
                 <div className="lg:border-r lg:border-gray-200 lg:pr-6">
                   <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Target className="h-4 w-4 text-orange-500" />
-                        <span className="text-sm font-medium text-gray-700">
-                          Metrik Keberhasilan
-                        </span>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <button
-                              type="button"
-                              className="inline-flex items-center justify-center ml-1"
-                            >
-                              <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                            </button>
-                          </PopoverTrigger>
-                          <PopoverContent side="right" className="max-w-sm">
-                            <div className="space-y-2">
-                              <h4 className="font-medium text-sm">
-                                Metrik Keberhasilan
-                              </h4>
-                              <p className="text-sm text-gray-600">
-                                Metrik keberhasilan adalah indikator kuantitatif untuk mengukur pencapaian inisiatif ini.
-                              </p>
-                              <p className="text-sm text-gray-600">
-                                <strong>Contoh:</strong> "Meningkatkan penjualan bulanan menjadi 100 unit", "Mencapai tingkat kepuasan pelanggan 85%"
-                              </p>
-                            </div>
-                          </PopoverContent>
-                        </Popover>
-                      </div>
-                      <Button
-                        onClick={() => {
-                          setEditingMetric(null);
-                          setIsSuccessMetricsModalOpen(true);
-                        }}
-                        size="sm"
-                        className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
-                        disabled={
-                          initiativeData.status === "selesai" ||
-                          initiativeData.status === "dibatalkan"
-                        }
-                      >
-                        <Plus className="h-4 w-4 mr-2" />
-                        <span className="hidden sm:inline">Tambah Metrik</span>
-                        <span className="sm:hidden">Metrik</span>
-                      </Button>
+                    <div className="flex items-center gap-2">
+                      <Target className="h-4 w-4 text-orange-500" />
+                      <span className="text-sm font-medium text-gray-700">
+                        Metrik Keberhasilan
+                      </span>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <button
+                            type="button"
+                            className="inline-flex items-center justify-center ml-1"
+                          >
+                            <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                          </button>
+                        </PopoverTrigger>
+                        <PopoverContent side="right" className="max-w-sm">
+                          <div className="space-y-2">
+                            <h4 className="font-medium text-sm">
+                              Metrik Keberhasilan
+                            </h4>
+                            <p className="text-sm text-gray-600">
+                              Metrik keberhasilan adalah indikator kuantitatif untuk mengukur pencapaian inisiatif ini.
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              <strong>Contoh:</strong> "Meningkatkan penjualan bulanan menjadi 100 unit", "Mencapai tingkat kepuasan pelanggan 85%"
+                            </p>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
                     </div>
                     <p className="text-xs text-gray-600 bg-orange-50 p-2 rounded border border-orange-200">
                       Indikator kuantitatif untuk mengukur <strong>seberapa baik</strong> pencapaian inisiatif ini. Contoh: penjualan 100 unit, kepuasan pelanggan 85%.
@@ -2015,65 +1997,70 @@ export default function InitiativeDetailPage() {
                       ))
                     )}
                   </div>
+
+                  {/* Add Metric Button */}
+                  <div className="pt-2">
+                    <Button
+                      onClick={() => {
+                        setEditingMetric(null);
+                        setIsSuccessMetricsModalOpen(true);
+                      }}
+                      size="sm"
+                      className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white w-full"
+                      disabled={
+                        initiativeData.status === "selesai" ||
+                        initiativeData.status === "dibatalkan"
+                      }
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      <span className="hidden sm:inline">Tambah Metrik</span>
+                      <span className="sm:hidden">Metrik</span>
+                    </Button>
+                  </div>
                 </div>
 
                 {/* Deliverables Section */}
                 <div className="lg:pl-6">
                   <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <CheckSquare className="h-4 w-4 text-green-500" />
-                        <span className="text-sm font-medium text-gray-700">
-                          Deliverables (Output Inisiatif)
-                        </span>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <button
-                              type="button"
-                              className="inline-flex items-center justify-center ml-1"
-                            >
-                              <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                            </button>
-                          </PopoverTrigger>
-                          <PopoverContent side="right" className="max-w-sm">
-                            <div className="space-y-2">
-                              <h4 className="font-medium text-sm">
-                                Deliverables / Output Inisiatif
-                              </h4>
-                              <p className="text-sm text-gray-600">
-                                Deliverables adalah hasil konkret yang harus dicapai dari inisiatif ini. 
-                                Berbeda dengan task yang merupakan aktivitas, deliverables adalah output atau produk akhir.
-                              </p>
-                              <p className="text-sm text-gray-600">
-                                <strong>Contoh Deliverables:</strong>
-                              </p>
-                              <ul className="text-sm text-gray-600 space-y-1 list-disc pl-4">
-                                <li>Laporan analisis pasar yang lengkap</li>
-                                <li>Website baru dengan fitur tertentu</li>
-                                <li>Sistem inventory yang terintegrasi</li>
-                                <li>Kampanye marketing dengan materi promosi</li>
-                                <li>Training manual untuk karyawan</li>
-                              </ul>
-                              <p className="text-sm text-gray-600">
-                                <strong>Cara Penggunaan:</strong> Centang kotak di samping deliverable ketika sudah benar-benar selesai dan siap diserahkan/digunakan.
-                              </p>
-                            </div>
-                          </PopoverContent>
-                        </Popover>
-                      </div>
-                      <Button
-                        onClick={() => setIsAddDeliverableModalOpen(true)}
-                        size="sm"
-                        className="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white"
-                        disabled={
-                          initiativeData.status === "selesai" ||
-                          initiativeData.status === "dibatalkan"
-                        }
-                      >
-                        <Plus className="h-4 w-4 mr-2" />
-                        <span className="hidden sm:inline">Tambah Deliverable</span>
-                        <span className="sm:hidden">Deliverable</span>
-                      </Button>
+                    <div className="flex items-center gap-2">
+                      <CheckSquare className="h-4 w-4 text-green-500" />
+                      <span className="text-sm font-medium text-gray-700">
+                        Deliverables (Output Inisiatif)
+                      </span>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <button
+                            type="button"
+                            className="inline-flex items-center justify-center ml-1"
+                          >
+                            <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                          </button>
+                        </PopoverTrigger>
+                        <PopoverContent side="right" className="max-w-sm">
+                          <div className="space-y-2">
+                            <h4 className="font-medium text-sm">
+                              Deliverables / Output Inisiatif
+                            </h4>
+                            <p className="text-sm text-gray-600">
+                              Deliverables adalah hasil konkret yang harus dicapai dari inisiatif ini. 
+                              Berbeda dengan task yang merupakan aktivitas, deliverables adalah output atau produk akhir.
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              <strong>Contoh Deliverables:</strong>
+                            </p>
+                            <ul className="text-sm text-gray-600 space-y-1 list-disc pl-4">
+                              <li>Laporan analisis pasar yang lengkap</li>
+                              <li>Website baru dengan fitur tertentu</li>
+                              <li>Sistem inventory yang terintegrasi</li>
+                              <li>Kampanye marketing dengan materi promosi</li>
+                              <li>Training manual untuk karyawan</li>
+                            </ul>
+                            <p className="text-sm text-gray-600">
+                              <strong>Cara Penggunaan:</strong> Centang kotak di samping deliverable ketika sudah benar-benar selesai dan siap diserahkan/digunakan.
+                            </p>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
                     </div>
                     <p className="text-xs text-gray-600 bg-green-50 p-2 rounded border border-green-200">
                       Hasil konkret yang harus <strong>diproduksi</strong> dari inisiatif ini. Contoh: laporan lengkap, website baru, sistem terintegrasi.
@@ -2213,6 +2200,23 @@ export default function InitiativeDetailPage() {
                       </p>
                     </div>
                   )}
+
+                  {/* Add Deliverable Button */}
+                  <div className="pt-2">
+                    <Button
+                      onClick={() => setIsAddDeliverableModalOpen(true)}
+                      size="sm"
+                      className="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white w-full"
+                      disabled={
+                        initiativeData.status === "selesai" ||
+                        initiativeData.status === "dibatalkan"
+                      }
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      <span className="hidden sm:inline">Tambah Deliverable</span>
+                      <span className="sm:hidden">Deliverable</span>
+                    </Button>
+                  </div>
                 </div>
               </div>
             </CardContent>
