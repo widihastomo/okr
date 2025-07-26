@@ -320,6 +320,7 @@ function TimelineFeedComponent() {
   const [expandedDetails, setExpandedDetails] = useState<Record<string, boolean>>({});
   const [showComments, setShowComments] = useState<Record<string, boolean>>({});
   const [commentTexts, setCommentTexts] = useState<Record<string, string>>({});
+  const [reactions, setReactions] = useState<Record<string, {liked: boolean, likeCount: number}>>({});
 
   // Helper function for thousand separator formatting
   const formatWithThousandSeparator = (value: string | number) => {
@@ -394,6 +395,20 @@ function TimelineFeedComponent() {
 
   const toggleComments = (id: string) => {
     setShowComments(prev => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  // Handle reaction toggle
+  const handleReactionToggle = (itemId: string) => {
+    setReactions(prev => {
+      const current = prev[itemId] || { liked: false, likeCount: 0 };
+      return {
+        ...prev,
+        [itemId]: {
+          liked: !current.liked,
+          likeCount: current.liked ? current.likeCount - 1 : current.likeCount + 1
+        }
+      };
+    });
   };
 
   if (timelineLoading) {
@@ -774,10 +789,18 @@ function TimelineFeedComponent() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="text-gray-500 hover:text-red-500 px-2 py-1"
+                        onClick={() => handleReactionToggle(item.id)}
+                        className={`px-2 py-1 transition-colors ${
+                          reactions[item.id]?.liked 
+                            ? 'text-red-500 hover:text-red-600' 
+                            : 'text-gray-500 hover:text-red-500'
+                        }`}
                       >
-                        <Heart className="w-4 h-4 mr-1" />
-                        <span className="text-xs">Suka</span>
+                        <Heart className={`w-4 h-4 mr-1 ${reactions[item.id]?.liked ? 'fill-current' : ''}`} />
+                        <span className="text-xs">
+                          {reactions[item.id]?.liked ? 'Disukai' : 'Suka'}
+                          {reactions[item.id]?.likeCount > 0 && ` (${reactions[item.id].likeCount})`}
+                        </span>
                       </Button>
                       
                       <Button
