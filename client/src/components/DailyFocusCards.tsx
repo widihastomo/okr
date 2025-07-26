@@ -347,7 +347,7 @@ export function DailyFocusCards({
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Task Prioritas Card */}
         <div className="flex-1">
-          <Card data-tour="task-prioritas">
+          <Card data-tour="task-prioritas" className="min-h-[400px] max-h-[600px] flex flex-col">
             <CardHeader>
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div className="flex-1 min-w-0">
@@ -369,7 +369,7 @@ export function DailyFocusCards({
                 </Button>
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="flex-1 overflow-y-auto">
               {isLoadingAllTasks ? (
                 <div className="space-y-4">
                   {Array.from({ length: 3 }).map((_, i) => (
@@ -562,14 +562,14 @@ export function DailyFocusCards({
 
         {/* Update Progress Card */}
         <div className="flex-1">
-          <Card data-tour="update-progress-tab">
+          <Card data-tour="update-progress-tab" className="min-h-[400px] max-h-[600px] flex flex-col">
             <CardHeader>
               <CardTitle>Update Progress Angka Target ({activeKeyResults.length})</CardTitle>
               <CardDescription>
                 Lakukan check-in pada angka target (termasuk yang sudah 100%)
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 flex-1 overflow-y-auto">
               {isLoadingObjectives ? (
                 <div className="space-y-4">
                   {Array.from({ length: 3 }).map((_, i) => (
