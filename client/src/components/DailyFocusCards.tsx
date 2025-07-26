@@ -394,7 +394,6 @@ export function DailyFocusCards({
                           <div className="flex items-start justify-between gap-2">
                             <div className="flex-1 min-w-0">
                               <h3 className="text-sm font-medium text-gray-900 truncate">{task.title}</h3>
-                              <p className="text-xs text-gray-600 mb-1">{task.description}</p>
                               <div className="flex items-center gap-2 mb-1">
                                 {renderTaskPriorityBadge(task.priority)}
                                 <span className="text-xs text-red-600">
@@ -440,7 +439,6 @@ export function DailyFocusCards({
                           <div className="flex items-start justify-between gap-2">
                             <div className="flex-1 min-w-0">
                               <h3 className="text-sm font-medium text-gray-900 truncate">{task.title}</h3>
-                              <p className="text-xs text-gray-600 mb-1">{task.description}</p>
                               <div className="flex items-center gap-2 mb-1">
                                 {renderTaskPriorityBadge(task.priority)}
                                 <span className="text-xs text-blue-600">
@@ -486,7 +484,6 @@ export function DailyFocusCards({
                           <div className="flex items-start justify-between gap-2">
                             <div className="flex-1 min-w-0">
                               <h3 className="text-sm font-medium text-gray-900 truncate">{task.title}</h3>
-                              <p className="text-xs text-gray-600 mb-1">{task.description}</p>
                               <div className="flex items-center gap-2 mb-1">
                                 {renderTaskPriorityBadge(task.priority)}
                                 <span className="text-xs text-green-600">
