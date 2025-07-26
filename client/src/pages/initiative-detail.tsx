@@ -1801,7 +1801,7 @@ export default function InitiativeDetailPage() {
           </Card>
 
           {/* Metrik Keberhasilan & Deliverables Card - Combined */}
-          <Card className="border-gray-200 shadow-sm">
+          <Card className="border-gray-200 shadow-sm lg:col-span-2">
             <CardHeader className="pb-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
