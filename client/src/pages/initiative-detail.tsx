@@ -1858,37 +1858,7 @@ export default function InitiativeDetailPage() {
                     </PopoverContent>
                   </Popover>
                 </div>
-                <div className="flex gap-2">
-                  <Button
-                    onClick={() => {
-                      setEditingMetric(null);
-                      setIsSuccessMetricsModalOpen(true);
-                    }}
-                    size="sm"
-                    className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
-                    disabled={
-                      initiativeData.status === "selesai" ||
-                      initiativeData.status === "dibatalkan"
-                    }
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    <span className="hidden sm:inline">Tambah Metrik</span>
-                    <span className="sm:hidden">Metrik</span>
-                  </Button>
-                  <Button
-                    onClick={() => setIsAddDeliverableModalOpen(true)}
-                    size="sm"
-                    className="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white"
-                    disabled={
-                      initiativeData.status === "selesai" ||
-                      initiativeData.status === "dibatalkan"
-                    }
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    <span className="hidden sm:inline">Tambah Deliverable</span>
-                    <span className="sm:hidden">Deliverable</span>
-                  </Button>
-                </div>
+
               </div>
             </CardHeader>
             <CardContent className="pt-0">
@@ -1925,6 +1895,22 @@ export default function InitiativeDetailPage() {
                         </PopoverContent>
                       </Popover>
                     </div>
+                    <Button
+                      onClick={() => {
+                        setEditingMetric(null);
+                        setIsSuccessMetricsModalOpen(true);
+                      }}
+                      size="sm"
+                      className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
+                      disabled={
+                        initiativeData.status === "selesai" ||
+                        initiativeData.status === "dibatalkan"
+                      }
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      <span className="hidden sm:inline">Tambah Metrik</span>
+                      <span className="sm:hidden">Metrik</span>
+                    </Button>
                   </div>
 
                   {/* Success Metrics List */}
@@ -2069,6 +2055,19 @@ export default function InitiativeDetailPage() {
                         </PopoverContent>
                       </Popover>
                     </div>
+                    <Button
+                      onClick={() => setIsAddDeliverableModalOpen(true)}
+                      size="sm"
+                      className="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white"
+                      disabled={
+                        initiativeData.status === "selesai" ||
+                        initiativeData.status === "dibatalkan"
+                      }
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      <span className="hidden sm:inline">Tambah Deliverable</span>
+                      <span className="sm:hidden">Deliverable</span>
+                    </Button>
                   </div>
 
                   {/* Deliverables Progress and List */}
