@@ -624,6 +624,55 @@ function TimelineFeedComponent() {
     });
   };
 
+  // Handle mention functionality for edit comment
+  const handleEditMentionTrigger = (commentId: string, inputValue: string, cursorPosition: number) => {
+    const lastAtIndex = inputValue.lastIndexOf('@', cursorPosition - 1);
+    
+    if (lastAtIndex !== -1 && (lastAtIndex === 0 || inputValue[lastAtIndex - 1] === ' ')) {
+      const searchTerm = inputValue.substring(lastAtIndex + 1, cursorPosition);
+      const spaceIndex = searchTerm.indexOf(' ');
+      
+      if (spaceIndex === -1) {
+        setMentionSearch(prev => ({ ...prev, [`edit-${commentId}`]: searchTerm }));
+        setMentionPosition(prev => ({ ...prev, [`edit-${commentId}`]: lastAtIndex }));
+        setShowMentionDropdown(prev => ({ ...prev, [`edit-${commentId}`]: true }));
+        return;
+      }
+    }
+    
+    setShowMentionDropdown(prev => ({ ...prev, [`edit-${commentId}`]: false }));
+  };
+
+  // Get filtered users for edit mention
+  const getFilteredUsersForEditMention = (commentId: string) => {
+    const search = mentionSearch[`edit-${commentId}`] || '';
+    return (users as any[])
+      .filter((user: any) => user.isActive === true)
+      .filter((user: any) => {
+        const name = user.name || user.email || '';
+        return name.toLowerCase().includes(search.toLowerCase());
+      })
+      .slice(0, 5); // Limit to 5 results
+  };
+
+  // Handle mention selection for edit comment
+  const handleEditMentionSelect = (commentId: string, selectedUser: any) => {
+    const currentText = editCommentText || '';
+    const position = mentionPosition[`edit-${commentId}`] || 0;
+    const searchTerm = mentionSearch[`edit-${commentId}`] || '';
+    
+    // Replace @search with @username
+    const beforeMention = currentText.substring(0, position);
+    const afterMention = currentText.substring(position + 1 + searchTerm.length);
+    const username = selectedUser.name || selectedUser.email;
+    const newText = beforeMention + '@' + username + ' ' + afterMention;
+    
+    setEditCommentText(newText);
+    setShowMentionDropdown(prev => ({ ...prev, [`edit-${commentId}`]: false }));
+    setMentionSearch(prev => ({ ...prev, [`edit-${commentId}`]: '' }));
+    setMentionPosition(prev => ({ ...prev, [`edit-${commentId}`]: 0 }));
+  };
+
   // Handle mention functionality
   const handleMentionTrigger = (timelineItemId: string, inputValue: string, cursorPosition: number) => {
     const lastAtIndex = inputValue.lastIndexOf('@', cursorPosition - 1);
@@ -1275,10 +1324,25 @@ function TimelineFeedComponent() {
                                       <div className="relative">
                                         <textarea
                                           value={editCommentText}
-                                          onChange={(e) => setEditCommentText(e.target.value)}
+                                          onChange={(e) => {
+                                            const value = e.target.value;
+                                            setEditCommentText(value);
+                                            
+                                            // Use a small timeout to get accurate cursor position after onChange
+                                            setTimeout(() => {
+                                              const cursorPosition = e.target.selectionStart || 0;
+                                              handleEditMentionTrigger(comment.id, value, cursorPosition);
+                                            }, 0);
+                                          }}
+                                          onKeyDown={(e) => {
+                                            // Handle escape key to close mention dropdown
+                                            if (e.key === 'Escape') {
+                                              setShowMentionDropdown(prev => ({ ...prev, [`edit-${comment.id}`]: false }));
+                                            }
+                                          }}
                                           className="w-full p-2 pr-10 text-sm border border-gray-300 rounded resize-none focus:outline-none focus:ring-2 focus:ring-orange-500"
                                           rows={2}
-                                          placeholder="Edit komentar..."
+                                          placeholder="Edit komentar... (gunakan @ untuk mention)"
                                         />
                                         <Button
                                           variant="ghost"
@@ -1308,6 +1372,40 @@ function TimelineFeedComponent() {
                                                 </button>
                                               ))}
                                             </div>
+                                          </div>
+                                        )}
+
+                                        {/* User Mention Dropdown for Edit Form - Positioned to appear above */}
+                                        {showMentionDropdown[`edit-${comment.id}`] && (
+                                          <div className="absolute bottom-full left-0 mb-2 z-50 mention-dropdown-container bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                                            <div className="text-xs text-gray-500 p-2 font-medium">Mention User:</div>
+                                            {getFilteredUsersForEditMention(comment.id).length > 0 ? (
+                                              <div className="space-y-1">
+                                                {getFilteredUsersForEditMention(comment.id).map((user: any) => (
+                                                  <button
+                                                    key={user.id}
+                                                    onClick={() => handleEditMentionSelect(comment.id, user)}
+                                                    className="w-full flex items-center space-x-2 px-3 py-2 hover:bg-gray-100 transition-colors"
+                                                  >
+                                                    <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-green-500 rounded-full flex items-center justify-center text-white font-semibold text-xs flex-shrink-0">
+                                                      {(user.name || user.email || 'U').charAt(0).toUpperCase()}
+                                                    </div>
+                                                    <div className="flex-1 text-left">
+                                                      <div className="text-sm font-medium text-gray-900">
+                                                        {user.name || user.email}
+                                                      </div>
+                                                      {user.name && (
+                                                        <div className="text-xs text-gray-500">{user.email}</div>
+                                                      )}
+                                                    </div>
+                                                  </button>
+                                                ))}
+                                              </div>
+                                            ) : (
+                                              <div className="p-3 text-xs text-gray-500 italic">
+                                                Tidak ada user ditemukan
+                                              </div>
+                                            )}
                                           </div>
                                         )}
                                       </div>
