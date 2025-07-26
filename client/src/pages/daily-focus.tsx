@@ -411,7 +411,6 @@ function TimelineFeedComponent() {
   useEffect(() => {
     if (allCommentsData && Object.keys(allCommentsData).length > 0) {
       setCommentsData(allCommentsData);
-      console.log('📊 Comments data updated:', allCommentsData);
     }
   }, [allCommentsData]);
 
@@ -982,12 +981,7 @@ function TimelineFeedComponent() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => {
-                          console.log('🔍 Comment button clicked for item:', item.id);
-                          console.log('🔍 Comments data for this item:', commentsData[item.id]);
-                          console.log('🔍 Comment count:', commentsData[item.id]?.length || 0);
-                          toggleComments(item.id);
-                        }}
+                        onClick={() => toggleComments(item.id)}
                         className="text-gray-500 hover:text-blue-500 px-2 py-1"
                       >
                         <MessageSquare className="w-4 h-4 mr-1" />
@@ -1042,7 +1036,7 @@ function TimelineFeedComponent() {
                           {((user as any)?.name || (user as any)?.email || 'U').charAt(0).toUpperCase()}
                         </div>
                         
-                        <div className="flex-1 space-y-2">
+                        <div className="flex-1 space-y-2 relative">
                           <div className="flex space-x-2">
                             <div className="flex-1 relative">
                               <input
@@ -1062,7 +1056,6 @@ function TimelineFeedComponent() {
                                 size="sm"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  console.log('🎭 Emoji button clicked for item:', item.id);
                                   toggleEmojiPicker(item.id);
                                 }}
                                 className="emoji-button absolute right-1 top-1/2 transform -translate-y-1/2 p-1 h-6 w-6"
@@ -1083,28 +1076,24 @@ function TimelineFeedComponent() {
                             </Button>
                           </div>
                           
-                          {/* Emoji Picker */}
-                          {(() => {
-                            const shouldShow = showEmojiPicker[item.id];
-                            console.log(`🎭 Should show emoji picker for ${item.id}:`, shouldShow);
-                            return shouldShow && (
-                              <div className="emoji-picker-container bg-white border border-gray-200 rounded-lg p-3 shadow-lg">
-                                <div className="text-xs text-gray-500 mb-2 font-medium">Pilih Emoticon:</div>
-                                <div className="grid grid-cols-8 gap-1">
-                                  {emoticons.map((emoji, index) => (
-                                    <button
-                                      key={index}
-                                      onClick={() => addEmojiToComment(item.id, emoji)}
-                                      className="w-6 h-6 flex items-center justify-center hover:bg-gray-100 rounded text-sm transition-colors"
-                                      title={emoji}
-                                    >
-                                      {emoji}
-                                    </button>
-                                  ))}
-                                </div>
+                          {/* Emoji Picker - Positioned to appear above */}
+                          {showEmojiPicker[item.id] && (
+                            <div className="absolute bottom-full left-0 mb-2 z-50 emoji-picker-container bg-white border border-gray-200 rounded-lg p-3 shadow-lg">
+                              <div className="text-xs text-gray-500 mb-2 font-medium">Pilih Emoticon:</div>
+                              <div className="grid grid-cols-8 gap-1">
+                                {emoticons.map((emoji, index) => (
+                                  <button
+                                    key={index}
+                                    onClick={() => addEmojiToComment(item.id, emoji)}
+                                    className="w-6 h-6 flex items-center justify-center hover:bg-gray-100 rounded text-sm transition-colors"
+                                    title={emoji}
+                                  >
+                                    {emoji}
+                                  </button>
+                                ))}
                               </div>
-                            );
-                          })()}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>

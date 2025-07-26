@@ -340,6 +340,18 @@ PORT=5001 npm run dev
 - **INVOICE PROTECTION**: Both reset types explicitly preserve invoice history and billing data for financial record integrity
 
 ## Recently Fixed Issues
+- **EMOJI PICKER POPUP POSITIONING FIXED** (July 26, 2025): Emoji picker popup now appears above input field instead of below
+  * **Enhancement:** Changed emoji picker positioning from default flow to absolute positioned above comment input
+  * **Implementation:** Added `absolute bottom-full left-0 mb-2 z-50` classes for upward positioning
+  * **Container Fix:** Added `relative` positioning to parent container for proper absolute positioning reference
+  * **UI Improvement:** Emoji picker no longer gets cut off by timeline container boundaries
+  * **Result:** Emoji picker popup now opens cleanly above comment input field with proper z-index layering
+- **COMMENT COUNT DISPLAY FIXED** (July 26, 2025): Comment count numbers now properly display on comment buttons
+  * **Root Cause:** Comments data was being fetched individually instead of bulk loading from optimized API endpoint
+  * **Solution:** Implemented centralized comments query using `/api/timeline/comments` endpoint with automatic data synchronization
+  * **Enhanced:** Added proper data transformation and React state management for comment count display
+  * **Verified:** 9 comments now properly show as "Komentar (9)" on timeline items
+  * **Result:** Comment count badges display correctly with real-time updates after new comments added
 - **CRITICAL COMMENT BUG COMPLETELY FIXED** (July 26, 2025): Timeline comments not being saved bug resolved
   * **Root Cause:** Schema mismatch between shared/schema.ts and actual database structure - mentionedUsers field existed in schema but not in database
   * **Solution:** Removed mentionedUsers field from timelineComments schema definition and API payload
