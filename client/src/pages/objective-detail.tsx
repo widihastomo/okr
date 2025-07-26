@@ -2270,14 +2270,16 @@ export default function GoalDetail() {
             </h3>
             <p className="text-purple-700 text-sm leading-relaxed">Tugas adalah aktivitas operasional yang mendukung pelaksanaan inisiatif. </p>
           </div>
-          <Button
-            variant="outline"
-            onClick={() => setShowTaskModal(true)}
-            className="border-purple-600 text-purple-600 hover:bg-purple-50 w-full md:w-auto"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Tambah Task
-          </Button>
+          {tugas.length > 0 && (
+            <Button
+              variant="outline"
+              onClick={() => setShowTaskModal(true)}
+              className="border-purple-600 text-purple-600 hover:bg-purple-50 w-full md:w-auto"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Tambah Task
+            </Button>
+          )}
         </div>
 
 
