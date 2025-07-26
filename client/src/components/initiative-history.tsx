@@ -150,13 +150,13 @@ export function InitiativeHistory({ initiativeId }: InitiativeHistoryProps) {
   }
 
   return (
-    <Card className="h-fit">
-      <CardHeader className="pb-4">
+    <Card className="h-96 flex flex-col">
+      <CardHeader className="pb-4 flex-shrink-0">
         <CardTitle className="text-lg">Riwayat Inisiatif</CardTitle>
         <CardDescription className="text-sm">Timeline aktivitas dan perubahan</CardDescription>
       </CardHeader>
-      <CardContent className="pt-0">
-        <div className="max-h-96 overflow-y-auto space-y-3">
+      <CardContent className="pt-0 flex-1 flex flex-col">
+        <div className="flex-1 overflow-y-auto space-y-3">
           {history.length > 0 ? (
             history.map((entry, index) => (
               <div key={entry.id} className="flex gap-2">
