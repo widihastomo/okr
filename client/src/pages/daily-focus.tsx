@@ -999,7 +999,9 @@ function TimelineFeedComponent() {
                       {/* Existing Comments */}
                       {commentsData[item.id]?.length > 0 && (
                         <div className="space-y-3 mb-3">
-                          {commentsData[item.id].map((comment: any) => (
+                          {commentsData[item.id]
+                            .sort((a: any, b: any) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+                            .map((comment: any) => (
                             <div key={comment.id} className="flex space-x-2">
                               <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-green-500 rounded-full flex items-center justify-center text-white font-semibold text-xs flex-shrink-0">
                                 {(comment.userName || comment.userEmail || 'U').charAt(0).toUpperCase()}

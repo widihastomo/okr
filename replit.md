@@ -340,6 +340,11 @@ PORT=5001 npm run dev
 - **INVOICE PROTECTION**: Both reset types explicitly preserve invoice history and billing data for financial record integrity
 
 ## Recently Fixed Issues
+- **COMMENT TIME SORTING IMPLEMENTED** (July 26, 2025): Comments now display in chronological order from oldest to newest
+  * **Enhancement:** Added time-based sorting to comment display using `sort()` with `createdAt` timestamps
+  * **Implementation:** Comments sorted by `new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()` for ascending chronological order
+  * **User Experience:** Comments now flow naturally from oldest at top to newest at bottom for better conversation flow
+  * **Result:** Timeline comment threads display in proper chronological sequence enhancing readability
 - **EMOJI PICKER POPUP POSITIONING FIXED** (July 26, 2025): Emoji picker popup now appears above input field instead of below
   * **Enhancement:** Changed emoji picker positioning from default flow to absolute positioned above comment input
   * **Implementation:** Added `absolute bottom-full left-0 mb-2 z-50` classes for upward positioning
