@@ -2200,7 +2200,10 @@ export default function DailyFocusPage() {
             isLoadingAllTasks={isLoadingAllTasks}
             onEditTask={handleEditTask}
             onDeleteTask={handleDeleteTask}
-            onOpenTaskModal={() => setIsTaskModalOpen(true)}
+            onOpenTaskModal={() => {
+              setSelectedTask(null);
+              setIsTaskModalOpen(true);
+            }}
             onToggleTaskStatus={handleToggleTaskStatus}
             activeKeyResults={activeKeyResults}
             isLoadingObjectives={isLoadingObjectives}
@@ -2268,20 +2271,11 @@ export default function DailyFocusPage() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {selectedTask && (
-        <TaskModal
-          open={isTaskModalOpen}
-          onOpenChange={setIsTaskModalOpen}
-          task={selectedTask}
-        />
-      )}
-
-      {!selectedTask && (
-        <TaskModal
-          open={isTaskModalOpen}
-          onOpenChange={setIsTaskModalOpen}
-        />
-      )}
+      <TaskModal
+        open={isTaskModalOpen}
+        onOpenChange={setIsTaskModalOpen}
+        task={selectedTask || undefined}
+      />
 
       {isGoalModalOpen && (
         <GoalFormModal
