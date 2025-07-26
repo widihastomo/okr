@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Plus, Eye, Edit, Trash2, Target, CheckCircle, Clock, Calendar, Lightbulb, TrendingUp, BarChart3, User } from "lucide-react";
@@ -126,6 +127,38 @@ export function DailyFocusCards({
     }
     
     return "Pengguna";
+  };
+
+  // Helper function to get user initials for avatar
+  const getUserInitials = (userId: string | null | undefined): string => {
+    if (!userId || !users) return "?";
+    const user = users.find((u: any) => u.id === userId);
+
+    // Use the consolidated name field
+    if (user?.name && user.name.trim() !== "") {
+      const nameParts = user.name.trim().split(' ');
+      if (nameParts.length >= 2) {
+        // Get first letter of first name and first letter of last name
+        return `${nameParts[0].charAt(0)}${nameParts[nameParts.length - 1].charAt(0)}`.toUpperCase();
+      } else {
+        // Just use first letter of single name
+        return nameParts[0].charAt(0).toUpperCase();
+      }
+    }
+
+    // Fallback to email first letter
+    if (user?.email) {
+      return user.email.charAt(0).toUpperCase();
+    }
+
+    return "U";
+  };
+
+  // Helper function to get key result title by ID
+  const getKeyResultTitle = (keyResultId: string | null | undefined): string => {
+    if (!keyResultId || !activeKeyResults) return "Key Result tidak ditemukan";
+    const keyResult = activeKeyResults.find((kr: any) => kr.id === keyResultId);
+    return keyResult?.title || "Key Result tidak ditemukan";
   };
 
   // Format value with thousand separator and rupiah formatting
@@ -671,7 +704,7 @@ export function DailyFocusCards({
                                       </Tooltip>
                                     </TooltipProvider>
                                     <span className="text-xs text-blue-600 font-medium">
-                                      {initiative.keyResultId}
+                                      {getKeyResultTitle(initiative.keyResultId)}
                                     </span>
                                   </div>
                                 )}
@@ -757,9 +790,14 @@ export function DailyFocusCards({
                               </div>
                             </TableCell>
                             <TableCell className="px-4 py-4">
-                              <div className="flex items-center space-x-2">
-                                <User className="w-4 h-4 text-gray-400" />
-                                <span className="text-sm text-gray-600">
+                              <div className="flex items-center space-x-3">
+                                <Avatar className="h-8 w-8">
+                                  <AvatarImage src={users.find((u: any) => u.id === (initiative.picId || initiative.createdBy))?.profileImageUrl} />
+                                  <AvatarFallback className="bg-blue-100 text-blue-600 text-xs font-medium">
+                                    {getUserInitials(initiative.picId || initiative.createdBy)}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <span className="text-sm text-gray-900 font-medium">
                                   {getUserName(initiative.picId || initiative.createdBy)}
                                 </span>
                               </div>
@@ -893,17 +931,25 @@ export function DailyFocusCards({
                         </div>
                         
                         {/* Due Date and PIC */}
-                        <div className="flex items-center justify-between text-xs text-gray-500">
-                          <span className={
+                        <div className="flex items-center justify-between">
+                          <span className={`text-xs ${
                             new Date(initiative.dueDate) < new Date()
                               ? "text-red-600 font-medium"
-                              : ""
-                          }>
+                              : "text-gray-500"
+                          }`}>
                             Due: {new Date(initiative.dueDate).toLocaleDateString("id-ID")}
                           </span>
-                          <span>
-                            PIC: {getUserName(initiative.picId || initiative.createdBy)}
-                          </span>
+                          <div className="flex items-center space-x-2">
+                            <Avatar className="h-6 w-6">
+                              <AvatarImage src={users.find((u: any) => u.id === (initiative.picId || initiative.createdBy))?.profileImageUrl} />
+                              <AvatarFallback className="bg-blue-100 text-blue-600 text-xs font-medium">
+                                {getUserInitials(initiative.picId || initiative.createdBy)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <span className="text-xs text-gray-700 font-medium">
+                              {getUserName(initiative.picId || initiative.createdBy)}
+                            </span>
+                          </div>
                         </div>
                         
                         {/* Action Buttons */}
