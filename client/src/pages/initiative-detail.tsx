@@ -1894,7 +1894,7 @@ export default function InitiativeDetailPage() {
             <CardContent className="pt-0">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Success Metrics Section */}
-                <div>
+                <div className="lg:border-r lg:border-gray-200 lg:pr-6">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
                       <Target className="h-4 w-4 text-orange-500" />
@@ -2027,7 +2027,7 @@ export default function InitiativeDetailPage() {
                 </div>
 
                 {/* Deliverables Section */}
-                <div>
+                <div className="lg:pl-6">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
                       <CheckSquare className="h-4 w-4 text-green-500" />
