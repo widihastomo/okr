@@ -837,7 +837,7 @@ function TimelineFeedComponent() {
                 {(() => {
                   // Create user activity summary from timeline data
                   const userActivity = (users as any[]).map((user: any) => {
-                    const userTimeline = (timeline || []).filter((item: any) => 
+                    const userTimeline = (timelineData || []).filter((item: any) => 
                       item.userId === user.id
                     );
                     
