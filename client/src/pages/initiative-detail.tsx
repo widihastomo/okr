@@ -1795,183 +1795,395 @@ export default function InitiativeDetailPage() {
                   </div>
                 )}
 
-                {/* Success Metrics Section */}
-                <div className="pt-4 border-t border-gray-100">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                      <Target className="h-4 w-4 text-orange-500" />
-                      <span className="text-sm font-medium text-gray-700">
-                        Metrik Keberhasilan
-                      </span>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <button
-                            type="button"
-                            className="inline-flex items-center justify-center ml-1"
-                          >
-                            <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                          </button>
-                        </PopoverTrigger>
-                        <PopoverContent side="right" className="max-w-sm">
-                          <div className="space-y-2">
-                            <h4 className="font-medium text-sm">
-                              Metrik Keberhasilan
-                            </h4>
-                            <p className="text-sm text-gray-600">
-                              Metrik keberhasilan adalah indikator kuantitatif
-                              yang digunakan untuk mengukur pencapaian inisiatif
-                              ini. Dengan menetapkan target yang jelas dan
-                              melacak progress secara berkala, Anda dapat:
-                            </p>
-                            <ul className="text-sm text-gray-600 space-y-1 list-disc pl-4">
-                              <li>
-                                Memantau kemajuan inisiatif secara objektif
-                              </li>
-                              <li>
-                                Mengevaluasi efektivitas strategi yang
-                                dijalankan
-                              </li>
-                              <li>
-                                Mengidentifikasi area yang perlu diperbaiki
-                              </li>
-                              <li>
-                                Memberikan bukti konkret pencapaian kepada
-                                stakeholder
-                              </li>
-                            </ul>
-                            <p className="text-sm text-gray-600 mt-2">
-                              <strong>Contoh:</strong> "Meningkatkan penjualan
-                              bulanan menjadi 100 unit", "Mencapai tingkat
-                              kepuasan pelanggan 85%"
-                            </p>
-                          </div>
-                        </PopoverContent>
-                      </Popover>
-                    </div>
-                    <Button
-                      onClick={() => {
-                        setEditingMetric(null);
-                        setIsSuccessMetricsModalOpen(true);
-                      }}
-                      size="sm"
-                      className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
-                      disabled={
-                        initiativeData.status === "selesai" ||
-                        initiativeData.status === "dibatalkan"
-                      }
-                    >
-                      <Plus className="h-4 w-4 mr-2" />
-                      <span className="hidden sm:inline">Tambah Metrik</span>
-                      <span className="sm:hidden">Tambah</span>
-                    </Button>
-                  </div>
 
-                  {/* Success Metrics List */}
-                  <div className="space-y-2">
-                    {successMetrics.length === 0 ? (
-                      <p className="text-sm text-gray-500 text-center py-2">
-                        Belum ada metrik keberhasilan. Tambahkan metrik pertama
-                        untuk memulai.
-                      </p>
-                    ) : (
-                      successMetrics.map((metric: any) => (
-                        <div
-                          key={metric.id}
-                          className="flex items-center justify-between p-2 bg-gray-50 rounded-lg"
-                        >
-                          <div className="flex-1">
-                            <div className="text-sm font-medium text-gray-900">
-                              {metric.name}
-                            </div>
-                            <div className="text-xs text-gray-600">
-                              Target: {metric.target}
-                            </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Success Metrics Card */}
+          <Card className="border-gray-200 shadow-sm">
+            <CardHeader className="pb-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Target className="h-5 w-5 text-orange-500" />
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Metrik Keberhasilan
+                  </h3>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button
+                        type="button"
+                        className="inline-flex items-center justify-center ml-1"
+                      >
+                        <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent side="right" className="max-w-sm">
+                      <div className="space-y-2">
+                        <h4 className="font-medium text-sm">
+                          Metrik Keberhasilan
+                        </h4>
+                        <p className="text-sm text-gray-600">
+                          Metrik keberhasilan adalah indikator kuantitatif
+                          yang digunakan untuk mengukur pencapaian inisiatif
+                          ini. Dengan menetapkan target yang jelas dan
+                          melacak progress secara berkala, Anda dapat:
+                        </p>
+                        <ul className="text-sm text-gray-600 space-y-1 list-disc pl-4">
+                          <li>
+                            Memantau kemajuan inisiatif secara objektif
+                          </li>
+                          <li>
+                            Mengevaluasi efektivitas strategi yang
+                            dijalankan
+                          </li>
+                          <li>
+                            Mengidentifikasi area yang perlu diperbaiki
+                          </li>
+                          <li>
+                            Memberikan bukti konkret pencapaian kepada
+                            stakeholder
+                          </li>
+                        </ul>
+                        <p className="text-sm text-gray-600 mt-2">
+                          <strong>Contoh:</strong> "Meningkatkan penjualan
+                          bulanan menjadi 100 unit", "Mencapai tingkat
+                          kepuasan pelanggan 85%"
+                        </p>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+                <Button
+                  onClick={() => {
+                    setEditingMetric(null);
+                    setIsSuccessMetricsModalOpen(true);
+                  }}
+                  size="sm"
+                  className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
+                  disabled={
+                    initiativeData.status === "selesai" ||
+                    initiativeData.status === "dibatalkan"
+                  }
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  <span className="hidden sm:inline">Tambah Metrik</span>
+                  <span className="sm:hidden">Tambah</span>
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-0">
+              {/* Success Metrics List */}
+              <div className="space-y-3">
+                {successMetrics.length === 0 ? (
+                  <div className="text-center py-8">
+                    <Target className="h-12 w-12 text-gray-300 mx-auto mb-3" />
+                    <p className="text-sm text-gray-500 mb-2">
+                      Belum ada metrik keberhasilan
+                    </p>
+                    <p className="text-xs text-gray-400">
+                      Tambahkan metrik untuk melacak pencapaian inisiatif
+                    </p>
+                  </div>
+                ) : (
+                  successMetrics.map((metric: any) => (
+                    <div
+                      key={metric.id}
+                      className="flex items-center justify-between p-4 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 transition-colors"
+                    >
+                      <div className="flex-1">
+                        <div className="text-sm font-semibold text-gray-900 mb-1">
+                          {metric.name}
+                        </div>
+                        <div className="text-xs text-gray-600">
+                          Target: <span className="font-medium">{metric.target}</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="text-right">
+                          <div className="text-lg font-bold text-orange-600">
+                            {metric.achievement || 0}
                           </div>
-                          <div className="flex items-center gap-2">
-                            <div className="text-sm font-medium text-orange-600">
-                              Saat ini: {metric.achievement || 0}
-                            </div>
-                            <QuickUpdateButton
-                              metric={metric}
-                              onUpdateSuccess={() => {
-                                queryClient.invalidateQueries({
-                                  queryKey: [
-                                    `/api/initiatives/${id}/success-metrics`,
-                                  ],
-                                });
-                                queryClient.invalidateQueries({
-                                  queryKey: [`/api/initiatives/${id}/history`],
-                                });
-                                queryClient.invalidateQueries({
-                                  queryKey: [`/api/initiatives/${id}`],
-                                });
-                              }}
+                          <div className="text-xs text-gray-500">saat ini</div>
+                        </div>
+                        <QuickUpdateButton
+                          metric={metric}
+                          onUpdateSuccess={() => {
+                            queryClient.invalidateQueries({
+                              queryKey: [
+                                `/api/initiatives/${id}/success-metrics`,
+                              ],
+                            });
+                            queryClient.invalidateQueries({
+                              queryKey: [`/api/initiatives/${id}/history`],
+                            });
+                            queryClient.invalidateQueries({
+                              queryKey: [`/api/initiatives/${id}`],
+                            });
+                          }}
+                          disabled={
+                            initiativeData.status === "selesai" ||
+                            initiativeData.status === "dibatalkan"
+                          }
+                        />
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 p-0 hover:bg-orange-200"
                               disabled={
                                 initiativeData.status === "selesai" ||
                                 initiativeData.status === "dibatalkan"
                               }
-                            />
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-6 w-6 p-0"
-                                  disabled={
-                                    initiativeData.status === "selesai" ||
-                                    initiativeData.status === "dibatalkan"
-                                  }
-                                >
-                                  <MoreVertical className="w-3 h-3" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuItem
-                                  onClick={() => {
-                                    // Map the metric fields to the form structure
-                                    const formattedMetric = {
-                                      id: metric.id,
-                                      name: metric.name,
-                                      target: metric.target,
-                                      achievement: metric.achievement || "0",
-                                    };
-                                    setEditingMetric(formattedMetric);
-                                    setIsSuccessMetricsModalOpen(true);
-                                  }}
-                                >
-                                  <Edit className="w-4 h-4 mr-2" />
-                                  Edit
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  onClick={() => {
-                                    setMetricToDelete(metric);
-                                    setIsDeleteMetricModalOpen(true);
-                                  }}
-                                  className="text-red-600 hover:text-red-700"
-                                >
-                                  <Trash2 className="w-4 h-4 mr-2" />
-                                  Hapus
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
+                            >
+                              <MoreVertical className="w-4 h-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                              onClick={() => {
+                                // Map the metric fields to the form structure
+                                const formattedMetric = {
+                                  id: metric.id,
+                                  name: metric.name,
+                                  target: metric.target,
+                                  achievement: metric.achievement || "0",
+                                };
+                                setEditingMetric(formattedMetric);
+                                setIsSuccessMetricsModalOpen(true);
+                              }}
+                            >
+                              <Edit className="w-4 h-4 mr-2" />
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setMetricToDelete(metric);
+                                setIsDeleteMetricModalOpen(true);
+                              }}
+                              className="text-red-600 hover:text-red-700"
+                            >
+                              <Trash2 className="w-4 h-4 mr-2" />
+                              Hapus
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Deliverables Card */}
+          <Card className="border-gray-200 shadow-sm">
+            <CardHeader className="pb-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <CheckSquare className="h-5 w-5 text-green-500" />
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Deliverables (Output Inisiatif)
+                  </h3>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button
+                        type="button"
+                        className="inline-flex items-center justify-center ml-1"
+                      >
+                        <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent side="right" className="max-w-sm">
+                      <div className="space-y-2">
+                        <h4 className="font-medium text-sm">
+                          Deliverables / Output Inisiatif
+                        </h4>
+                        <p className="text-sm text-gray-600">
+                          Deliverables adalah hasil konkret yang harus dicapai dari inisiatif ini. 
+                          Berbeda dengan task yang merupakan aktivitas, deliverables adalah output atau produk akhir.
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          <strong>Contoh Deliverables:</strong>
+                        </p>
+                        <ul className="text-sm text-gray-600 space-y-1 list-disc pl-4">
+                          <li>Laporan analisis pasar yang lengkap</li>
+                          <li>Website baru dengan fitur tertentu</li>
+                          <li>Sistem inventory yang terintegrasi</li>
+                          <li>Kampanye marketing dengan materi promosi</li>
+                          <li>Training manual untuk karyawan</li>
+                        </ul>
+                        <p className="text-sm text-gray-600">
+                          <strong>Cara Penggunaan:</strong> Centang kotak di samping deliverable ketika sudah benar-benar selesai dan siap diserahkan/digunakan.
+                        </p>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+                <Button
+                  onClick={() => setIsAddDeliverableModalOpen(true)}
+                  size="sm"
+                  className="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white"
+                  disabled={
+                    initiativeData.status === "selesai" ||
+                    initiativeData.status === "dibatalkan"
+                  }
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  <span className="hidden sm:inline">Tambah Deliverable</span>
+                  <span className="sm:hidden">Tambah</span>
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-0">
+              {definitionOfDoneItems && definitionOfDoneItems.length > 0 ? (
+                <div className="space-y-4">
+                  {/* Progress Summary */}
+                  <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="font-semibold text-green-700">
+                        Progress Deliverable
+                      </span>
+                      <span className="text-green-600 font-bold text-lg">
+                        {Math.round((definitionOfDoneItems.filter((item: any) => item.isCompleted).length / definitionOfDoneItems.length) * 100)}%
+                      </span>
+                    </div>
+                    <div className="w-full bg-green-100 rounded-full h-3 mb-2">
+                      <div 
+                        className="bg-green-500 h-3 rounded-full transition-all duration-500 ease-in-out" 
+                        style={{ 
+                          width: `${(definitionOfDoneItems.filter((item: any) => item.isCompleted).length / definitionOfDoneItems.length) * 100}%` 
+                        }}
+                      ></div>
+                    </div>
+                    <div className="text-sm text-green-600 text-center">
+                      {definitionOfDoneItems.filter((item: any) => item.isCompleted).length} dari {definitionOfDoneItems.length} deliverable selesai
+                    </div>
+                  </div>
+
+                  {/* Deliverables List */}
+                  <div className="space-y-3">
+                    {definitionOfDoneItems.map(
+                      (item: any, index: number) => (
+                        <div
+                          key={item.id || index}
+                          className={`flex items-center gap-3 p-4 rounded-lg border transition-all ${
+                            item.isCompleted 
+                              ? 'bg-green-50 border-green-200' 
+                              : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
+                          }`}
+                        >
+                          <button
+                            onClick={() => {
+                              if (
+                                initiativeData.status !== "selesai" &&
+                                initiativeData.status !== "dibatalkan"
+                              ) {
+                                toggleDoLItemMutation.mutate({
+                                  itemId: item.id,
+                                  isCompleted: !item.isCompleted,
+                                });
+                              }
+                            }}
+                            disabled={
+                              initiativeData.status === "selesai" ||
+                              initiativeData.status === "dibatalkan"
+                            }
+                            className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors hover:opacity-80 ${
+                              item.isCompleted
+                                ? "bg-green-500 border-green-500"
+                                : "border-gray-300 hover:border-green-400"
+                            } ${
+                              initiativeData.status === "selesai" ||
+                              initiativeData.status === "dibatalkan"
+                                ? "cursor-not-allowed opacity-50"
+                                : "cursor-pointer"
+                            }`}
+                          >
+                            {item.isCompleted && (
+                              <Check className="w-3 h-3 text-white" />
+                            )}
+                          </button>
+                          <div className="flex-1">
+                            <span
+                              className={`text-sm font-medium ${
+                                item.isCompleted
+                                  ? "text-green-700 line-through"
+                                  : "text-gray-700"
+                              }`}
+                            >
+                              {item.title}
+                            </span>
+                            {item.isCompleted && item.completedAt && (
+                              <div className="text-xs text-green-600 mt-1">
+                                ✓ Selesai pada {new Date(item.completedAt).toLocaleDateString("id-ID")}
+                              </div>
+                            )}
                           </div>
+                          
+                          {/* Deliverable Actions Dropdown */}
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0 hover:bg-green-200"
+                                disabled={
+                                  initiativeData.status === "selesai" ||
+                                  initiativeData.status === "dibatalkan"
+                                }
+                              >
+                                <MoreVertical className="w-4 h-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  setEditingDeliverable(item);
+                                  setIsEditDeliverableModalOpen(true);
+                                }}
+                              >
+                                <Edit className="w-4 h-4 mr-2" />
+                                Ubah
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => handleDeleteDeliverable(item)}
+                                className="text-red-600 hover:text-red-700"
+                              >
+                                <Trash2 className="w-4 h-4 mr-2" />
+                                Hapus
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </div>
-                      ))
+                      ),
                     )}
                   </div>
                 </div>
-              </div>
+              ) : (
+                <div className="text-center py-8">
+                  <CheckSquare className="h-12 w-12 text-gray-300 mx-auto mb-3" />
+                  <p className="text-sm text-gray-500 mb-2">
+                    Belum ada deliverable
+                  </p>
+                  <p className="text-xs text-gray-400">
+                    Tambahkan deliverable untuk melacak output inisiatif
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
 
           {/* Implementation & Task Management Card */}
           <Card className="border-gray-200 shadow-sm lg:col-span-2">
-            <CardHeader className="pb-3">
+            <CardHeader className="pb-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-gray-700">
-                    Rencana Eksekusi Inisiatif
-                  </span>
+                  <FileText className="h-5 w-5 text-blue-500" />
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Rencana Eksekusi & Manajemen Task
+                  </h3>
                 </div>
               </div>
             </CardHeader>
@@ -1992,186 +2204,7 @@ export default function InitiativeDetailPage() {
                   </div>
                 )}
 
-                {/* Output Section */}
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <CheckSquare className="h-4 w-4 text-green-500" />
-                      <span className="text-sm font-medium text-gray-700">
-                        Deliverables (Output Inisiatif)
-                      </span>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <button
-                            type="button"
-                            className="inline-flex items-center justify-center ml-1"
-                          >
-                            <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                          </button>
-                        </PopoverTrigger>
-                        <PopoverContent side="right" className="max-w-sm">
-                          <div className="space-y-2">
-                            <h4 className="font-medium text-sm">
-                              Deliverables / Output Inisiatif
-                            </h4>
-                            <p className="text-sm text-gray-600">
-                              Deliverables adalah hasil konkret yang harus dicapai dari inisiatif ini. 
-                              Berbeda dengan task yang merupakan aktivitas, deliverables adalah output atau produk akhir.
-                            </p>
-                            <p className="text-sm text-gray-600">
-                              <strong>Contoh Deliverables:</strong>
-                            </p>
-                            <ul className="text-sm text-gray-600 space-y-1 list-disc pl-4">
-                              <li>Laporan analisis pasar yang lengkap</li>
-                              <li>Website baru dengan fitur tertentu</li>
-                              <li>Sistem inventory yang terintegrasi</li>
-                              <li>Kampanye marketing dengan materi promosi</li>
-                              <li>Training manual untuk karyawan</li>
-                            </ul>
-                            <p className="text-sm text-gray-600">
-                              <strong>Cara Penggunaan:</strong> Centang kotak di samping deliverable ketika sudah benar-benar selesai dan siap diserahkan/digunakan.
-                            </p>
-                          </div>
-                        </PopoverContent>
-                      </Popover>
-                    </div>
-                    <Button
-                      onClick={() => setIsAddDeliverableModalOpen(true)}
-                      size="sm"
-                      className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
-                      disabled={
-                        initiativeData.status === "selesai" ||
-                        initiativeData.status === "dibatalkan"
-                      }
-                    >
-                      <Plus className="h-4 w-4 mr-2" />
-                      <span className="hidden sm:inline">Tambah Deliverable</span>
-                      <span className="sm:hidden">Tambah</span>
-                    </Button>
-                  </div>
-                  {definitionOfDoneItems && definitionOfDoneItems.length > 0 ? (
-                    <div className="bg-green-50 p-3 rounded-lg border border-green-200">
-                      {/* Progress Summary */}
-                      <div className="mb-3 pb-2 border-b border-green-200">
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="font-medium text-green-700">
-                            Progress Deliverable
-                          </span>
-                          <span className="text-green-600 font-semibold">
-                            {Math.round((definitionOfDoneItems.filter((item: any) => item.isCompleted).length / definitionOfDoneItems.length) * 100)}% 
-                            ({definitionOfDoneItems.filter((item: any) => item.isCompleted).length}/{definitionOfDoneItems.length})
-                          </span>
-                        </div>
-                        <div className="mt-2 w-full bg-green-100 rounded-full h-2">
-                          <div 
-                            className="bg-green-500 h-2 rounded-full transition-all duration-300" 
-                            style={{ 
-                              width: `${(definitionOfDoneItems.filter((item: any) => item.isCompleted).length / definitionOfDoneItems.length) * 100}%` 
-                            }}
-                          ></div>
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        {definitionOfDoneItems.map(
-                          (item: any, index: number) => (
-                            <div
-                              key={item.id || index}
-                              className="flex items-center gap-2 group"
-                            >
-                              <button
-                                onClick={() => {
-                                  if (
-                                    initiativeData.status !== "selesai" &&
-                                    initiativeData.status !== "dibatalkan"
-                                  ) {
-                                    toggleDoLItemMutation.mutate({
-                                      itemId: item.id,
-                                      isCompleted: !item.isCompleted,
-                                    });
-                                  }
-                                }}
-                                disabled={
-                                  initiativeData.status === "selesai" ||
-                                  initiativeData.status === "dibatalkan"
-                                }
-                                className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-colors hover:opacity-80 ${
-                                  item.isCompleted
-                                    ? "bg-green-500 border-green-500"
-                                    : "border-gray-300 hover:border-green-400"
-                                } ${
-                                  initiativeData.status === "selesai" ||
-                                  initiativeData.status === "dibatalkan"
-                                    ? "cursor-not-allowed opacity-50"
-                                    : "cursor-pointer"
-                                }`}
-                              >
-                                {item.isCompleted && (
-                                  <Check className="w-3 h-3 text-white" />
-                                )}
-                              </button>
-                              <span
-                                className={`text-sm flex-1 ${
-                                  item.isCompleted
-                                    ? "text-green-700 line-through"
-                                    : "text-gray-700"
-                                }`}
-                              >
-                                {item.title}
-                              </span>
-                              {item.isCompleted && item.completedAt && (
-                                <span className="text-xs text-green-600">
-                                  ✓{" "}
-                                  {new Date(
-                                    item.completedAt,
-                                  ).toLocaleDateString("id-ID")}
-                                </span>
-                              )}
-                              
-                              {/* Deliverable Actions Dropdown */}
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-6 w-6 p-0"
-                                    disabled={
-                                      initiativeData.status === "selesai" ||
-                                      initiativeData.status === "dibatalkan"
-                                    }
-                                  >
-                                    <MoreVertical className="w-3 h-3" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuItem
-                                    onClick={() => {
-                                      setEditingDeliverable(item);
-                                      setIsEditDeliverableModalOpen(true);
-                                    }}
-                                  >
-                                    <Edit className="w-4 h-4 mr-2" />
-                                    Ubah
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem
-                                    onClick={() => handleDeleteDeliverable(item)}
-                                    className="text-red-600 hover:text-red-700"
-                                  >
-                                    <Trash2 className="w-4 h-4 mr-2" />
-                                    Hapus
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </div>
-                          ),
-                        )}
-                      </div>
-                    </div>
-                  ) : (
-                    <p className="text-sm text-gray-500 text-center py-2">
-                      Belum ada deliverable. Tambahkan deliverable pertama untuk memulai.
-                    </p>
-                  )}
-                </div>
+
 
                 {/* Task Management Section */}
                 <div>
