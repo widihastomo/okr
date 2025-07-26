@@ -401,6 +401,20 @@ function TimelineFeedComponent() {
   const [commentsLoading, setCommentsLoading] = useState<{[key: string]: boolean}>({});
   const [showEmojiPicker, setShowEmojiPicker] = useState<{[key: string]: boolean}>({});
 
+  // Fetch all comments for timeline items - API already returns grouped format
+  const { data: allCommentsData = {} } = useQuery({
+    queryKey: ['/api/timeline/comments'],
+    enabled: !!user && timelineData.length > 0,
+  });
+
+  // Update local comments data when API data changes
+  useEffect(() => {
+    if (allCommentsData && Object.keys(allCommentsData).length > 0) {
+      setCommentsData(allCommentsData);
+      console.log('📊 Comments data updated:', allCommentsData);
+    }
+  }, [allCommentsData]);
+
   // Emoticons for picker
   const emoticons = ['😊', '😄', '😆', '😍', '🥰', '😂', '🤣', '😭', '😢', '😓', '😤', '😡', '🤔', '😴', '🤯', '🥳', '🎉', '👍', '👎', '❤️', '💯', '🔥', '✨', '⚡', '💪', '🙌', '👏', '🎯', '✅', '❌', '⭐'];
 
@@ -968,7 +982,12 @@ function TimelineFeedComponent() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => toggleComments(item.id)}
+                        onClick={() => {
+                          console.log('🔍 Comment button clicked for item:', item.id);
+                          console.log('🔍 Comments data for this item:', commentsData[item.id]);
+                          console.log('🔍 Comment count:', commentsData[item.id]?.length || 0);
+                          toggleComments(item.id);
+                        }}
                         className="text-gray-500 hover:text-blue-500 px-2 py-1"
                       >
                         <MessageSquare className="w-4 h-4 mr-1" />
