@@ -1171,7 +1171,7 @@ function TimelineFeedComponent() {
                                         {getTimeAgo(comment.createdAt)}
                                       </span>
                                       {/* 3-dot menu - only show for comment creator */}
-                                      {comment.userId === user?.id && (
+                                      {(comment.userId === user?.id || comment.createdBy === user?.id) && (
                                         <div className="relative comment-menu-container">
                                           <button
                                             onClick={(e) => {
@@ -1196,7 +1196,7 @@ function TimelineFeedComponent() {
                                                 Edit
                                               </button>
                                               <button
-                                                onClick={() => handleDeleteComment(comment.id, item.id)}
+                                                onClick={() => handleDeleteComment(comment.id)}
                                                 className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
                                               >
                                                 <Trash2 className="h-3 w-3" />
