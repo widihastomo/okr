@@ -452,6 +452,14 @@ The system now includes a comprehensive dummy data generation feature that creat
 
 ## Changelog
 ```
+- July 26, 2025. **DIRECT DASHBOARD NAVIGATION AFTER ONBOARDING COMPLETED** - Successfully implemented direct navigation to dashboard after onboarding completion per user request:
+  * CHANGED: Onboarding completion flow now navigates directly to "/" using wouter navigation instead of showing completion modal
+  * REMOVED: TourCompletionModal component and related state from company onboarding completion flow
+  * ENHANCED: Added success toast notification "Selamat! Onboarding berhasil diselesaikan. Selamat datang di dashboard!"
+  * SIMPLIFIED: Eliminated intermediate completion modal step for faster user experience
+  * MAINTAINED: localStorage flag setting for onboarding completion tracking
+  * IMPROVED: 1-second delay before navigation to allow toast visibility
+  * RESULT: Users now automatically navigate to dashboard immediately after onboarding completion without additional modal interactions
 - July 26, 2025. **MOBILE TOUR SIDEBAR EXPANSION BUG FIXED** - Successfully resolved mobile tour step navigation issue where sidebar wasn't expanding properly:
   * FIXED: Updated isMenuStep function to remove obsolete "timeline" reference and include correct current menu step IDs
   * ENHANCED: Modified nextStep function to properly handle mobile sidebar expansion before proceeding to menu steps

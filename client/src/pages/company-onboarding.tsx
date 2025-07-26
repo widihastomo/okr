@@ -95,7 +95,7 @@ import { type CompanyOnboardingData } from "@shared/schema";
 import { useTour } from "@/hooks/useTour";
 import { KeyResultModal } from "@/components/goal-form-modal";
 import EditCycleModal from "@/components/edit-cycle-modal";
-import TourCompletionModal from "@/components/TourCompletionModal";
+
 import WelcomeScreen from "@/components/WelcomeScreen";
 
 // Onboarding steps following the reference structure
@@ -225,7 +225,6 @@ export default function CompanyOnboarding() {
     keyResult: any;
   }>({ open: false, index: -1, keyResult: null });
   const [editCycleModal, setEditCycleModal] = useState(false);
-  const [showCompletionModal, setShowCompletionModal] = useState(false);
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
 
   // Separate states for individual editing
@@ -1233,15 +1232,24 @@ export default function CompanyOnboarding() {
       return apiRequest("POST", "/api/onboarding/complete", { onboardingData });
     },
     onSuccess: () => {
-      // Set onboarding completed flag to trigger welcome screen flow
+      // Set onboarding completed flag
       localStorage.setItem("onboarding-completed", "true");
 
       // Immediate cache invalidation
       queryClient.invalidateQueries({ queryKey: ["/api/onboarding/status"] });
       queryClient.invalidateQueries({ queryKey: ["/api/onboarding/progress"] });
 
-      // Show completion modal instead of immediate navigation
-      setShowCompletionModal(true);
+      // Show success toast
+      toast({
+        title: "Selamat!",
+        description: "Onboarding berhasil diselesaikan. Selamat datang di dashboard!",
+        variant: "default",
+      });
+
+      // Direct navigation to dashboard using wouter
+      setTimeout(() => {
+        navigate("/");
+      }, 1000);
     },
     onError: (error) => {
       toast({
@@ -1283,7 +1291,7 @@ export default function CompanyOnboarding() {
   const welcomeScreenData = {
     title: "",
     description:
-      "Tim hebat bukan hanya tentang kerja keras, tapi tentang kerja yang selaras dan terarah. Refokus hadir untuk menyelaraskan tujuan, waktu, dan tindakan tim agar benar-benar bergerak menuju tujuan.",
+      "Tim hebat bukan hanya tentang kerja keras, tapi tentang kerja yang selaras, terarah, dan bersama - sama mendayung menuju tujuan yang sama. ",
     icon: Sparkles,
   };
 
@@ -1896,7 +1904,7 @@ export default function CompanyOnboarding() {
                         </div>
                       </div>
                       <p className="text-gray-300 mb-2 md:mb-3 text-base md:text-lg">
-                        Apa yang ingin dicapai dalam 3-12 bulan ke depan
+                        Apa yang ingin dicapai dalam kurun waktu tertentu
                       </p>
                       <div className="bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg md:rounded-xl p-2 md:p-3 border-l-4 border-orange-400 shadow-md">
                         <div className="flex items-center space-x-2 mb-2">
@@ -2881,7 +2889,7 @@ export default function CompanyOnboarding() {
     }
 
     const stepMessages = {
-      0: `Selamat datang di Refokus! Platform ini dirancang khusus untuk menyelaraskan visi, strategi, dan eksekusi tim Anda dengan pendekatan OKR (Objectives and Key Results). Mari kita mulai perjalanan transformasi bisnis Anda bersama-sama. 🚀`,
+      0: `Selamat datang di Refokus! Platform ini dirancang khusus untuk menyelaraskan visi, strategi, dan eksekusi dalam organisasi Anda. Mari kita mulai perjalanan transformasi bisnis Anda bersama-sama. 🚀`,
     };
 
     return stepMessages[0] || null;
@@ -3751,22 +3759,7 @@ export default function CompanyOnboarding() {
         }}
       />
 
-      {/* Tour Completion Modal */}
-      <TourCompletionModal
-        isOpen={showCompletionModal}
-        onClose={() => {
-          setShowCompletionModal(false);
-          // Start the tour system after closing completion modal
-          startTour();
-          // Navigate to dashboard
-          setTimeout(() => {
-            setIsRedirecting(true);
-            setTimeout(() => {
-              navigate("/");
-            }, 1000);
-          }, 500);
-        }}
-      />
+
 
       {/* Welcome Screen Modal */}
       <WelcomeScreen
